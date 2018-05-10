@@ -31,6 +31,7 @@ endif()
 find_package(Threads REQUIRED)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+find_package(Qt5Core 5.10.0 REQUIRED)
 find_package(BioGears REQUIRED)
 
 if (ARA_${PREFIX}_BUILD_STATIC)
@@ -55,8 +56,8 @@ add_source_files(SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src "*.c" "Sources\\")
 add_source_files(PUBLIC_HDRS ${CMAKE_CURRENT_SOURCE_DIR}/include "*.h"  "Headers\\Public\\")
 add_source_files(PUBLIC_HDRS ${CMAKE_CURRENT_SOURCE_DIR}/include "*.hpp"  "Headers\\Public\\")
 
-set(LIB${PREFIX}_HEADERS ${HDRS} ${PUBLIC_HDRS} ${GEN_HDRS})
-set(LIB${PREFIX}_SOURCES ${SRCS} ${GEN_SRCS})
+set(${PREFIX}_HEADERS ${HDRS} ${PUBLIC_HDRS} ${GEN_HDRS})
+set(${PREFIX}_SOURCES ${SRCS} ${GEN_SRCS})
 
 ###############################################################################
 #Define Logic
@@ -74,7 +75,7 @@ if (ARA_${PREFIX}_BUILD_STATIC)
   add_definitions("-D${PREFIX}_BUILT_AS_STATIC")
 endif()
 
-add_executable(${PROJECT_NAME} STATIC ${LIB${PREFIX}_SOURCES} ${LIB${PREFIX}_HEADERS})
+add_executable(${PROJECT_NAME} ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS})
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
   DEFINE_SYMBOL ${PROJECT_NAME}_EXPORTS
@@ -106,8 +107,6 @@ list(APPEND ${PREFIX}_INCLUDES
       ${PREFIX}_GENERATED_INCLUDE_DIR
       BioGears_INCLUDE_DIRS
       Boost_INCLUDE_DIRS
-      Eigen3_INCLUDE_DIRS
-      Log4cpp_INCLUDE_DIRS
 )
 if(ARA_${PROJECT_NAME}_BUILD_JAVATOOLS)
   list(APPEND ${PREFIX}_INCLUDES   Java_JAVA_INCLUDE_DIRS )
@@ -123,8 +122,6 @@ set(${PREFIX}_LIBS
       ${CMAKE_DL_LIBS}
       ${BioGears_LIBRARIES}
       ${Boost_LIBRARIES}
-      ${EIGEN_LIBRARIES}
-      ${Log4cpp_LIBRARIES}
       ${CodeSynthesis_LIBRARIES}
 )
 set(${PREFIX}_LIBS ${${PREFIX}_LIBS} PARENT_SCOPE)

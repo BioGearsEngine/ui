@@ -42,4 +42,3 @@ endif()
 
 add_subdirectory(ui)
 
-endif()

@@ -28,7 +28,7 @@ if(WIN32)
 find_library(BioGears_String_LIBRARY_RELEASE NAMES
     biogears_string
     libbiogears_string
-  HINT ${BioGears_INCLUDE_DIR}
+  HINTS ${BioGears_INCLUDE_DIR}/../lib/
   PATH_SUFFIX  release 
   DOC "BioGears Release Library. Prefered over DLL"
 )
@@ -38,7 +38,7 @@ find_library(BioGears_String_LIBRARY_DEBUG NAMES
     libbiogears_string_d
     biogears_string
     libbiogears_string
-  HINT ${BioGears_INCLUDE_DIR}
+  HINTS ${BioGears_INCLUDE_DIR}/../lib/
   PATH_SUFFIX  debug
   DOC "BioGears Debug Library. Prefered over DLL"
 )
@@ -48,7 +48,7 @@ endif()
 find_library(BioGears_CDM_LIBRARY_RELEASE NAMES
     biogears_cdm
     libbiogears_cdm
-  HINT ${BioGears_INCLUDE_DIR}
+  HINTS ${BioGears_INCLUDE_DIR}/../lib/
   PATH_SUFFIX  release
   DOC "BioGears Release Library. Prefered over DLL"
 )
@@ -58,7 +58,7 @@ find_library(BioGears_CDM_LIBRARY_DEBUG NAMES
     libbiogears_cdm_d
     biogears_cdm
     libbiogears_cdm
-  HINT ${BioGears_INCLUDE_DIR}
+  HINTS ${BioGears_INCLUDE_DIR}/../lib/
   PATH_SUFFIX  debug
   DOC "BioGears Debug Library. Prefered over DLL"
 )
@@ -66,7 +66,7 @@ find_library(BioGears_CDM_LIBRARY_DEBUG NAMES
 find_library(BioGears_LIBRARY_RELEASE NAMES
     biogears
     libbiogears
-  HINT ${BioGears_INCLUDE_DIR}
+  HINTS ${BioGears_INCLUDE_DIR}/../lib/
   PATH_SUFFIX  release
   DOC "BioGears Release Library. Prefered over DLL"
 )
@@ -76,7 +76,7 @@ find_library(BioGears_LIBRARY_DEBUG NAMES
     libbiogears_d
     biogears
     libbiogears
-  HINT ${BioGears_INCLUDE_DIR}
+  HINTS ${BioGears_INCLUDE_DIR}/../lib/
   PATH_SUFFIX  debug
   DOC "BioGears Debug Library. Prefered over DLL"
 )
@@ -89,10 +89,10 @@ include(FindPackageHandleStandardArgs)
 if(WIN32)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(BioGears
                                   REQUIRED_VARS 
-                                                BioGears_LIBRARY_String_DEBUG 
-                                                BioGears_LIBRARY_String_RELEASE 
-                                                BioGears_LIBRARY_CDM_DEBUG 
-                                                BioGears_LIBRARY_CDM_RELEASE 
+                                                BioGears_String_LIBRARY_DEBUG 
+                                                BioGears_String_LIBRARY_RELEASE 
+                                                BioGears_CDM_LIBRARY_DEBUG 
+                                                BioGears_CDM_LIBRARY_RELEASE 
                                                 BioGears_LIBRARY_DEBUG 
                                                 BioGears_LIBRARY_RELEASE 
                                                 BioGears_INCLUDE_DIR
@@ -100,25 +100,24 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(BioGears
 else()
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(BioGears
                                   REQUIRED_VARS 
-                                                BioGears_LIBRARY_CDM_DEBUG 
-                                                BioGears_LIBRARY_CDM_RELEASE 
+                                                BioGears_CDM_LIBRARY_DEBUG 
+                                                BioGears_CDM_LIBRARY_RELEASE 
                                                 BioGears_LIBRARY_DEBUG 
                                                 BioGears_LIBRARY_RELEASE 
                                                 BioGears_INCLUDE_DIR
                                  )
 
 endif()
-
 if(BioGears_FOUND)
   if(WIN32)
     set(BioGears_LIBRARIES 
-           optimized ${BioGears_LIBRARY_String_RELEASE} debug ${BioGears_String_LIBRARY_DEBUG}
-           optimized ${BioGears_LIBRARY_CDM_RELEASE} debug ${BioGears_CDM_LIBRARY_DEBUG}
+           optimized ${BioGears_String_LIBRARY_RELEASE} debug ${BioGears_String_LIBRARY_DEBUG}
+           optimized ${BioGears_CDM_LIBRARY_RELEASE} debug ${BioGears_CDM_LIBRARY_DEBUG}
            optimized ${BioGears_LIBRARY_RELEASE} debug ${BioGears_LIBRARY_DEBUG}
            )
   else()
     set(BioGears_LIBRARIES 
-           optimized ${BioGears_LIBRARY_CDM_RELEASE} debug ${BioGears_CDM_LIBRARY_DEBUG}
+           optimized ${BioGears_CDM_LIBRARY_RELEASE} debug ${BioGears_CDM_LIBRARY_DEBUG}
            optimized ${BioGears_LIBRARY_RELEASE} debug ${BioGears_LIBRARY_DEBUG}
            )
   endif()
