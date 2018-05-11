@@ -1,6 +1,18 @@
 #include <main.h>
 
-int main(int argc, char* argv[])
+#include <QCoreApplication>
+#include <QApplication>
+#include <QPushButton>
+
+#include <QDebug>
+
+int main( int argc, char * argv[] )
 {
-  return 1;
+ QApplication app (argc, argv);
+
+ QPushButton button ("Hello world !");
+ button.show();
+
+ return app.exec();
 }
+
