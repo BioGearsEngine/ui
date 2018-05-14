@@ -108,6 +108,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(BioGears
                                  )
 
 endif()
+
 if(BioGears_FOUND)
   if(WIN32)
     set(BioGears_LIBRARIES 
@@ -125,4 +126,6 @@ if(BioGears_FOUND)
   mark_as_advanced(BioGears_LIBRARY_DEBUG)
   mark_as_advanced(BioGears_LIBRARY_RELEASE)
   mark_as_advanced(BioGears_INCLUDE_DIR)
+else()
+ message(FATAL_ERROR "BioGears was not found. You can use BioGears_INCLUDE_DIR as a HINT to where the Biogears libraries are located") 
 endif()

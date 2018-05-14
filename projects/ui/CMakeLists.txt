@@ -120,7 +120,7 @@ endforeach()
 set(${PREFIX}_LIBS
       ${CMAKE_THREAD_LIBS_INIT}
       ${CMAKE_DL_LIBS}
-      ${BioGears_LIBRARIES}
+      #${BioGears_LIBRARIES}
       ${Boost_LIBRARIES}
       ${CodeSynthesis_LIBRARIES}
       Qt5::Widgets
