@@ -32,6 +32,7 @@ find_package(Threads REQUIRED)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(Qt5Widgets 5.10.0 REQUIRED)
+find_package(Qt5Charts 5.10.0 REQUIRED)
 find_package(BioGears REQUIRED)
 
 if (ARA_${PREFIX}_BUILD_STATIC)
@@ -124,6 +125,7 @@ set(${PREFIX}_LIBS
       ${Boost_LIBRARIES}
       ${CodeSynthesis_LIBRARIES}
       Qt5::Widgets
+	  Qt5::Charts
 )
 set(${PREFIX}_LIBS ${${PREFIX}_LIBS} PARENT_SCOPE)
 target_link_libraries(${PROJECT_NAME}  ${${PREFIX}_LIBS} )
