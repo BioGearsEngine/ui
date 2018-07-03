@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.8.0)
-
-enable_language(CXX)
-
 ###############################################################################
 # Step 1: Some packages need to be configured globally to ensure they find the 
 #         right library all others should be called in the respective projects
@@ -39,6 +35,11 @@ endif()
 # Step 2: Project Includes are generally order dependent.  So manually maintain
 #         this list
 ###############################################################################
-
+option (Boost_USE_STATIC_LIBS "Toggle this option to allow static libraries" ON)
+if(WIN32)
+  set(Boost_USE_MULTITHREADED      ON)
+  set(Boost_USE_STATIC_RUNTIME    OFF)
+endif()
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 add_subdirectory(ui)
 
