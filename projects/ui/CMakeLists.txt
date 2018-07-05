@@ -25,7 +25,7 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
 find_package(Qt5Widgets 5.10.0 CONFIG REQUIRED)
 find_package(Qt5Charts 5.10.0 CONFIG REQUIRED)
-find_package(BioGears REQUIRED)
+find_package(Biogears REQUIRED)
 
 ###############################################################################
 #Code Generation
