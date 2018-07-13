@@ -9,12 +9,13 @@
 class ScenarioData
 {
 public:
-	ScenarioData(std::string &filePath);
+	ScenarioData();
 	~ScenarioData();
 
 	std::vector<std::string>& getHeaders();
 	void setHeaders();
-	void SetDataSeries(std::string &y_header);
+	void setDataSeries(std::string &y_header);
+	void setScenario(std::string &file_name);
 	std::vector<double>& getXSeries();
 	std::vector<double>& getYSeries();
 

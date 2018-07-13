@@ -4,18 +4,15 @@
 #include <qlineseries.h>
 #include <QtCharts/QValueAxis>
 
-class BioGearsChart : public QtCharts::QChart
+class BgChart : public QtCharts::QChart
 {
 public:
-	BioGearsChart(ScenarioData *bgData);
-	~BioGearsChart();
-	void SetQSeries();
-	void UpdateBgChart(std::string &new_header);
+	BgChart();
+	~BgChart();
+	void SetQSeries(ScenarioData *data, std::string &y_header);
+	void UpdateBgChart(ScenarioData *data, std::string &y_header);
 private:
-	ScenarioData *bg_data_;
 	QtCharts::QLineSeries *bg_series_;
-	std::string y_header_;
-
 	QtCharts::QValueAxis *axis_x_;
 	QtCharts::QValueAxis *axis_y_;
 };

@@ -2,7 +2,7 @@
 
 
 
-ScenarioData::ScenarioData(std::string &filePath) : file_name_(filePath)
+ScenarioData::ScenarioData()
 {
 }
 
@@ -38,14 +38,13 @@ void ScenarioData::setHeaders()
 	}
 }
 
-void ScenarioData::SetDataSeries(std::string &y_header)
+void ScenarioData::setDataSeries(std::string &y_header)
 {
 	std::string line;
 	std::ifstream dataReader(file_name_);
 	bool x_def = false;
 	if (!x_data_.empty())
 		x_def = true;
-
 	if(!dataReader.is_open())
 	{
 		std::cout << "Error: Could not open file" << std::endl;
@@ -75,6 +74,12 @@ void ScenarioData::SetDataSeries(std::string &y_header)
 			std::cout << "Error: Could not find data header in file" << std::endl;
 		}
 	}
+}
+
+void ScenarioData::setScenario(std::string &file_name)
+{
+	file_name_ = file_name;
+	setHeaders();
 }
 
 std::vector<double>& ScenarioData::getXSeries()
