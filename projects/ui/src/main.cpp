@@ -6,10 +6,14 @@
 #include <QtCharts>
 #include <ScenarioData.h>
 #include <BgChartDriver.h>
+#include <State.h>
+#include <StateManager.h>
 
 
 int main( int argc, char * argv[] )
 {
+	StateManager *Estate = new StateManager(argc, argv);
+
 
 	QApplication app (argc, argv);
 
