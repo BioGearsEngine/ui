@@ -81,7 +81,9 @@ target_include_directories(${PROJECT_NAME}
 
 set(${PREFIX}_LIBS
       Threads::Threads
+	  Boost::disable_autolinking
       Boost::filesystem
+	  Boost::program_options
       Qt5::Widgets
 	  Qt5::Charts
       Biogears::libbiogears
