@@ -1,37 +1,25 @@
-#include <main.h>
+#include "main.h"
 
-#include <QMainWindow>
-#include <QApplication>
-#include <QPushButton>
-#include <QtCharts>
-#include <ScenarioData.h>
-#include <BgChartDriver.h>
-#include <State.h>
-#include <StateManager.h>
+//System Inlcudes
+#include <iostream>
 
+//Project Inlcudes
+#include "QtUI.h"
+#include "Utils/StateManager.h"
 
-int main( int argc, char * argv[] )
+int main(int argc, char* argv[])
 {
-	StateManager *Estate = new StateManager(argc, argv);
-	State *Scenario = new State(Estate->GenerateState());
-	std::cout << "State Information : " << std::endl;
-	std::cout << "Input File = " << Scenario->GetInputPath().string() << std::endl;
-	std::cout << "Output File = " << Scenario->GetOutputPath().string() << std::endl;
-	std::cout << "Baseline File = " << Scenario->GetBaselinePath().string() << std::endl;
+  using biogears_ui::StateManager;
+  using biogears_ui::State;;
 
-	//QApplication app (argc, argv);
+  StateManager mgr = StateManager(argc, argv);
+  State scenario = mgr.state();
+  std::cout << "State Information : " << std::endl;
+  std::cout << "Input File = " << scenario.inputPath().string() << std::endl;
+  std::cout << "Output File = " << scenario.outputPath().string() << std::endl;
+  std::cout << "Baseline File = " << scenario.baselinePath().string() << std::endl;
 
-	//QMainWindow *mainWin = new QMainWindow();
-	//mainWin->resize(1500, 750);
-
-	////Set up a chart driver to display graph.  Right now everything is set in the driver constructor since we
-	////aren't doing anything dynamically and this is just an example.  The default is plotting the Heart Rate in
-	////BasicStandard
-	//BgChartDriver *chartDriver = new BgChartDriver();
-	//mainWin->setCentralWidget(chartDriver->DisplayBgChart());
-	//mainWin->show();
-
-	//return app.exec();
-	return 0;
+  biogears_ui::QtUI ui;
+  ui.show();
+  return ui.run();
 }
-
