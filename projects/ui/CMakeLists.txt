@@ -61,7 +61,7 @@ set_target_properties(${PROJECT_NAME}
   )
 
 if(WIN32)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE "_SCL_SECURE_NO_WARNINGS" "_CRT_SECURE_NO_WARNINGS" "bigobj"  ENV{PARALLEL_COMPILE} )
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "_SCL_SECURE_NO_WARNINGS" "_CRT_SECURE_NO_WARNINGS" "bigobj"  $ENV{PARALLEL_COMPILE} )
 elseif(CMAKE_COMPILER_IS_GNUCXX)
 
 endif()
@@ -73,20 +73,23 @@ endif()
 #target_compile_definitions(lib${PROJECT_NAME} PRIVATE ${${PREFIX}_CPPFLAGS})
 
 target_include_directories(${PROJECT_NAME}
-    PRIVATE  ${${PREFIX}_INCLUDE_DIR} ${${PREFIX}_PRIVATE_INCLUDE_DIR} ${${PREFIX}_GENERATED_INCLUDE_DIR}
+    PRIVATE  ${${PREFIX}_INCLUDE_DIR} 
+             ${${PREFIX}_PRIVATE_INCLUDE_DIR} 
+             ${${PREFIX}_GENERATED_INCLUDE_DIR}
     INTERFACE $<BUILD_INTERFACE:${${PREFIX}_GENERATED_INCLUDE_DIR}> 
               $<BUILD_INTERFACE:${${PREFIX}_INCLUDE_DIR}>
               $<INSTALL_INTERFACE:include>
 )
 
 set(${PREFIX}_LIBS
-      Threads::Threads
-	  Boost::disable_autolinking
-      Boost::filesystem
-	  Boost::program_options
-      Qt5::Widgets
-	  Qt5::Charts
-      Biogears::libbiogears
+    Threads::Threads
+    Boost::disable_autolinking
+    Boost::filesystem
+    Boost::program_options
+    Qt5::Widgets
+    Qt5::Charts
+    Biogears::core
+    Biogears::libbiogears
 )
 target_link_libraries(${PROJECT_NAME}  ${${PREFIX}_LIBS} )
 

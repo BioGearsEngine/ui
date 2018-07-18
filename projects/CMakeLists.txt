@@ -11,7 +11,7 @@ else()
 endif()
 
 set(CMAKE_STATIC_LIBRARY_PREFIX "lib")
-set(CMAKE_STATIC_LIBRARY_SUFFIX "_st")
+set(CMAKE_STATIC_LIBRARY_SUFFIX "_st${CMAKE_STATIC_LIBRARY_SUFFIX}")
 set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
   
 set(OUTPUT_PREFIX ${CMAKE_BINARY_DIR}/outputs)
@@ -42,5 +42,7 @@ if(WIN32)
   #set(BOOST_ALL_NO_LIB ON)
 endif()
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+
+add_subdirectory(biogears-core)
 add_subdirectory(ui)
 
