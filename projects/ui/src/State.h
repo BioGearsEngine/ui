@@ -4,16 +4,16 @@
 class State
 {
 public:
-	State(boost::filesystem::path p);
-	State(int argc, char * argv[]);
+	State(const boost::filesystem::path& configFile);
+	State(const boost::filesystem::path& input, const boost::filesystem::path& output, const boost::filesystem::path& base_dir);
+	State(const State& copy);
 	~State();
 
-	boost::filesystem::path& GetLog() const;
-	boost::filesystem::path& GetScenario() const;
-	boost::filesystem::path& GetBaselineDirectory() const;
+	boost::filesystem::path GetInputPath() const;
+	boost::filesystem::path GetOutputPath() const;
+	boost::filesystem::path GetBaselinePath() const;
 private:
-	boost::filesystem::path *log_path_;
-	boost::filesystem::path *scenario_path_;
-	boost::filesystem::path *baseline_dir_;
-
+	boost::filesystem::path *input_path_;
+	boost::filesystem::path *output_path_;
+	boost::filesystem::path *baseline_path_;
 };
