@@ -46,7 +46,7 @@ private:
 template <class Implementation>
 template <typename... PARAMS>
 unique_propagate_const<Implementation>::unique_propagate_const(PARAMS... params)
-  : _impl(std::make_unique<Implementation>(Implementation(std::forward<PARAMS>(params)...)))
+  : _impl(std::make_unique<Implementation>(std::forward<PARAMS>(params)...))
 {
 }
 //-------------------------------------------------------------------------------

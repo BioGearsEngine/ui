@@ -46,7 +46,7 @@ private:
 template <class Implementation>
 template <typename... PARAMS>
 shared_propagate_const<Implementation>::shared_propagate_const(PARAMS... params)
-  : _impl(std::make_unique<Implementation>(Implementation(std::forward<PARAMS>(params)...)))
+  : _impl(std::make_unique<Implementation>(std::forward<PARAMS>(params)...))
 {
 }
 //-------------------------------------------------------------------------------
