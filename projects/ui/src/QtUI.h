@@ -24,8 +24,10 @@ public:
   ~QtUI();
   void show();
 
-protected:
-private:
+  static constexpr const char* BIOGEARS_VERSION = "7.0.0";
+  static constexpr const char* BIOGEARS_UI_VERSION = "1.0.0";
+  
+  private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
   //std::unique_ptr<Implementation> _impl;
