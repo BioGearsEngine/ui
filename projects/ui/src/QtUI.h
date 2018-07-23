@@ -1,7 +1,7 @@
 #ifndef BIOGEARSUI_QtUI_H
 #define BIOGEARSUI_QtUI_H
 
-#include <biogears/framework/const_propagation_pointers.h>
+#include <biogears/framework/unique_propagate_const.h>
 
 //! \file
 //! \author Steven A WHite
@@ -22,15 +22,13 @@ public:
   QtUI(int argc, char* argv[]);
 
   ~QtUI();
-
-
   void show();
-  int run();
+
 protected:
 private:
   struct Implementation;
-  ///biogears::Unique_Prop_Ptr<Implementation> _impl;
-  std::unique_ptr<Implementation> _impl;
+  biogears::unique_propagate_const<Implementation> _impl;
+  //std::unique_ptr<Implementation> _impl;
 };
 }
 #endif //BIOGEARSUI_BOGEARSQTUI_H

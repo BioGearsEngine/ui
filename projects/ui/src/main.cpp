@@ -9,17 +9,7 @@
 
 int main(int argc, char* argv[])
 {
-  using biogears_ui::StateManager;
-  using biogears_ui::State;;
-
-  StateManager mgr = StateManager(argc, argv);
-  State scenario = mgr.state();
-  std::cout << "State Information : " << std::endl;
-  std::cout << "Input File = " << scenario.inputPath().string() << std::endl;
-  std::cout << "Output File = " << scenario.outputPath().string() << std::endl;
-  std::cout << "Baseline File = " << scenario.baselinePath().string() << std::endl;
-
-  biogears_ui::QtUI ui;
+  biogears_ui::QtUI ui(argc,argv);
   ui.show();
-  return ui.run();
+  return ui.exec();
 }

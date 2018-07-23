@@ -6,6 +6,8 @@
 //Project Includes
 #include <utils/State.h>
 #include <utils/StateManager.h>
+#include <iostream>
+#include <qcommandlineparser.h>
 
 namespace biogears_ui {
 
@@ -34,17 +36,41 @@ QtUI::Implementation::Implementation(std::vector<std::string>)
 {
 }
 //---------------------------------------------------------------------------
+//! Constructor for QtUI -- Passes QApplication g_argc and g_argv
+//! Is defined mostly because of the PIMPL implementation and should not be used
+//! \see QApplication(argc,argv)
 QtUI::QtUI()
   : QApplication(g_argc,g_argv)
   , _impl()
 {
+
 }
-  //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//! Constructor for QtUI -- Inheriting from QApplicaiton is not normally done
+//!                      -- Much like QApplication only one of these should exist
+//!                      -- per application
+//! 
+//! \param int  [IN] Number of arguments contained in ARGV.  Assumed argc > 0
+//! \param char** [IN] An array of cstrings such that argv[0] is the executable name and argv[i] i>0 is the number of arguments passed to the executable
 QtUI::QtUI(int argc, char* argv[])
   : QApplication(argc, argv)
   , _impl()
 {
-  //TODO Parse with argc,argv and pass to the correct class
+  using biogears_ui::State;
+  using biogears_ui::StateManager;
+
+  QCoreApplication::setOrganizationName("QtProject");
+  QCoreApplication::setApplicationName("Application Example");
+  QCoreApplication::setApplicationVersion(QT_VERSION_STR);
+
+  StateManager mgr = StateManager(argc, argv);
+ _impl->application_state = mgr.state();
+
+  auto& scenario = _impl->application_state;
+  std::cout << "State Information : " << std::endl;
+  std::cout << "Input File = " << scenario.inputPath().string() << std::endl;
+  std::cout << "Output File = " << scenario.outputPath().string() << std::endl;
+  std::cout << "Baseline File = " << scenario.baselinePath().string() << std::endl;
 }
 
 //---------------------------------------------------------------------------
@@ -55,11 +81,6 @@ QtUI ::~QtUI()
 //---------------------------------------------------------------------------
 void QtUI::show()
 {
-}
-//---------------------------------------------------------------------------
-int QtUI::run()
-{
-  return 0;
 }
 //---------------------------------------------------------------------------
 }

@@ -28,11 +28,10 @@ public:
 //-------------------------------------------------------------------------------
 State::Implementation::Implementation()
 {
-  
 }
 //-------------------------------------------------------------------------------
 State::Implementation::Implementation(const Implementation& obj)
-  
+
 {
   *this = obj;
 }
@@ -55,7 +54,7 @@ State::Implementation& State::Implementation::operator=(const Implementation& rh
 State::Implementation& State::Implementation::operator=(Implementation&& rhs)
 {
   if (this != &rhs) {
-    input_path = std::move( rhs.input_path);
+    input_path = std::move(rhs.input_path);
     output_path = std::move(rhs.output_path);
     baseline_path = std::move(rhs.baseline_path);
   }
@@ -81,12 +80,13 @@ State::State(const boost::filesystem::path& configFile)
 State::State()
   : _impl()
 {
+  auto j = 0;
+  auto i = j + &_impl;
 }
 //-------------------------------------------------------------------------------
 State::State(const State& obj)
-  : _impl(obj._impl.copy())
+  : _impl(*obj._impl)
 {
-  ;
 }
 //-------------------------------------------------------------------------------
 State::State(State&& obj)
@@ -97,6 +97,23 @@ State::State(State&& obj)
 State::~State()
 {
   _impl = nullptr;
+}
+//-------------------------------------------------------------------------------
+State& State::operator=(const State& rhs)
+{
+  if (this!=&rhs)
+  {
+    *_impl = *rhs._impl;
+  }
+  return *this;
+}
+//-------------------------------------------------------------------------------
+State& State::operator=(State&& rhs)
+{
+  if (this != &rhs) {
+    *_impl = std::move(*rhs._impl);
+  }
+  return *this;
 }
 //-------------------------------------------------------------------------------
 const boost::filesystem::path& State::inputPath() const
@@ -114,7 +131,8 @@ const boost::filesystem::path& State::baselinePath() const
   return _impl->baseline_path;
 }
 //-------------------------------------------------------------------------------
-State& State::inputPath(boost::filesystem::path p){
+State& State::inputPath(boost::filesystem::path p)
+{
   _impl->input_path = p;
   return *this;
 }

@@ -10,7 +10,7 @@
 //External Includes
 #include <boost/filesystem.hpp>
 //Project Includes
-#include <biogears/framework/const_propagation_pointers.h>
+#include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
 class State {
@@ -21,6 +21,9 @@ public:
   State(const State&);
   State(State&&);
   ~State();
+
+  State& operator=(const State&);
+  State& operator=(State&&);
 
 	const boost::filesystem::path& inputPath() const;
   const boost::filesystem::path& outputPath() const;
@@ -33,7 +36,7 @@ public:
 
 private:
   struct Implementation;
-  biogears::Unique_Prop_Ptr<Implementation> _impl;
+  biogears::unique_propagate_const<Implementation> _impl;
 };
 }
 
