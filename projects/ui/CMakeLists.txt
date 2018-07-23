@@ -39,12 +39,14 @@ message(STATUS "Configuring ${PROJECT_NAME}")
 
 #Biogears Core
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 add_source_files(HDRS ${CMAKE_CURRENT_SOURCE_DIR}/src "*.h"   "Headers\\Private\\")
 add_source_files(SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src "*.cpp" "Sources\\")
 add_source_files(PUBLIC_HDRS ${CMAKE_CURRENT_SOURCE_DIR}/include "*.h"  "Headers\\Public\\")
+add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src "*.qrc"  "Resources")
 
 set(${PREFIX}_HEADERS ${HDRS} ${PUBLIC_HDRS} ${GEN_HDRS})
-set(${PREFIX}_SOURCES ${SRCS} ${GEN_SRCS})
+set(${PREFIX}_SOURCES ${SRCS} ${GEN_SRCS} ${RESOURCES})
 
 ###############################################################################
 #Define Logic
