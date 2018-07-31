@@ -26,7 +26,7 @@ class shared_propagate_const {
 public:
   template <typename... PARAMS>
   shared_propagate_const(PARAMS...);
-  shared_propagate_const(nullptr_t);
+  shared_propagate_const(std::nullptr_t);
 
   constexpr Implementation& operator*();
   constexpr const Implementation& operator*() const;
