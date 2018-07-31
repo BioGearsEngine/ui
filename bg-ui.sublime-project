@@ -5,6 +5,9 @@
 			"path": "projects/ui"
 		},
 		{
+			"path": "projects/biogears-common"
+		},
+		{
 			"path": "cmake"
 		},
 		{
