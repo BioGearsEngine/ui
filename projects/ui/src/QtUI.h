@@ -30,7 +30,6 @@ public:
   private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
-  //std::unique_ptr<Implementation> _impl;
 };
 }
 #endif //BIOGEARSUI_BOGEARSQTUI_H

@@ -49,15 +49,15 @@ State StateManager::state() const
   }
   std::cout << info << std::endl;
 
-  State* stateFromConfig = new State(config_path);
+  State stateFromConfig{config_path};
 
   if (num_flags_ == 0) {
-    return *stateFromConfig;
+    return stateFromConfig;
   }
 
-  auto inputPath = (var_map_.count("input")) ? bfs::path(var_map_["input"].as<std::string>()) : stateFromConfig->inputPath();
-  auto outputPath = (var_map_.count("output")) ? bfs::path(var_map_["output"].as<std::string>()) : stateFromConfig->outputPath();
-  auto basePath = (var_map_.count("baseline")) ? bfs::path(var_map_["baseline"].as<std::string>()) : stateFromConfig->baselinePath();
+  auto inputPath = (var_map_.count("input")) ? bfs::path(var_map_["input"].as<std::string>()) : stateFromConfig.inputPath();
+  auto outputPath = (var_map_.count("output")) ? bfs::path(var_map_["output"].as<std::string>()) : stateFromConfig.outputPath();
+  auto basePath = (var_map_.count("baseline")) ? bfs::path(var_map_["baseline"].as<std::string>()) : stateFromConfig.baselinePath();
 
   State stateFromArgs = State().inputPath(inputPath).outputPath(outputPath).baselinePath(basePath);
   return stateFromArgs;
