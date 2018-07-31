@@ -19,9 +19,10 @@ class QtUI : public QApplication {
 //Q_OBJECT
 public:
   QtUI();
-  QtUI(int argc, char* argv[]);
+  QtUI(int& argc, char* argv[]);
 
   ~QtUI();
+  
   void show();
 
   static constexpr const char* BIOGEARS_VERSION = "7.0.0";

@@ -17,7 +17,7 @@ public:
   MainWindow();
 
   void loadFile(const QString& fileName);
-
+  
 protected:
   void closeEvent(QCloseEvent* event) override;
 

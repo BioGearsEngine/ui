@@ -57,7 +57,7 @@ QtUI::QtUI()
 //!
 //! \param int  [IN] Number of arguments contained in ARGV.  Assumed argc > 0
 //! \param char** [IN] An array of cstrings such that argv[0] is the executable name and argv[i] i>0 is the number of arguments passed to the executable
-QtUI::QtUI(int argc, char* argv[])
+QtUI::QtUI(int& argc, char* argv[])
   : QApplication(argc, argv)
   , _impl()
 {
