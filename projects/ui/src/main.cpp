@@ -5,7 +5,7 @@
 
 //Project Inlcudes
 #include "QtUI.h"
-#include "Utils/StateManager.h"
+#include "utils/StateManager.h"
 
 int main(int argc, char* argv[])
 {
