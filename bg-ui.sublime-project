@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "projects/ui"
+		},
+		{
+			"path": "cmake"
+		},
+		{
+			"path": "share"
+		}
+	]
+}
