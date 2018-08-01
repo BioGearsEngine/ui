@@ -55,7 +55,7 @@ if(BIOGEARS_COMMON_BUILD_STATIC)
 else()
   add_library(biogears_common SHARED ${COMMON_SOURCES} ${COMMON_HEADERS})
 endif()
-add_library(Biogears::core ALIAS biogears_common)
+add_library(Biogears::common ALIAS biogears_common)
 
 target_compile_definitions(biogears_common PRIVATE ${COMMON_CPPFLAGS_PRIVATE} PUBLIC ${COMMON_CPPFLAGS_PUBLIC} )
 

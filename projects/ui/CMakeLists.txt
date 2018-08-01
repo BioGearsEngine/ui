@@ -91,7 +91,7 @@ set(${PREFIX}_LIBS
     Boost::program_options
     Qt5::Widgets
     Qt5::Charts
-    Biogears::core
+    Biogears::common
     Biogears::libbiogears
 )
 target_link_libraries(${PROJECT_NAME}  ${${PREFIX}_LIBS} )
@@ -102,7 +102,7 @@ install(TARGETS ${PROJECT_NAME} EXPORT BiogearsUI
    ARCHIVE DESTINATION lib
 )
 
-if(NOT ARA_${PREFIX}_BUILD_STATIC)
+if(NOT ${PREFIX}_BUILD_STATIC)
   if(WIN32)
     install(FILES $<TARGET_PDB_FILE:${PROJECT_NAME}> DESTINATION bin OPTIONAL)
   endif()
