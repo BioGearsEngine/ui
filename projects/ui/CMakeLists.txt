@@ -62,7 +62,7 @@ set_target_properties(${PROJECT_NAME}
   DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
   CXX_STANDARD 14
   )
-
+add_dependencies(${PROJECT_NAME} stage_runtime)
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE "_SCL_SECURE_NO_WARNINGS" "_CRT_SECURE_NO_WARNINGS" "bigobj"  $ENV{PARALLEL_COMPILE} )
 elseif(CMAKE_COMPILER_IS_GNUCXX)
@@ -115,5 +115,29 @@ else()
    endif()
 endif()
  
+add_custom_command(
+    OUTPUT  ${PROJECT_BINARY_DIR}/runtime 
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/runtime
+)
+
+file(GLOB_RECURSE source_xsd_list LIST_DIRECTORIES false "${Biogears_XSD_SCHEMA_DIR}/*.xsd")
+foreach(_file IN LISTS  source_xsd_list)
+	string(REPLACE "${Biogears_XSD_SCHEMA_DIR}" "${PROJECT_BINARY_DIR}/runtime/xsd" runtime_file "${_file}" )
+	list(APPEND runtime_xsd_list ${runtime_file})
+	add_custom_command(
+		OUTPUT  ${runtime_file}
+		DEPENDS ${_file}
+                COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${runtime_file}
+	)
+endforeach()
+
+list(APPEND runtime_glob_list 	"${runtime_xsd_list}"	)
+
+add_custom_target(stage_runtime 
+    DEPENDS 
+	${PROJECT_BINARY_DIR}/runtime
+	${runtime_glob_list}
+	COMMENT "Scanning for need to stage runtime dir"
+)	
 
 message(STATUS "")
