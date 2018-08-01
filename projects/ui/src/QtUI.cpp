@@ -14,7 +14,7 @@
 namespace biogears_ui {
 
 static int g_argc = 1;
-static char* g_argv[] = { "biogears_ui" };
+static char * g_argv[] = { "biogears_ui" };
 //!
 //! \brief Data Implementation of the QtUI class
 //!
