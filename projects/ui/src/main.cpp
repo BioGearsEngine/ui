@@ -15,7 +15,5 @@ int main(int argc, char* argv[])
 {
   biogears_ui::QtUI ui(argc,argv);
   ui.show();
-//  std::unique_ptr<PhysiologyEngine> bg = CreateBioGearsEngine("HowToAirwayObstruction.log");
-  Logger log;
   return ui.exec();
 }

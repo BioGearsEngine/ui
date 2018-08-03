@@ -1,7 +1,6 @@
 #include "ScenarioData.h"
 
-
-
+namespace biogears_ui {
 ScenarioData::ScenarioData()
 {
 }
@@ -90,4 +89,5 @@ std::vector<double>& ScenarioData::getXSeries()
 std::vector<double>& ScenarioData::getYSeries()
 {
 	return y_data_;
+}
 }

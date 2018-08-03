@@ -1,5 +1,5 @@
-#ifndef BIOGEARSUI_WIDGETS_MAIN_WINDOW_H
-#define BIOGEARSUI_WIDGETS_MAIN_WINDOW_H
+#ifndef BIOGEARSUI_PHYS_SCENARIO_DRIVER_H
+#define BIOGEARSUI_PHYS_SCENARIO_DRIVER_H
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
@@ -15,42 +15,25 @@
 
 //!
 //! \author Steven A White
-//! \date   June 24th 2018
+//! \date   Aug 24th 2017
 //!
-//!  
-//! \brief Primary window of BioGears UI
+//!  Wrapper Class for controlling Physiology Simulations
+//!
 
-//External Includes
-#include <QMainWindow>
+//Standard Includes
+#include <string>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
-class MainWindow : public QMainWindow {
-  Q_OBJECT
-
+class PhysiologyDriver {
 public:
-  MainWindow();
-  ~MainWindow();
+	PhysiologyDriver(const std::string& );
+   ~PhysiologyDriver();
 
-  void loadFile(const QString& fileName);
-  
-protected:
-  void closeEvent(QCloseEvent* event) override;
-
-private slots:
-  void about();
-  void run();
 private:
-  void createActions();
-  void createStatusBar();
-  void readSettings();
-  void writeSettings();
-
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
-  
 };
 }
-
-#endif //MAIN_WINDOW
+#endif  //BIOGEARSUI_PHYS_SCENARIO_DRIVER_H
