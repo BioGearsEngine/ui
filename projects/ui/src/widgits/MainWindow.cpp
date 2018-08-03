@@ -103,7 +103,7 @@ void MainWindow::createActions()
   //--Scenario MENU --//
   QMenu* fileMenu = menuBar()->addMenu(tr("&Simulation"));
   QToolBar* fileToolBar = addToolBar(tr("Simulation"));
-  const QIcon newIcon = QIcon::fromTheme("Run", QIcon(":/images/play.png"));
+  const QIcon newIcon = QIcon::fromTheme("Run", QIcon(":/img/play.png"));
   QAction* newAct = new QAction(newIcon, tr("&Run"), this);
   // newAct->setShortcuts(QKeySequence::New);
   newAct->setStatusTip(tr("Run current simulation"));
