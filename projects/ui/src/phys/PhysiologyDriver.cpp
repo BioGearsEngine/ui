@@ -16,6 +16,7 @@
 #include <memory>
 
 //External Includes
+#include <biogears/string-exports.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 
 namespace biogears_ui {

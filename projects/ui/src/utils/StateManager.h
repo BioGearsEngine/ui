@@ -6,7 +6,7 @@
 //! \date   2018-07-10
 //! \brief  Stil deciding on a Manager/Factory construct
 //!         Responsible for creating states and distributing them
-
+#include <biogears/string-exports.h>
 //Standard includes
 #include <string>
 //External includes

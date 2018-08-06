@@ -66,7 +66,9 @@ add_dependencies(${PROJECT_NAME} stage_runtime)
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE "_SCL_SECURE_NO_WARNINGS" "_CRT_SECURE_NO_WARNINGS" "bigobj"  $ENV{PARALLEL_COMPILE} )
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-
+endif()
+if(NOT Boost_USE_STATIC_LIBS)
+   target_compile_definitions(${PROJECT_NAME} PUBLIC "BOOST_PROGRAM_OPTIONS_DYN_LINK=1")
 endif()
 
 ###############################################################################

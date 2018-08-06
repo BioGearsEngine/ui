@@ -35,11 +35,17 @@ endif()
 # Step 2: Project Includes are generally order dependent.  So manually maintain
 #         this list
 ###############################################################################
-option (Boost_USE_STATIC_LIBS "Toggle this option to allow static libraries" ON)
+option (Boost_USE_STATIC_LIBS "Toggle this option to allow static libraries" OFF)
 if(WIN32)
-  set(Boost_USE_MULTITHREADED      ON)
-  set(Boost_USE_STATIC_RUNTIME    OFF)
-  #set(BOOST_ALL_NO_LIB ON)
+  if(NOT DEFINED Boost_USE_MULTITHREADED)
+    set(Boost_USE_MULTITHREADED      ON)
+  endif()
+  if (Boost_USE_STATIC_LIBS AND NOT DEFINED Boost_USE_STATIC_RUNTIME)
+    set(Boost_USE_STATIC_RUNTIME    ON)
+  else()
+    set(Boost_USE_STATIC_RUNTIME    OFF)
+  endif()
+  set(BOOST_ALL_NO_LIB ON)
 endif()
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
