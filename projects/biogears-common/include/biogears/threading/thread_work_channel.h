@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_CORE_THREADWORKCHANNEL_H
-#define BIOGEARS_CORE_THREADWORKCHANNEL_H
+#ifndef BIOGEARS_COMMON_THREADWORKCHANNEL_H
+#define BIOGEARS_COMMON_THREADWORKCHANNEL_H
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2017 Applied Research Associates, Inc.
@@ -57,4 +57,4 @@ namespace biogears {
 	};
 }
 
-#endif //BIOGEARS_CORE_THREADWORKCHANNEL_H
+#endif //BIOGEARS_COMMON_THREADWORKCHANNEL_H

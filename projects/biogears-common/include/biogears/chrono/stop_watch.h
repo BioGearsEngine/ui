@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_CORE_CHRONO_STOPWATCH
-#define BIOGEARS_CORE_CHRONO_STOPWATCH
+#ifndef BIOGEARS_COMMON_CHRONO_STOPWATCH
+#define BIOGEARS_COMMON_CHRONO_STOPWATCH
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2017 Applied Research Associates, Inc.
@@ -61,5 +61,5 @@ namespace biogears {
   
 } //namespace biogears
 
-#endif //BIOGEARS_CORE_CHRONO_STOPWATCH
+#endif //BIOGEARS_COMMON_CHRONO_STOPWATCH
 

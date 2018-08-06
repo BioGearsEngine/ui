@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_CORE_THREADWORKCHANNEL_IMPL
-#define BIOGEARS_CORE_THREADWORKCHANNEL_IMPL
+#ifndef BIOGEARS_COMMON_THREADWORKCHANNEL_IMPL
+#define BIOGEARS_COMMON_THREADWORKCHANNEL_IMPL
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2017 Applied Research Associates, Inc.
@@ -98,4 +98,4 @@ auto ThreadWorkChannel<Signiture>::as_sink() -> SinkPtr
 //---------------------------------------------------------------------------
 }
 
-#endif //BIOGEARS_CORE_THREADWORKCHANNEL_IMPL
+#endif //BIOGEARS_COMMON_THREADWORKCHANNEL_IMPL

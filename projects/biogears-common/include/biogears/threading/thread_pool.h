@@ -29,7 +29,7 @@
 #include <biogears/Export.h>
 namespace biogears {
 
-  class BIOGEARS_CORE_PUBLIC_API ThreadPool {
+  class BIOGEARS_COMMON_PUBLIC_API ThreadPool {
   public:
     using SourcePtr = ThreadWorkChannel<void(void)>::SourcePtr;
     using SinkPtr = ThreadWorkChannel<void(void)>::SinkPtr;

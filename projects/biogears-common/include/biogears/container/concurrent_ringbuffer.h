@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_CORE_CONTAINER_CONCURRENTRINGBUFFER
-#define BIOGEARS_CORE_CONTAINER_CONCURRENTRINGBUFFER
+#ifndef BIOGEARS_COMMON_CONTAINER_CONCURRENTRINGBUFFER
+#define BIOGEARS_COMMON_CONTAINER_CONCURRENTRINGBUFFER
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2017 Applied Research Associates, Inc.

@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_CORE_CONTAINER_CONCURRENTQUEUE
-#define BIOGEARS_CORE_CONTAINER_CONCURRENTQUEUE
+#ifndef BIOGEARS_COMMON_CONTAINER_CONCURRENTQUEUE
+#define BIOGEARS_COMMON_CONTAINER_CONCURRENTQUEUE
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2017 Applied Research Associates, Inc.

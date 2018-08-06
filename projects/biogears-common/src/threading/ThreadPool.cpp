@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_CORE_THREAD_POOL_IMPL
-#define BIOGEARS_CORE_THREAD_POOL_IMPL
+#ifndef BIOGEARS_COMMON_THREAD_POOL_IMPL
+#define BIOGEARS_COMMON_THREAD_POOL_IMPL
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2017 Applied Research Associates, Inc.
@@ -185,4 +185,4 @@ ThreadPool::SinkPtr   const ThreadPool::get_sink()
 
 }
 
-#endif //BIOGEARS_CORE_THREAD_POOL_IMPL
+#endif //BIOGEARS_COMMON_THREAD_POOL_IMPL

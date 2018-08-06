@@ -62,7 +62,7 @@ target_compile_definitions(biogears_common PRIVATE ${COMMON_CPPFLAGS_PRIVATE} PU
 
 set_target_properties(biogears_common
     PROPERTIES
-    DEFINE_SYMBOL COMMON_EXPORTS
+    DEFINE_SYMBOL BIOGEARS_COMMON_EXPORTS
     FOLDER "Libraries"
     OUTPUT_NAME biogears_common
     COMPILE_PDB_NAME biogears_common

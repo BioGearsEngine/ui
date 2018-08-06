@@ -19,30 +19,30 @@
 //!
 //! \brief Shared library visibility header
 //!  Defines two macros that control dll visibility
-//!         BIOGEARS_CORE_PUBLIC_API
-//!         BIOGEARS_CORE_PRIVATE_API
+//!         BIOGEARS_COMMON_PUBLIC_API
+//!         BIOGEARS_COMMON_PRIVATE_API
 //!
 
 
-#if defined(BIOGEARS_CORE_BUILD_STATIC)
-  #define BIOGEARS_CORE_PUBLIC_API
-  #define BIOGEARS_CORE_PRIVATE_API
+#if defined(BIOGEARS_COMMON_BUILD_STATIC)
+  #define BIOGEARS_COMMON_PUBLIC_API
+  #define BIOGEARS_COMMON_PRIVATE_API
 #else
   #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BIOGEARS_CORE_EXPORTS
-      #define BIOGEARS_CORE_PUBLIC_API __declspec(dllexport)
-      #define BIOGEARS_CORE_PRIVATE_API
+    #ifdef BIOGEARS_COMMON_EXPORTS
+      #define BIOGEARS_COMMON_PUBLIC_API __declspec(dllexport)
+      #define BIOGEARS_COMMON_PRIVATE_API
     #else
-      #define BIOGEARS_CORE_PUBLIC_API __declspec(dllimport)
-      #define BIOGEARS_CORE_PRIVATE_API
+      #define BIOGEARS_COMMON_PUBLIC_API __declspec(dllimport)
+      #define BIOGEARS_COMMON_PRIVATE_API
     #endif
   #else
     #if __GNUC__ >= 4
-      #define BIOGEARS_CORE_PUBLIC_API __attribute__ ((visibility ("default")))
-      #define BIOGEARS_CORE_PRIVATE_API  __attribute__ ((visibility ("hidden")))
+      #define BIOGEARS_COMMON_PUBLIC_API __attribute__ ((visibility ("default")))
+      #define BIOGEARS_COMMON_PRIVATE_API  __attribute__ ((visibility ("hidden")))
     #else
-      #define BIOGEARS_CORE_PUBLIC_API
-      #define BIOGEARS_CORE_PRIVATE_API
+      #define BIOGEARS_COMMON_PUBLIC_API
+      #define BIOGEARS_COMMON_PRIVATE_API
     #endif
   #endif
 #endif
