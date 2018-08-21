@@ -35,7 +35,12 @@ public:
 
   static auto create() -> ScenarioToolbarPtr;
 
-private:
+ signals:
+  void patientChanged();
+  void envonmentChanged();
+  void timelineChanged();
+
+  private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
 };

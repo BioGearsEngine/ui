@@ -23,7 +23,8 @@
 
 namespace biogears_ui {
 
-struct ScenarioToolbar::Implementation {
+struct ScenarioToolbar::Implementation: QObject {
+
 public:
   Implementation();
   Implementation(const Implementation&);
@@ -32,30 +33,36 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  QComboBox* enviroments;
+public:
   QComboBox* patients;
+  QComboBox* enviroments;
   QComboBox* timelines;
 };
 //-------------------------------------------------------------------------------
 ScenarioToolbar::Implementation::Implementation()
-  : enviroments(new QComboBox)
-  , patients(new QComboBox)
+  : patients(new QComboBox)
+  , enviroments(new QComboBox)
   , timelines(new QComboBox)
 
 { 
   //Toolbar Patient
   patients->addItem(tr("Select a Patient"));
+  patients->addItem(tr("New Scenario"));
   patients->addItem(tr("Austin Baird"));
   patients->addItem(tr("Nathan Tatum"));
+  patients->addItem(tr("Load from file..."));
   //Toolbar Enviroments
   enviroments->addItem(tr("Select an Environment"));
+  enviroments->addItem(tr("New Environment"));
   enviroments->addItem(tr("desert"));
   enviroments->addItem(tr("jungle"));
+  enviroments->addItem(tr("Load from file..."));
   //Toolbar timelines
+  timelines->addItem(tr("New Timeline"));
   timelines->addItem(tr("Select a Timeline"));
-  timelines->addItem(tr("item 2"));
-  timelines->addItem(tr("item 3"));
-
+  timelines->addItem(tr("Pool exercise"));
+  timelines->addItem(tr("Mardi Gras Asthma Attack"));
+  timelines->addItem(tr("Load from file..."));
 }
 //-------------------------------------------------------------------------------
 ScenarioToolbar::Implementation::Implementation(const Implementation& obj)
@@ -82,7 +89,7 @@ ScenarioToolbar::Implementation& ScenarioToolbar::Implementation::operator=(Impl
   }
   return *this;
 }
-//-------------------------------------------------------------------------------
+ //-------------------------------------------------------------------------------
 ScenarioToolbar::ScenarioToolbar()
   : QToolBar(tr("Simulation"))
   , _impl()
@@ -98,6 +105,11 @@ ScenarioToolbar::ScenarioToolbar()
   QAction* launch  = new QAction(launchIcon, tr("&Launch"), this);
   launch->setStatusTip(tr("Run current simulation"));
   addAction(launch);
+
+  
+  connect(_impl->patients, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::patientChanged);
+  connect(_impl->enviroments, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::envonmentChanged);
+  connect(_impl->timelines, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::timelineChanged);
 }
 //-------------------------------------------------------------------------------
 ScenarioToolbar::~ScenarioToolbar()
@@ -113,5 +125,4 @@ auto ScenarioToolbar::create() -> ScenarioToolbarPtr
 {
   return new ScenarioToolbar;
 }
-//-------------------------------------------------------------------------------
 }

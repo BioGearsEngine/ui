@@ -152,7 +152,11 @@ void MainWindow::createActions()
 
   
   addToolBar(_impl->runToolbar);
+
   setCentralWidget(_impl->physiologySelection);
+  connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, this, &MainWindow::about);
+  connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, this, &MainWindow::about);
+  connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, this, &MainWindow::about);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::createStatusBar()
