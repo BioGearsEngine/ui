@@ -14,7 +14,7 @@
 //! \author Steven A White
 //! \date   June 24th 2018
 //!
-//!  
+//!
 //! \brief Primary window of BioGears UI
 
 #include <QtWidgets>
@@ -31,7 +31,6 @@ public:
 
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
-
 };
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation()
@@ -79,7 +78,7 @@ MainWindow::~MainWindow()
 //-------------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    event->accept();
+  event->accept();
 }
 //-------------------------------------------------------------------------------
 void MainWindow::about()
@@ -100,33 +99,105 @@ void MainWindow::run()
 void MainWindow::createActions()
 {
 
-  //--Scenario MENU --//
-  QMenu* fileMenu = menuBar()->addMenu(tr("&Simulation"));
-  QToolBar* fileToolBar = addToolBar(tr("Simulation"));
-  const QIcon newIcon = QIcon::fromTheme("Run", QIcon(":/img/play.png"));
-  QAction* newAct = new QAction(newIcon, tr("&Run"), this);
-  // newAct->setShortcuts(QKeySequence::New);
-  newAct->setStatusTip(tr("Run current simulation"));
-  connect(newAct, &QAction::triggered, this, &MainWindow::run);
-  fileMenu->addAction(newAct);
-  fileToolBar->addAction(newAct);
+  //-- Create Header Menu
+  QMenu* entry = nullptr;
+  QToolBar* toolbar = nullptr;
+  QAction* action = nullptr;
 
-  fileMenu->addSeparator();
+  //Global Toolbar
+  toolbar = addToolBar(tr("Simulation"));
 
+  //Simualtion
+  entry = menuBar()->addMenu(tr("&Simulation"));
+  //Simulation -> Launch
+  QIcon launchIcon = QIcon::fromTheme("Launch", QIcon(":/img/play.png"));
+  QAction* launch = action = new QAction(launchIcon, tr("&Launch"), this);
+  action->setStatusTip(tr("Run current simulation"));
+  connect(action, &QAction::triggered, this, &MainWindow::run);
+  entry->addAction(action);
+
+  //Simulation -> Load Scenario
+  action = new QAction(launchIcon, tr("&Load Scenario"), this);
+  action->setStatusTip(tr("Load an existing scenario file."));
+  connect(action, &QAction::triggered, this, &MainWindow::run);
+  entry->addAction(action);
+  //Simulation -> Load Environment
+  action = new QAction(launchIcon, tr("&Load Environment"), this);
+  action->setStatusTip(tr("Load an existing environment file."));
+  connect(action, &QAction::triggered, this, &MainWindow::run);
+  entry->addAction(action);
+  //Simulation -> Load Patient
+  action = new QAction(launchIcon, tr("&Load Patient"), this);
+  action->setStatusTip(tr("Load an existing psatient file."));
+  connect(action, &QAction::triggered, this, &MainWindow::run);
+  entry->addAction(action);
+  //Simulation -> Exit
+  entry->addSeparator();
   const QIcon exitIcon = QIcon::fromTheme("application-exit");
-  QAction* exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
+  QAction* exitAct = entry->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
   exitAct->setShortcuts(QKeySequence::Quit);
   exitAct->setStatusTip(tr("Exit the application"));
 
-  //--HELP MENU --//
+  //Help
+  entry = menuBar()->addMenu(tr("&Help"));
+  //Help -> Help
+  action = entry->addAction(tr("&About"), this, &MainWindow::about);
+  action->setStatusTip(tr("Show the application's About box"));
+  //Help -> About
+  action = entry->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
+  action->setStatusTip(tr("Show the Qt library's About box"));
 
-  QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
-  QAction* aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
-  aboutAct->setStatusTip(tr("Show the application's About box"));
+  //Toolbar Scenarios
+  QComboBox* box = new QComboBox;
+  box->addItem(tr("Select a Scenario"));
+  box->addItem(tr("item 2"));
+  box->addItem(tr("item 3"));
+  toolbar->addSeparator();
+  toolbar->addWidget(box);
+  //Toolbar Enviroments
+  box = new QComboBox;
+  box->addItem(tr("Select an Environment"));
+  box->addItem(tr("item 2"));
+  box->addItem(tr("item 3"));
+  toolbar->addSeparator();
+  toolbar->addWidget(box);
+  //Toolbar Patient
+  box = new QComboBox;
+  box->addItem(tr("Select a Patient"));
+  box->addItem(tr("item 2"));
+  box->addItem(tr("item 3"));
+  toolbar->addSeparator();
+  toolbar->addWidget(box);
+  //Toolbar launch
+  toolbar->addAction(launch);
 
-  QAction* aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
-  aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+  QWidget* center = new QWidget;
+  setCentralWidget(center);
 
+  QHBoxLayout* hLayout = new QHBoxLayout;
+  QVBoxLayout* vLayout = new QVBoxLayout;
+
+  QListWidget* physiologyDataList = new QListWidget;
+  physiologyDataList->addItem("HeartRate");
+  physiologyDataList->addItem("Blood Pressure");
+  physiologyDataList->addItem("Breaths per Minute");
+  physiologyDataList->addItem("Tidal Volume");
+  physiologyDataList->addItem("Blood Surger Concentration");
+  QListWidget* preferenceDataList = new QListWidget;
+
+  QWidget* buttonWidget = new QWidget;
+
+  QPushButton* moveLeftButton = new QPushButton("<<");
+  QPushButton* moveRightButton  = new QPushButton(">>");
+
+  hLayout->addWidget(physiologyDataList);
+  vLayout->addWidget(moveRightButton);
+  vLayout->addWidget(moveLeftButton);
+  hLayout->addWidget(buttonWidget);
+  hLayout->addWidget(preferenceDataList);
+
+  center->setLayout(hLayout);
+  buttonWidget->setLayout(vLayout);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::createStatusBar()

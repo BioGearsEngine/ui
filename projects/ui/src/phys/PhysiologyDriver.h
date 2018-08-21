@@ -22,18 +22,32 @@
 
 //Standard Includes
 #include <string>
+#include <chrono>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
+#include <chrono>
 
 namespace biogears_ui {
 class PhysiologyDriver {
 public:
-	PhysiologyDriver(const std::string& );
-   ~PhysiologyDriver();
+  PhysiologyDriver(const std::string&);
+  ~PhysiologyDriver();
+
+
+  void advance(std::chrono::milliseconds deltaT);
+  void async_advance(std::chrono::milliseconds deltaT);
+
+  bool isPaused();
+
+  bool loadPatient(std::string path, std::string filename);
+  bool loadScenario(std::string path, std::string filename);
+  bool loadEnvironment(std::string path, std::string filename);
+
+  bool applyAction();
 
 private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
 };
 }
-#endif  //BIOGEARSUI_PHYS_SCENARIO_DRIVER_H
+#endif //BIOGEARSUI_PHYS_SCENARIO_DRIVER_H

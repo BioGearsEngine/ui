@@ -73,4 +73,39 @@ PhysiologyDriver::~PhysiologyDriver()
 {
   _impl = nullptr;
 }
+//-------------------------------------------------------------------------------
+void advance(std::chrono::milliseconds deltaT)
+{
+  
+}
+//-------------------------------------------------------------------------------
+void async_advance(std::chrono::milliseconds deltaT)
+{
+  
+}
+//-------------------------------------------------------------------------------
+bool isPaused()
+{
+  return false;
+}
+//-------------------------------------------------------------------------------
+bool loadPatient(std::string path, std::string filename)
+{
+  return true;
+}
+//-------------------------------------------------------------------------------
+bool loadScenario(std::string path, std::string filename)
+{
+  return true;
+}
+//-------------------------------------------------------------------------------
+bool loadEnvironment(std::string path, std::string filename)
+{
+  return true;
+}
+//-------------------------------------------------------------------------------
+bool applyAction()
+{
+  return true;
+}
 }
