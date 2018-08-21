@@ -17,10 +17,12 @@
 //!
 //! \brief Primary window of BioGears UI
 
-#include <QtWidgets>
-
 #include "MainWindow.h"
-
+//External Includes
+#include <QtWidgets>
+//Project Includes
+#include "ScenarioToolbar.h"
+#include "MultiSelectionWidget.h"
 namespace biogears_ui {
 
 struct MainWindow::Implementation {
@@ -31,9 +33,14 @@ public:
 
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
+
+  MultiSelectionWidget* physiologySelection;
+  ScenarioToolbar* runToolbar;
 };
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation()
+  : physiologySelection(MultiSelectionWidget::create())
+  , runToolbar(ScenarioToolbar::create())
 {
 }
 //-------------------------------------------------------------------------------
@@ -98,14 +105,10 @@ void MainWindow::run()
 //-------------------------------------------------------------------------------
 void MainWindow::createActions()
 {
-
   //-- Create Header Menu
   QMenu* entry = nullptr;
   QToolBar* toolbar = nullptr;
   QAction* action = nullptr;
-
-  //Global Toolbar
-  toolbar = addToolBar(tr("Simulation"));
 
   //Simualtion
   entry = menuBar()->addMenu(tr("&Simulation"));
@@ -147,57 +150,9 @@ void MainWindow::createActions()
   action = entry->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
   action->setStatusTip(tr("Show the Qt library's About box"));
 
-  //Toolbar Scenarios
-  QComboBox* box = new QComboBox;
-  box->addItem(tr("Select a Scenario"));
-  box->addItem(tr("item 2"));
-  box->addItem(tr("item 3"));
-  toolbar->addSeparator();
-  toolbar->addWidget(box);
-  //Toolbar Enviroments
-  box = new QComboBox;
-  box->addItem(tr("Select an Environment"));
-  box->addItem(tr("item 2"));
-  box->addItem(tr("item 3"));
-  toolbar->addSeparator();
-  toolbar->addWidget(box);
-  //Toolbar Patient
-  box = new QComboBox;
-  box->addItem(tr("Select a Patient"));
-  box->addItem(tr("item 2"));
-  box->addItem(tr("item 3"));
-  toolbar->addSeparator();
-  toolbar->addWidget(box);
-  //Toolbar launch
-  toolbar->addAction(launch);
-
-  QWidget* center = new QWidget;
-  setCentralWidget(center);
-
-  QHBoxLayout* hLayout = new QHBoxLayout;
-  QVBoxLayout* vLayout = new QVBoxLayout;
-
-  QListWidget* physiologyDataList = new QListWidget;
-  physiologyDataList->addItem("HeartRate");
-  physiologyDataList->addItem("Blood Pressure");
-  physiologyDataList->addItem("Breaths per Minute");
-  physiologyDataList->addItem("Tidal Volume");
-  physiologyDataList->addItem("Blood Surger Concentration");
-  QListWidget* preferenceDataList = new QListWidget;
-
-  QWidget* buttonWidget = new QWidget;
-
-  QPushButton* moveLeftButton = new QPushButton("<<");
-  QPushButton* moveRightButton  = new QPushButton(">>");
-
-  hLayout->addWidget(physiologyDataList);
-  vLayout->addWidget(moveRightButton);
-  vLayout->addWidget(moveLeftButton);
-  hLayout->addWidget(buttonWidget);
-  hLayout->addWidget(preferenceDataList);
-
-  center->setLayout(hLayout);
-  buttonWidget->setLayout(vLayout);
+  
+  addToolBar(_impl->runToolbar);
+  setCentralWidget(_impl->physiologySelection);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::createStatusBar()
