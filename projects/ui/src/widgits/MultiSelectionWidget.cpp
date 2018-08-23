@@ -20,11 +20,11 @@
 #include "MultiSelectionWidget.h"
 //External Includes
 #include <QtWidgets>
-
+#include <QSpacerItem>
 
 namespace biogears_ui {
 
-struct MultiSelectionWidget::Implementation {
+struct MultiSelectionWidget::Implementation: public QObject {
 public:
   Implementation();
   Implementation(const Implementation&);
@@ -33,14 +33,20 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  QListWidget* choices  = nullptr;
+  QListWidget* choices = nullptr;
   QListWidget* selected = nullptr;
+public slots: //QT5 Slots >(
+  void clearAllPreferences();
+  void moveSelectedLeft();
+  void moveSelectedRight();
+  void selectAllPreferences();
 };
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::Implementation::Implementation()
   : choices(new QListWidget)
   , selected(new QListWidget)
-{ }
+{
+}
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::Implementation::Implementation(const Implementation& obj)
 
@@ -67,6 +73,26 @@ MultiSelectionWidget::Implementation& MultiSelectionWidget::Implementation::oper
   return *this;
 }
 //-------------------------------------------------------------------------------
+void MultiSelectionWidget::Implementation::clearAllPreferences()
+{
+  
+}
+//-------------------------------------------------------------------------------
+void MultiSelectionWidget::Implementation::moveSelectedLeft()
+{
+  
+}
+//-------------------------------------------------------------------------------
+void MultiSelectionWidget::Implementation::moveSelectedRight()
+{
+  
+}
+//-------------------------------------------------------------------------------
+void MultiSelectionWidget::Implementation::selectAllPreferences()
+{
+  
+}
+//-------------------------------------------------------------------------------
 MultiSelectionWidget::MultiSelectionWidget()
   : _impl()
 {
@@ -83,12 +109,23 @@ MultiSelectionWidget::MultiSelectionWidget()
 
   QWidget* buttonWidget = new QWidget;
 
+  QPushButton* clearAllButton = new QPushButton("ClearAll");
   QPushButton* moveLeftButton = new QPushButton("<<");
   QPushButton* moveRightButton = new QPushButton(">>");
+  QPushButton* selectAllButton = new QPushButton("Move all");
+  //QSpacerItem* topSpacer = new QSpacerItem;
+
+  connect(clearAllButton, &QPushButton::clicked, _impl.get(), &Implementation::clearAllPreferences);
+  connect(moveLeftButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedLeft);
+  connect(moveRightButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedRight);
+  connect(selectAllButton, &QPushButton::clicked, _impl.get(), &Implementation::selectAllPreferences);
 
   hLayout->addWidget(physiologyDataList);
+  vLayout->addWidget(clearAllButton);
+  //vLayout->addWidget(topSpacer);
   vLayout->addWidget(moveRightButton);
   vLayout->addWidget(moveLeftButton);
+  vLayout->addWidget(selectAllButton);
   hLayout->addWidget(buttonWidget);
   hLayout->addWidget(preferenceDataList);
 
