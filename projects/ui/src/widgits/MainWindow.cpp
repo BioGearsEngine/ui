@@ -18,15 +18,19 @@
 //! \brief Primary window of BioGears UI
 
 #include "MainWindow.h"
+//Standard Includes
+#include <iostream>
 //External Includes
 #include <QtWidgets>
 //Project Includes
-#include "ScenarioToolbar.h"
+#include "../phys/PhysiologyDriver.h"
 #include "MultiSelectionWidget.h"
+#include "ScenarioToolbar.h"
+#include <biogears/string-exports.h>
 namespace biogears_ui {
 
-struct MainWindow::Implementation {
-public:
+struct MainWindow::Implementation : public QObject {
+public: //Functions
   Implementation();
   Implementation(const Implementation&);
   Implementation(Implementation&&);
@@ -34,18 +38,27 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  MultiSelectionWidget* physiologySelection;
-  ScenarioToolbar* runToolbar;
+public slots: //QT5 Slots >(
+  void handlePatientChange(int index);
+  void handleEnvironmentChange(int index);
+  void handleTimelineChange(int index);
+
+public: //Data
+  std::vector<PhysiologyDriver> drivers;
+
+  MultiSelectionWidget* physiologySelection = nullptr;
+  ScenarioToolbar* runToolbar = nullptr;
 };
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation()
   : physiologySelection(MultiSelectionWidget::create())
   , runToolbar(ScenarioToolbar::create())
 {
+  PhysiologyDriver driver("BiogearsGUI");
+  drivers.push_back(std::move(driver));
 }
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation(const Implementation& obj)
-
 {
   *this = obj;
 }
@@ -67,6 +80,39 @@ MainWindow::Implementation& MainWindow::Implementation::operator=(Implementation
   if (this != &rhs) {
   }
   return *this;
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handlePatientChange(int index)
+{
+  if (0 == index) {
+    drivers[0].clearPatient();
+  } else if (runToolbar->patientListSize() == index+1) {
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+      tr("Load patient file"), ".", tr("Biogears patient files (*.xml)"));
+    drivers[0].patient(fileName.toStdString());
+  }
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handleEnvironmentChange(int index)
+{
+  if (0 == index) {
+    drivers[0].clearEnvironment();
+  } else if (runToolbar->envrionmentListSize() == index + 1) {
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+      tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+    drivers[0].environment(fileName.toStdString());
+  }
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handleTimelineChange(int index)
+{
+  if (0 == index) {
+    drivers[0].clearTimeline();
+  } else if (runToolbar->timelineListSize() == index + 1) {
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+      tr("Load Timeline file"), ".", tr("Biogears Timeline files (*.xml)"));
+    drivers[0].timeline(fileName.toStdString());
+  }
 }
 //-------------------------------------------------------------------------------
 MainWindow::MainWindow()
@@ -150,13 +196,12 @@ void MainWindow::createActions()
   action = entry->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
   action->setStatusTip(tr("Show the Qt library's About box"));
 
-  
   addToolBar(_impl->runToolbar);
 
   setCentralWidget(_impl->physiologySelection);
-  connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, this, &MainWindow::about);
-  connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, this, &MainWindow::about);
-  connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, this, &MainWindow::about);
+  connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, _impl.get(), &Implementation::handlePatientChange);
+  connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, _impl.get(), &Implementation::handleEnvironmentChange);
+  connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, _impl.get(), &Implementation::handleTimelineChange);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::createStatusBar()

@@ -25,12 +25,14 @@
 #include <chrono>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
-#include <chrono>
 
 namespace biogears_ui {
 class PhysiologyDriver {
 public:
+  PhysiologyDriver();
   PhysiologyDriver(const std::string&);
+  PhysiologyDriver(const PhysiologyDriver&) = delete;
+  PhysiologyDriver(PhysiologyDriver&&);
   ~PhysiologyDriver();
 
 
@@ -40,8 +42,20 @@ public:
   bool isPaused();
 
   bool loadPatient(std::string path, std::string filename);
-  bool loadScenario(std::string path, std::string filename);
+  bool loadTimeline(std::string path, std::string filename);
   bool loadEnvironment(std::string path, std::string filename);
+
+  void clearPatient();
+  void clearEnvironment();
+  void clearTimeline();
+
+  std::string patient() const;
+  std::string environment() const;
+  std::string timeline() const;
+
+  void patient(const std::string&);
+  void environment(const std::string&);
+  void timeline(const std::string&);
 
   bool applyAction();
 

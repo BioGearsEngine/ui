@@ -23,7 +23,7 @@
 
 namespace biogears_ui {
 
-struct ScenarioToolbar::Implementation: QObject {
+struct ScenarioToolbar::Implementation : QObject {
 
 public:
   Implementation();
@@ -44,7 +44,7 @@ ScenarioToolbar::Implementation::Implementation()
   , enviroments(new QComboBox)
   , timelines(new QComboBox)
 
-{ 
+{
   //Toolbar Patient
   patients->addItem(tr("Select a Patient"));
   patients->addItem(tr("New Scenario"));
@@ -89,7 +89,7 @@ ScenarioToolbar::Implementation& ScenarioToolbar::Implementation::operator=(Impl
   }
   return *this;
 }
- //-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
 ScenarioToolbar::ScenarioToolbar()
   : QToolBar(tr("Simulation"))
   , _impl()
@@ -102,11 +102,10 @@ ScenarioToolbar::ScenarioToolbar()
   addSeparator();
 
   QIcon launchIcon = QIcon::fromTheme("Launch", QIcon(":/img/play.png"));
-  QAction* launch  = new QAction(launchIcon, tr("&Launch"), this);
+  QAction* launch = new QAction(launchIcon, tr("&Launch"), this);
   launch->setStatusTip(tr("Run current simulation"));
   addAction(launch);
 
-  
   connect(_impl->patients, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::patientChanged);
   connect(_impl->enviroments, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::envonmentChanged);
   connect(_impl->timelines, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::timelineChanged);
@@ -116,6 +115,12 @@ ScenarioToolbar::~ScenarioToolbar()
 {
   _impl = nullptr;
 }
+//-------------------------------------------------------------------------------
+int ScenarioToolbar::patientListSize() { return _impl->patients->count(); }
+//-------------------------------------------------------------------------------
+int ScenarioToolbar::envrionmentListSize() { return _impl->enviroments->count(); }
+//-------------------------------------------------------------------------------
+int ScenarioToolbar::timelineListSize() { return _impl->timelines->count(); }
 //-------------------------------------------------------------------------------
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
