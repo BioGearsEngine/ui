@@ -42,6 +42,9 @@ public slots: //QT5 Slots >(
   void handlePatientChange(int index);
   void handleEnvironmentChange(int index);
   void handleTimelineChange(int index);
+  void loadPatient();
+  void loadEnvironment();
+  void loadTimeline();
 
 public: //Data
   std::vector<PhysiologyDriver> drivers;
@@ -86,10 +89,13 @@ void MainWindow::Implementation::handlePatientChange(int index)
 {
   if (0 == index) {
     drivers[0].clearPatient();
-  } else if (runToolbar->patientListSize() == index+1) {
-    QString fileName = QFileDialog::getOpenFileName(nullptr,
-      tr("Load patient file"), ".", tr("Biogears patient files (*.xml)"));
-    drivers[0].patient(fileName.toStdString());
+  } else if (1 == index) {
+    drivers[0].clearPatient();
+    //New Patient Window
+  } else if (runToolbar->patientListSize() == index + 1) {
+    loadPatient();
+  } else {
+    //TODO:sawhite:Load Patient from Selection
   }
 }
 //-------------------------------------------------------------------------------
@@ -97,10 +103,14 @@ void MainWindow::Implementation::handleEnvironmentChange(int index)
 {
   if (0 == index) {
     drivers[0].clearEnvironment();
-  } else if (runToolbar->envrionmentListSize() == index + 1) {
-    QString fileName = QFileDialog::getOpenFileName(nullptr,
-      tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
-    drivers[0].environment(fileName.toStdString());
+  } else if (1 == index) {
+    drivers[0].clearEnvironment();
+    //New Environment;
+  }
+  if (runToolbar->envrionmentListSize() == index + 1) {
+    loadEnvironment();
+  } else {
+    //TODO:sawhite:Load Environment From Selection
   }
 }
 //-------------------------------------------------------------------------------
@@ -108,11 +118,35 @@ void MainWindow::Implementation::handleTimelineChange(int index)
 {
   if (0 == index) {
     drivers[0].clearTimeline();
+  } else if (1 == index) {
+    drivers[0].clearTimeline();
+    //New Timeline;
   } else if (runToolbar->timelineListSize() == index + 1) {
-    QString fileName = QFileDialog::getOpenFileName(nullptr,
-      tr("Load Timeline file"), ".", tr("Biogears Timeline files (*.xml)"));
-    drivers[0].timeline(fileName.toStdString());
+    loadTimeline();
+  } else {
+    //TODO:sawhite:Load Timeline From Selection
   }
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::loadPatient()
+{
+  QString fileName = QFileDialog::getOpenFileName(nullptr,
+  tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+  drivers[0].patient(fileName.toStdString());
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::loadEnvironment()
+{
+  QString fileName = QFileDialog::getOpenFileName(nullptr,
+    tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+  drivers[0].environment(fileName.toStdString());
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::loadTimeline()
+{
+  QString fileName = QFileDialog::getOpenFileName(nullptr,
+    tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+  drivers[0].timeline(fileName.toStdString());
 }
 //-------------------------------------------------------------------------------
 MainWindow::MainWindow()
@@ -165,20 +199,20 @@ void MainWindow::createActions()
   connect(action, &QAction::triggered, this, &MainWindow::run);
   entry->addAction(action);
 
-  //Simulation -> Load Scenario
-  action = new QAction(launchIcon, tr("&Load Scenario"), this);
-  action->setStatusTip(tr("Load an existing scenario file."));
-  connect(action, &QAction::triggered, this, &MainWindow::run);
+  //Simulation -> Load Patient
+  action = new QAction(tr("&Load Patient"), this);
+  action->setStatusTip(tr("Load an existing patient file."));
+  connect(action, &QAction::triggered, _impl.get(), &MainWindow::Implementation::loadPatient);
   entry->addAction(action);
   //Simulation -> Load Environment
-  action = new QAction(launchIcon, tr("&Load Environment"), this);
+  action = new QAction(tr("&Load Environment"), this);
   action->setStatusTip(tr("Load an existing environment file."));
-  connect(action, &QAction::triggered, this, &MainWindow::run);
+  connect(action, &QAction::triggered, _impl.get(), &MainWindow::Implementation::loadEnvironment);
   entry->addAction(action);
-  //Simulation -> Load Patient
-  action = new QAction(launchIcon, tr("&Load Patient"), this);
-  action->setStatusTip(tr("Load an existing psatient file."));
-  connect(action, &QAction::triggered, this, &MainWindow::run);
+  //Simulation -> Load timeline
+  action = new QAction(tr("&Load Timeline"), this);
+  action->setStatusTip(tr("Load an existing timeline file."));
+  connect(action, &QAction::triggered, _impl.get(), &MainWindow::Implementation::loadTimeline);
   entry->addAction(action);
   //Simulation -> Exit
   entry->addSeparator();

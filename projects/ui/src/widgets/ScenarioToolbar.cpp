@@ -47,22 +47,22 @@ ScenarioToolbar::Implementation::Implementation()
 {
   //Toolbar Patient
   patients->addItem(tr("Select a Patient"));
-  patients->addItem(tr("New Scenario"));
+  patients->addItem(tr("New Patient"));
   patients->addItem(tr("Austin Baird"));
   patients->addItem(tr("Nathan Tatum"));
-  patients->addItem(tr("Load from file..."));
+  patients->addItem(tr("Load patient from file..."));
   //Toolbar Enviroments
   enviroments->addItem(tr("Select an Environment"));
   enviroments->addItem(tr("New Environment"));
   enviroments->addItem(tr("desert"));
   enviroments->addItem(tr("jungle"));
-  enviroments->addItem(tr("Load from file..."));
+  enviroments->addItem(tr("Load environment from file..."));
   //Toolbar timelines
   timelines->addItem(tr("New Timeline"));
   timelines->addItem(tr("Select a Timeline"));
   timelines->addItem(tr("Pool exercise"));
   timelines->addItem(tr("Mardi Gras Asthma Attack"));
-  timelines->addItem(tr("Load from file..."));
+  timelines->addItem(tr("Load timeline from file..."));
 }
 //-------------------------------------------------------------------------------
 ScenarioToolbar::Implementation::Implementation(const Implementation& obj)
@@ -102,9 +102,14 @@ ScenarioToolbar::ScenarioToolbar()
   addSeparator();
 
   QIcon launchIcon = QIcon::fromTheme("Launch", QIcon(":/img/play.png"));
-  QAction* launch = new QAction(launchIcon, tr("&Launch"), this);
-  launch->setStatusTip(tr("Run current simulation"));
-  addAction(launch);
+  QAction* action = new QAction(launchIcon, tr("&Launch"), this);
+  action->setStatusTip(tr("Run current simulation"));
+  addAction(action);
+ 
+  QIcon pauseIcon = QIcon::fromTheme("Pause", QIcon(":/img/pause.png"));
+  action = new QAction(pauseIcon, tr("&Pause"), this);
+  action->setStatusTip(tr("Pause running simulation"));
+  addAction(action);
 
   connect(_impl->patients, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::patientChanged);
   connect(_impl->enviroments, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::envonmentChanged);

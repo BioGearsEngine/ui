@@ -21,7 +21,7 @@
 
 #include "MultiSelectionWidget.h"
 //External Includes
-#include <QSpacerItem>
+#include <QtAlgorithms>
 #include <QtWidgets>
 
 namespace biogears_ui {
@@ -86,18 +86,22 @@ void MultiSelectionWidget::Implementation::clearAllPreferences()
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedLeft()
 {
-  auto pickList = selected->selectionModel()->selectedIndexes();
-  for (auto item : pickList) {
-    choices->addItem(selected->takeItem(0));   
+  auto pickList = selected->selectionModel()->selectedIndexes().toVector();
+  qSort(pickList.begin(), pickList.end());
+  for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
+    auto check = item->row();
+    choices->addItem(selected->takeItem(item->row()));   
   }
   choices->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedRight()
 {
-  auto pickList = choices->selectionModel()->selectedIndexes();
-  for (auto item : pickList) {
-    selected->addItem(choices->takeItem(0));
+  auto pickList =choices->selectionModel()->selectedIndexes().toVector();
+  qSort(pickList.begin(), pickList.end());
+  for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
+    auto check = item->row();
+    selected->addItem(choices->takeItem(item->row()));
   }
   selected->sortItems();
 }

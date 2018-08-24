@@ -7,5 +7,6 @@
     <file>img/paste.png</file>
     <file>img/save.png</file>
     <file>img/play.png</file>
+    <file>img/pause.png</file>
 </qresource>
 </RCC>
