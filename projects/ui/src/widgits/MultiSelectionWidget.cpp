@@ -16,15 +16,17 @@
 //!
 //!
 //! \brief Primary window of BioGears UI
+#include <biogears/string-exports.h>
+#include <iostream>
 
 #include "MultiSelectionWidget.h"
 //External Includes
-#include <QtWidgets>
 #include <QSpacerItem>
+#include <QtWidgets>
 
 namespace biogears_ui {
 
-struct MultiSelectionWidget::Implementation: public QObject {
+struct MultiSelectionWidget::Implementation : public QObject {
 public:
   Implementation();
   Implementation(const Implementation&);
@@ -75,22 +77,38 @@ MultiSelectionWidget::Implementation& MultiSelectionWidget::Implementation::oper
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::clearAllPreferences()
 {
-  
+  int remianing = selected->count();
+  for (auto i = 0; i < remianing; ++i) {
+    choices->addItem(selected->takeItem(0));
+  }
+  choices->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedLeft()
 {
-  
+  auto pickList = selected->selectionModel()->selectedIndexes();
+  for (auto item : pickList) {
+    choices->addItem(selected->takeItem(0));   
+  }
+  choices->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedRight()
 {
-  
+  auto pickList = choices->selectionModel()->selectedIndexes();
+  for (auto item : pickList) {
+    selected->addItem(choices->takeItem(0));
+  }
+  selected->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::selectAllPreferences()
 {
-  
+  int remianing = choices->count();
+  for (auto i = 0; i < remianing; ++i) {
+    selected->addItem(choices->takeItem(0));
+  }
+  selected->sortItems();
 }
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::MultiSelectionWidget()
@@ -99,13 +117,13 @@ MultiSelectionWidget::MultiSelectionWidget()
   QHBoxLayout* hLayout = new QHBoxLayout;
   QVBoxLayout* vLayout = new QVBoxLayout;
 
-  QListWidget* physiologyDataList = new QListWidget;
-  physiologyDataList->addItem("HeartRate");
-  physiologyDataList->addItem("Blood Pressure");
-  physiologyDataList->addItem("Breaths per Minute");
-  physiologyDataList->addItem("Tidal Volume");
-  physiologyDataList->addItem("Blood Surger Concentration");
-  QListWidget* preferenceDataList = new QListWidget;
+  auto& choices = _impl->choices;
+  choices->addItem("HeartRate");
+  choices->addItem("Blood Pressure");
+  choices->addItem("Breaths per Minute");
+  choices->addItem("Tidal Volume");
+  choices->addItem("Blood Surger Concentration");
+  choices->sortItems();
 
   QWidget* buttonWidget = new QWidget;
 
@@ -113,21 +131,24 @@ MultiSelectionWidget::MultiSelectionWidget()
   QPushButton* moveLeftButton = new QPushButton("<<");
   QPushButton* moveRightButton = new QPushButton(">>");
   QPushButton* selectAllButton = new QPushButton("Move all");
-  //QSpacerItem* topSpacer = new QSpacerItem;
-
+ 
   connect(clearAllButton, &QPushButton::clicked, _impl.get(), &Implementation::clearAllPreferences);
   connect(moveLeftButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedLeft);
   connect(moveRightButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedRight);
   connect(selectAllButton, &QPushButton::clicked, _impl.get(), &Implementation::selectAllPreferences);
 
-  hLayout->addWidget(physiologyDataList);
+  choices->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+  _impl->selected->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+
+  hLayout->addWidget(choices);
   vLayout->addWidget(clearAllButton);
-  //vLayout->addWidget(topSpacer);
+  vLayout->insertStretch(1);
   vLayout->addWidget(moveRightButton);
   vLayout->addWidget(moveLeftButton);
+  vLayout->insertStretch(4);
   vLayout->addWidget(selectAllButton);
   hLayout->addWidget(buttonWidget);
-  hLayout->addWidget(preferenceDataList);
+  hLayout->addWidget(_impl->selected);
 
   setLayout(hLayout);
   buttonWidget->setLayout(vLayout);
