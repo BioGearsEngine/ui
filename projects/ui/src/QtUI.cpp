@@ -9,7 +9,7 @@
 //Project Includes
 #include <utils/State.h>
 #include <utils/StateManager.h>
-#include <widgits/MainWindow.h>
+#include <widgets/MainWindow.h>
 
 namespace biogears_ui {
 
