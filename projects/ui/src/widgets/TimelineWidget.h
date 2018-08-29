@@ -1,4 +1,5 @@
-
+#ifndef BIOGEARSUI_WIDGETS_TIMELINE_WIDGET_H
+#define BIOGEARSUI_WIDGETS_TIMELINE_WIDGET_H
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
@@ -21,19 +22,30 @@
 
 //External Includes
 #include <QWidget>
+#include <QtGui>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
 class TimelineWidget : public QWidget {
-Q_OBJECT
+  Q_OBJECT
 public:
-  TimelineWidget();
+  TimelineWidget(QWidget* parent = 0);
   ~TimelineWidget();
+
+  QSize minimumSizeHint() const;
+  QSize sizeHint() const;
+  using TimelineWidgetPtr = TimelineWidget*;
+
+  static auto create() -> TimelineWidgetPtr;
+
+protected : 
+	void paintEvent(QPaintEvent* event);
 
 private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
 };
-
 }
+
+#endif
