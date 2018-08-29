@@ -21,14 +21,17 @@
 
 #include "TimelineEntry.h"
 
+
 namespace biogears_ui {
 class TimelineAction : public TimelineEntry {
+
 public:
-  TimelineAction(QWidget* parent = 0);
+  TimelineAction(QWidget* parent);
   ~TimelineAction();
 
-  void paintEvent(QPaintEvent* event) const;
-
+  void drawEntry() const;
+  QSize minimumSizeHint() const;
+  QSize sizeHint() const;
 };
 }
 #endif

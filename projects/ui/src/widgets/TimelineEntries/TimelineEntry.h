@@ -29,12 +29,18 @@ namespace biogears_ui {
 class TimelineEntry : public QWidget {
   Q_OBJECT
 public:
-  virtual void paintEvent(QPaintEvent* event) const = 0;
+  TimelineEntry(QWidget* parent)
+    : QWidget(parent){};
+
+
+  virtual void drawEntry() const = 0;
+  virtual QSize minimumSizeHint() const = 0;
+  virtual QSize sizeHint() const = 0;
 
   int getX() const { return _x; };
   int getY() const { return _y; };
   int getWidth() const { return _width; };
-  int getHeight() const {return _height; };
+  int getHeight() const { return _height; };
   void setX(int x) { _x = x; };
   void setY(int y) { _y = y; };
 
