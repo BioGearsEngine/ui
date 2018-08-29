@@ -26,12 +26,12 @@ namespace biogears_ui {
 class TimelineAction : public TimelineEntry {
 
 public:
-  TimelineAction(QWidget* parent);
+  TimelineAction(QWidget* parent = 0);
   ~TimelineAction();
 
-  void drawEntry() const;
-  QSize minimumSizeHint() const;
-  QSize sizeHint() const;
+  void drawEntry(TimelineWidget* timeline) const override;
+  QSize minimumSizeHint() const override;
+  QSize sizeHint() const override;
 };
 }
 #endif

@@ -29,18 +29,22 @@ TimelineAction::~TimelineAction()
 {
 }
 
-void TimelineAction::drawEntry() const
+void TimelineAction::drawEntry(TimelineWidget* timeline) const
 {
+  QPainter painter(timeline);
+  painter.setPen(QPen(Qt::GlobalColor::darkGreen, 3.0));
+  painter.drawLine(0, 0, timeline->rect().width(), timeline->rect().height());
+
 }
 
 QSize TimelineAction::minimumSizeHint() const
 {
-  return QSize(100, 100);
+  return QSize(10, 10);
 }
 
 QSize TimelineAction::sizeHint() const
 {
-  return QSize(100, 100);
+  return QSize(25, 25);
 }
 //-----------------------------------------------------------------------------------------
 }

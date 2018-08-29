@@ -39,8 +39,9 @@ public:
 
   static auto create() -> TimelineWidgetPtr;
 
-protected : 
-	void paintEvent(QPaintEvent* event);
+
+protected:
+  void paintEvent(QPaintEvent* event) override;
 
 private:
   struct Implementation;

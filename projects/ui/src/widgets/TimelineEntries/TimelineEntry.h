@@ -19,6 +19,8 @@
 //!
 //! \brief Base class for elements that are drawn on to timeline (scenario actions and patient events)
 
+//Project Includes
+#include "../TimelineWidget.h"
 //External Includes
 #include <QWidget>
 #include <QtGui>
@@ -31,18 +33,26 @@ class TimelineEntry : public QWidget {
 public:
   TimelineEntry(QWidget* parent)
     : QWidget(parent){};
+  virtual ~TimelineEntry(){};
 
-
-  virtual void drawEntry() const = 0;
+  virtual void drawEntry(TimelineWidget* timeline) const = 0;
   virtual QSize minimumSizeHint() const = 0;
   virtual QSize sizeHint() const = 0;
 
-  int getX() const { return _x; };
-  int getY() const { return _y; };
-  int getWidth() const { return _width; };
-  int getHeight() const { return _height; };
-  void setX(int x) { _x = x; };
-  void setY(int y) { _y = y; };
+  int X() const { return _x; };
+  int Y() const { return _y; };
+  int Width() const { return _width; };
+  int Height() const { return _height; };
+  TimelineEntry& X(int x)
+  {
+    _x = x;
+    return *this;
+  };
+  TimelineEntry& Y(int y)
+  {
+    _y = y;
+    return *this;
+  };
 
 protected:
   int _x;

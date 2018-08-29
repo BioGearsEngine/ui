@@ -17,10 +17,11 @@
 //!
 //! \brief Graphical timeline of scenario actions for BioGears UI
 
+#include "TimelineEntries/TimelineEvent.h"
+#include "TimelineEntries/TimelineAction.h"
 #include "TimelineWidget.h"
 //External Includes
-
-
+#include <QVector>
 
 namespace biogears_ui {
 
@@ -30,30 +31,35 @@ public:
   Implementation(const Implementation&);
   Implementation(Implementation&&);
 
-  void processPaintEvent(QWidget* timeline);
+  void processPaintEvent(TimelineWidget* timeline);
   QSize getMinimumSizeHint() const;
   QSize getSizeHint() const;
 
-
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
+
+  QVector<TimelineEntry*> timelineEntries;
 
   int penWidth;
   QColor penColor;
   QBrush backgroundBrush;
   QSize minSizeHint;
   QSize sizeHint;
-
-
 };
 
 TimelineWidget::Implementation::Implementation()
 {
   penWidth = 3;
   penColor = Qt::GlobalColor::darkBlue;
-  backgroundBrush = QBrush(Qt::GlobalColor::white,Qt::BrushStyle::SolidPattern);
+  backgroundBrush = QBrush(Qt::GlobalColor::white, Qt::BrushStyle::SolidPattern);
   minSizeHint = QSize(100, 100);
   sizeHint = QSize(400, 250);
+
+  //Test out making a timeline action
+  TimelineAction* sampleAction = new TimelineAction();
+  TimelineEvent* sampleEvent = new TimelineEvent();
+  timelineEntries.push_back(sampleAction);
+  timelineEntries.push_back(sampleEvent);
 }
 //-------------------------------------------------------------------------------
 TimelineWidget::Implementation::Implementation(const Implementation& obj)
@@ -81,15 +87,19 @@ TimelineWidget::Implementation& TimelineWidget::Implementation::operator=(Implem
   return *this;
 }
 //---------------------------------------------------------------------------------
-void TimelineWidget::Implementation::processPaintEvent(QWidget* timeline)
+void TimelineWidget::Implementation::processPaintEvent(TimelineWidget* timeline)
 {
   QPainter painter(timeline);
   //Set up background
   painter.fillRect(timeline->rect(), backgroundBrush);
   //Draw a line
   painter.setPen(QPen(penColor, penWidth));
-  painter.drawLine(0, timeline->rect().height()/2, timeline->rect().width(), timeline->rect().height()/2);
+  painter.drawLine(0, timeline->rect().height() / 2, timeline->rect().width(), timeline->rect().height() / 2);
 
+  for (auto entry : timelineEntries)
+  {
+    entry->drawEntry(timeline);
+  }
 }
 //----------------------------------------------------------------------------------
 QSize TimelineWidget::Implementation::getMinimumSizeHint() const
@@ -101,8 +111,8 @@ QSize TimelineWidget::Implementation::getSizeHint() const
 {
   return sizeHint;
 }
-  //--------------------------------------------------------------------------------
-TimelineWidget::TimelineWidget(QWidget *parent)
+//--------------------------------------------------------------------------------
+TimelineWidget::TimelineWidget(QWidget* parent)
   : QWidget(parent)
   , _impl()
 {
@@ -127,14 +137,10 @@ QSize TimelineWidget::sizeHint() const
 {
   return _impl->getSizeHint();
 }
-
 //----------------------------------------------------------------------------------
-auto TimelineWidget::create()->TimelineWidgetPtr
+auto TimelineWidget::create() -> TimelineWidgetPtr
 {
   return new TimelineWidget;
 }
 //----------------------------------------------------------------------------------
-
-
 }
-
