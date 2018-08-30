@@ -45,10 +45,6 @@ set(COMMON_SOURCES ${SRCS} ${GEN_SRCS})
 if (BIOGEARS_COMMON_BUILD_STATIC)
   list(APPEND COMMON_CPPFLAGS_PUBLIC "-DBIOGEARS_COMMON_BUILD_STATIC")
 endif()
-if(WIN32)
-  list(APPEND COMMON_CPPFLAGS_PUBLIC )
-  list(APPEND COMMON_CPPFLAGS_PRIVATE "-D_CRT_SECURE_NO_WARNINGS" $ENV{PBIOLLEL_COMPILE} ${CodeSynthesis_CPPFLAGS})
-endif()
 
 if(BIOGEARS_COMMON_BUILD_STATIC)
   add_library(biogears_common STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
@@ -56,9 +52,6 @@ else()
   add_library(biogears_common SHARED ${COMMON_SOURCES} ${COMMON_HEADERS})
 endif()
 add_library(Biogears::common ALIAS biogears_common)
-
-target_compile_definitions(biogears_common PRIVATE ${COMMON_CPPFLAGS_PRIVATE} PUBLIC ${COMMON_CPPFLAGS_PUBLIC} )
-
 
 set_target_properties(biogears_common
     PROPERTIES
@@ -70,9 +63,14 @@ set_target_properties(biogears_common
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
     CXX_STANDARD 14
     )
-
-if(CMAKE_COMPILER_IS_GNUCXX AND DEFINED COMMON_LDFLAGS)
-    set_target_properties(biogears_common PROPERTIES LINK_FLAGS ${COMMON_LDFLAGS})
+add_dependencies(biogears_common stage_runtime)
+if(WIN32)
+  target_compile_definitions(biogears_common PRIVATE _SCL_SECURE_NO_WARNINGS _CRT_SECURE_NO_WARNINGS bigobj)
+  target_compile_options(biogears_common PRIVATE $<$<PLATFORM_ID:Windows>:/bigobj>  PRIVATE $<$<PLATFORM_ID:Windows>:/MP>)
+elseif(CMAKE_COMPILER_IS_GNUCXX)
+endif()
+if(NOT Boost_USE_STATIC_LIBS)
+   target_compile_definitions(biogears_common PUBLIC "BOOST_PROGRAM_OPTIONS_DYN_LINK=1")
 endif()
 
 ###############################################################################

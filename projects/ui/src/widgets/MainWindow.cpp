@@ -22,11 +22,15 @@
 #include <iostream>
 //External Includes
 #include <QtWidgets>
+#include <QTabWidget>
+#include <biogears/string-exports.h>
 //Project Includes
 #include "../phys/PhysiologyDriver.h"
 #include "MultiSelectionWidget.h"
 #include "ScenarioToolbar.h"
-#include <biogears/string-exports.h>
+#include "PatientConfigWidget.h"
+#include "EnvironmentConfigWidget.h"
+#include "TimelineConfigWidget.h"
 namespace biogears_ui {
 
 struct MainWindow::Implementation : public QObject {
@@ -51,11 +55,17 @@ public: //Data
 
   MultiSelectionWidget* physiologySelection = nullptr;
   ScenarioToolbar* runToolbar = nullptr;
+  PatientConfigWidget* patient_widget = nullptr;
+  EnvironmentConfigWidget* envrionment_widget = nullptr;
+  TimelineConfigWidget* timeline_widget= nullptr;
 };
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation()
   : physiologySelection(MultiSelectionWidget::create())
   , runToolbar(ScenarioToolbar::create())
+  , patient_widget(PatientConfigWidget::create())
+  , envrionment_widget(EnvironmentConfigWidget::create())
+  , timeline_widget(TimelineConfigWidget::create())
 {
   PhysiologyDriver driver("BiogearsGUI");
   drivers.push_back(std::move(driver));
@@ -91,7 +101,6 @@ void MainWindow::Implementation::handlePatientChange(int index)
     drivers[0].clearPatient();
   } else if (1 == index) {
     drivers[0].clearPatient();
-    //New Patient Window
   } else if (runToolbar->patientListSize() == index + 1) {
     loadPatient();
   } else {
@@ -189,7 +198,7 @@ void MainWindow::createActions()
   QMenu* entry = nullptr;
   QToolBar* toolbar = nullptr;
   QAction* action = nullptr;
-
+  QTabWidget* tabs = nullptr;
   //Simualtion
   entry = menuBar()->addMenu(tr("&Simulation"));
   //Simulation -> Launch
@@ -232,7 +241,14 @@ void MainWindow::createActions()
 
   addToolBar(_impl->runToolbar);
 
-  setCentralWidget(_impl->physiologySelection);
+  tabs = new QTabWidget();
+
+  tabs->addTab(_impl->physiologySelection, "Outputs");
+  tabs->addTab(_impl->patient_widget, "Patient");
+  tabs->addTab(_impl->envrionment_widget, "Environment");
+  tabs->addTab(_impl->timeline_widget, "Timeline");
+  setCentralWidget(tabs);
+
   connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, _impl.get(), &Implementation::handlePatientChange);
   connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, _impl.get(), &Implementation::handleEnvironmentChange);
   connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, _impl.get(), &Implementation::handleTimelineChange);
