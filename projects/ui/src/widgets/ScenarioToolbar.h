@@ -28,12 +28,12 @@ namespace biogears_ui {
 class ScenarioToolbar : public QToolBar {
   Q_OBJECT
 public:
-  ScenarioToolbar();
+  ScenarioToolbar(QWidget* parent = nullptr);
   ~ScenarioToolbar();
 
   using ScenarioToolbarPtr = ScenarioToolbar*;
 
-  static auto create() -> ScenarioToolbarPtr;
+  static auto create(QWidget* parent = nullptr) -> ScenarioToolbarPtr;
 
   int patientListSize();
   int envrionmentListSize();

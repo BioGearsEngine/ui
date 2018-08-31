@@ -28,12 +28,12 @@ namespace biogears_ui {
 class EnvironmentConfigWidget : public QWidget {
   Q_OBJECT
 public:
-  EnvironmentConfigWidget();
+  EnvironmentConfigWidget(QWidget* parent = nullptr);
   ~EnvironmentConfigWidget();
 
   using EnvironmentConfigWidgetPtr = EnvironmentConfigWidget*;
 
-  static auto create() -> EnvironmentConfigWidgetPtr;
+  static auto create(QWidget* parent = nullptr) -> EnvironmentConfigWidgetPtr;
 
   int patientListSize();
   int envrionmentListSize();

@@ -28,12 +28,12 @@ namespace biogears_ui {
 class TimelineConfigWidget : public QWidget {
   Q_OBJECT
 public:
-  TimelineConfigWidget();
+  TimelineConfigWidget(QWidget* parent = nullptr);
   ~TimelineConfigWidget();
 
   using TimelineConfigWidgetPtr = TimelineConfigWidget*;
 
-  static auto create() -> TimelineConfigWidgetPtr;
+  static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
 
   int patientListSize();
   int envrionmentListSize();

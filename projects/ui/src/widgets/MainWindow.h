@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  MainWindow();
+  MainWindow(QWidget* parent);
   ~MainWindow();
 
   void loadFile(const QString& fileName);

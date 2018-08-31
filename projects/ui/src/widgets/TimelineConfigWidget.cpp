@@ -26,7 +26,7 @@ namespace biogears_ui {
 struct TimelineConfigWidget::Implementation : QObject {
 
 public:
-  Implementation();
+  Implementation(QWidget* parent = nullptr);
   Implementation(const Implementation&);
   Implementation(Implementation&&);
 
@@ -36,7 +36,7 @@ public:
 public:
 };
 //-------------------------------------------------------------------------------
-TimelineConfigWidget::Implementation::Implementation()
+TimelineConfigWidget::Implementation::Implementation(QWidget* parent)
 
 {
 }
@@ -66,9 +66,9 @@ TimelineConfigWidget::Implementation& TimelineConfigWidget::Implementation::oper
   return *this;
 }
 //-------------------------------------------------------------------------------
-TimelineConfigWidget::TimelineConfigWidget()
-  : QWidget()
-  , _impl()
+TimelineConfigWidget::TimelineConfigWidget(QWidget* parent)
+  : QWidget(parent)
+  , _impl(this)
 {
 }
 //-------------------------------------------------------------------------------
@@ -80,8 +80,8 @@ TimelineConfigWidget::~TimelineConfigWidget()
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
 //!        the caller is responsible for all memory management
-auto TimelineConfigWidget::create() -> TimelineConfigWidgetPtr
+auto TimelineConfigWidget::create(QWidget* parent) -> TimelineConfigWidgetPtr
 {
-  return new TimelineConfigWidget;
+  return new TimelineConfigWidget(parent);
 }
 }

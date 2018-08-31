@@ -26,7 +26,7 @@ namespace biogears_ui {
 struct ScenarioToolbar::Implementation : QObject {
 
 public:
-  Implementation();
+  Implementation(QWidget* parent);
   Implementation(const Implementation&);
   Implementation(Implementation&&);
 
@@ -39,10 +39,10 @@ public:
   QComboBox* timelines;
 };
 //-------------------------------------------------------------------------------
-ScenarioToolbar::Implementation::Implementation()
-  : patients(new QComboBox)
-  , enviroments(new QComboBox)
-  , timelines(new QComboBox)
+ScenarioToolbar::Implementation::Implementation(QWidget* parent)
+  : patients(new QComboBox(parent))
+  , enviroments(new QComboBox(parent))
+  , timelines(new QComboBox(parent))
 
 {
   //Toolbar Patient
@@ -90,9 +90,9 @@ ScenarioToolbar::Implementation& ScenarioToolbar::Implementation::operator=(Impl
   return *this;
 }
 //-------------------------------------------------------------------------------
-ScenarioToolbar::ScenarioToolbar()
-  : QToolBar(tr("Simulation"))
-  , _impl()
+ScenarioToolbar::ScenarioToolbar(QWidget* parent)
+  : QToolBar(tr("Simulation"),parent)
+  , _impl(this)
 {
   addWidget(_impl->patients);
   addSeparator();
@@ -131,8 +131,8 @@ int ScenarioToolbar::timelineListSize() { return _impl->timelines->count(); }
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
 //!        the caller is responsible for all memory management
 
-auto ScenarioToolbar::create() -> ScenarioToolbarPtr
+auto ScenarioToolbar::create(QWidget* parent) -> ScenarioToolbarPtr
 {
-  return new ScenarioToolbar;
+  return new ScenarioToolbar(parent);
 }
 }

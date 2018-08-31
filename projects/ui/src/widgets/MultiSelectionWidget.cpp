@@ -28,7 +28,7 @@ namespace biogears_ui {
 
 struct MultiSelectionWidget::Implementation : public QObject {
 public:
-  Implementation();
+  Implementation(QWidget* parent = nullptr);
   Implementation(const Implementation&);
   Implementation(Implementation&&);
 
@@ -44,9 +44,9 @@ public slots: //QT5 Slots >(
   void selectAllPreferences();
 };
 //-------------------------------------------------------------------------------
-MultiSelectionWidget::Implementation::Implementation()
-  : choices(new QListWidget)
-  , selected(new QListWidget)
+MultiSelectionWidget::Implementation::Implementation(QWidget* parent)
+  : choices(new QListWidget(parent))
+  , selected(new QListWidget(parent))
 {
 }
 //-------------------------------------------------------------------------------
@@ -115,8 +115,9 @@ void MultiSelectionWidget::Implementation::selectAllPreferences()
   selected->sortItems();
 }
 //-------------------------------------------------------------------------------
-MultiSelectionWidget::MultiSelectionWidget()
-  : _impl()
+MultiSelectionWidget::MultiSelectionWidget(QWidget* parent)
+  : QWidget(parent)
+  ,_impl(this)
 {
   QHBoxLayout* hLayout = new QHBoxLayout;
   QVBoxLayout* vLayout = new QVBoxLayout;
@@ -167,9 +168,9 @@ MultiSelectionWidget::~MultiSelectionWidget()
 //! \brief returns a MultiSelectionWidget* which it retains no ownership of
 //!        the caller is responsible for all memory management
 
-auto MultiSelectionWidget::create() -> MultiSelectionWidgetPtr
+auto MultiSelectionWidget::create(QWidget* parent) -> MultiSelectionWidgetPtr
 {
-  return new MultiSelectionWidget;
+  return new MultiSelectionWidget(parent);
 }
 //-------------------------------------------------------------------------------
 }

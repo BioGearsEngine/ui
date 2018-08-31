@@ -30,7 +30,7 @@ public:
 };
 QtUI::Implementation::Implementation()
   : application_state()
-  , main_window()
+  , main_window(nullptr)
 {
 }
 //---------------------------------------------------------------------------
@@ -38,7 +38,7 @@ QtUI::Implementation::Implementation()
 
 QtUI::Implementation::Implementation(std::vector<std::string>)
   : application_state()
-  , main_window()
+  , main_window(nullptr)
 {
 }
 //---------------------------------------------------------------------------

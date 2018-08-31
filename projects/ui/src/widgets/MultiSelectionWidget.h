@@ -28,13 +28,13 @@ namespace biogears_ui {
 class MultiSelectionWidget : public QWidget {
   Q_OBJECT
 public:
-  MultiSelectionWidget();
+  MultiSelectionWidget(QWidget* parent);
   ~MultiSelectionWidget();
 
 
   using MultiSelectionWidgetPtr = MultiSelectionWidget*;
 
-  static auto create() -> MultiSelectionWidgetPtr;
+  static auto create(QWidget* parent) -> MultiSelectionWidgetPtr;
 
 private:
   struct Implementation;

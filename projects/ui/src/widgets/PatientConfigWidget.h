@@ -28,12 +28,12 @@ namespace biogears_ui {
 class PatientConfigWidget : public QWidget {
   Q_OBJECT
 public:
-  PatientConfigWidget();
+  PatientConfigWidget(QWidget* parent = nullptr);
   ~PatientConfigWidget();
 
   using PatientConfigWidgetPtr = PatientConfigWidget*;
 
-  static auto create() -> PatientConfigWidgetPtr;
+  static auto create(QWidget* parent = nullptr) -> PatientConfigWidgetPtr;
 
   int patientListSize();
   int envrionmentListSize();
