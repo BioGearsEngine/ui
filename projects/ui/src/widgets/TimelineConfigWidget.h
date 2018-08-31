@@ -32,12 +32,22 @@ public:
   ~TimelineConfigWidget();
 
   using TimelineConfigWidgetPtr = TimelineConfigWidget*;
+  
+  void addAction(const std::string& name, double time);
+  bool removeAction(const std::string& name);
+  void ScenarioTime(double time);
+  double ScenarioTime();
 
   static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
+
+  int patientListSize();
+  int envrionmentListSize();
+  int timelineListSize();
 signals:
   void valueChanged();
 
 private:
+  struct TimelineData;
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
 };
