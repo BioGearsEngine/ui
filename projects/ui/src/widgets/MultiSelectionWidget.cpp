@@ -22,6 +22,7 @@
 #include "MultiSelectionWidget.h"
 //Project Includes
 #include "TimelineWidget.h"
+#include "utils/ScenarioManager.h"
 //External Includes
 #include <QtAlgorithms>
 #include <QtWidgets>
@@ -153,7 +154,9 @@ MultiSelectionWidget::MultiSelectionWidget(QWidget* parent)
   _impl->selected->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
 
   auto actionTimeline = TimelineWidget::create();
- 
+  ScenarioManager* sMan = new ScenarioManager();
+  sMan->scenarioTime(30.0);
+
 
   hLayout->addWidget(choices);
   vLayout->addWidget(clearAllButton);

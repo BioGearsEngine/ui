@@ -20,6 +20,8 @@
 //!
 //! \brief Graphical timeline of scenario actions
 
+#include "TimelineEntries/TimelineAction.h"
+#include "TimelineEntries/TimelineEvent.h"
 //External Includes
 #include <QWidget>
 #include <QtGui>
@@ -33,12 +35,16 @@ public:
   TimelineWidget(QWidget* parent = 0);
   ~TimelineWidget();
 
+  void addAction(TimelineAction* bgAction);
+  void addEvent(TimelineEvent* bgEvent);
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
-  using TimelineWidgetPtr = TimelineWidget*;
 
+  using TimelineWidgetPtr = TimelineWidget*;
   static auto create() -> TimelineWidgetPtr;
 
+public slots:
+  void actionAdded();
 
 protected:
   void paintEvent(QPaintEvent* event) override;

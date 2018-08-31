@@ -1,3 +1,6 @@
+#ifndef BIOGEARSUI_UTILS_SCENARIO_MANAGER_H
+#define BIOGEARSUI_UTILS_SCENARIO_MANAGER_H
+
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
 //- Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -11,40 +14,32 @@
 //-------------------------------------------------------------------------------------------
 
 //!
-//! \author Matt McDaniel
-//! \date   Aug 29 2018
+//! \author Matthew McDaniel
+//! \date   August 30th 2018
 //!
-//! \brief Derived from Timeline Entry class, handles drawing of scenario actions
+//!
 
-#include "TimelineAction.h"
+//Project includes
+#include <biogears/framework/unique_propagate_const.h>
+//Standard Includes
+#include <string>
+#include <vector>
 
 namespace biogears_ui {
+class ScenarioManager {
+public:
+  ScenarioManager();
+  ~ScenarioManager();
 
-TimelineAction::TimelineAction(QWidget* parent)
-: TimelineEntry(parent)
-{
-}
-  
-TimelineAction::~TimelineAction() 
-{
-}
+  void addAction(const std::string& name, double startTime);
+  bool removeAction(const std::string& name);
+  void scenarioTime(double time);
+  double scenarioTime();
 
-void TimelineAction::drawEntry(QWidget* timeline) const
-{
-  QPainter painter(timeline);
-  painter.setPen(QPen(Qt::GlobalColor::darkGreen, 3.0));
-  painter.drawLine(0, 0, timeline->rect().width(), timeline->rect().height());
-
+private:
+  struct BioGearsAction;
+  struct Implementation;
+  biogears::unique_propagate_const<Implementation> _impl;
+};
 }
-
-QSize TimelineAction::minimumSizeHint() const
-{
-  return QSize(10, 10);
-}
-
-QSize TimelineAction::sizeHint() const
-{
-  return QSize(25, 25);
-}
-//-----------------------------------------------------------------------------------------
-}
+#endif

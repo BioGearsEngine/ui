@@ -28,7 +28,7 @@ public:
   TimelineEvent(QWidget* parent = 0);
   ~TimelineEvent();
 
-  void drawEntry(TimelineWidget* timeline) const override;
+  void drawEntry(QWidget* timeline) const override;
   QSize minimumSizeHint() const override;
   QSize sizeHint() const override;
 };

@@ -17,8 +17,7 @@
 //!
 //! \brief Graphical timeline of scenario actions for BioGears UI
 
-#include "TimelineEntries/TimelineEvent.h"
-#include "TimelineEntries/TimelineAction.h"
+
 #include "TimelineWidget.h"
 //External Includes
 #include <QVector>
@@ -38,7 +37,8 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  QVector<TimelineEntry*> timelineEntries;
+  QVector<TimelineEntry*> timelineActions;
+  QVector<TimelineEntry*> timelineEvents;
 
   int penWidth;
   QColor penColor;
@@ -58,8 +58,8 @@ TimelineWidget::Implementation::Implementation()
   //Test out making a timeline action
   TimelineAction* sampleAction = new TimelineAction();
   TimelineEvent* sampleEvent = new TimelineEvent();
-  timelineEntries.push_back(sampleAction);
-  timelineEntries.push_back(sampleEvent);
+  timelineActions.push_back(sampleAction);
+  timelineEvents.push_back(sampleEvent);
 }
 //-------------------------------------------------------------------------------
 TimelineWidget::Implementation::Implementation(const Implementation& obj)
@@ -96,8 +96,11 @@ void TimelineWidget::Implementation::processPaintEvent(TimelineWidget* timeline)
   painter.setPen(QPen(penColor, penWidth));
   painter.drawLine(0, timeline->rect().height() / 2, timeline->rect().width(), timeline->rect().height() / 2);
 
-  for (auto entry : timelineEntries)
+  for (auto entry : timelineActions)
   {
+    entry->drawEntry(timeline);
+  }
+  for (auto entry : timelineEvents) {
     entry->drawEntry(timeline);
   }
 }
@@ -137,7 +140,21 @@ QSize TimelineWidget::sizeHint() const
 {
   return _impl->getSizeHint();
 }
-//----------------------------------------------------------------------------------
+void TimelineWidget::addAction(TimelineAction* bgAction)
+{
+  _impl->timelineActions.push_back(bgAction);
+  update();
+}
+void TimelineWidget::addEvent(TimelineEvent* bgEvent)
+{
+  _impl->timelineEvents.push_back(bgEvent);
+  update();
+}
+void TimelineWidget::actionAdded()
+{
+
+}
+  //----------------------------------------------------------------------------------
 auto TimelineWidget::create() -> TimelineWidgetPtr
 {
   return new TimelineWidget;

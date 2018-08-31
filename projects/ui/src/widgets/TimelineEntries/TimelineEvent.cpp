@@ -29,7 +29,7 @@ TimelineEvent::~TimelineEvent()
 {
 }
 
-void TimelineEvent::drawEntry(TimelineWidget* timeline) const
+void TimelineEvent::drawEntry(QWidget* timeline) const
 {
   QPainter painter(timeline);
   painter.setPen(QPen(Qt::GlobalColor::darkRed, 3.0));
