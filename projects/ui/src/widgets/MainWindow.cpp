@@ -364,7 +364,7 @@ void MainWindow::createActions()
   connect(_impl->runToolbar, &ScenarioToolbar::pauseSimulation, _impl.get(), &Implementation::pause);
   connect(_impl->patient_widget, &PatientConfigWidget::valueChanged, _impl.get(), &Implementation::handlePatientValueChange);
   connect(_impl->environment_widget, &EnvironmentConfigWidget::valueChanged, _impl.get(), &Implementation::handleEnvironmentValueChange);
-  connect(_impl->timeline_widget, &TimelineConfigWidget::valueChanged, _impl.get(), &Implementation::handleTimelineValueChange);
+  connect(_impl->timeline_widget, &TimelineConfigWidget::timeChanged, _impl.get(), &Implementation::handleTimelineValueChange);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::createStatusBar()

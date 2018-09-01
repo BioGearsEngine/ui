@@ -22,6 +22,7 @@
 
 #include "TimelineEntries/TimelineAction.h"
 #include "TimelineEntries/TimelineEvent.h"
+#include "utils/ActionDataStruct.h"
 //External Includes
 #include <QWidget>
 #include <QtGui>
@@ -32,19 +33,22 @@ namespace biogears_ui {
 class TimelineWidget : public QWidget {
   Q_OBJECT
 public:
-  TimelineWidget(QWidget* parent = 0);
+  TimelineWidget(QWidget* parent);
   ~TimelineWidget();
 
-  void addAction(TimelineAction* bgAction);
   void addEvent(TimelineEvent* bgEvent);
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
+  
+  double ScenarioTime();
+  void ScenarioTime(double time);
 
   using TimelineWidgetPtr = TimelineWidget*;
-  static auto create() -> TimelineWidgetPtr;
+  static auto create(QWidget*) -> TimelineWidgetPtr;
 
 public slots:
-  void actionAdded();
+  void addAction(const ActionData data);
+  void updateTime(int time);
 
 protected:
   void paintEvent(QPaintEvent* event) override;

@@ -18,22 +18,13 @@
 //! \brief Primary window of BioGears UI
 
 #include "TimelineConfigWidget.h"
+#include "TimelineWidget.h"
 //External Includes
 #include <QtWidgets>
 #include <biogears/string-exports.h>
 
-
 namespace biogears_ui {
 
-
-struct TimelineConfigWidget::TimelineData {
-public:
-  TimelineData(const std::string&, double);
-  std::string dataName;
-  double timelineLocation;
-
-  bool operator==(const std::string&);
-};
 
 struct TimelineConfigWidget::Implementation : QObject {
 
@@ -45,34 +36,22 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  std::vector<TimelineData> timelineSeries;
-  double scenarioTime;
+  TimelineWidget* timeWidget = nullptr;
+  std::vector<ActionData> timelineSeries;
 
 public:
 };
-//------------------------------------------------------------------------------
-TimelineConfigWidget::TimelineData::TimelineData(const std::string& name, double time)
-  : dataName(name)
-  , timelineLocation(time)
-{
 
-}
-//-------------------------------------------------------------------------------
-//This equality operator works for testing, but will need to get more specific since we can have multiple scenarios of the same
-//type in a single timeline (e.g. multiple substance boluses)
-bool TimelineConfigWidget::TimelineData::operator==(const std::string& rhs)
-{
-  if (this->dataName.compare(rhs) == 0) {
-    return true;
-  } else {
-    return false;
-  }
-}
 //-------------------------------------------------------------------------------
 TimelineConfigWidget::Implementation::Implementation(QWidget* parent)
-  : timelineSeries()
-  , scenarioTime(0)
+  : timeWidget(TimelineWidget::create(parent))
+  , timelineSeries()
 {
+  QGridLayout* grid = new QGridLayout();
+  parent->setLayout(grid);
+
+  grid->addWidget(new QLabel("Test Area"), 0, 0);
+  grid->addWidget(timeWidget, 1, 0);
 }
 //-------------------------------------------------------------------------------
 TimelineConfigWidget::Implementation::Implementation(const Implementation& obj)
@@ -104,6 +83,11 @@ TimelineConfigWidget::TimelineConfigWidget(QWidget* parent)
   : QWidget(parent)
   , _impl(this)
 {
+
+  _impl->timeWidget->ScenarioTime(30.0);
+  connect(this, &TimelineConfigWidget::actionAdded, _impl->timeWidget, &TimelineWidget::addAction);
+
+    addAction("Sample", 5.0);
 }
 //-------------------------------------------------------------------------------
 TimelineConfigWidget::~TimelineConfigWidget()
@@ -114,8 +98,9 @@ TimelineConfigWidget::~TimelineConfigWidget()
 void TimelineConfigWidget::addAction(const std::string& name, double time)
 {
   _impl->timelineSeries.emplace_back(name, time);
+  emit actionAdded(_impl->timelineSeries.back());
 }
-
+//-------------------------------------------------------------------------------
 bool TimelineConfigWidget::removeAction(const std::string& name)
 {
   auto it = std::find(_impl->timelineSeries.begin(), _impl->timelineSeries.end(), name);
@@ -126,16 +111,29 @@ bool TimelineConfigWidget::removeAction(const std::string& name)
     return false;
   }
 }
+//-------------------------------------------------------------------------------
 //This is only to test functionality.  In practice, we should increment time as we add AdvanceTime actions to action struct
 void TimelineConfigWidget::ScenarioTime(double time)
 {
-  _impl->scenarioTime = time;
+  _impl->timeWidget->ScenarioTime(time);
 }
+//-------------------------------------------------------------------------------
 double TimelineConfigWidget::ScenarioTime()
 {
-  return _impl->scenarioTime;
+  return _impl->timeWidget->ScenarioTime();
 }
-////-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+std::vector<ActionData> TimelineConfigWidget::Actions() const
+{
+  return _impl->timelineSeries;
+
+}
+//-------------------------------------------------------------------------------
+void TimelineConfigWidget::Actions(std::vector<ActionData> actions)
+{
+  _impl->timelineSeries = actions;
+}
+//-------------------------------------------------------------------------------
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
 //!        the caller is responsible for all memory management
@@ -143,4 +141,5 @@ auto TimelineConfigWidget::create(QWidget* parent) -> TimelineConfigWidgetPtr
 {
   return new TimelineConfigWidget(parent);
 }
+
 }

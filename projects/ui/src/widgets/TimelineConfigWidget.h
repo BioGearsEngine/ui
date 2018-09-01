@@ -21,8 +21,10 @@
 
 //External Includes
 #include <QToolBar>
-//Project Includes
+
 #include <biogears/framework/unique_propagate_const.h>
+//Project Includes
+#include "..\utils\ActionDataStruct.h"
 
 namespace biogears_ui {
 class TimelineConfigWidget : public QWidget {
@@ -33,23 +35,23 @@ public:
 
   using TimelineConfigWidgetPtr = TimelineConfigWidget*;
   
-  void addAction(const std::string& name, double time);
-  bool removeAction(const std::string& name);
+  std::vector<ActionData> Actions() const;
+  void Actions(std::vector<ActionData>) ;
+
   void ScenarioTime(double time);
   double ScenarioTime();
 
+  void addAction(const std::string& name, double time);
+  bool removeAction(const std::string& name);
   static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
 
-  int patientListSize();
-  int envrionmentListSize();
-  int timelineListSize();
 signals:
-  void valueChanged();
+  void actionAdded(const ActionData data);
+  void timeChanged(int time);
 
 private:
-  struct TimelineData;
-  struct Implementation;
-  biogears::unique_propagate_const<Implementation> _impl;
+	struct Implementation;
+	biogears::unique_propagate_const<Implementation> _impl;
 };
 }
 

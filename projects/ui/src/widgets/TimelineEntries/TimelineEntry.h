@@ -39,26 +39,28 @@ public:
   virtual QSize minimumSizeHint() const = 0;
   virtual QSize sizeHint() const = 0;
 
-  int X() const { return _x; };
-  int Y() const { return _y; };
-  int Width() const { return _width; };
-  int Height() const { return _height; };
-  TimelineEntry& X(int x)
+  double X() const { return _x; };
+  double Y() const { return _y; };
+  double Width() const { return _width; };
+  double Height() const { return _height; };
+
+  TimelineEntry& X(double x)
   {
     _x = x;
     return *this;
   };
-  TimelineEntry& Y(int y)
+  TimelineEntry& Y(double y)
   {
     _y = y;
     return *this;
   };
 
+
 protected:
-  int _x;
-  int _y;
-  int _height;
-  int _width;
+  double _x;
+  double _y;
+  double _height;
+  double _width;
 };
 }
 #endif

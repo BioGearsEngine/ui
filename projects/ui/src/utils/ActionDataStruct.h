@@ -1,3 +1,6 @@
+#ifndef BIOGEARSUI_UTILS_ACTION_DATA_STRUCT_H
+#define BIOGEARSUI_UTILS_ACTION_DATA_STRUCT_H
+
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
 //- Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -11,40 +14,37 @@
 //-------------------------------------------------------------------------------------------
 
 //!
-//! \author Matt McDaniel
-//! \date   Aug 29 2018
+//! \author Matthew McDaniel
+//! \date   August 31st 2018
 //!
-//! \brief Derived from Timeline Entry class, handles drawing of scenario actions
+//!
 
-#include "TimelineAction.h"
+// \brief A structure to hold data pertaining to BioGears actions that is accessible to widgets that need access to
+// (i.e. TimelineConfigWidget, TimelineWidget)
+
+//External Includes
+#include <biogears/string-exports.h>
 
 namespace biogears_ui {
 
-TimelineAction::TimelineAction(QWidget* parent)
-: TimelineEntry(parent)
-{
-}
-  
-TimelineAction::~TimelineAction() 
-{
-}
+struct ActionData {
+public:
+  ActionData(const std::string& name, double time)
+    : dataName(name)
+    , dataTime(time){};
 
-void TimelineAction::drawEntry(QWidget* timeline) const
-{
-  QPainter painter(timeline);
-  painter.setPen(QPen(Qt::GlobalColor::darkGreen, 3.0));
-  painter.drawLine(_x, 0, _x, timeline->rect().height());
+  std::string dataName;
+  double dataTime;
 
-}
+  bool operator==(const std::string& rhs)
+  {
+    if (this->dataName.compare(rhs) == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
-QSize TimelineAction::minimumSizeHint() const
-{
-  return QSize(10, 10);
+};
 }
-
-QSize TimelineAction::sizeHint() const
-{
-  return QSize(25, 25);
-}
-//-----------------------------------------------------------------------------------------
-}
+#endif

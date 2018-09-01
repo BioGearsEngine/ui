@@ -17,7 +17,6 @@
 //!
 //! \brief Graphical timeline of scenario actions for BioGears UI
 
-
 #include "TimelineWidget.h"
 //External Includes
 #include <QVector>
@@ -26,7 +25,7 @@ namespace biogears_ui {
 
 struct TimelineWidget::Implementation : public QObject {
 public:
-  Implementation();
+  Implementation(QWidget* config);
   Implementation(const Implementation&);
   Implementation(Implementation&&);
 
@@ -37,8 +36,8 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  QVector<TimelineEntry*> timelineActions;
-  QVector<TimelineEntry*> timelineEvents;
+  double timelineLength;
+  QVector<TimelineEntry*> timelineElements;
 
   int penWidth;
   QColor penColor;
@@ -47,8 +46,9 @@ public:
   QSize sizeHint;
 };
 
-TimelineWidget::Implementation::Implementation()
+TimelineWidget::Implementation::Implementation(QWidget* parent)
 {
+  timelineLength = 0.0;
   penWidth = 3;
   penColor = Qt::GlobalColor::darkBlue;
   backgroundBrush = QBrush(Qt::GlobalColor::white, Qt::BrushStyle::SolidPattern);
@@ -56,10 +56,8 @@ TimelineWidget::Implementation::Implementation()
   sizeHint = QSize(400, 250);
 
   //Test out making a timeline action
-  TimelineAction* sampleAction = new TimelineAction();
-  TimelineEvent* sampleEvent = new TimelineEvent();
-  timelineActions.push_back(sampleAction);
-  timelineEvents.push_back(sampleEvent);
+  //TimelineEvent* sampleEvent = new TimelineEvent();
+  //timelineElements.push_back(sampleEvent);
 }
 //-------------------------------------------------------------------------------
 TimelineWidget::Implementation::Implementation(const Implementation& obj)
@@ -96,11 +94,7 @@ void TimelineWidget::Implementation::processPaintEvent(TimelineWidget* timeline)
   painter.setPen(QPen(penColor, penWidth));
   painter.drawLine(0, timeline->rect().height() / 2, timeline->rect().width(), timeline->rect().height() / 2);
 
-  for (auto entry : timelineActions)
-  {
-    entry->drawEntry(timeline);
-  }
-  for (auto entry : timelineEvents) {
+  for (auto entry : timelineElements) {
     entry->drawEntry(timeline);
   }
 }
@@ -116,8 +110,7 @@ QSize TimelineWidget::Implementation::getSizeHint() const
 }
 //--------------------------------------------------------------------------------
 TimelineWidget::TimelineWidget(QWidget* parent)
-  : QWidget(parent)
-  , _impl()
+  : _impl(this)
 {
 }
 //---------------------------------------------------------------------------------
@@ -140,24 +133,38 @@ QSize TimelineWidget::sizeHint() const
 {
   return _impl->getSizeHint();
 }
-void TimelineWidget::addAction(TimelineAction* bgAction)
+void TimelineWidget::addAction(const ActionData data)
 {
-  _impl->timelineActions.push_back(bgAction);
+  //Need some sort of check to make sure we don't push actions on to timeline that already exist
+  //For now, just do them all while testing
+  TimelineAction* sampleAction = new TimelineAction();
+  sampleAction->X(data.dataTime / _impl->timelineLength * this->rect().width());
+  _impl->timelineElements.push_back(sampleAction);
   update();
 }
+double TimelineWidget::ScenarioTime()
+{
+  return _impl->timelineLength;
+}
+void TimelineWidget::ScenarioTime(double time)
+{
+  _impl->timelineLength = time;
+}
+
 void TimelineWidget::addEvent(TimelineEvent* bgEvent)
 {
-  _impl->timelineEvents.push_back(bgEvent);
+  _impl->timelineElements.push_back(bgEvent);
   update();
 }
-void TimelineWidget::actionAdded()
-{
 
-}
-  //----------------------------------------------------------------------------------
-auto TimelineWidget::create() -> TimelineWidgetPtr
+void TimelineWidget::updateTime(int time)
 {
-  return new TimelineWidget;
+  update();
+}
+//----------------------------------------------------------------------------------
+auto TimelineWidget::create(QWidget* parent) -> TimelineWidgetPtr
+{
+  return new TimelineWidget(parent);
 }
 //----------------------------------------------------------------------------------
 }
