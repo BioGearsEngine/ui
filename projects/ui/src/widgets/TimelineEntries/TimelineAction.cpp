@@ -31,10 +31,34 @@ TimelineAction::~TimelineAction()
 
 void TimelineAction::drawEntry(QWidget* timeline) const
 {
+  int windowWidth = timeline->rect().width();
+  int windowHeight = timeline->rect().height();
+  QPoint center(_x, windowHeight / 2);
+  //Create painter that draws on the timeline widget
   QPainter painter(timeline);
-  painter.setPen(QPen(Qt::GlobalColor::darkGreen, 3.0));
-  painter.drawLine(_x, 0, _x, timeline->rect().height());
+  //Create a path we will use to draw action "bubble"
+  QPainterPath drawPath;
+  //Scale path to current size of window
+  int rHeight = 0.5 * windowHeight;
+  int rWidth = 0.10 * windowWidth;
+  //Create a rectangular boundary around draw area (center will be at event point on timeline)
+  QRectF boundR(_x - 0.5 * rWidth, windowHeight / 2 - 0.5 * rHeight, rWidth, rHeight);
+  //Start path event location on timeline
+  drawPath.moveTo(center);
+  //Move to upper left of bounding rectangle
+  drawPath.lineTo(boundR.topLeft());
+  //Draw arc to top right
+  QPoint c(center.x(), center.y() - rHeight);
+  drawPath.quadTo(c, boundR.topRight());
+  //Return to starting point
+  drawPath.lineTo(center);
+  painter.setPen(QPen(Qt::GlobalColor::darkGreen, 1.0));
+  QBrush fillBrush(Qt::GlobalColor::darkGreen);
 
+  painter.fillPath(drawPath,fillBrush);
+  //painter.drawLine(_x, 0, _x, timeline->rect().height());
+
+  
 }
 
 QSize TimelineAction::minimumSizeHint() const

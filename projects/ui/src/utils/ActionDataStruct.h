@@ -29,22 +29,61 @@ namespace biogears_ui {
 
 struct ActionData {
 public:
-  ActionData(const std::string& name, double time)
+  ActionData(std::string& name, double time)
     : dataName(name)
     , dataTime(time){};
 
   std::string dataName;
   double dataTime;
 
-  bool operator==(const std::string& rhs)
-  {
-    if (this->dataName.compare(rhs) == 0) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  inline bool operator==(const std::string& rhs) const;
+  inline bool operator!=(const std::string& rhs) const;
+  inline bool operator==(const ActionData& rhs) const;
+  inline bool operator!=(const ActionData& rhs) const;
+  inline bool operator<(const ActionData& rhs) const;
+  inline bool operator>(const ActionData& rhs) const;
+  inline bool operator<=(const ActionData& rhs) const;
+  inline bool operator>=(const ActionData& rhs) const;
 
+};
+bool ActionData::operator==(const std::string& rhs) const
+{
+	if (dataName.compare(rhs) == 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
+};
+bool ActionData::operator!=(const std::string& rhs) const
+{
+	return !(*this == rhs);
+};
+bool ActionData::operator==(const ActionData& rhs) const
+{
+	return dataName == rhs.dataName
+      && dataTime == dataTime;
+
+};
+bool ActionData::operator!=(const ActionData& rhs) const
+{
+	return !(*this == rhs);
+};
+bool ActionData::operator<(const ActionData& rhs) const
+{
+	return dataName < rhs.dataName;
+};
+bool ActionData::operator>(const ActionData& rhs) const
+{
+	return dataName > rhs.dataName;
+};
+bool ActionData::operator<=(const ActionData& rhs) const
+{
+	return dataName <= rhs.dataName;
+};
+bool ActionData::operator>=(const ActionData& rhs) const
+{
+	return dataName >= rhs.dataName;
 };
 }
 #endif

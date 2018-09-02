@@ -46,6 +46,7 @@ public:
   using TimelineWidgetPtr = TimelineWidget*;
   static auto create(QWidget*) -> TimelineWidgetPtr;
 
+
 public slots:
   void addAction(const ActionData data);
   void updateTime(int time);

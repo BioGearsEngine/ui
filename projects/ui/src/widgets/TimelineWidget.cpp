@@ -37,7 +37,7 @@ public:
   Implementation& operator=(Implementation&&);
 
   double timelineLength;
-  QVector<TimelineEntry*> timelineElements;
+  std::map<ActionData, TimelineEntry*> elementsMap;
 
   int penWidth;
   QColor penColor;
@@ -55,9 +55,6 @@ TimelineWidget::Implementation::Implementation(QWidget* parent)
   minSizeHint = QSize(100, 100);
   sizeHint = QSize(400, 250);
 
-  //Test out making a timeline action
-  //TimelineEvent* sampleEvent = new TimelineEvent();
-  //timelineElements.push_back(sampleEvent);
 }
 //-------------------------------------------------------------------------------
 TimelineWidget::Implementation::Implementation(const Implementation& obj)
@@ -94,8 +91,11 @@ void TimelineWidget::Implementation::processPaintEvent(TimelineWidget* timeline)
   painter.setPen(QPen(penColor, penWidth));
   painter.drawLine(0, timeline->rect().height() / 2, timeline->rect().width(), timeline->rect().height() / 2);
 
-  for (auto entry : timelineElements) {
-    entry->drawEntry(timeline);
+  for (auto actionPair : elementsMap) {
+    auto dataStruct = actionPair.first;
+    auto dataPaint = actionPair.second;
+    dataPaint->X(dataStruct.dataTime / timelineLength * timeline->rect().width());
+    dataPaint->drawEntry(timeline);
   }
 }
 //----------------------------------------------------------------------------------
@@ -135,12 +135,13 @@ QSize TimelineWidget::sizeHint() const
 }
 void TimelineWidget::addAction(const ActionData data)
 {
-  //Need some sort of check to make sure we don't push actions on to timeline that already exist
-  //For now, just do them all while testing
-  TimelineAction* sampleAction = new TimelineAction();
-  sampleAction->X(data.dataTime / _impl->timelineLength * this->rect().width());
-  _impl->timelineElements.push_back(sampleAction);
-  update();
+  //This should use the map find function but I was having trouble overloading the boolean operators for ActionStruct
+  if (_impl->elementsMap.find(data) == _impl->elementsMap.end()) {
+    TimelineAction* sampleAction = new TimelineAction();
+    sampleAction->X(data.dataTime / _impl->timelineLength * this->rect().width());
+    _impl->elementsMap[data] = sampleAction;
+    update();
+  }
 }
 double TimelineWidget::ScenarioTime()
 {
@@ -153,7 +154,7 @@ void TimelineWidget::ScenarioTime(double time)
 
 void TimelineWidget::addEvent(TimelineEvent* bgEvent)
 {
-  _impl->timelineElements.push_back(bgEvent);
+
   update();
 }
 

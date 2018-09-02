@@ -76,6 +76,7 @@ public: //Data
 };
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation(QWidget* parent)
+
   : physiologySelection(MultiSelectionWidget::create(parent))
   , runToolbar(ScenarioToolbar::create(parent))
   , patient_widget(PatientConfigWidget::create(parent))

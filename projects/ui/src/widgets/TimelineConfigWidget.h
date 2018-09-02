@@ -41,7 +41,7 @@ public:
   void ScenarioTime(double time);
   double ScenarioTime();
 
-  void addAction(const std::string& name, double time);
+  void addAction(std::string& name, double time);
   bool removeAction(const std::string& name);
   static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
 
