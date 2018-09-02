@@ -21,11 +21,11 @@
 namespace biogears_ui {
 
 TimelineAction::TimelineAction(QWidget* parent)
-: TimelineEntry(parent)
+  : TimelineEntry(parent)
 {
 }
-  
-TimelineAction::~TimelineAction() 
+
+TimelineAction::~TimelineAction()
 {
 }
 
@@ -33,32 +33,28 @@ void TimelineAction::drawEntry(QWidget* timeline) const
 {
   int windowWidth = timeline->rect().width();
   int windowHeight = timeline->rect().height();
+
   QPoint center(_x, windowHeight / 2);
-  //Create painter that draws on the timeline widget
+  QPoint upper(center.x(), center.y() - 0.25 * windowHeight);
+  //Create painter that draws on the timeline widget, as well as a pen and fill brush
   QPainter painter(timeline);
-  //Create a path we will use to draw action "bubble"
-  QPainterPath drawPath;
-  //Scale path to current size of window
-  int rHeight = 0.5 * windowHeight;
-  int rWidth = 0.10 * windowWidth;
-  //Create a rectangular boundary around draw area (center will be at event point on timeline)
-  QRectF boundR(_x - 0.5 * rWidth, windowHeight / 2 - 0.5 * rHeight, rWidth, rHeight);
-  //Start path event location on timeline
-  drawPath.moveTo(center);
-  //Move to upper left of bounding rectangle
-  drawPath.lineTo(boundR.topLeft());
-  //Draw arc to top right
-  QPoint c(center.x(), center.y() - rHeight);
-  drawPath.quadTo(c, boundR.topRight());
-  //Return to starting point
-  drawPath.lineTo(center);
-  painter.setPen(QPen(Qt::GlobalColor::darkGreen, 1.0));
+  QPen pen(Qt::GlobalColor::darkGreen, 1.0);
   QBrush fillBrush(Qt::GlobalColor::darkGreen);
+  //Create a path we will use to outline circles (one on timeline, one above)
+  QPainterPath drawPath;
+  //Start the path at the event location on timeline
+  drawPath.moveTo(center);
+  //Draw circle
+  drawPath.addEllipse(center, 5, 5);
+  //Use painter to draw line to upper bound--path only fills in a closed object (i.e. not a line)
+  painter.drawLine(center, upper);
+  //Move draw path to upper bound
+  drawPath.moveTo(upper);
+  //Add circle to upper bound
+  drawPath.addEllipse(upper, 5, 5);
+  //Use defined brush to fill in closed subpaths created by path object
+  painter.fillPath(drawPath, fillBrush);
 
-  painter.fillPath(drawPath,fillBrush);
-  //painter.drawLine(_x, 0, _x, timeline->rect().height());
-
-  
 }
 
 QSize TimelineAction::minimumSizeHint() const
