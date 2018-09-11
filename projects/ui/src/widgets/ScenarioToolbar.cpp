@@ -23,7 +23,7 @@
 
 namespace biogears_ui {
 
-struct ScenarioToolbar::Implementation : QObject {
+struct ScenarioToolbar::Implementation : public QObject {
 
 public:
   Implementation(QWidget* parent);

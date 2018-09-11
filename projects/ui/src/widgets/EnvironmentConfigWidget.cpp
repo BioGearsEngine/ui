@@ -20,12 +20,15 @@
 #include "EnvironmentConfigWidget.h"
 //External Includes
 #include <QtWidgets>
-
+#include <Units.h>
+//Project Includes
+#include "TemperatureInputWidget.h"
+#include "UnitInputWidget.h"
 namespace biogears_ui {
-struct AmbientGasWidget : QObject {
+struct AmbientGasWidget : public QObject {
 };
 
-struct EnvironmentConfigWidget::Implementation : QObject {
+struct EnvironmentConfigWidget::Implementation : public QObject {
 
 public:
   Implementation(QWidget* parent = nullptr);
@@ -37,115 +40,66 @@ public:
 
 public:
   QComboBox* f_surroundings = nullptr;
-  QSpinBox* f_airVelocity = nullptr;
-  QSpinBox* f_ambientTemp = nullptr;
-  QSpinBox* f_atmoosphericPressure = nullptr;
-  QSpinBox* f_clothing = nullptr;
-  QSpinBox* f_surroundingEmissivity = nullptr;
-  QSpinBox* f_meanradientTemp = nullptr;
-  QSpinBox* f_relativeHumidity = nullptr;
-  QSpinBox* f_resperationAmbientTemp = nullptr;
-
-  QComboBox* f_airVelocity_unit = nullptr;
-  QComboBox* f_ambientTemp_unit = nullptr;
-  QComboBox* f_atmoosphericPressure_unit = nullptr;
-  QComboBox* f_clothing_unit = nullptr;
-  QComboBox* f_surroundingEmissivity_unit = nullptr;
-  QComboBox* f_meanradientTemp_unit = nullptr;
-  QComboBox* f_relativeHumidity_unit = nullptr;
-  QComboBox* f_resperationAmbientTemp_unit = nullptr;
+  UnitInputWidget* airVelocity = nullptr;
+  TemperatureInputWidget* ambientTemp = nullptr;
+  UnitInputWidget* atmosphericPressure = nullptr;
+  UnitInputWidget* clothing = nullptr;
+  UnitInputWidget* surroundingEmissivity = nullptr;
+  UnitInputWidget* meanradientTemp = nullptr;
+  UnitInputWidget* relativeHumidity = nullptr;
+  UnitInputWidget* resperationAmbientTemp = nullptr;
 
   QPushButton* b_addAmbientGas = nullptr;
+  QLabel* l_ambientGas = nullptr;
   QVBoxLayout* gasses = nullptr;
 };
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget::Implementation::Implementation(QWidget* parent)
   : f_surroundings(new QComboBox(parent))
-  , f_airVelocity(new QSpinBox(parent))
-  , f_ambientTemp(new QSpinBox(parent))
-  , f_atmoosphericPressure(new QSpinBox(parent))
-  , f_clothing(new QSpinBox(parent))
-  , f_surroundingEmissivity(new QSpinBox(parent))
-  , f_meanradientTemp(new QSpinBox(parent))
-  , f_relativeHumidity(new QSpinBox(parent))
-  , f_resperationAmbientTemp(new QSpinBox(parent))
-  , f_airVelocity_unit(new QComboBox(parent))
-  , f_ambientTemp_unit(new QComboBox(parent))
-  , f_atmoosphericPressure_unit(new QComboBox(parent))
-  , f_clothing_unit(new QComboBox(parent))
-  , f_surroundingEmissivity_unit(new QComboBox(parent))
-  , f_meanradientTemp_unit(new QComboBox(parent))
-  , f_relativeHumidity_unit(new QComboBox(parent))
-  , f_resperationAmbientTemp_unit(new QComboBox(parent))
+  , airVelocity(UnitInputWidget::create(tr("Air Velocity"), 0.0, "km/h", parent))
+  , ambientTemp(TemperatureInputWidget::create(tr("Ambient Temperature"), 0.0, parent))
+  , clothing(UnitInputWidget::create(tr("Clothing Resitance"), 0.0, "Clo", parent))
+  , atmosphericPressure(UnitInputWidget::create(tr("Atmospheric Pressure"), 0.0, "mmHg", parent))
+  , surroundingEmissivity(UnitInputWidget::create(tr("Emssivity"), 0.0, "k", parent))
+  , meanradientTemp(UnitInputWidget::create(tr("Mean Radient Temperature"), 0.0, "C", parent))
+  , relativeHumidity(UnitInputWidget::create(tr("Relative Humidity"), 0.0, "%", parent))
+  , resperationAmbientTemp(UnitInputWidget::create(tr("Resperation Ambient Temperature"), 0.0, "C", parent))
   , b_addAmbientGas(new QPushButton(tr("Add"), parent))
+  , l_ambientGas(new QLabel(tr("Ambient Gases")))
   , gasses(new QVBoxLayout())
 {
+
+  f_surroundings->addItem("Air");
+  f_surroundings->addItem("water");
+  airVelocity->addUnit(tr("mph"));
+  clothing->addUnit(tr("R"));
+  meanradientTemp->addUnit(tr("K"));
+  meanradientTemp->addUnit(tr("F"));
+  resperationAmbientTemp->addUnit(tr("K"));
+  resperationAmbientTemp->addUnit(tr("F"));
+
   QGridLayout* grid = new QGridLayout;
   parent->setLayout(grid);
 
   //Labels
   int row = 0, col = 0;
-  grid->addWidget(new QLabel(tr("Surrounding Substance") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Air Velocity") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Ambient Temperature") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Clothing Resistance") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Atmospheric Pressure") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Clothing Resitance") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Emissivity") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Mean Radiant Temperature") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Resperation Ambient Temperature") + ":", parent), row++, col);
-  grid->addWidget(new QLabel(tr("Ambient Gasses") + ":", parent), row, col);
-  grid->addWidget(b_addAmbientGas, row, col+2);
-  //Fields
-  row = 0, ++col;
-  grid->addWidget(f_surroundings, row++, col);
-  grid->addWidget(f_airVelocity, row++, col);
-  grid->addWidget(f_ambientTemp, row++, col);
-  grid->addWidget(f_atmoosphericPressure, row++, col);
-  grid->addWidget(f_clothing, row++, col);
-  grid->addWidget(f_surroundingEmissivity, row++, col);
-  grid->addWidget(f_meanradientTemp, row++, col);
-  grid->addWidget(f_relativeHumidity, row++, col);
-  grid->addWidget(f_resperationAmbientTemp, row, col);
-
-  //Unit Fields
-  row = 1, ++col;
-  grid->addWidget(f_airVelocity_unit, row++, col);
-  grid->addWidget(f_ambientTemp_unit, row++, col);
-  grid->addWidget(f_atmoosphericPressure_unit, row++, col);
-  grid->addWidget(f_clothing_unit, row++, col);
-  grid->addWidget(f_surroundingEmissivity_unit, row++, col);
-  grid->addWidget(f_meanradientTemp_unit, row++, col);
-  grid->addWidget(f_relativeHumidity_unit, row++, col);
-  grid->addWidget(f_resperationAmbientTemp_unit, row, col);
-
-  f_surroundings->addItem("Air");
-  f_surroundings->addItem("water");
-  
-  f_airVelocity_unit->addItem(tr("m/s"));
-  f_airVelocity_unit->addItem(tr("km/h"));
-  f_airVelocity_unit->addItem(tr("mph"));
-
-  f_ambientTemp_unit->addItem(tr("C"));
-  f_ambientTemp_unit->addItem(tr("K"));
-  f_ambientTemp_unit->addItem(tr("F"));
-
-  f_atmoosphericPressure_unit->addItem(tr("mmHg"));
-
-  f_clothing_unit->addItem(tr("Clo"));
-  f_clothing_unit->addItem(tr("R"));
-
-  f_surroundingEmissivity_unit->addItem(tr("k"));
-
-  f_meanradientTemp_unit->addItem(tr("C"));
-  f_meanradientTemp_unit->addItem(tr("K"));
-  f_meanradientTemp_unit->addItem(tr("F"));
-
-  f_relativeHumidity_unit->addItem(tr("%"));
-
-  f_resperationAmbientTemp_unit->addItem(tr("C"));
-  f_resperationAmbientTemp_unit->addItem(tr("K"));
-  f_resperationAmbientTemp_unit->addItem(tr("F"));
+  grid->setSpacing(0);
+  grid->setVerticalSpacing(0);
+  //grid->setContentsMargins(0, 0, 0, 0);
+  parent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  grid->addWidget(new QLabel(tr("Surrounding Substance") + ":", parent), row, col);
+  grid->addWidget(f_surroundings, row++, col + 1);
+  grid->addWidget(airVelocity, row++, col, 1, 3);
+  grid->addWidget(ambientTemp->Widget(), row++, col, 1, 3);
+  grid->addWidget(clothing, row++, col, 1, 3);
+  grid->addWidget(atmosphericPressure, row++, col, 1, 3);
+  grid->addWidget(surroundingEmissivity, row++, col, 1, 3);
+  grid->addWidget(meanradientTemp, row++, col, 1, 3);
+  grid->addWidget(relativeHumidity, row++, col, 1, 3);
+  grid->addWidget(resperationAmbientTemp, row++, col, 1, 3);
+  grid->addWidget(airVelocity, row++, col, 1, 3);
+  grid->addWidget(l_ambientGas, row, col);
+  grid->addWidget(b_addAmbientGas, row, col + 2);
 }
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget::Implementation::Implementation(const Implementation& obj)

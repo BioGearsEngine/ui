@@ -18,7 +18,7 @@ set(BIO_COMMON_GENERATED_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
 ###############################################################################
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
-
+find_package(Units REQUIRED)
 ###############################################################################
 #Code Generation
 ###############################################################################

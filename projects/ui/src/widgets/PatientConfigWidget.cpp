@@ -23,7 +23,7 @@
 
 namespace biogears_ui {
 
-struct PatientConfigWidget::Implementation : QObject {
+struct PatientConfigWidget::Implementation : public QObject {
 
 public:
   Implementation(QWidget* parent = nullptr);

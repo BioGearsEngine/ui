@@ -23,7 +23,7 @@
 
 namespace biogears_ui {
 
-struct TimelineConfigWidget::Implementation : QObject {
+struct TimelineConfigWidget::Implementation : public QObject {
 
 public:
   Implementation(QWidget* parent = nullptr);
