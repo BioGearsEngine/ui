@@ -49,6 +49,7 @@ public:
   QWidget* Widget();
 
   void setRange(double, double);
+  void setSingleStep(double);
 
   signals : void valueChanged();
 

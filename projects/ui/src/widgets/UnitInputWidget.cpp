@@ -55,6 +55,7 @@ UnitInputWidget::Implementation::Implementation(QWidget* parent)
   layout->addWidget(units, 0, 2);
   layout->setSizeConstraint(QLayout::SetMinimumSize);
   value->setDecimals(2);
+  value->setSingleStep(.1);
 }
 //-------------------------------------------------------------------------------
 UnitInputWidget::Implementation::Implementation(const Implementation& obj)
@@ -158,5 +159,9 @@ void UnitInputWidget::setUnits(QStringList&& strings)
 void UnitInputWidget::setRange(double minimum, double maximum)
 {
   _impl->value->setRange(minimum,maximum);
+}
+void UnitInputWidget::setSingleStep(double step)
+{
+  _impl->value->setSingleStep(step);
 }
 }

@@ -1,5 +1,5 @@
-#ifndef BIOGEARSUI_WIDGETS_UNIT_INPUT_WIDGET_WIDGET_H
-#define BIOGEARSUI_WIDGETS_UNIT_INPUT_WIDGET_WIDGET_H
+#ifndef BIOGEARSUI_WIDGETS_Velocity_WIDGET_WIDGET_H
+#define BIOGEARSUI_WIDGETS_Velocity_WIDGET_WIDGET_H
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
@@ -15,45 +15,44 @@
 
 //!
 //! \author Steven A White
-//! \date   Sept 10th 2018
+//! \date   Sept 11th 2018
 //!
-//!
+//! \brief This class is an input field for a Velocity value. The return of Value will always be in the model unit of km/h
+//!        passed in at construction. Additionally you can view and input velocities in mph and m/s
+//!        you can retrieve the current view using ViewUnitText();
 
 //External Includes
 #include <QComboBox>
+#include <units.h>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
-class UnitInputWidget : public QWidget {
+class VelocityInputWidget : public QObject {
   Q_OBJECT
 public:
-  UnitInputWidget(QWidget* parent = nullptr);
-  virtual ~UnitInputWidget();
+  VelocityInputWidget(QWidget* parent = nullptr);
+  VelocityInputWidget(QString label, double value, QWidget* parent = nullptr);
+  virtual ~VelocityInputWidget();
 
-  using UnitInputWidgetPtr = UnitInputWidget*;
-  static auto create(QString label, double value, QString unit, QWidget* parent = nullptr) -> UnitInputWidgetPtr;
+  using VelocityInputWidgetPtr = VelocityInputWidget*;
+  static auto create(QString label, double value, QWidget* parent = nullptr) -> VelocityInputWidgetPtr;
 
   double Value() const;
-  void Value(double);
+  void Value(units::velocity::kilometers_per_hour_t);
 
   QString Label() const;
   void Label(const QString&);
 
-  QString UnitText() const;
-  int UnitIndex() const;
-  void addUnit(const QString&);
+  QString ViewUnitText() const;
 
-  std::vector<QString> getUnits();
-  void setUnits(QStringList);
-  void setUnits(QStringList&&);
+  QWidget* Widget();
 
-  void setRange(double minimum, double maximum);
-  void setSingleStep(double step);
+  void setRange(double, double);
+  void setSingleStep(double);
 
 signals:
   void valueChanged();
-  void unitChanged();
 
 private:
   struct Implementation;
@@ -61,4 +60,4 @@ private:
 };
 }
 
-#endif //BIOGEARSUI_WIDGETS_UNIT_INPUT_WIDGET_WIDGET_H
+#endif //BIOGEARSUI_WIDGETS_Velocity_WIDGET_WIDGET_H
