@@ -17,7 +17,7 @@
 //!
 //! \brief Primary window of BioGears UI
 
-#include "TemperatureInputWidget.h"
+#include "PressureInputWidget.h"
 //Standard Includes
 #include <cassert>
 //External Includes
@@ -25,9 +25,11 @@
 #include <units.h>
 
 #include "UnitInputWidget.h"
+#include "ThermalResistanceInputWidget.h"
+
 namespace biogears_ui {
 
-struct TemperatureInputWidget::Implementation : public QObject {
+struct PressureInputWidget::Implementation : public QObject {
 public:
   Implementation(QString label, double value, QWidget* parent = nullptr);
   Implementation(const Implementation&);
@@ -39,7 +41,7 @@ public:
   void updateView();
   void notify();
 
-  void subscribe(TemperatureInputWidget*);
+  void subscribe(PressureInputWidget*);
   void unsubscribe();
 
 public slots:
@@ -48,21 +50,23 @@ public slots:
 
 public:
   UnitInputWidget* unitInput = nullptr;
-  units::temperature::celsius_t value;
-  units::temperature::celsius_t minimum;
-  units::temperature::celsius_t maximum;
+  units::pressure::milimeters_of_mercury_t value;
+  units::pressure::milimeters_of_mercury_t minimum;
+  units::pressure::milimeters_of_mercury_t maximum;
 
-  TemperatureInputWidget* subscriber = nullptr;
+  PressureInputWidget* subscriber = nullptr;
 };
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation::Implementation(::QString label, double value, ::QWidget* parent)
-  : unitInput(UnitInputWidget::create(label, value, "C", parent))
+PressureInputWidget::Implementation::Implementation(::QString label, double value, ::QWidget* parent)
+  : unitInput(UnitInputWidget::create(label, value, "mmHg", parent))
   , value(value)
-  ,minimum(-273.15)
-  ,maximum(126.85)
+  , minimum(0.0)
+  , maximum(1000.0)
 {
-  unitInput->addUnit("F");
-  unitInput->addUnit("K");
+  unitInput->addUnit("inHg");
+  unitInput->addUnit("bar");
+  unitInput->addUnit("atm");
+  unitInput->setSingleStep(0.01);
   unitInput->setRange(minimum(), maximum());
   unitInput->Value(value);
 
@@ -70,89 +74,99 @@ TemperatureInputWidget::Implementation::Implementation(::QString label, double v
   connect(unitInput, &UnitInputWidget::unitChanged, this, &Implementation::processViewChange);
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation::Implementation(const Implementation& obj)
+PressureInputWidget::Implementation::Implementation(const Implementation& obj)
 {
   *this = obj;
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation::Implementation(Implementation&& obj)
+PressureInputWidget::Implementation::Implementation(Implementation&& obj)
 {
   *this = std::move(obj);
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::subscribe(TemperatureInputWidget* obj)
+void PressureInputWidget::Implementation::subscribe(PressureInputWidget* obj)
 {
   subscriber = obj;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::unsubscribe()
+void PressureInputWidget::Implementation::unsubscribe()
 {
   subscriber = nullptr;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::processValueChange()
+void PressureInputWidget::Implementation::processValueChange()
 {
   switch (unitInput->UnitIndex()) {
-  case 0: //View value as celcius
-    value = units::temperature::celsius_t(unitInput->Value());
+  case 0: //View value as mmHG
+    value = units::pressure::milimeters_of_mercury_t(unitInput->Value());
     break;
-  case 1: { //View value as Fahrenheit
-    value = units::temperature::fahrenheit_t(unitInput->Value());
+  case 1: { //View value as inHG
+    value = units::pressure::inches_of_mercury_t(unitInput->Value());
   } break;
-  case 2: { //View value as Kelvin
-    value = units::temperature::kelvin_t(unitInput->Value());
+  case 2: { //View value as bar
+    value = units::pressure::bar_t(unitInput->Value());
   } break;
-  default: //Debug case for if this class is patched but updateView has not been modified
-  {
-    assert(unitInput->UnitIndex() < 3);
-    value = units::temperature::celsius_t(unitInput->Value());
+  case 3: { //View value as atm
+    value = units::pressure::atmosphere_t(unitInput->Value());
   } break;
+    {
+      assert(unitInput->UnitIndex() < 3);
+      value = units::pressure::milimeters_of_mercury_t(unitInput->Value());
+    }
+    break;
   }
   if (subscriber) {
     emit subscriber->valueChanged();
   }
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::processViewChange()
+void PressureInputWidget::Implementation::processViewChange()
 {
   updateView();
 }
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation& TemperatureInputWidget::Implementation::operator=(const Implementation& rhs)
+PressureInputWidget::Implementation& PressureInputWidget::Implementation::operator=(const Implementation& rhs)
 {
   if (this != &rhs) {
   }
   return *this;
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation& TemperatureInputWidget::Implementation::operator=(Implementation&& rhs)
+PressureInputWidget::Implementation& PressureInputWidget::Implementation::operator=(Implementation&& rhs)
 {
   if (this != &rhs) {
   }
   return *this;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::updateView()
+void PressureInputWidget::Implementation::updateView()
 {
   auto current = value;
   switch (unitInput->UnitIndex()) {
-  case 0: //View value as celcius
+  case 0: //View value as mmHG
     unitInput->setRange(minimum(), maximum());
     unitInput->Value(current());
     break;
-  case 1: { //View value as Fahrenheit
-    units::temperature::fahrenheit_t view{ current };
-    units::temperature::fahrenheit_t minF{ minimum };
-    units::temperature::fahrenheit_t maxF{ maximum };
-    unitInput->setRange(minF(), maxF());
+  case 1: { //View value as inHG
+    units::pressure::inches_of_mercury_t view{ current };
+    units::pressure::inches_of_mercury_t min{ minimum };
+    units::pressure::inches_of_mercury_t max{ maximum };
+    unitInput->setRange(min(), max());
     unitInput->Value(view());
   } break;
-  case 2: { //View value as Kelvin
-    units::temperature::kelvin_t view{ current };
-    units::temperature::kelvin_t minK{ minimum };
-    units::temperature::kelvin_t maxK{ maximum };
-    unitInput->setRange(minK(), maxK());
+  case 2: { //View value as bar
+    units::pressure::bar_t view{ current };
+    units::pressure::bar_t min{ minimum };
+    units::pressure::bar_t max{ maximum };
+    unitInput->setRange(min(), max());
+    unitInput->Value(view());
+  } break;
+  case 3: { //View value as atm
+    units::pressure::atmosphere_t view{ current };
+    units::pressure::atmosphere_t min{ minimum };
+    units::pressure::atmosphere_t max{ maximum };
+    unitInput->setRange(min(), max());
     unitInput->Value(view());
   } break;
   default: //Debug case for if this class is patched but updateView has not been modified
@@ -164,18 +178,18 @@ void TemperatureInputWidget::Implementation::updateView()
   }
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::TemperatureInputWidget(QWidget* parent)
-  : _impl("Temperature", 0.0, parent)
+PressureInputWidget::PressureInputWidget(QWidget* parent)
+  : _impl("Pressure", 0.0, parent)
 {
   _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::TemperatureInputWidget(QString label, double value, QWidget* parent)
+PressureInputWidget::PressureInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::~TemperatureInputWidget()
+PressureInputWidget::~PressureInputWidget()
 {
   _impl = nullptr;
 }
@@ -183,51 +197,51 @@ TemperatureInputWidget::~TemperatureInputWidget()
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
 //!        the caller is responsible for all memory management
-auto TemperatureInputWidget::create(QString label, double value, QWidget* parent) -> TemperatureInputWidgetPtr
+auto PressureInputWidget::create(QString label, double value, QWidget* parent) -> PressureInputWidgetPtr
 {
-  auto widget = new TemperatureInputWidget(label, value, parent);
+  auto widget = new PressureInputWidget(label, value, parent);
   return widget;
 }
 //-------------------------------------------------------------------------------
-double TemperatureInputWidget::Value() const
+double PressureInputWidget::Value() const
 {
   return _impl->value();
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Value(units::temperature::celsius_t given)
+void PressureInputWidget::Value(units::pressure::milimeters_of_mercury_t given)
 {
   _impl->value = given;
   _impl->updateView();
 }
 //-------------------------------------------------------------------------------
-QString TemperatureInputWidget::Label() const
+QString PressureInputWidget::Label() const
 {
   return _impl->unitInput->Label();
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Label(const QString& given)
+void PressureInputWidget::Label(const QString& given)
 {
   _impl->unitInput->Label(given);
 }
 //-------------------------------------------------------------------------------
-QString TemperatureInputWidget::ViewUnitText() const
+QString PressureInputWidget::ViewUnitText() const
 {
   return _impl->unitInput->UnitText();
 }
 //-------------------------------------------------------------------------------
-QWidget* TemperatureInputWidget::Widget()
+QWidget* PressureInputWidget::Widget()
 {
   return _impl->unitInput;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::setRange(double min, double max)
+void PressureInputWidget::setRange(double min, double max)
 {
-  _impl->minimum = units::temperature::celsius_t(min);
-  _impl->maximum = units::temperature::celsius_t(max);
+  _impl->minimum = units::pressure::milimeters_of_mercury_t(min);
+  _impl->maximum = units::pressure::milimeters_of_mercury_t(max);
   _impl->updateView();
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::setSingleStep(double step)
+void PressureInputWidget::setSingleStep(double step)
 {
   _impl->unitInput->setSingleStep(step);
 }

@@ -1,5 +1,5 @@
-#ifndef BIOGEARSUI_WIDGETS_UNIT_INPUT_WIDGET_WIDGET_H
-#define BIOGEARSUI_WIDGETS_UNIT_INPUT_WIDGET_WIDGET_H
+#ifndef BIOGEARSUI_WIDGETS_DISTANCE_WIDGET_WIDGET_H
+#define BIOGEARSUI_WIDGETS_DISTANCE_WIDGET_WIDGET_H
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
@@ -15,46 +15,44 @@
 
 //!
 //! \author Steven A White
-//! \date   Sept 10th 2018
+//! \date   Sept 11th 2018
 //!
-//!
+//! \brief This class is an input field for a Length value. The return of Value will always be in the model unit of meters (m)
+//!        passed in at construction. Additionally you can view and input rates imperial ft/in
+//!        you can retrieve the current view using ViewUnit();
 
 //External Includes
 #include <QComboBox>
+#include <units.h>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
-class UnitInputWidget : public QWidget {
+class LengthInputWidget : public QObject {
   Q_OBJECT
 public:
-  UnitInputWidget(QWidget* parent = nullptr);
-  virtual ~UnitInputWidget();
+  LengthInputWidget(QWidget* parent = nullptr);
+  LengthInputWidget(QString label, double value, QWidget* parent = nullptr);
+  virtual ~LengthInputWidget();
 
-  using UnitInputWidgetPtr = UnitInputWidget*;
-  static auto create(QString label, double value, QString unit, QWidget* parent = nullptr) -> UnitInputWidgetPtr;
+  using LengthInputWidgetPtr = LengthInputWidget*;
+  static auto create(QString label, double value, QWidget* parent = nullptr) -> LengthInputWidgetPtr;
 
   double Value() const;
-  void Value(double);
+  void Value(units::length::meter_t);
 
   QString Label() const;
   void Label(const QString&);
 
-  QString UnitText() const;
-  int UnitIndex() const;
-  void UnitIndex(int ) ;
-  void addUnit(const QString&);
+  QString ViewUnitText() const;
 
-  std::vector<QString> getUnits();
-  void setUnits(QStringList);
-  void setUnits(QStringList&&);
+  QWidget* Widget();
 
-  void setRange(double minimum, double maximum);
-  void setSingleStep(double step);
-  void setPercision(int places);
+  void setRange(double, double);
+  void setSingleStep(double);
+
 signals:
   void valueChanged();
-  void unitChanged();
 
 private:
   struct Implementation;
@@ -62,4 +60,4 @@ private:
 };
 }
 
-#endif //BIOGEARSUI_WIDGETS_UNIT_INPUT_WIDGET_WIDGET_H
+#endif //BIOGEARSUI_WIDGETS_DISTANCE_WIDGET_WIDGET_H

@@ -26,6 +26,7 @@
 #include "TemperatureInputWidget.h"
 #include "UnitInputWidget.h"
 #include "VelocityInputWidget.h"
+#include "PressureInputWidget.h"
 namespace biogears_ui {
 struct AmbientGasWidget : public QObject {
 };
@@ -44,7 +45,7 @@ public:
   QComboBox* f_surroundings = nullptr;
   VelocityInputWidget* airVelocity = nullptr;
   TemperatureInputWidget* ambientTemp = nullptr;
-  UnitInputWidget* atmosphericPressure = nullptr;
+  PressureInputWidget* atmosphericPressure = nullptr;
   ThermalResistanceInputWidget* clothing = nullptr;
   UnitInputWidget* surroundingEmissivity = nullptr;
   TemperatureInputWidget* meanradientTemp = nullptr;
@@ -61,7 +62,7 @@ EnvironmentConfigWidget::Implementation::Implementation(QWidget* parent)
   , airVelocity(VelocityInputWidget::create(tr("Air Velocity"), 12.0, parent))
   , ambientTemp(TemperatureInputWidget::create(tr("Ambient Temperature"), 27.0, parent))
   , clothing(ThermalResistanceInputWidget::create(tr("Clothing Resitance"), 0.61 , parent))
-  , atmosphericPressure(UnitInputWidget::create(tr("Atmospheric Pressure"), 0.0, "mmHg", parent))
+  , atmosphericPressure(PressureInputWidget::create(tr("Atmospheric Pressure"), 760.0, parent))
   , surroundingEmissivity(UnitInputWidget::create(tr("Emissivity"), 0.0, "k", parent))
   , meanradientTemp(TemperatureInputWidget::create(tr("Mean Radient Temperature"), 25.0, parent))
   , relativeHumidity(UnitInputWidget::create(tr("Relative Humidity"), 0.0, "%", parent))
@@ -88,7 +89,7 @@ EnvironmentConfigWidget::Implementation::Implementation(QWidget* parent)
   grid->addWidget(airVelocity->Widget(), row++, col, 1, 3);
   grid->addWidget(ambientTemp->Widget(), row++, col, 1, 3);
   grid->addWidget(clothing->Widget(), row++, col, 1, 3);
-  grid->addWidget(atmosphericPressure, row++, col, 1, 3);
+  grid->addWidget(atmosphericPressure->Widget(), row++, col, 1, 3);
   grid->addWidget(surroundingEmissivity, row++, col, 1, 3);
   grid->addWidget(meanradientTemp->Widget(), row++, col, 1, 3);
   grid->addWidget(relativeHumidity, row++, col, 1, 3);

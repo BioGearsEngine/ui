@@ -63,6 +63,8 @@ VelocityInputWidget::Implementation::Implementation(::QString label, double valu
 {
   unitInput->addUnit("m/s");
   unitInput->addUnit("mph");
+  unitInput->setRange(minimum(), maximum());
+  unitInput->Value(value);
 
   connect(unitInput, &UnitInputWidget::valueChanged, this, &Implementation::processValueChange);
   connect(unitInput, &UnitInputWidget::unitChanged, this, &Implementation::processViewChange);

@@ -139,6 +139,11 @@ int UnitInputWidget::UnitIndex() const
   return _impl->units->currentIndex();
 }
 //-------------------------------------------------------------------------------
+void UnitInputWidget::UnitIndex(int index) 
+{
+  _impl->units->setCurrentIndex(index);
+}
+//-------------------------------------------------------------------------------
 void UnitInputWidget::addUnit(const QString& given)
 {
   _impl->units->addItem(given);
@@ -163,5 +168,9 @@ void UnitInputWidget::setRange(double minimum, double maximum)
 void UnitInputWidget::setSingleStep(double step)
 {
   _impl->value->setSingleStep(step);
+}
+void UnitInputWidget::setPercision(int places)
+{
+  _impl->value->setDecimals(places);
 }
 }

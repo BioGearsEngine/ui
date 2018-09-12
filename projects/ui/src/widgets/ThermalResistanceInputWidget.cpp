@@ -65,6 +65,8 @@ ThermalResistanceInputWidget::Implementation::Implementation(::QString label, do
   unitInput->addUnit("RSI");
   unitInput->addUnit("tog");
   unitInput->setSingleStep(0.01);
+  unitInput->setRange(minimum(), maximum());
+  unitInput->Value(value);
 
   connect(unitInput, &UnitInputWidget::valueChanged, this, &Implementation::processValueChange);
   connect(unitInput, &UnitInputWidget::unitChanged, this, &Implementation::processViewChange);

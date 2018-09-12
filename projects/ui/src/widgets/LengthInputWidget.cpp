@@ -17,7 +17,7 @@
 //!
 //! \brief Primary window of BioGears UI
 
-#include "TemperatureInputWidget.h"
+#include "LengthInputWidget.h"
 //Standard Includes
 #include <cassert>
 //External Includes
@@ -27,7 +27,7 @@
 #include "UnitInputWidget.h"
 namespace biogears_ui {
 
-struct TemperatureInputWidget::Implementation : public QObject {
+struct LengthInputWidget::Implementation : public QObject {
 public:
   Implementation(QString label, double value, QWidget* parent = nullptr);
   Implementation(const Implementation&);
@@ -39,7 +39,7 @@ public:
   void updateView();
   void notify();
 
-  void subscribe(TemperatureInputWidget*);
+  void subscribe(LengthInputWidget*);
   void unsubscribe();
 
 public slots:
@@ -48,21 +48,23 @@ public slots:
 
 public:
   UnitInputWidget* unitInput = nullptr;
-  units::temperature::celsius_t value;
-  units::temperature::celsius_t minimum;
-  units::temperature::celsius_t maximum;
+  units::length::meter_t value;
+  units::length::meter_t minimum;
+  units::length::meter_t maximum;
 
-  TemperatureInputWidget* subscriber = nullptr;
+  LengthInputWidget* subscriber = nullptr;
 };
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation::Implementation(::QString label, double value, ::QWidget* parent)
-  : unitInput(UnitInputWidget::create(label, value, "C", parent))
+LengthInputWidget::Implementation::Implementation(::QString label, double value, ::QWidget* parent)
+  : unitInput(UnitInputWidget::create(label, value, "m", parent))
   , value(value)
-  ,minimum(-273.15)
-  ,maximum(126.85)
+  , minimum(0)
+  , maximum(10.)
 {
-  unitInput->addUnit("F");
-  unitInput->addUnit("K");
+  unitInput->addUnit("inch");
+
+  unitInput->setPercision(3);
+  unitInput->setSingleStep(.01);
   unitInput->setRange(minimum(), maximum());
   unitInput->Value(value);
 
@@ -70,42 +72,39 @@ TemperatureInputWidget::Implementation::Implementation(::QString label, double v
   connect(unitInput, &UnitInputWidget::unitChanged, this, &Implementation::processViewChange);
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation::Implementation(const Implementation& obj)
+LengthInputWidget::Implementation::Implementation(const Implementation& obj)
 {
   *this = obj;
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation::Implementation(Implementation&& obj)
+LengthInputWidget::Implementation::Implementation(Implementation&& obj)
 {
   *this = std::move(obj);
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::subscribe(TemperatureInputWidget* obj)
+void LengthInputWidget::Implementation::subscribe(LengthInputWidget* obj)
 {
   subscriber = obj;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::unsubscribe()
+void LengthInputWidget::Implementation::unsubscribe()
 {
   subscriber = nullptr;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::processValueChange()
+void LengthInputWidget::Implementation::processValueChange()
 {
   switch (unitInput->UnitIndex()) {
   case 0: //View value as celcius
-    value = units::temperature::celsius_t(unitInput->Value());
+    value = units::length::meter_t(unitInput->Value());
     break;
   case 1: { //View value as Fahrenheit
-    value = units::temperature::fahrenheit_t(unitInput->Value());
-  } break;
-  case 2: { //View value as Kelvin
-    value = units::temperature::kelvin_t(unitInput->Value());
+    value = units::length::inch_t(unitInput->Value());
   } break;
   default: //Debug case for if this class is patched but updateView has not been modified
   {
     assert(unitInput->UnitIndex() < 3);
-    value = units::temperature::celsius_t(unitInput->Value());
+    value = units::length::meter_t(unitInput->Value());
   } break;
   }
   if (subscriber) {
@@ -113,46 +112,39 @@ void TemperatureInputWidget::Implementation::processValueChange()
   }
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::processViewChange()
+void LengthInputWidget::Implementation::processViewChange()
 {
   updateView();
 }
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation& TemperatureInputWidget::Implementation::operator=(const Implementation& rhs)
+LengthInputWidget::Implementation& LengthInputWidget::Implementation::operator=(const Implementation& rhs)
 {
   if (this != &rhs) {
   }
   return *this;
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::Implementation& TemperatureInputWidget::Implementation::operator=(Implementation&& rhs)
+LengthInputWidget::Implementation& LengthInputWidget::Implementation::operator=(Implementation&& rhs)
 {
   if (this != &rhs) {
   }
   return *this;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Implementation::updateView()
+void LengthInputWidget::Implementation::updateView()
 {
   auto current = value;
   switch (unitInput->UnitIndex()) {
-  case 0: //View value as celcius
+  case 0: //View value as Seconds
     unitInput->setRange(minimum(), maximum());
     unitInput->Value(current());
     break;
-  case 1: { //View value as Fahrenheit
-    units::temperature::fahrenheit_t view{ current };
-    units::temperature::fahrenheit_t minF{ minimum };
-    units::temperature::fahrenheit_t maxF{ maximum };
-    unitInput->setRange(minF(), maxF());
-    unitInput->Value(view());
-  } break;
-  case 2: { //View value as Kelvin
-    units::temperature::kelvin_t view{ current };
-    units::temperature::kelvin_t minK{ minimum };
-    units::temperature::kelvin_t maxK{ maximum };
-    unitInput->setRange(minK(), maxK());
+  case 1: { //View value as Minutes
+    units::length::inch_t view{ current };
+    units::length::inch_t min{ minimum };
+    units::length::inch_t max{ maximum };
+    unitInput->setRange(min(), max());
     unitInput->Value(view());
   } break;
   default: //Debug case for if this class is patched but updateView has not been modified
@@ -164,18 +156,18 @@ void TemperatureInputWidget::Implementation::updateView()
   }
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::TemperatureInputWidget(QWidget* parent)
-  : _impl("Temperature", 0.0, parent)
+LengthInputWidget::LengthInputWidget(QWidget* parent)
+  : _impl("Length", 0.0, parent)
 {
   _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::TemperatureInputWidget(QString label, double value, QWidget* parent)
+LengthInputWidget::LengthInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
 }
 //-------------------------------------------------------------------------------
-TemperatureInputWidget::~TemperatureInputWidget()
+LengthInputWidget::~LengthInputWidget()
 {
   _impl = nullptr;
 }
@@ -183,51 +175,51 @@ TemperatureInputWidget::~TemperatureInputWidget()
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
 //!        the caller is responsible for all memory management
-auto TemperatureInputWidget::create(QString label, double value, QWidget* parent) -> TemperatureInputWidgetPtr
+auto LengthInputWidget::create(QString label, double value, QWidget* parent) -> LengthInputWidgetPtr
 {
-  auto widget = new TemperatureInputWidget(label, value, parent);
+  auto widget = new LengthInputWidget(label, value, parent);
   return widget;
 }
 //-------------------------------------------------------------------------------
-double TemperatureInputWidget::Value() const
+double LengthInputWidget::Value() const
 {
   return _impl->value();
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Value(units::temperature::celsius_t given)
+void LengthInputWidget::Value(units::length::meter_t given)
 {
   _impl->value = given;
   _impl->updateView();
 }
 //-------------------------------------------------------------------------------
-QString TemperatureInputWidget::Label() const
+QString LengthInputWidget::Label() const
 {
   return _impl->unitInput->Label();
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::Label(const QString& given)
+void LengthInputWidget::Label(const QString& given)
 {
   _impl->unitInput->Label(given);
 }
 //-------------------------------------------------------------------------------
-QString TemperatureInputWidget::ViewUnitText() const
+QString LengthInputWidget::ViewUnitText() const
 {
   return _impl->unitInput->UnitText();
 }
 //-------------------------------------------------------------------------------
-QWidget* TemperatureInputWidget::Widget()
+QWidget* LengthInputWidget::Widget()
 {
   return _impl->unitInput;
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::setRange(double min, double max)
+void LengthInputWidget::setRange(double min, double max)
 {
-  _impl->minimum = units::temperature::celsius_t(min);
-  _impl->maximum = units::temperature::celsius_t(max);
+  _impl->minimum = units::length::meter_t(min);
+  _impl->maximum = units::length::meter_t(max);
   _impl->updateView();
 }
 //-------------------------------------------------------------------------------
-void TemperatureInputWidget::setSingleStep(double step)
+void LengthInputWidget::setSingleStep(double step)
 {
   _impl->unitInput->setSingleStep(step);
 }

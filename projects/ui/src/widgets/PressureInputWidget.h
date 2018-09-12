@@ -1,5 +1,5 @@
-#ifndef BIOGEARSUI_WIDGETS_THERMAL_RESISTANCE_WIDGET_WIDGET_H
-#define BIOGEARSUI_WIDGETS_THERMAL_RESISTANCE_WIDGET_WIDGET_H
+#ifndef BIOGEARSUI_WIDGETS_PRESSURE_WIDGET_WIDGET_H
+#define BIOGEARSUI_WIDGETS_PRESSURE_WIDGET_WIDGET_H
 
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
@@ -17,8 +17,8 @@
 //! \author Steven A White
 //! \date   Sept 11th 2018
 //!
-//! \brief This class is an input field for a ThermalResistance value. The return of Value will always be in the model unit of km/h
-//!        passed in at construction. Additionally you can view and input velocities in mph and m/s
+//! \brief This class is an input field for a Pressure value. The return of Value will always be in the model unit of mmHg
+//!        passed in at construction. Additionally you can view and input pressures of bar and atm, inHG
 //!        you can retrieve the current view using ViewUnitText();
 
 //External Includes
@@ -28,25 +28,23 @@
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace units {
-  UNIT_ADD(insulation, r_value, r_values, R, units::compound_unit<squared<units::length::meters>, units::temperature::celsius, inverse<squared<units::power::watts>>>)
-  UNIT_ADD(insulation, rsi_value, rsi_values, RSI, units::unit<std::ratio<567826, 100000>, r_values>)
-  UNIT_ADD(insulation, clo, clothes, clo, units::unit<std::ratio<86,100>, r_values>)
-  UNIT_ADD(insulation, tog, togs, tog, units::unit<std::ratio<100,155>, clo>)
-  }
+UNIT_ADD(pressure, milimeters_of_mercury, milimeters_of_mercury, mmHG, units::unit<std::ratio<1000000000, 133322387415>, units::pressure::pascals>)
+UNIT_ADD(pressure, inches_of_mercury, inches_of_mercury, inHG, units::unit<std::ratio<25400, 1000>, milimeters_of_mercury>)
+}
 
 namespace biogears_ui {
-class ThermalResistanceInputWidget : public QObject {
+class PressureInputWidget : public QObject {
   Q_OBJECT
 public:
-  ThermalResistanceInputWidget(QWidget* parent = nullptr);
-  ThermalResistanceInputWidget(QString label, double value, QWidget* parent = nullptr);
-  virtual ~ThermalResistanceInputWidget();
+  PressureInputWidget(QWidget* parent = nullptr);
+  PressureInputWidget(QString label, double value, QWidget* parent = nullptr);
+  virtual ~PressureInputWidget();
 
-  using ThermalResistanceInputWidgetPtr = ThermalResistanceInputWidget*;
-  static auto create(QString label, double value, QWidget* parent = nullptr) -> ThermalResistanceInputWidgetPtr;
+  using PressureInputWidgetPtr = PressureInputWidget*;
+  static auto create(QString label, double value, QWidget* parent = nullptr) -> PressureInputWidgetPtr;
 
   double Value() const;
-  void Value(units::insulation::clo_t);
+  void Value(units::pressure::milimeters_of_mercury_t);
 
   QString Label() const;
   void Label(const QString&);
@@ -67,4 +65,4 @@ private:
 };
 }
 
-#endif //BIOGEARSUI_WIDGETS_THERMAL_RESISTANCE_WIDGET_WIDGET_H
+#endif //BIOGEARSUI_WIDGETS_PRESSURE_WIDGET_WIDGET_H
