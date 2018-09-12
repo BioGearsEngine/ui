@@ -20,7 +20,8 @@
 #include "ScenarioToolbar.h"
 //External Includes
 #include <QtWidgets>
-
+//Project Includes
+#include "../utils/Resources.h"
 namespace biogears_ui {
 
 struct ScenarioToolbar::Implementation : public QObject {
@@ -48,20 +49,27 @@ ScenarioToolbar::Implementation::Implementation(QWidget* parent)
   //Toolbar Patient
   patients->addItem(tr("Select a Patient"));
   patients->addItem(tr("New Patient"));
-  patients->addItem(tr("Austin Baird"));
-  patients->addItem(tr("Nathan Tatum"));
+  auto fileList = Resources::list_directory("patients", R"(.*\.xml)" );
+  for (const auto& file : fileList) {
+    patients->addItem( file.c_str() );
+  }
   patients->addItem(tr("Load patient from file..."));
   //Toolbar Enviroments
   enviroments->addItem(tr("Select an Environment"));
   enviroments->addItem(tr("New Environment"));
-  enviroments->addItem(tr("desert"));
-  enviroments->addItem(tr("jungle"));
+  fileList = Resources::list_directory("environments", R"(.*\.xml)" );
+  for (const auto& file : fileList) {
+    enviroments->addItem(file.c_str());
+  }
   enviroments->addItem(tr("Load environment from file..."));
   //Toolbar timelines
+  timelines->addItem(tr("Select an Timeline"));
   timelines->addItem(tr("New Timeline"));
-  timelines->addItem(tr("Select a Timeline"));
-  timelines->addItem(tr("Pool exercise"));
-  timelines->addItem(tr("Mardi Gras Asthma Attack"));
+  ;
+  fileList = Resources::list_directory("timelines", R"(.*\.xml)" );
+  for (const auto& file : fileList) {
+    timelines->addItem(file.c_str());
+  }
   timelines->addItem(tr("Load timeline from file..."));
 }
 //-------------------------------------------------------------------------------

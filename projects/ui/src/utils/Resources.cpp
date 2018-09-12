@@ -1,6 +1,3 @@
-#ifndef BIOGEARSUI_WIDGETS_SIMULATION_PATIENT_CONFIG_WIDGET_H
-#define BIOGEARSUI_WIDGETS_SIMULATION_PATIENT_CONFIG_WIDGET_H
-
 //-------------------------------------------------------------------------------------------
 //- Copyright 2018 Applied Research Associates, Inc.
 //- Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -12,37 +9,39 @@
 //- CONDITIONS OF ANY KIND, either express or implied. See the License for the
 //-  specific language governing permissions and limitations under the License.
 //-------------------------------------------------------------------------------------------
+#include "Resources.h"
 
 //!
 //! \author Steven A White
-//! \date   August 30th 2018
+//! \date   Sept 12th 2018
 //!
 //!
-
-//External Includes
-#include <QToolBar>
-//Project Includes
-#include <biogears/framework/unique_propagate_const.h>
+//! \brief Helper functions for the locating of files and resources
+#include <boost/filesystem.hpp>
+#include <regex>
 
 namespace biogears_ui {
-class PatientConfigWidget : public QWidget {
-  Q_OBJECT
-public:
-  PatientConfigWidget(QWidget* parent = nullptr);
-  ~PatientConfigWidget();
+namespace Resources {
+  std::vector<std::string> list_directory(std::string path, std::string pattern)
+  {
+    namespace bfs = boost::filesystem;
 
-  using PatientConfigWidgetPtr = PatientConfigWidget*;
-
-  static auto create(QWidget* parent = nullptr) -> PatientConfigWidgetPtr;
-
-signals:
-  void valueChanged();
-
-
-private:
-  struct Implementation;
-  biogears::unique_propagate_const<Implementation> _impl;
-};
-}
-
-#endif //BIOGEARSUI_WIDGETS_SIMULATION_PATIENT_CONFIG_WIDGET_H
+    std::vector<std::string> result;
+    std::regex re{ pattern };
+    std::smatch match;
+    std::string filepath;
+    if (bfs::is_directory(path) )
+    {
+      for (auto& p : bfs::directory_iterator(path)) {
+        filepath = p.path().string();
+        if (std::regex_match(filepath, match, re)) {
+          if (match.size() != 0) {
+            result.push_back(match[0]);
+          }
+        }
+      }
+    }
+    return result;
+  }
+} //Resources
+} //biogears_ui

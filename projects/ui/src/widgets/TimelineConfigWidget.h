@@ -34,15 +34,8 @@ public:
   using TimelineConfigWidgetPtr = TimelineConfigWidget*;
 
   static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
-
-  int patientListSize();
-  int envrionmentListSize();
-  int timelineListSize();
-
 signals:
-  void patientChanged(int index);
-  void envonmentChanged(int index);
-  void timelineChanged(int index);
+  void valueChanged();
 
 private:
   struct Implementation;

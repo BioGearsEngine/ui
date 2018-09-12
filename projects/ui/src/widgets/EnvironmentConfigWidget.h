@@ -35,14 +35,8 @@ public:
 
   static auto create(QWidget* parent = nullptr) -> EnvironmentConfigWidgetPtr;
 
-  int patientListSize();
-  int envrionmentListSize();
-  int timelineListSize();
-
 signals:
-  void patientChanged(int index);
-  void envonmentChanged(int index);
-  void timelineChanged(int index);
+  void valueChanged();
 
 private:
   struct Implementation;

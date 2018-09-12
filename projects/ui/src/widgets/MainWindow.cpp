@@ -43,9 +43,12 @@ public: //Functions
   Implementation& operator=(Implementation&&);
 
 public slots: //QT5 Slots >(
-  void handlePatientChange(int index);
-  void handleEnvironmentChange(int index);
-  void handleTimelineChange(int index);
+  void handlePatientFileChange(int index);
+  void handleEnvironmentFileChange(int index);
+  void handleTimelineFileChange(int index);
+  void handlePatientValueChange();
+  void handleEnvironmentValueChange();
+  void handleTimelineValueChange();
   void loadPatient();
   void loadEnvironment();
   void loadTimeline();
@@ -95,46 +98,60 @@ MainWindow::Implementation& MainWindow::Implementation::operator=(Implementation
   return *this;
 }
 //-------------------------------------------------------------------------------
-void MainWindow::Implementation::handlePatientChange(int index)
+void MainWindow::Implementation::handlePatientFileChange(int index)
 {
   if (0 == index) {
     drivers[0].clearPatient();
-  } else if (1 == index) {
-    drivers[0].clearPatient();
   } else if (runToolbar->patientListSize() == index + 1) {
     loadPatient();
+  } else if (1 == index) {
+    drivers[0].clearPatient();
   } else {
     //TODO:sawhite:Load Patient from Selection
   }
 }
 //-------------------------------------------------------------------------------
-void MainWindow::Implementation::handleEnvironmentChange(int index)
+void MainWindow::Implementation::handleEnvironmentFileChange(int index)
 {
   if (0 == index) {
     drivers[0].clearEnvironment();
+  }  else if (runToolbar->envrionmentListSize() == index + 1) {
+    loadEnvironment();
   } else if (1 == index) {
     drivers[0].clearEnvironment();
     //New Environment;
-  }
-  if (runToolbar->envrionmentListSize() == index + 1) {
-    loadEnvironment();
   } else {
     //TODO:sawhite:Load Environment From Selection
   }
 }
 //-------------------------------------------------------------------------------
-void MainWindow::Implementation::handleTimelineChange(int index)
+void MainWindow::Implementation::handleTimelineFileChange(int index)
 {
   if (0 == index) {
     drivers[0].clearTimeline();
+  } else if (runToolbar->timelineListSize() == index + 1) {
+    loadTimeline();
   } else if (1 == index) {
     drivers[0].clearTimeline();
     //New Timeline;
-  } else if (runToolbar->timelineListSize() == index + 1) {
-    loadTimeline();
   } else {
     //TODO:sawhite:Load Timeline From Selection
   }
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handlePatientValueChange()
+{
+
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handleEnvironmentValueChange()
+{
+
+}
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handleTimelineValueChange()
+{
+
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::loadPatient()
@@ -250,9 +267,13 @@ void MainWindow::createActions()
   tabs->addTab(_impl->timeline_widget, "Timeline");
   setCentralWidget(tabs);
 
-  connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, _impl.get(), &Implementation::handlePatientChange);
-  connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, _impl.get(), &Implementation::handleEnvironmentChange);
-  connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, _impl.get(), &Implementation::handleTimelineChange);
+  connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, _impl.get(), &Implementation::handlePatientFileChange);
+  connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, _impl.get(), &Implementation::handleEnvironmentFileChange);
+  connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, _impl.get(), &Implementation::handleTimelineFileChange);
+
+  connect(_impl->patient_widget, &PatientConfigWidget::valueChanged, _impl.get(), &Implementation::handlePatientValueChange);
+  connect(_impl->envrionment_widget, &EnvironmentConfigWidget::valueChanged, _impl.get(), &Implementation::handleEnvironmentValueChange);
+  connect(_impl->timeline_widget, &TimelineConfigWidget::valueChanged, _impl.get(), &Implementation::handleTimelineValueChange);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::createStatusBar()
