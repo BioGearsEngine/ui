@@ -48,6 +48,7 @@ endif()
 
 if(BIOGEARS_COMMON_BUILD_STATIC)
   add_library(biogears_common STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
+  target_compile_definitions(biogears_common PUBLIC BIOGEARS_COMMON_BUILD_STATIC)
 else()
   add_library(biogears_common SHARED ${COMMON_SOURCES} ${COMMON_HEADERS})
 endif()

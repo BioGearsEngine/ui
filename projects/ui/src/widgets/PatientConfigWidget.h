@@ -35,9 +35,19 @@ public:
 
   static auto create(QWidget* parent = nullptr) -> PatientConfigWidgetPtr;
 
+  std::string Name();
+  std::string Gender();
+  double Age();
+  double Weight();
+  double Height();
+  double BodyFatPercentage();
+  double HeartRate();
+  double RespritoryRate();
+  double DiastolicPressureBaseline();
+  double SystolicPresureBaseline();
+
 signals:
   void valueChanged();
-
 
 private:
   struct Implementation;

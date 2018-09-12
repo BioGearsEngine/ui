@@ -129,6 +129,21 @@ ScenarioToolbar::~ScenarioToolbar()
   _impl = nullptr;
 }
 //-------------------------------------------------------------------------------
+std::string ScenarioToolbar::Patient() const
+{
+  return _impl->patients->currentText().toStdString();
+};
+//-------------------------------------------------------------------------------
+std::string ScenarioToolbar::Environment() const 
+{
+  return _impl->enviroments->currentText().toStdString();
+};
+//-------------------------------------------------------------------------------
+std::string ScenarioToolbar::Timeline() const
+{
+  return _impl->timelines->currentText().toStdString();
+};
+//-------------------------------------------------------------------------------
 int ScenarioToolbar::patientListSize() { return _impl->patients->count(); }
 //-------------------------------------------------------------------------------
 int ScenarioToolbar::envrionmentListSize() { return _impl->enviroments->count(); }

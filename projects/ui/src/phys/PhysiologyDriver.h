@@ -21,9 +21,12 @@
 //!
 
 //Standard Includes
-#include <string>
 #include <chrono>
+#include <string>
 //Project Includes
+#include <biogears/string-exports.h>
+#include <biogears/cdm/patient/SEPatient.h>
+#include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
@@ -35,27 +38,22 @@ public:
   PhysiologyDriver(PhysiologyDriver&&);
   ~PhysiologyDriver();
 
-
   void advance(std::chrono::milliseconds deltaT);
   void async_advance(std::chrono::milliseconds deltaT);
 
   bool isPaused();
 
-  bool loadPatient(std::string path, std::string filename);
-  bool loadTimeline(std::string path, std::string filename);
-  bool loadEnvironment(std::string path, std::string filename);
+  bool loadPatient(const std::string& filepath);
+  bool loadTimeline(const std::string& filepath);
+  bool loadEnvironment(const std::string& filepath);
 
   void clearPatient();
   void clearEnvironment();
   void clearTimeline();
 
-  std::string patient() const;
-  std::string environment() const;
+  SEPatient& Patient();
+  SEEnvironment& Environment();
   std::string timeline() const;
-
-  void patient(const std::string&);
-  void environment(const std::string&);
-  void timeline(const std::string&);
 
   bool applyAction();
 

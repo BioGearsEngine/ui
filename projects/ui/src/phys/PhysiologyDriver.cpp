@@ -16,12 +16,18 @@
 #include <memory>
 
 //External Includes
-#include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/string-exports.h>
+
+#include <biogears/engine/Controller/BioGears.h>
+#include <biogears/engine/BioGearsPhysiologyEngine.h>
+#include <biogears/cdm/patient/SEPatient.h>
+#include <biogears/cdm/scenario/SEScenario.h>
+#include <biogears/cdm/system/environment/SEEnvironment.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace biogears_ui {
 struct PhysiologyDriver::Implementation {
@@ -33,7 +39,11 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  std::unique_ptr<PhysiologyEngine> phy = nullptr;
+  std::unique_ptr<BioGears> phy = nullptr;
+
+  void loadPatient();
+  void loadTimeline();
+  void loadEnvironment();
 
   std::string patient_file = "";
   std::string environment_file = "";
@@ -41,7 +51,7 @@ public:
 };
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation::Implementation(const std::string& scenario)
-  : phy(CreateBioGearsEngine(scenario + ".log"))
+  : phy(new BioGears(scenario + ".log"))
 {
 }
 //-------------------------------------------------------------------------------
@@ -68,6 +78,24 @@ PhysiologyDriver::Implementation& PhysiologyDriver::Implementation::operator=(Im
   if (this != &rhs) {
   }
   return *this;
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::Implementation::loadPatient()
+{
+  SEPatient& patient = phy->GetPatient();
+  patient.Load(patient_file);
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::Implementation::loadTimeline()
+{
+  //TODO:sawhite:Walk through with Matt on what to do here
+  //auto& patient = phy->Ge();
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::Implementation::loadEnvironment()
+{
+  SEEnvironment& env = phy->GetEnvironment();
+  env.Load(environment_file);
 }
 //-------------------------------------------------------------------------------
 PhysiologyDriver::PhysiologyDriver()
@@ -106,24 +134,27 @@ bool PhysiologyDriver::isPaused()
   return false;
 }
 //-------------------------------------------------------------------------------
-bool PhysiologyDriver::loadPatient(std::string path, std::string filename)
+bool PhysiologyDriver::loadPatient(const std::string& filepath)
 {
   namespace bfs = boost::filesystem;
-  _impl->patient_file = (bfs::path(path) / bfs::path(filename)).string();
+  _impl->patient_file = filepath;
+  _impl->loadPatient();
   return true;
 }
 //-------------------------------------------------------------------------------
-bool PhysiologyDriver::loadTimeline(std::string path, std::string filename)
+bool PhysiologyDriver::loadTimeline(const std::string& filepath)
 {
   namespace bfs = boost::filesystem;
-  _impl->timeline_file = (bfs::path(path) / bfs::path(filename)).string();
+  _impl->timeline_file = filepath;
+  _impl->loadTimeline();
   return true;
 }
 //-------------------------------------------------------------------------------
-bool PhysiologyDriver::loadEnvironment(std::string path, std::string filename)
+bool PhysiologyDriver::loadEnvironment(const std::string& filepath)
 {
   namespace bfs = boost::filesystem;
-  _impl->environment_file = (bfs::path(path) / bfs::path(filename)).string();
+  _impl->environment_file = filepath;
+  _impl->loadEnvironment();
   return true;
 }
 void PhysiologyDriver::clearPatient() { _impl->patient_file = ""; }
@@ -132,34 +163,19 @@ void PhysiologyDriver::clearEnvironment() { _impl->environment_file = ""; }
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::clearTimeline() { _impl->timeline_file = ""; }
 //-------------------------------------------------------------------------------
-std::string PhysiologyDriver::patient() const
+SEPatient& PhysiologyDriver::Patient()
 {
-  return _impl->patient_file;
+  return _impl->phy->GetPatient();
 }
 //-------------------------------------------------------------------------------
-std::string PhysiologyDriver::environment() const
+SEEnvironment& PhysiologyDriver::Environment()
 {
-  return _impl->environment_file;
+  return _impl->phy->GetEnvironment();
 }
 //-------------------------------------------------------------------------------
 std::string PhysiologyDriver::timeline() const
 {
   return _impl->timeline_file;
-}
-//-------------------------------------------------------------------------------
-void PhysiologyDriver::patient(const std::string& patient)
-{
-  _impl->patient_file = patient;
-}
-//-------------------------------------------------------------------------------
-void PhysiologyDriver::environment(const std::string& environment)
-{
-  _impl->environment_file = environment;
-}
-//-------------------------------------------------------------------------------
-void PhysiologyDriver::timeline(const std::string& timeline)
-{
-  _impl->timeline_file = timeline;
 }
 //-------------------------------------------------------------------------------
 bool PhysiologyDriver::applyAction()

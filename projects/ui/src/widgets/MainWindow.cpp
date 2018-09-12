@@ -21,16 +21,19 @@
 //Standard Includes
 #include <iostream>
 //External Includes
-#include <QtWidgets>
 #include <QTabWidget>
+#include <QtWidgets>
+#include <units.h>
+#include <biogears/cdm/properties/SEScalars.h>
 #include <biogears/string-exports.h>
 //Project Includes
 #include "../phys/PhysiologyDriver.h"
-#include "MultiSelectionWidget.h"
-#include "ScenarioToolbar.h"
-#include "PatientConfigWidget.h"
 #include "EnvironmentConfigWidget.h"
+#include "MultiSelectionWidget.h"
+#include "PatientConfigWidget.h"
+#include "ScenarioToolbar.h"
 #include "TimelineConfigWidget.h"
+
 namespace biogears_ui {
 
 struct MainWindow::Implementation : public QObject {
@@ -60,7 +63,7 @@ public: //Data
   ScenarioToolbar* runToolbar = nullptr;
   PatientConfigWidget* patient_widget = nullptr;
   EnvironmentConfigWidget* envrionment_widget = nullptr;
-  TimelineConfigWidget* timeline_widget= nullptr;
+  TimelineConfigWidget* timeline_widget = nullptr;
 };
 //-------------------------------------------------------------------------------
 MainWindow::Implementation::Implementation(QWidget* parent)
@@ -107,7 +110,7 @@ void MainWindow::Implementation::handlePatientFileChange(int index)
   } else if (1 == index) {
     drivers[0].clearPatient();
   } else {
-    //TODO:sawhite:Load Patient from Selection
+    drivers[0].loadPatient(runToolbar->Patient());
   }
 }
 //-------------------------------------------------------------------------------
@@ -115,13 +118,13 @@ void MainWindow::Implementation::handleEnvironmentFileChange(int index)
 {
   if (0 == index) {
     drivers[0].clearEnvironment();
-  }  else if (runToolbar->envrionmentListSize() == index + 1) {
+  } else if (runToolbar->envrionmentListSize() == index + 1) {
     loadEnvironment();
   } else if (1 == index) {
     drivers[0].clearEnvironment();
     //New Environment;
   } else {
-    //TODO:sawhite:Load Environment From Selection
+    drivers[0].loadEnvironment(runToolbar->Environment());
   }
 }
 //-------------------------------------------------------------------------------
@@ -133,46 +136,55 @@ void MainWindow::Implementation::handleTimelineFileChange(int index)
     loadTimeline();
   } else if (1 == index) {
     drivers[0].clearTimeline();
-    //New Timeline;
   } else {
-    //TODO:sawhite:Load Timeline From Selection
+    drivers[0].loadTimeline(runToolbar->Timeline());
   }
 }
-//-------------------------------------------------------------------------------
-void MainWindow::Implementation::handlePatientValueChange()
-{
 
+  //-------------------------------------------------------------------------------
+  void
+  MainWindow::Implementation::handlePatientValueChange()
+{
+  SEPatient& patient = drivers[0].Patient();
+  patient.SetName(patient_widget->Name());
+  patient.SetGender((patient_widget->Gender() == "Male") ? CDM::enumSex::Male : CDM::enumSex::Female);
+  patient.GetAge().SetValue(patient_widget->Age(), TimeUnit::s);
+  patient.GetWeight().SetValue(patient_widget->Weight(), MassUnit::kg);
+  patient.GetHeight().SetValue(patient_widget->Height(), LengthUnit::m);
+  patient.GetBodyFatFraction().SetValue(patient_widget->BodyFatPercentage() / 100.0);
+  patient.GetHeartRateBaseline().SetValue(patient_widget->HeartRate(), FrequencyUnit::Hz);
+  patient.GetRespirationRateBaseline().SetValue(patient_widget->RespritoryRate(), FrequencyUnit::Hz);
+  patient.GetDiastolicArterialPressureBaseline().SetValue(patient_widget->DiastolicPressureBaseline(), PressureUnit::mmHg);
+  patient.GetSystolicArterialPressureBaseline().SetValue(patient_widget->SystolicPresureBaseline(), PressureUnit::mmHg);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::handleEnvironmentValueChange()
 {
-
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::handleTimelineValueChange()
 {
-
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::loadPatient()
 {
   QString fileName = QFileDialog::getOpenFileName(nullptr,
-  tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
-  drivers[0].patient(fileName.toStdString());
+    tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+  drivers[0].loadPatient(fileName.toStdString());
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::loadEnvironment()
 {
   QString fileName = QFileDialog::getOpenFileName(nullptr,
     tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
-  drivers[0].environment(fileName.toStdString());
+  drivers[0].loadEnvironment(fileName.toStdString());
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::loadTimeline()
 {
   QString fileName = QFileDialog::getOpenFileName(nullptr,
     tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
-  drivers[0].timeline(fileName.toStdString());
+  drivers[0].loadTimeline(fileName.toStdString());
 }
 //-------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget* parent)

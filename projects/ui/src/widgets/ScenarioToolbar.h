@@ -35,6 +35,10 @@ public:
 
   static auto create(QWidget* parent = nullptr) -> ScenarioToolbarPtr;
 
+  std::string Patient() const;
+  std::string Environment() const;
+  std::string Timeline() const;
+
   int patientListSize();
   int envrionmentListSize();
   int timelineListSize();

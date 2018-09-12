@@ -26,6 +26,7 @@
 #include "LengthInputWidget.h"
 #include "PressureInputWidget.h"
 #include "UnitInputWidget.h"
+#include "MassInputWidget.h"
 namespace biogears_ui {
 
 struct PatientConfigWidget::Implementation : public QObject {
@@ -42,6 +43,7 @@ public:
   QLineEdit* f_name = nullptr;
   QComboBox* f_gender = nullptr;
   DurationInputWidget* f_age = nullptr;
+  MassInputWidget* f_weight = nullptr;
   LengthInputWidget* f_height = nullptr;
   UnitInputWidget* f_bodyFat = nullptr;
   FrequencyInputWidget* f_heartRate = nullptr;
@@ -55,6 +57,7 @@ PatientConfigWidget::Implementation::Implementation(QWidget* parent)
   : f_name(new QLineEdit(parent))
   , f_gender(new QComboBox(parent))
   , f_age(DurationInputWidget::create(tr("Age"), units::time::year_t(27), parent))
+  , f_weight(MassInputWidget::create(tr("Weight"), units::mass::pound_t(160), parent))
   , f_height(LengthInputWidget::create(tr("Height"), 1.65, parent))
   , f_bodyFat(UnitInputWidget::create(tr("Body Fat"), 0.0, "%", parent))
   , f_heartRate(FrequencyInputWidget::create(tr("Heart Rate"), units::frequency::beats_per_minute_t(60), parent))
@@ -74,6 +77,7 @@ PatientConfigWidget::Implementation::Implementation(QWidget* parent)
   grid->addWidget(f_gender, row++, col+1);
   grid->addWidget(f_age->Widget(), row++, col, 1, 3);
   grid->addWidget(f_height->Widget(), row++, col, 1, 3);
+  grid->addWidget(f_weight->Widget(), row++, col, 1, 3);
   grid->addWidget(f_bodyFat,row++,col,1,3);
   grid->addWidget(f_heartRate->Widget(), row++, col,1,3);
   grid->addWidget(f_respritoryRate->Widget(), row++, col, 1, 3);
@@ -133,4 +137,55 @@ auto PatientConfigWidget::create(QWidget* parent) -> PatientConfigWidgetPtr
 {
   return new PatientConfigWidget(parent);
 }
+//-------------------------------------------------------------------------------
+std::string PatientConfigWidget::Name()
+{
+  return _impl->f_name->text().toStdString();
+}
+//-------------------------------------------------------------------------------
+std::string PatientConfigWidget::Gender()
+{
+  return _impl->f_gender->currentText().toStdString();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::Age()
+{
+  return _impl->f_age->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::Weight()
+{
+  return _impl->f_weight->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::Height()
+{
+  return _impl->f_height->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::BodyFatPercentage()
+{
+  return _impl->f_bodyFat->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::HeartRate()
+{
+  return _impl->f_heartRate->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::RespritoryRate()
+{
+  return _impl->f_respritoryRate->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::DiastolicPressureBaseline()
+{
+  return _impl->f_systolic->Value();
+}
+//-------------------------------------------------------------------------------
+double PatientConfigWidget::SystolicPresureBaseline()
+{
+  return _impl->f_systolic->Value();
+}
+//-------------------------------------------------------------------------------
 }
