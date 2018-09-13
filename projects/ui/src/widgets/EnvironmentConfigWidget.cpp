@@ -156,56 +156,116 @@ auto EnvironmentConfigWidget::create(QWidget* parent) -> EnvironmentConfigWidget
   return new EnvironmentConfigWidget(parent);
 }
 //-------------------------------------------------------------------------------
-QString EnvironmentConfigWidget::Surrondings()
+ESurrondings EnvironmentConfigWidget::Surrondings() const
 {
-  return _impl->f_surroundings->currentText();
+  return ( 0 == _impl->f_surroundings->currentIndex() ) ? ESurrondings::Air : ESurrondings::Water ;
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::AirVelocity()
+double EnvironmentConfigWidget::AirVelocity() const
 {
   return _impl->airVelocity->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::AmbientTemperature()
+double EnvironmentConfigWidget::AmbientTemperature() const
 {
   return _impl->ambientTemp->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::ClothingResistance()
+double EnvironmentConfigWidget::ClothingResistance() const
 {
   return _impl->clothing->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::AtmosphericPressure()
+double EnvironmentConfigWidget::AtmosphericPressure() const
 {
   return _impl->atmosphericPressure->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::SurroundingEmissivity()
+double EnvironmentConfigWidget::SurroundingEmissivity() const
 {
   return _impl->surroundingEmissivity->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::MeanRadientTemperature()
+double EnvironmentConfigWidget::MeanRadientTemperature() const
 {
   return _impl->meanradientTemp->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::RelativeHumidity()
+double EnvironmentConfigWidget::RelativeHumidity() const
 {
   return _impl->relativeHumidity->Value();
 }
 //-------------------------------------------------------------------------------
-double EnvironmentConfigWidget::ResperationAmbientTemperature()
+double EnvironmentConfigWidget::ResperationAmbientTemperature() const
 {
   return _impl->resperationAmbientTemp->Value();
 }
 //-------------------------------------------------------------------------------
-std::vector<AmbientGas> EnvironmentConfigWidget::AmbientGasses()
+std::vector<AmbientGas> EnvironmentConfigWidget::AmbientGasses() const
 {
   //todo:sawhite:Implement Ambeint Gas Accessor
   //return _impl->ambientGasses->Value();
   return {};
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::Surrondings(ESurrondings value)
+{
+  _impl->f_surroundings->setCurrentIndex( ( ESurrondings::Air == value ) ? 0:1 );
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::AirVelocity(units::velocity::meters_per_second_t value)
+{
+  _impl->airVelocity->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::AmbientTemperature(units::temperature::celsius_t value)
+{
+  _impl->ambientTemp->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::ClothingResistance(units::insulation::clo_t value)
+{
+  _impl->clothing->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::AtmosphericPressure(units::pressure::milimeters_of_mercury_t value)
+{
+  _impl->atmosphericPressure->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::SurroundingEmissivity(double value)
+{
+  _impl->surroundingEmissivity->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::MeanRadientTemperature(units::temperature::celsius_t value)
+{
+  _impl->meanradientTemp->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::RelativeHumidity(double value)
+{
+  _impl->relativeHumidity->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::ResperationAmbientTemperature(units::temperature::celsius_t value)
+{
+  _impl->ambientTemp->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+EnvironmentConfigWidget& EnvironmentConfigWidget::AmbientGasses(std::vector<AmbientGas>&&)
+{
+  //todo:sawhite:Implement Ambeint Gas Accessor
+  return *this;
 }
 //-------------------------------------------------------------------------------
 }

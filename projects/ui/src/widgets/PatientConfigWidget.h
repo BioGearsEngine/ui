@@ -21,10 +21,14 @@
 
 //External Includes
 #include <QToolBar>
+#include <units.h>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
+#include <biogears/math/units.h>
 
 namespace biogears_ui {
+enum class EGender { Male,
+  Female };
 class PatientConfigWidget : public QWidget {
   Q_OBJECT
 public:
@@ -35,16 +39,26 @@ public:
 
   static auto create(QWidget* parent = nullptr) -> PatientConfigWidgetPtr;
 
-  std::string Name();
-  std::string Gender();
-  double Age();
-  double Weight();
-  double Height();
-  double BodyFatPercentage();
-  double HeartRate();
-  double RespritoryRate();
-  double DiastolicPressureBaseline();
-  double SystolicPresureBaseline();
+  QString Name() const;
+  PatientConfigWidget& Name(QString);
+  EGender Gender() const;
+  PatientConfigWidget& Gender(EGender);
+  double Age() const;
+  PatientConfigWidget& Age(units::time::year_t);
+  double Weight() const;
+  PatientConfigWidget& Weight(units::mass::kilogram_t);
+  double Height() const;
+  PatientConfigWidget& Height(units::length::meter_t);
+  double BodyFatPercentage() const;
+  PatientConfigWidget& BodyFatPercentage(double);
+  double HeartRate() const;
+  PatientConfigWidget& HeartRate(units::frequency::hertz_t);
+  double RespritoryRate() const;
+  PatientConfigWidget& RespritoryRate(units::frequency::hertz_t);
+  double DiastolicPressureBaseline() const;
+  PatientConfigWidget& DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t);
+  double SystolicPresureBaseline() const;
+  PatientConfigWidget& SystolicPresureBaseline(units::pressure::milimeters_of_mercury_t);
 
 signals:
   void valueChanged();

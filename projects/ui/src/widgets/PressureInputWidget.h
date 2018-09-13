@@ -23,14 +23,9 @@
 
 //External Includes
 #include <QComboBox>
-#include <units.h>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
-
-namespace units {
-UNIT_ADD(pressure, milimeters_of_mercury, milimeters_of_mercury, mmHG, units::unit<std::ratio<1000000000, 133322387415>, units::pressure::pascals>)
-UNIT_ADD(pressure, inches_of_mercury, inches_of_mercury, inHG, units::unit<std::ratio<25400, 1000>, milimeters_of_mercury>)
-}
+#include <biogears/math/units.h>
 
 namespace biogears_ui {
 class PressureInputWidget : public QObject {

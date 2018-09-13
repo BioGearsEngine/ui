@@ -23,6 +23,7 @@
 #include <QToolBar>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
+#include <biogears/math/units.h>
 
 namespace biogears_ui {
 
@@ -31,6 +32,7 @@ struct AmbientGas {
   double fraction;
 };
 
+enum class ESurrondings { Air,  Water };
 class EnvironmentConfigWidget : public QWidget {
   Q_OBJECT
 public:
@@ -41,16 +43,27 @@ public:
 
   static auto create(QWidget* parent = nullptr) -> EnvironmentConfigWidgetPtr;
 
-  QString Surrondings();
-  double AirVelocity();
-  double AmbientTemperature();
-  double ClothingResistance();
-  double AtmosphericPressure();
-  double SurroundingEmissivity();
-  double MeanRadientTemperature();
-  double RelativeHumidity();
-  double ResperationAmbientTemperature();
-  std::vector<AmbientGas> AmbientGasses();
+  ESurrondings Surrondings() const;
+  double AirVelocity() const;
+  double AmbientTemperature() const;
+  double ClothingResistance() const;
+  double AtmosphericPressure() const;
+  double SurroundingEmissivity() const;
+  double MeanRadientTemperature() const;
+  double RelativeHumidity() const;
+  double ResperationAmbientTemperature() const;
+  std::vector<AmbientGas> AmbientGasses() const;
+
+  EnvironmentConfigWidget& Surrondings(ESurrondings);
+  EnvironmentConfigWidget& AirVelocity( units::velocity::meters_per_second_t);
+  EnvironmentConfigWidget& AmbientTemperature( units::temperature::celsius_t);
+  EnvironmentConfigWidget& ClothingResistance(units::insulation::clo_t);
+  EnvironmentConfigWidget& AtmosphericPressure( units::pressure::milimeters_of_mercury_t);
+  EnvironmentConfigWidget& SurroundingEmissivity( double );
+  EnvironmentConfigWidget& MeanRadientTemperature( units::temperature::celsius_t);
+  EnvironmentConfigWidget& RelativeHumidity( double);
+  EnvironmentConfigWidget& ResperationAmbientTemperature(units::temperature::celsius_t );
+  EnvironmentConfigWidget& AmbientGasses( std::vector<AmbientGas>&& );
 
 signals:
   void valueChanged();

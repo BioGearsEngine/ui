@@ -1,5 +1,5 @@
-#ifndef BIOGEARS_MATH_H
-#define BIOGEARS_MATH_H
+#ifndef BIOGEARS_MATH_ANGLES_H
+#define BIOGEARS_MATH_ANGLES_H
 
 //--NGSS PREAMBLE--//
 
@@ -663,4 +663,4 @@ EulerAngBase<T> QuaternionBase<T>::to_euler() const {
 
 
 
-#endif // BIOGEARS_MATH_H
+#endif // BIOGEARS_MATH_ANGLES_H

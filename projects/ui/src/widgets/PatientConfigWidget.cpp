@@ -145,54 +145,123 @@ auto PatientConfigWidget::create(QWidget* parent) -> PatientConfigWidgetPtr
   return new PatientConfigWidget(parent);
 }
 //-------------------------------------------------------------------------------
-std::string PatientConfigWidget::Name()
+QString PatientConfigWidget::Name() const
 {
-  return _impl->f_name->text().toStdString();
+  return _impl->f_name->text();
 }
 //-------------------------------------------------------------------------------
-std::string PatientConfigWidget::Gender()
+EGender PatientConfigWidget::Gender() const
 {
-  return _impl->f_gender->currentText().toStdString();
+  return (0 == _impl->f_gender->currentIndex()) ? EGender::Male : EGender::Female;
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::Age()
+double PatientConfigWidget::Age() const
 {
   return _impl->f_age->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::Weight()
+double PatientConfigWidget::Weight() const
 {
   return _impl->f_weight->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::Height()
+double PatientConfigWidget::Height() const
 {
   return _impl->f_height->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::BodyFatPercentage()
+double PatientConfigWidget::BodyFatPercentage() const
 {
   return _impl->f_bodyFat->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::HeartRate()
+double PatientConfigWidget::HeartRate() const
 {
   return _impl->f_heartRate->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::RespritoryRate()
+double PatientConfigWidget::RespritoryRate() const
 {
   return _impl->f_respritoryRate->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::DiastolicPressureBaseline()
+double PatientConfigWidget::DiastolicPressureBaseline() const
 {
   return _impl->f_systolic->Value();
 }
 //-------------------------------------------------------------------------------
-double PatientConfigWidget::SystolicPresureBaseline()
+double PatientConfigWidget::SystolicPresureBaseline() const
 {
   return _impl->f_systolic->Value();
+}
+//-------------------------------------------------------------------------------
+PatientConfigWidget& PatientConfigWidget::Name(QString value)
+{
+  _impl->f_name->setText(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::Gender(EGender value)
+{
+  (0 == _impl->f_gender->currentIndex()) ? EGender::Male : EGender::Female;
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::Age(units::time::year_t value)
+{
+  _impl->f_age->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::Weight(units::mass::kilogram_t value)
+{
+  _impl->f_weight->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::Height(units::length::meter_t value)
+{
+  _impl->f_height->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::BodyFatPercentage(double value)
+{
+  _impl->f_bodyFat->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::HeartRate(units::frequency::hertz_t value)
+{
+  _impl->f_heartRate->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::RespritoryRate(units::frequency::hertz_t value)
+{
+  _impl->f_respritoryRate->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t value)
+{
+  _impl->f_systolic->Value(value);
+  return *this;
+}
+//-------------------------------------------------------------------------------
+
+PatientConfigWidget& PatientConfigWidget::SystolicPresureBaseline(units::pressure::milimeters_of_mercury_t value)
+{
+  _impl->f_systolic->Value(value);
+  return *this;
 }
 //-------------------------------------------------------------------------------
 }

@@ -23,16 +23,9 @@
 
 //External Includes
 #include <QComboBox>
-#include <units.h>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
-
-namespace units {
-  UNIT_ADD(insulation, r_value, r_values, R, units::compound_unit<squared<units::length::meters>, units::temperature::celsius, inverse<squared<units::power::watts>>>)
-  UNIT_ADD(insulation, rsi_value, rsi_values, RSI, units::unit<std::ratio<567826, 100000>, r_values>)
-  UNIT_ADD(insulation, clo, clothes, clo, units::unit<std::ratio<86,100>, r_values>)
-  UNIT_ADD(insulation, tog, togs, tog, units::unit<std::ratio<100,155>, clo>)
-  }
+#include <biogears/math/units.h>
 
 namespace biogears_ui {
 class ThermalResistanceInputWidget : public QObject {
