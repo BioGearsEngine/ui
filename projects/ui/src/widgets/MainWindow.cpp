@@ -23,9 +23,11 @@
 //External Includes
 #include <QTabWidget>
 #include <QtWidgets>
-#include <units.h>
 #include <biogears/cdm/properties/SEScalars.h>
+#include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
+#include <biogears/cdm/system/environment/conditions/SEEnvironmentCondition.h>
 #include <biogears/string-exports.h>
+#include <units.h>
 //Project Includes
 #include "../phys/PhysiologyDriver.h"
 #include "EnvironmentConfigWidget.h"
@@ -62,7 +64,7 @@ public: //Data
   MultiSelectionWidget* physiologySelection = nullptr;
   ScenarioToolbar* runToolbar = nullptr;
   PatientConfigWidget* patient_widget = nullptr;
-  EnvironmentConfigWidget* envrionment_widget = nullptr;
+  EnvironmentConfigWidget* environment_widget = nullptr;
   TimelineConfigWidget* timeline_widget = nullptr;
 };
 //-------------------------------------------------------------------------------
@@ -70,7 +72,7 @@ MainWindow::Implementation::Implementation(QWidget* parent)
   : physiologySelection(MultiSelectionWidget::create(parent))
   , runToolbar(ScenarioToolbar::create(parent))
   , patient_widget(PatientConfigWidget::create(parent))
-  , envrionment_widget(EnvironmentConfigWidget::create(parent))
+  , environment_widget(EnvironmentConfigWidget::create(parent))
   , timeline_widget(TimelineConfigWidget::create(parent))
 {
   PhysiologyDriver driver("BiogearsGUI");
@@ -141,9 +143,8 @@ void MainWindow::Implementation::handleTimelineFileChange(int index)
   }
 }
 
-  //-------------------------------------------------------------------------------
-  void
-  MainWindow::Implementation::handlePatientValueChange()
+//-------------------------------------------------------------------------------
+void MainWindow::Implementation::handlePatientValueChange()
 {
   SEPatient& patient = drivers[0].Patient();
   patient.SetName(patient_widget->Name());
@@ -160,6 +161,21 @@ void MainWindow::Implementation::handleTimelineFileChange(int index)
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::handleEnvironmentValueChange()
 {
+  SEEnvironment& environment = drivers[0].Environment();
+  SEEnvironmentalConditions& conditions = environment.GetConditions();
+
+  //Surrounding Type
+  conditions.SetSurroundingType(environment_widget->Surrondings() == "Air" ? CDM::enumSurroundingType::Air
+                                                                           : CDM::enumSurroundingType::Air);
+  conditions.GetAirVelocity().SetValue(environment_widget->AirVelocity(), LengthPerTimeUnit::m_Per_s);
+  conditions.GetAmbientTemperature().SetValue(environment_widget->AmbientTemperature(), TemperatureUnit::C);
+  conditions.GetAtmosphericPressure().SetValue(environment_widget->AtmosphericPressure(), PressureUnit::mmHg);
+  conditions.GetClothingResistance().SetValue(environment_widget->ClothingResistance(), HeatResistanceAreaUnit::clo);
+  conditions.GetEmissivity().SetValue(environment_widget->SurroundingEmissivity(), NoUnit::unitless);
+  conditions.GetMeanRadiantTemperature().SetValue(environment_widget->MeanRadientTemperature(), TemperatureUnit::C);
+  conditions.GetRelativeHumidity().SetValue(environment_widget->RelativeHumidity(), NoUnit::unitless);
+  conditions.GetRespirationAmbientTemperature().SetValue(environment_widget->ResperationAmbientTemperature(), TemperatureUnit::C);
+  //TODO:sawhite:SetAmbientGas
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::handleTimelineValueChange()
@@ -275,7 +291,7 @@ void MainWindow::createActions()
 
   tabs->addTab(_impl->physiologySelection, "Outputs");
   tabs->addTab(_impl->patient_widget, "Patient");
-  tabs->addTab(_impl->envrionment_widget, "Environment");
+  tabs->addTab(_impl->environment_widget, "Environment");
   tabs->addTab(_impl->timeline_widget, "Timeline");
   setCentralWidget(tabs);
 
@@ -284,7 +300,7 @@ void MainWindow::createActions()
   connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, _impl.get(), &Implementation::handleTimelineFileChange);
 
   connect(_impl->patient_widget, &PatientConfigWidget::valueChanged, _impl.get(), &Implementation::handlePatientValueChange);
-  connect(_impl->envrionment_widget, &EnvironmentConfigWidget::valueChanged, _impl.get(), &Implementation::handleEnvironmentValueChange);
+  connect(_impl->environment_widget, &EnvironmentConfigWidget::valueChanged, _impl.get(), &Implementation::handleEnvironmentValueChange);
   connect(_impl->timeline_widget, &TimelineConfigWidget::valueChanged, _impl.get(), &Implementation::handleTimelineValueChange);
 }
 //-------------------------------------------------------------------------------

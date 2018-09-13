@@ -56,13 +56,13 @@ public:
 };
 //-------------------------------------------------------------------------------
 VelocityInputWidget::Implementation::Implementation(::QString label, double value, ::QWidget* parent)
-  : unitInput(UnitInputWidget::create(label, value, "km/h", parent))
+  : unitInput(UnitInputWidget::create(label, value, "m/s", parent))
   , value(value)
   , minimum(0.0)
   , maximum(500.0)
 {
-  unitInput->addUnit("m/s");
   unitInput->addUnit("mph");
+  unitInput->addUnit("km/h");
   unitInput->setRange(minimum(), maximum());
   unitInput->Value(value);
 
@@ -93,15 +93,15 @@ void VelocityInputWidget::Implementation::unsubscribe()
 void VelocityInputWidget::Implementation::processValueChange()
 {
   switch (unitInput->UnitIndex()) {
-  case 0: //View value as km/h
-    value = units::velocity::kilometers_per_hour_t(unitInput->Value());
-    break;
-  case 1: { //View value as m/s
+  case 0: { //View value as m/s
     value = units::velocity::meters_per_second_t(unitInput->Value());
   } break;
-  case 2: { //View value as mph
+  case 1: { //View value as mph
     value = units::velocity::miles_per_hour_t(unitInput->Value());
   } break;
+  case 2: //View value as km/h
+    value = units::velocity::kilometers_per_hour_t(unitInput->Value());
+    break;
   default: //Debug case for if this class is patched but updateView has not been modified
   {
     assert(unitInput->UnitIndex() < 3);
@@ -141,14 +141,14 @@ void VelocityInputWidget::Implementation::updateView()
     unitInput->setRange(minimum(), maximum());
     unitInput->Value(current());
     break;
-  case 1: { //View value as m/s
-    units::velocity::meters_per_second_t view{ current };
-    units::velocity::meters_per_second_t min{ minimum };
-    units::velocity::meters_per_second_t max{ maximum };
+  case 2: { //View value as mph
+    units::velocity::kilometers_per_hour_t view{ current };
+    units::velocity::kilometers_per_hour_t min{ minimum };
+    units::velocity::kilometers_per_hour_t max{ maximum };
     unitInput->setRange(min(), max());
     unitInput->Value(view());
   } break;
-  case 2: { //View value as mph
+  case 1: { //View value as m/s
     units::velocity::miles_per_hour_t view{ current };
     units::velocity::miles_per_hour_t min{ minimum };
     units::velocity::miles_per_hour_t max{ maximum };
@@ -173,6 +173,7 @@ VelocityInputWidget::VelocityInputWidget(QWidget* parent)
 VelocityInputWidget::VelocityInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
+  _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
 VelocityInputWidget::~VelocityInputWidget()
@@ -189,6 +190,16 @@ auto VelocityInputWidget::create(QString label, double value, QWidget* parent) -
   return widget;
 }
 //-------------------------------------------------------------------------------
+//!
+//! \brief returns a ScenarioToolbar* which it retains no ownership of
+//!        the caller is responsible for all memory management
+auto VelocityInputWidget::create(QString label, units::velocity::meters_per_second_t value, QWidget* parent) -> VelocityInputWidgetPtr
+{
+  auto widget = new VelocityInputWidget(label, value(), parent);
+  return widget;
+}
+//-------------------------------------------------------------------------------
+//! \return double value contained reported in km/h
 double VelocityInputWidget::Value() const
 {
   return _impl->value();
@@ -213,6 +224,24 @@ void VelocityInputWidget::Label(const QString& given)
 QString VelocityInputWidget::ViewUnitText() const
 {
   return _impl->unitInput->UnitText();
+}
+//-------------------------------------------------------------------------------
+void VelocityInputWidget::setUnitView(Velocity unit)
+{
+  switch (unit) {
+  case Velocity::mps:
+    _impl->unitInput->UnitIndex(0);
+    break;
+  case Velocity::kph:
+    _impl->unitInput->UnitIndex(1);
+    break;
+  case Velocity::mph:
+    _impl->unitInput->UnitIndex(2);
+    break;
+  default:
+    _impl->unitInput->UnitIndex(0);
+    break;
+  };
 }
 //-------------------------------------------------------------------------------
 QWidget* VelocityInputWidget::Widget()

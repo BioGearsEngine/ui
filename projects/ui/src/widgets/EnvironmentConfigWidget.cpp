@@ -22,11 +22,13 @@
 #include <QtWidgets>
 #include <Units.h>
 //Project Includes
-#include "ThermalResistanceInputWidget.h"
+#include "PressureInputWidget.h"
 #include "TemperatureInputWidget.h"
+#include "ThermalResistanceInputWidget.h"
 #include "UnitInputWidget.h"
 #include "VelocityInputWidget.h"
-#include "PressureInputWidget.h"
+#include "PatientConfigWidget.h"
+
 namespace biogears_ui {
 struct AmbientGasWidget : public QObject {
 };
@@ -51,7 +53,7 @@ public:
   TemperatureInputWidget* meanradientTemp = nullptr;
   UnitInputWidget* relativeHumidity = nullptr;
   TemperatureInputWidget* resperationAmbientTemp = nullptr;
-
+  //AmbientGasInputWidget* ambientGasses;
   QPushButton* b_addAmbientGas = nullptr;
   QLabel* l_ambientGas = nullptr;
   QVBoxLayout* gasses = nullptr;
@@ -59,9 +61,9 @@ public:
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget::Implementation::Implementation(QWidget* parent)
   : f_surroundings(new QComboBox(parent))
-  , airVelocity(VelocityInputWidget::create(tr("Air Velocity"), 12.0, parent))
+  , airVelocity(VelocityInputWidget::create(tr("Air Velocity"), units::velocity::kilometers_per_hour_t(12.0), parent))
   , ambientTemp(TemperatureInputWidget::create(tr("Ambient Temperature"), 27.0, parent))
-  , clothing(ThermalResistanceInputWidget::create(tr("Clothing Resitance"), 0.61 , parent))
+  , clothing(ThermalResistanceInputWidget::create(tr("Clothing Resitance"), 0.61, parent))
   , atmosphericPressure(PressureInputWidget::create(tr("Atmospheric Pressure"), 760.0, parent))
   , surroundingEmissivity(UnitInputWidget::create(tr("Emissivity"), 0.0, "k", parent))
   , meanradientTemp(TemperatureInputWidget::create(tr("Mean Radient Temperature"), 25.0, parent))
@@ -74,6 +76,8 @@ EnvironmentConfigWidget::Implementation::Implementation(QWidget* parent)
 
   f_surroundings->addItem("Air");
   f_surroundings->addItem("water");
+
+  airVelocity->setUnitView(Velocity::kph);
 
   QGridLayout* grid = new QGridLayout;
   parent->setLayout(grid);
@@ -127,6 +131,16 @@ EnvironmentConfigWidget::EnvironmentConfigWidget(QWidget* parent)
   : QWidget(parent)
   , _impl(this)
 {
+  Implementation& implementation = *_impl.get();
+  connect(implementation.f_surroundings, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.airVelocity, &VelocityInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.atmosphericPressure, &PressureInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.clothing, &ThermalResistanceInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.surroundingEmissivity, &UnitInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.meanradientTemp, &TemperatureInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.relativeHumidity, &UnitInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  connect(implementation.resperationAmbientTemp, &TemperatureInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
+  //connect(implementation.ambientGasses, &AmbientGasInputWidget::valueChanged, this, &EnvironmentConfigWidget::valueChanged);
 }
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget::~EnvironmentConfigWidget()
@@ -141,4 +155,57 @@ auto EnvironmentConfigWidget::create(QWidget* parent) -> EnvironmentConfigWidget
 {
   return new EnvironmentConfigWidget(parent);
 }
+//-------------------------------------------------------------------------------
+QString EnvironmentConfigWidget::Surrondings()
+{
+  return _impl->f_surroundings->currentText();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::AirVelocity()
+{
+  return _impl->airVelocity->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::AmbientTemperature()
+{
+  return _impl->ambientTemp->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::ClothingResistance()
+{
+  return _impl->clothing->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::AtmosphericPressure()
+{
+  return _impl->atmosphericPressure->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::SurroundingEmissivity()
+{
+  return _impl->surroundingEmissivity->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::MeanRadientTemperature()
+{
+  return _impl->meanradientTemp->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::RelativeHumidity()
+{
+  return _impl->relativeHumidity->Value();
+}
+//-------------------------------------------------------------------------------
+double EnvironmentConfigWidget::ResperationAmbientTemperature()
+{
+  return _impl->resperationAmbientTemp->Value();
+}
+//-------------------------------------------------------------------------------
+std::vector<AmbientGas> EnvironmentConfigWidget::AmbientGasses()
+{
+  //todo:sawhite:Implement Ambeint Gas Accessor
+  //return _impl->ambientGasses->Value();
+  return {};
+}
+//-------------------------------------------------------------------------------
 }

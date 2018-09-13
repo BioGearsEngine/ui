@@ -165,6 +165,7 @@ LengthInputWidget::LengthInputWidget(QWidget* parent)
 LengthInputWidget::LengthInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
+  _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
 LengthInputWidget::~LengthInputWidget()

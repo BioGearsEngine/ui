@@ -119,10 +119,17 @@ PatientConfigWidget::PatientConfigWidget(QWidget* parent)
   : QWidget(parent)
   , _impl(this)
 {
-  //createActions();
-  //createStatusBar();
-  //readSettings();
-  //setUnifiedTitleAndToolBarOnMac(true);
+  Implementation& implementation = *_impl.get();
+  connect(implementation.f_name, &QLineEdit::textChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_gender, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_age, &DurationInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_weight, &MassInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_height, &LengthInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_bodyFat, &UnitInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_heartRate, &FrequencyInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_respritoryRate, &FrequencyInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_diastolic, &PressureInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
+  connect(implementation.f_systolic, &PressureInputWidget::valueChanged, this, &PatientConfigWidget::valueChanged);
 }
 //-------------------------------------------------------------------------------
 PatientConfigWidget::~PatientConfigWidget()

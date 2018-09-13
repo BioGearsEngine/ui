@@ -187,6 +187,7 @@ PressureInputWidget::PressureInputWidget(QWidget* parent)
 PressureInputWidget::PressureInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
+  _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
 PressureInputWidget::~PressureInputWidget()

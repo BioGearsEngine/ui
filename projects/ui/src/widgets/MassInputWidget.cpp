@@ -187,6 +187,7 @@ MassInputWidget::MassInputWidget(QWidget* parent)
 MassInputWidget::MassInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
+  _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
 MassInputWidget::~MassInputWidget()

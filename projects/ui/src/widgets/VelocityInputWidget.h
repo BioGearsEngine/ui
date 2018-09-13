@@ -17,8 +17,8 @@
 //! \author Steven A White
 //! \date   Sept 11th 2018
 //!
-//! \brief This class is an input field for a Velocity value. The return of Value will always be in the model unit of km/h
-//!        passed in at construction. Additionally you can view and input velocities in mph and m/s
+//! \brief This class is an input field for a Velocity value. The return of Value will always be in the model unit of m/s
+//!        passed in at construction. Additionally you can view and input velocities in mph and km/s
 //!        you can retrieve the current view using ViewUnitText();
 
 //External Includes
@@ -28,6 +28,7 @@
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
+enum class Velocity { mps,  kph,  mph};
 class VelocityInputWidget : public QObject {
   Q_OBJECT
 public:
@@ -37,6 +38,7 @@ public:
 
   using VelocityInputWidgetPtr = VelocityInputWidget*;
   static auto create(QString label, double value, QWidget* parent = nullptr) -> VelocityInputWidgetPtr;
+  static auto create(QString label, units::velocity::meters_per_second_t value, QWidget* parent) -> VelocityInputWidgetPtr;
 
   double Value() const;
   void Value(units::velocity::kilometers_per_hour_t);
@@ -45,6 +47,7 @@ public:
   void Label(const QString&);
 
   QString ViewUnitText() const;
+  void setUnitView(Velocity);
 
   QWidget* Widget();
 

@@ -162,6 +162,7 @@ FrequencyInputWidget::FrequencyInputWidget(QWidget* parent)
 FrequencyInputWidget::FrequencyInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
+  _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
 FrequencyInputWidget::~FrequencyInputWidget()

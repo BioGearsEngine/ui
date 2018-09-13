@@ -25,6 +25,12 @@
 #include <biogears/framework/unique_propagate_const.h>
 
 namespace biogears_ui {
+
+struct AmbientGas {
+  std::string name;
+  double fraction;
+};
+
 class EnvironmentConfigWidget : public QWidget {
   Q_OBJECT
 public:
@@ -34,6 +40,17 @@ public:
   using EnvironmentConfigWidgetPtr = EnvironmentConfigWidget*;
 
   static auto create(QWidget* parent = nullptr) -> EnvironmentConfigWidgetPtr;
+
+  QString Surrondings();
+  double AirVelocity();
+  double AmbientTemperature();
+  double ClothingResistance();
+  double AtmosphericPressure();
+  double SurroundingEmissivity();
+  double MeanRadientTemperature();
+  double RelativeHumidity();
+  double ResperationAmbientTemperature();
+  std::vector<AmbientGas> AmbientGasses();
 
 signals:
   void valueChanged();

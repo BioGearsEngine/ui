@@ -173,6 +173,7 @@ TemperatureInputWidget::TemperatureInputWidget(QWidget* parent)
 TemperatureInputWidget::TemperatureInputWidget(QString label, double value, QWidget* parent)
   : _impl(label, value, parent)
 {
+  _impl->subscribe(this);
 }
 //-------------------------------------------------------------------------------
 TemperatureInputWidget::~TemperatureInputWidget()
