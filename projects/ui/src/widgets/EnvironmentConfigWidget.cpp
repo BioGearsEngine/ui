@@ -258,7 +258,7 @@ EnvironmentConfigWidget& EnvironmentConfigWidget::RelativeHumidity(double value)
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget& EnvironmentConfigWidget::ResperationAmbientTemperature(units::temperature::celsius_t value)
 {
-  _impl->ambientTemp->Value(value);
+  _impl->resperationAmbientTemp->Value(value);
   return *this;
 }
 //-------------------------------------------------------------------------------

@@ -253,7 +253,7 @@ PatientConfigWidget& PatientConfigWidget::RespritoryRate(units::frequency::hertz
 
 PatientConfigWidget& PatientConfigWidget::DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t value)
 {
-  _impl->f_systolic->Value(value);
+  _impl->f_diastolic->Value(value);
   return *this;
 }
 //-------------------------------------------------------------------------------

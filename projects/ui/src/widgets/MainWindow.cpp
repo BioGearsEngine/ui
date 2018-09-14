@@ -188,16 +188,19 @@ void MainWindow::Implementation::handleEnvironmentValueChange()
 void MainWindow::Implementation::populatePatientWidget()
 {
   SEPatient& patient = drivers[0].Patient();
-  patient_widget->Name(patient.GetName().c_str());
-  patient_widget->Gender((patient.GetGender() == CDM::enumSex::Male) ? EGender::Male : EGender::Female);
-  patient_widget->Age(units::time::year_t(patient.GetAge(TimeUnit::yr)));
-  patient_widget->Weight(units::mass::kilogram_t(patient.GetWeight().GetValue(MassUnit::kg)));
-  patient_widget->Height(units::length::meter_t(patient.GetHeight().GetValue(LengthUnit::m)));
-  patient_widget->BodyFatPercentage(patient.GetBodyFatFraction().GetValue() * 100.0);
-  patient_widget->HeartRate(units::frequency::hertz_t(patient.GetHeartRateBaseline().GetValue(FrequencyUnit::Hz)));
-  patient_widget->RespritoryRate(units::frequency::hertz_t(patient.GetRespirationRateBaseline().GetValue(FrequencyUnit::Hz)));
-  patient_widget->DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetDiastolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)));
-  patient_widget->SystolicPresureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetSystolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)));
+
+  bool oldState = patient_widget->blockSignals(true);
+  patient_widget->Name(patient.GetName().c_str())
+    .Gender((patient.GetGender() == CDM::enumSex::Male) ? EGender::Male : EGender::Female)
+    .Age(units::time::year_t(patient.GetAge(TimeUnit::yr)))
+    .Weight(units::mass::kilogram_t(patient.GetWeight().GetValue(MassUnit::kg)))
+    .Height(units::length::meter_t(patient.GetHeight().GetValue(LengthUnit::m)))
+    .BodyFatPercentage(patient.GetBodyFatFraction().GetValue() * 100.0)
+    .HeartRate(units::frequency::hertz_t(patient.GetHeartRateBaseline().GetValue(FrequencyUnit::Hz)))
+    .RespritoryRate(units::frequency::hertz_t(patient.GetRespirationRateBaseline().GetValue(FrequencyUnit::Hz)))
+    .DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetDiastolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)))
+    .SystolicPresureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetSystolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)));
+  patient_widget->blockSignals(oldState);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::populateEnvironmentWidget()
@@ -206,6 +209,7 @@ void MainWindow::Implementation::populateEnvironmentWidget()
   SEEnvironmentalConditions& conditions = environment.GetConditions();
 
   //Surrounding Type
+  bool oldState = environment_widget->blockSignals(true);
   environment_widget->Surrondings((conditions.GetSurroundingType() == CDM::enumSurroundingType::Air) ? ESurrondings::Air : ESurrondings::Water);
   environment_widget->AirVelocity(units::velocity::meters_per_second_t(conditions.GetAirVelocity().GetValue(LengthPerTimeUnit::m_Per_s)));
   environment_widget->AmbientTemperature(units::temperature::celsius_t(conditions.GetAmbientTemperature().GetValue(TemperatureUnit::C)));
@@ -214,8 +218,9 @@ void MainWindow::Implementation::populateEnvironmentWidget()
   environment_widget->SurroundingEmissivity(conditions.GetEmissivity().GetValue(NoUnit::unitless));
   environment_widget->MeanRadientTemperature(units::temperature::celsius_t(conditions.GetMeanRadiantTemperature().GetValue(TemperatureUnit::C)));
   environment_widget->RelativeHumidity(conditions.GetRelativeHumidity().GetValue(NoUnit::unitless));
-  environment_widget->ResperationAmbientTemperature(units::velocity::meters_per_second_t(conditions.GetRespirationAmbientTemperature().GetValue(TemperatureUnit::C)));
+  environment_widget->ResperationAmbientTemperature(units::temperature::celsius_t(conditions.GetRespirationAmbientTemperature().GetValue(TemperatureUnit::C)));
   //TODO:sawhite:SetAmbientGas
+  environment_widget->blockSignals(oldState);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::populateTimelineWidget()

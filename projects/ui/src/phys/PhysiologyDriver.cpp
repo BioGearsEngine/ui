@@ -95,7 +95,8 @@ void PhysiologyDriver::Implementation::loadTimeline()
 void PhysiologyDriver::Implementation::loadEnvironment()
 {
   SEEnvironment& env = phy->GetEnvironment();
-  env.Load(environment_file);
+  SEEnvironmentalConditions& conditions = env.GetConditions();
+  conditions.Load(environment_file);
 }
 //-------------------------------------------------------------------------------
 PhysiologyDriver::PhysiologyDriver()
