@@ -123,16 +123,9 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/runtime
 )
 
-file(GLOB_RECURSE source_xsd_list LIST_DIRECTORIES false "${Biogears_XSD_SCHEMA_DIR}/*.xsd")
-foreach(_file IN LISTS  source_xsd_list)
-	string(REPLACE "${Biogears_XSD_SCHEMA_DIR}" "${PROJECT_BINARY_DIR}/runtime/xsd" runtime_file "${_file}" )
-	list(APPEND runtime_xsd_list ${runtime_file})
-	add_custom_command(
-		OUTPUT  ${runtime_file}
-		DEPENDS ${_file}
-                COMMAND ${CMAKE_COMMAND} -E copy ${_file} ${runtime_file}
-	)
-endforeach()
+stage_biogears_schema(DESTINATION ${PROJECT_BINARY_DIR}/runtime)
+stage_biogears_data  (DESTINATION ${PROJECT_BINARY_DIR}/runtime)
+add_dependencies(${PROJECT_NAME} stage_biogears_schema stage_biogears_data)
 
 list(APPEND runtime_glob_list 	"${runtime_xsd_list}"	)
 

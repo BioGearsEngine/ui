@@ -19,7 +19,7 @@
 //!
 //!  
 //! \brief Primary window of BioGears UI
-#include <biogears/string-exports.h>
+#include <biogears/exports.h>
 #include <QChart>
 #include <ScenarioData.h>
 #include <qlineseries.h>

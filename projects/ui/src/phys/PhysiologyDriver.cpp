@@ -16,10 +16,9 @@
 #include <memory>
 
 //External Includes
-#include <biogears/string-exports.h>
+#include <biogears/exports.h>
 
-#include <biogears/engine/Controller/BioGears.h>
-#include <biogears/engine/BioGearsPhysiologyEngine.h>
+#include <biogears/engine/Controller/BioGearsEngine.h>
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/scenario/SEScenario.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
@@ -29,6 +28,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+using namespace biogears;
 namespace biogears_ui {
 struct PhysiologyDriver::Implementation {
 public:
@@ -39,7 +39,7 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  std::unique_ptr<BioGears> phy = nullptr;
+  std::unique_ptr<BioGearsEngine> phy = nullptr;
 
   void loadPatient();
   void loadTimeline();
@@ -51,8 +51,9 @@ public:
 };
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation::Implementation(const std::string& scenario)
-  : phy(new BioGears(scenario + ".log"))
+  : phy(new BioGearsEngine(scenario + ".log"))
 {
+
 }
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation::Implementation(const Implementation& obj)
@@ -82,7 +83,7 @@ PhysiologyDriver::Implementation& PhysiologyDriver::Implementation::operator=(Im
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::Implementation::loadPatient()
 {
-  SEPatient& patient = phy->GetPatient();
+  SEPatient& patient = static_cast<BioGears*>(phy.get())->GetPatient();
   patient.Load(patient_file);
 }
 //-------------------------------------------------------------------------------
@@ -94,7 +95,7 @@ void PhysiologyDriver::Implementation::loadTimeline()
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::Implementation::loadEnvironment()
 {
-  SEEnvironment& env = phy->GetEnvironment();
+  SEEnvironment& env = static_cast<BioGears*>(phy.get())->GetEnvironment();
   SEEnvironmentalConditions& conditions = env.GetConditions();
   conditions.Load(environment_file);
 }
@@ -166,12 +167,12 @@ void PhysiologyDriver::clearTimeline() { _impl->timeline_file = ""; }
 //-------------------------------------------------------------------------------
 SEPatient& PhysiologyDriver::Patient()
 {
-  return _impl->phy->GetPatient();
+  return static_cast<BioGears*>(_impl->phy.get())->GetPatient();
 }
 //-------------------------------------------------------------------------------
 SEEnvironment& PhysiologyDriver::Environment()
 {
-  return _impl->phy->GetEnvironment();
+  return static_cast<BioGears*>(_impl->phy.get())->GetEnvironment();
 }
 //-------------------------------------------------------------------------------
 std::string PhysiologyDriver::timeline() const
@@ -183,4 +184,11 @@ bool PhysiologyDriver::applyAction()
 {
   return true;
 }
+//-------------------------------------------------------------------------------
+PhysiologyEngine* PhysiologyDriver::Physiology()
+{
+  //note:sawhite: We are loosing control of Physiology for now
+  return static_cast<PhysiologyEngine*>(_impl->phy.get());
+}
+
 }

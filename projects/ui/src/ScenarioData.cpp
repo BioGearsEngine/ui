@@ -53,7 +53,7 @@ void ScenarioData::setDataSeries(std::string &y_header)
 		auto y_itr = std::find(headers_vector_.begin(),headers_vector_.end(),y_header);	//iterator to column containing desired data
 		if(y_itr!=headers_vector_.end())
 		{
-			int y_index = y_itr - headers_vector_.begin();
+			auto y_index = y_itr - headers_vector_.begin();
 			std::vector<std::string> dataLine;
 			std::getline(dataReader, line);	//Discard first line, since this has the headers
 			while (std::getline(dataReader, line))

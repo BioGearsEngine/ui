@@ -6,7 +6,7 @@
 //! \date   2018-07-10
 //! \brief  Struct for communicating program STATE through out the UI
 //!
-#include <biogears/string-exports.h>
+#include <biogears/exports.h>
 //External Includes
 #include <boost/filesystem.hpp>
 //Project Includes

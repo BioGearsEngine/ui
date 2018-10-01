@@ -36,7 +36,6 @@
 #include "ScenarioToolbar.h"
 #include "TimelineConfigWidget.h"
 
-using namespace biogears;
 namespace biogears_ui {
 
 struct MainWindow::Implementation : public QObject {

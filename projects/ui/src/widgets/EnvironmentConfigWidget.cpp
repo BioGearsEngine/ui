@@ -27,7 +27,6 @@
 #include "ThermalResistanceInputWidget.h"
 #include "UnitInputWidget.h"
 #include "VelocityInputWidget.h"
-#include "PatientConfigWidget.h"
 
 namespace biogears_ui {
 struct AmbientGasWidget : public QObject {

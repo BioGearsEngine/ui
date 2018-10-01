@@ -24,13 +24,20 @@
 #include <chrono>
 #include <string>
 //Project Includes
-#include <biogears/string-exports.h>
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
+#include <biogears/exports.h>
 #include <biogears/framework/unique_propagate_const.h>
 
+namespace biogears {
+class PhysiologyEngine;
+}
+
 namespace biogears_ui {
+class PhysiologyThread;
 class PhysiologyDriver {
+  friend PhysiologyThread;
+
 public:
   PhysiologyDriver();
   PhysiologyDriver(const std::string&);
@@ -51,11 +58,14 @@ public:
   void clearEnvironment();
   void clearTimeline();
 
-  SEPatient& Patient();
-  SEEnvironment& Environment();
+  biogears::SEPatient& Patient();
+  biogears::SEEnvironment& Environment();
   std::string timeline() const;
 
   bool applyAction();
+
+private:
+  biogears::PhysiologyEngine* Physiology();
 
 private:
   struct Implementation;

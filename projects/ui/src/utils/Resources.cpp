@@ -17,6 +17,7 @@
 //!
 //!
 //! \brief Helper functions for the locating of files and resources
+#include <biogears/exports.h>
 #include <boost/filesystem.hpp>
 #include <regex>
 
@@ -36,7 +37,7 @@ namespace Resources {
         filepath = p.path().string();
         if (std::regex_match(filepath, match, re)) {
           if (match.size() != 0) {
-            result.push_back(match[0]);
+            result.emplace_back(match[0]);
           }
         }
       }

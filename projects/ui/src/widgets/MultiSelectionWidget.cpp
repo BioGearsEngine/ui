@@ -16,7 +16,7 @@
 //!
 //!
 //! \brief Primary window of BioGears UI
-#include <biogears/string-exports.h>
+#include <biogears/exports.h>
 #include <iostream>
 
 #include "MultiSelectionWidget.h"

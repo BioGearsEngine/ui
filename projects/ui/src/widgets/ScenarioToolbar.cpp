@@ -110,14 +110,16 @@ ScenarioToolbar::ScenarioToolbar(QWidget* parent)
   addSeparator();
 
   QIcon launchIcon = QIcon::fromTheme("Launch", QIcon(":/img/play.png"));
-  QAction* action = new QAction(launchIcon, tr("&Launch"), this);
+  QAction* action = new QAction(launchIcon, tr("Launch Simulation"), this);
   action->setStatusTip(tr("Run current simulation"));
   addAction(action);
- 
+  connect(action, &QAction::triggered, this, &ScenarioToolbar::resumeSimulation);
+
   QIcon pauseIcon = QIcon::fromTheme("Pause", QIcon(":/img/pause.png"));
-  action = new QAction(pauseIcon, tr("&Pause"), this);
+  action = new QAction(pauseIcon, tr("Pause Simulation"), this);
   action->setStatusTip(tr("Pause running simulation"));
   addAction(action);
+  connect(action, &QAction::triggered, this, &ScenarioToolbar::pauseSimulation);
 
   connect(_impl->patients, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::patientChanged);
   connect(_impl->enviroments, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::envonmentChanged);
