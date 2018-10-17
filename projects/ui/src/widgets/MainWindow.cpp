@@ -19,14 +19,20 @@
 
 #include "MainWindow.h"
 //Standard Includes
+#include <algorithm>
 #include <iostream>
+#include <regex>
 //External Includes
 #include <QTabWidget>
 #include <QtWidgets>
+
+#include <biogears/exports.h>
+
+#include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
+#include <biogears/cdm/scenario/SEAdvanceTime.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
 #include <biogears/cdm/system/environment/conditions/SEEnvironmentCondition.h>
-#include <biogears/exports.h>
 #include <units.h>
 //Project Includes
 #include "../phys/PhysiologyDriver.h"
@@ -35,6 +41,8 @@
 #include "PatientConfigWidget.h"
 #include "ScenarioToolbar.h"
 #include "TimelineConfigWidget.h"
+
+#include <xercesc/dom/DOMDocument.hpp>
 
 using namespace biogears;
 namespace biogears_ui {
@@ -204,6 +212,8 @@ void MainWindow::Implementation::populatePatientWidget()
   SEPatient& patient = drivers[0].Patient();
 
   bool oldState = patient_widget->blockSignals(true);
+ try
+ {
   patient_widget->Name(patient.GetName().c_str())
     .Gender((patient.GetGender() == CDM::enumSex::Male) ? EGender::Male : EGender::Female)
     .Age(units::time::year_t(patient.GetAge(TimeUnit::yr)))
@@ -214,6 +224,11 @@ void MainWindow::Implementation::populatePatientWidget()
     .RespritoryRate(units::frequency::hertz_t(patient.GetRespirationRateBaseline().GetValue(FrequencyUnit::Hz)))
     .DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetDiastolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)))
     .SystolicPresureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetSystolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)));
+ } catch ( std::exception e)
+ {
+   //TODO:Log Unable to load file
+   //TODO:Red Notifcation Bannor on UI
+ }
   patient_widget->blockSignals(oldState);
 }
 //-------------------------------------------------------------------------------
@@ -239,6 +254,22 @@ void MainWindow::Implementation::populateEnvironmentWidget()
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::populateTimelineWidget()
 {
+  auto actions = drivers[0].GetActions();
+  double time = 0;
+  std::string name;
+  
+  std::vector<ActionData> timeline;
+  for (auto action : actions) {
+    name = action->classname();
+    
+    timeline.emplace_back(name, time);
+    if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
+      auto delta = dynamic_cast<SEAdvanceTime*>(action);
+      time += delta->GetTime().GetValue(TimeUnit::s);
+    }
+  }
+  timeline_widget->Actions(timeline);
+  timeline_widget->ScenarioTime(time);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::handleTimelineValueChange()
@@ -352,10 +383,10 @@ void MainWindow::createActions()
 
   tabs = new QTabWidget();
 
-  tabs->addTab(_impl->physiologySelection, "Outputs");
+  tabs->addTab(_impl->timeline_widget, "Timeline");
   tabs->addTab(_impl->patient_widget, "Patient");
   tabs->addTab(_impl->environment_widget, "Environment");
-  tabs->addTab(_impl->timeline_widget, "Timeline");
+  tabs->addTab(_impl->physiologySelection, "Outputs");
   setCentralWidget(tabs);
 
   connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, _impl.get(), &Implementation::handlePatientFileChange);

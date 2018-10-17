@@ -52,6 +52,7 @@ public:
   TemperatureInputWidget* meanradientTemp = nullptr;
   UnitInputWidget* relativeHumidity = nullptr;
   TemperatureInputWidget* resperationAmbientTemp = nullptr;
+  //TODO:sawhite:Write ambient gas widget
   //AmbientGasInputWidget* ambientGasses;
   QPushButton* b_addAmbientGas = nullptr;
   QLabel* l_ambientGas = nullptr;
@@ -202,7 +203,7 @@ double EnvironmentConfigWidget::ResperationAmbientTemperature() const
 //-------------------------------------------------------------------------------
 std::vector<AmbientGas> EnvironmentConfigWidget::AmbientGasses() const
 {
-  //todo:sawhite:Implement Ambeint Gas Accessor
+  //TODO:sawhite:Implement Ambeint Gas Accessor
   //return _impl->ambientGasses->Value();
   return {};
 }
@@ -263,7 +264,7 @@ EnvironmentConfigWidget& EnvironmentConfigWidget::ResperationAmbientTemperature(
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget& EnvironmentConfigWidget::AmbientGasses(std::vector<AmbientGas>&&)
 {
-  //todo:sawhite:Implement Ambeint Gas Accessor
+  //TODO:sawhite:Implement Ambeint Gas Accessor
   return *this;
 }
 //-------------------------------------------------------------------------------

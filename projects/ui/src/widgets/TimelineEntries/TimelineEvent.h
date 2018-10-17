@@ -22,13 +22,18 @@
 #include "TimelineEntry.h"
 
 namespace biogears_ui {
+
+  
 class TimelineEvent : public TimelineEntry {
 
 public:
   TimelineEvent(QWidget* parent = 0);
   ~TimelineEvent();
 
-  void drawEntry(QWidget* timeline) const override;
+  void drawAtFullDetail(QPainter& painter)   const override;
+  void drawAtSimpleDetail(QPainter& painter) const override;
+  void drawAtMinmapDetail(QPainter& painter,double ratio) const override;
+
   QSize minimumSizeHint() const override;
   QSize sizeHint() const override;
 };

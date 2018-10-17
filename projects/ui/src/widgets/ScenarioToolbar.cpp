@@ -70,7 +70,12 @@ ScenarioToolbar::Implementation::Implementation(QWidget* parent)
   for (const auto& file : fileList) {
     timelines->addItem(file.c_str());
   }
+  fileList = Resources::list_directory("Scenarios", R"(.*\.xml)");
+  for (const auto& file : fileList) {
+    timelines->addItem(file.c_str());
+  }
   timelines->addItem(tr("Load timeline from file..."));
+
 }
 //-------------------------------------------------------------------------------
 ScenarioToolbar::Implementation::Implementation(const Implementation& obj)
@@ -124,6 +129,8 @@ ScenarioToolbar::ScenarioToolbar(QWidget* parent)
   connect(_impl->patients, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::patientChanged);
   connect(_impl->enviroments, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::envonmentChanged);
   connect(_impl->timelines, QOverload<int>::of(&QComboBox::activated), this, &ScenarioToolbar::timelineChanged);
+
+  setContextMenuPolicy(Qt::PreventContextMenu);
 }
 //-------------------------------------------------------------------------------
 ScenarioToolbar::~ScenarioToolbar()

@@ -37,20 +37,17 @@ public:
   Implementation& operator=(Implementation&&);
 
   TimelineWidget* timeWidget = nullptr;
-  std::vector<ActionData> timelineSeries;
-
 public:
 };
 
 //-------------------------------------------------------------------------------
 TimelineConfigWidget::Implementation::Implementation(QWidget* parent)
   : timeWidget(TimelineWidget::create(parent))
-  , timelineSeries()
 {
   QGridLayout* grid = new QGridLayout();
   parent->setLayout(grid);
 
-  grid->addWidget(new QLabel("Test Area"), 0, 0);
+  grid->addWidget(new QLabel("Timeline"), 0, 0);
   grid->addWidget(timeWidget, 1, 0);
 }
 //-------------------------------------------------------------------------------
@@ -84,10 +81,8 @@ TimelineConfigWidget::TimelineConfigWidget(QWidget* parent)
   , _impl(this)
 {
 
-  _impl->timeWidget->ScenarioTime(30.0);
-  connect(this, &TimelineConfigWidget::actionAdded, _impl->timeWidget, &TimelineWidget::addAction);
+  _impl->timeWidget->ScenarioLength(30.0);
 
-    addAction(std::string("Sample"), 5.0);
 }
 //-------------------------------------------------------------------------------
 TimelineConfigWidget::~TimelineConfigWidget()
@@ -95,44 +90,37 @@ TimelineConfigWidget::~TimelineConfigWidget()
   _impl = nullptr;
 }
 //-------------------------------------------------------------------------------
-void TimelineConfigWidget::addAction(std::string& name, double time)
+void TimelineConfigWidget::Actions(std::vector<ActionData> actions)
 {
-  _impl->timelineSeries.emplace_back(name, time);
-  emit actionAdded(_impl->timelineSeries.back());
+  _impl->timeWidget->Actions(actions);
+  repaint();
+  QWidget::update();
 }
-
 //-------------------------------------------------------------------------------
-bool TimelineConfigWidget::removeAction(const std::string& name)
+void TimelineConfigWidget::addTimelineAction(const std::string& name, double time)
 {
-  auto it = std::find(_impl->timelineSeries.begin(), _impl->timelineSeries.end(), name);
-  if (it != _impl->timelineSeries.end()) {
-    _impl->timelineSeries.erase(it);
-    return true;
-  } else {
-    return false;
-  }
+  _impl->timeWidget->addActionData( { name, time } );
+}
+//-------------------------------------------------------------------------------
+bool TimelineConfigWidget::removeTimelineAction(const std::string& name, double time)
+{
+  return _impl->timeWidget->removeActionData( { name, time } );
+}
+//-------------------------------------------------------------------------------
+void TimelineConfigWidget::clear()
+{
+  _impl->timeWidget->clear();
 }
 //-------------------------------------------------------------------------------
 //This is only to test functionality.  In practice, we should increment time as we add AdvanceTime actions to action struct
 void TimelineConfigWidget::ScenarioTime(double time)
 {
-  _impl->timeWidget->ScenarioTime(time);
+  _impl->timeWidget->ScenarioLength(time);
 }
 //-------------------------------------------------------------------------------
 double TimelineConfigWidget::ScenarioTime()
 {
-  return _impl->timeWidget->ScenarioTime();
-}
-//-------------------------------------------------------------------------------
-std::vector<ActionData> TimelineConfigWidget::Actions() const
-{
-  return _impl->timelineSeries;
-
-}
-//-------------------------------------------------------------------------------
-void TimelineConfigWidget::Actions(std::vector<ActionData> actions)
-{
-  _impl->timelineSeries = actions;
+  return _impl->timeWidget->ScenarioLength();
 }
 //-------------------------------------------------------------------------------
 //!

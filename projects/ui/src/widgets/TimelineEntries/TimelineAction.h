@@ -23,15 +23,19 @@
 
 
 namespace biogears_ui {
+
 class TimelineAction : public TimelineEntry {
 
 public:
   TimelineAction(QWidget* parent = 0);
   ~TimelineAction();
 
-  void drawEntry(QWidget* timeline) const override;
+  void drawAtFullDetail(QPainter& painter)   const override;
+  void drawAtSimpleDetail(QPainter& painter) const override;
+  void drawAtMinmapDetail(QPainter& painter, double ratio) const override;
+
   QSize minimumSizeHint() const override;
   QSize sizeHint() const override;
 };
 }
-#endif
+#endif //BIOGEARSUI_WIDGETS_TIMELINE_ACTION_H

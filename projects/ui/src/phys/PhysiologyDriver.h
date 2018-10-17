@@ -28,6 +28,7 @@
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/exports.h>
 #include <biogears/framework/unique_propagate_const.h>
+#include <biogears/cdm/scenario/SEAction.h>
 
 namespace biogears {
 class PhysiologyEngine;
@@ -53,6 +54,10 @@ public:
   bool loadPatient(const std::string& filepath);
   bool loadTimeline(const std::string& filepath);
   bool loadEnvironment(const std::string& filepath);
+
+  const std::vector<biogears::SEAction*> GetActions() const;
+  void SetActionsAfter(const biogears::SEAction& reference,const biogears::SEAction& newAction);
+  void SetActions(const std::vector<biogears::SEAction>& actions);
 
   void clearPatient();
   void clearEnvironment();

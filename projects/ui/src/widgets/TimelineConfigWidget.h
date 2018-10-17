@@ -34,15 +34,16 @@ public:
   ~TimelineConfigWidget();
 
   using TimelineConfigWidgetPtr = TimelineConfigWidget*;
-  
-  std::vector<ActionData> Actions() const;
-  void Actions(std::vector<ActionData>) ;
 
   void ScenarioTime(double time);
   double ScenarioTime();
 
-  void addAction(std::string& name, double time);
-  bool removeAction(const std::string& name);
+  void Actions(std::vector<ActionData> actions);
+
+  void addTimelineAction(const std::string& name, double time);
+  bool removeTimelineAction(const std::string& name, double time);
+  void clear();
+
   static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
 
 signals:

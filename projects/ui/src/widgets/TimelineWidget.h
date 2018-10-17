@@ -37,23 +37,29 @@ public:
   ~TimelineWidget();
 
   void addEvent(TimelineEvent* bgEvent);
-  QSize minimumSizeHint() const;
-  QSize sizeHint() const;
   
-  double ScenarioTime();
-  void ScenarioTime(double time);
+  double ScenarioLength();
+  void Actions(std::vector<ActionData>& actions);
+
+  double CurrentTime();
+  void   CurrentTime(double time);
+
+  void clear(); 
+  void addActionData(const ActionData data);
+  bool removeActionData(const ActionData data);
+
+
 
   using TimelineWidgetPtr = TimelineWidget*;
   static auto create(QWidget*) -> TimelineWidgetPtr;
 
-
 public slots:
-  void addAction(const ActionData data);
-  void updateTime(int time);
+  void   ScenarioLength(double time);
 
 protected:
   void paintEvent(QPaintEvent* event) override;
-
+  void keyPressEvent(QKeyEvent *) override;
+  void keyReleaseEvent(QKeyEvent *) override;
 private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;

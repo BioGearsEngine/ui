@@ -24,23 +24,36 @@ TimelineEvent::TimelineEvent(QWidget* parent)
   : TimelineEntry(parent)
 {
 }
-
+//-----------------------------------------------------------------------------------------
 TimelineEvent::~TimelineEvent()
 {
 }
-
-void TimelineEvent::drawEntry(QWidget* timeline) const
+//-----------------------------------------------------------------------------------------
+void TimelineEvent::drawAtFullDetail(::QPainter& painter) const
 {
-  QPainter painter(timeline);
+  
   painter.setPen(QPen(Qt::GlobalColor::darkRed, 3.0));
-  painter.drawLine(0, timeline->rect().height(), timeline->rect().width(),0);
+  painter.drawLine(0, painter.device()->height(), painter.device()->width(),0);
 }
+//-----------------------------------------------------------------------------------------
+void TimelineEvent::drawAtSimpleDetail(QPainter& painter) const
+{
 
+  painter.setPen(QPen(Qt::GlobalColor::darkRed, 3.0));
+  painter.drawLine(0, painter.device()->height(), painter.device()->width(), 0);
+}
+//-----------------------------------------------------------------------------------------
+void TimelineEvent::drawAtMinmapDetail(::QPainter& painter, double ratio) const
+{
+  painter.setPen(QPen(Qt::GlobalColor::darkRed, 3.0));
+  painter.drawLine(0, painter.device()->height(), painter.device()->width(), 0);
+}
+//-----------------------------------------------------------------------------------------
 QSize TimelineEvent::minimumSizeHint() const
 {
   return QSize(10, 10);
 }
-
+//-----------------------------------------------------------------------------------------
 QSize TimelineEvent::sizeHint() const
 {
   return QSize(25, 25);

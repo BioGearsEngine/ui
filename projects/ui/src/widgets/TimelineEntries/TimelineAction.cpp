@@ -18,50 +18,83 @@
 
 #include "TimelineAction.h"
 
+
 namespace biogears_ui {
 
 TimelineAction::TimelineAction(QWidget* parent)
   : TimelineEntry(parent)
 {
 }
-
+//-----------------------------------------------------------------------------------------
 TimelineAction::~TimelineAction()
 {
 }
-
-void TimelineAction::drawEntry(QWidget* timeline) const
+//-----------------------------------------------------------------------------------------
+void TimelineAction::drawAtFullDetail(::QPainter& painter) const
 {
-  int windowWidth = timeline->rect().width();
-  int windowHeight = timeline->rect().height();
-
+  //Draws a 1/16th of an inch green line 
+  //Draws a 1/8th inch blue circle above the line
+  //Labels Marker with name
+  
+  int windowWidth  = painter.device()->width();
+  int windowHeight = painter.device()->height();
+  
   QPoint center(_x, windowHeight / 2);
   QPoint upper(center.x(), center.y() - 0.25 * windowHeight);
-  //Create painter that draws on the timeline widget, as well as a pen and fill brush
-  QPainter painter(timeline);
+ 
   QPen pen(Qt::GlobalColor::darkGreen, 1.0);
   QBrush fillBrush(Qt::GlobalColor::darkGreen);
-  //Create a path we will use to outline circles (one on timeline, one above)
   QPainterPath drawPath;
-  //Start the path at the event location on timeline
   drawPath.moveTo(center);
-  //Draw circle
   drawPath.addEllipse(center, 5, 5);
-  //Use painter to draw line to upper bound--path only fills in a closed object (i.e. not a line)
   painter.drawLine(center, upper);
-  //Move draw path to upper bound
   drawPath.moveTo(upper);
-  //Add circle to upper bound
   drawPath.addEllipse(upper, 5, 5);
-  //Use defined brush to fill in closed subpaths created by path object
   painter.fillPath(drawPath, fillBrush);
 
 }
+//-----------------------------------------------------------------------------------------
+void TimelineAction::drawAtSimpleDetail(::QPainter& painter) const
+{
+  //Draws a 1/16th of an inch green line 
+  //Draws a 1/8th inch blue circle above the line
+  //Labels Marker with name
 
+  int windowWidth = painter.device()->width();
+  int windowHeight = painter.device()->height();
+
+  QPoint center(_x, windowHeight / 2);
+  QPoint upper(center.x(), center.y() - 0.25 * windowHeight);
+
+  QPen pen(Qt::GlobalColor::darkGreen, 1.0);
+  QBrush fillBrush(Qt::GlobalColor::darkGreen);
+  QPainterPath drawPath;
+  drawPath.moveTo(center);
+  drawPath.addEllipse(center, 5, 5);
+  painter.drawLine(center, upper);
+  drawPath.moveTo(upper);
+  drawPath.addEllipse(upper, 5, 5);
+  painter.fillPath(drawPath, fillBrush);
+}
+//-----------------------------------------------------------------------------------------
+void TimelineAction::drawAtMinmapDetail(::QPainter& painter, double ratio) const
+{
+  int windowWidth = painter.device()->width();
+  int windowHeight = painter.device()->height();
+
+  QPoint base(_x*ratio, windowHeight );
+  QPoint top( _x*ratio, static_cast<int>(windowHeight/4.0));
+  
+  painter.setPen({ Qt::GlobalColor::darkGreen, 2.0 });
+  painter.drawLine(base, top);
+
+}
+//-----------------------------------------------------------------------------------------
 QSize TimelineAction::minimumSizeHint() const
 {
   return QSize(10, 10);
 }
-
+//-----------------------------------------------------------------------------------------
 QSize TimelineAction::sizeHint() const
 {
   return QSize(25, 25);

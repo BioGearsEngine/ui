@@ -22,6 +22,7 @@
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/scenario/SEScenario.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
+#include <biogears/schema/cdm/Scenario.hxx>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -39,11 +40,12 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  std::unique_ptr<BioGearsEngine> phy = nullptr;
-
   void loadPatient();
   void loadTimeline();
   void loadEnvironment();
+
+  std::unique_ptr<BioGearsEngine> phy = nullptr;
+  std::unique_ptr<SEScenario> scenario = nullptr;
 
   std::string patient_file = "";
   std::string environment_file = "";
@@ -51,7 +53,8 @@ public:
 };
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation::Implementation(const std::string& scenario)
-  : phy(new BioGearsEngine(scenario + ".log"))
+  : phy(std::make_unique<BioGearsEngine>(scenario + ".log"))
+  , scenario( std::make_unique<SEScenario>(phy->GetSubstanceManager()) )
 {
 
 }
@@ -90,7 +93,8 @@ void PhysiologyDriver::Implementation::loadPatient()
 void PhysiologyDriver::Implementation::loadTimeline()
 {
   //TODO:sawhite:Walk through with Matt on what to do here
-  //auto& patient = phy->Ge();
+  scenario->Load(timeline_file);
+
 }
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::Implementation::loadEnvironment()
@@ -159,6 +163,30 @@ bool PhysiologyDriver::loadEnvironment(const std::string& filepath)
   _impl->loadEnvironment();
   return true;
 }
+//-------------------------------------------------------------------------------
+//!
+//! \brief Passes a copy 
+//!\return 
+//!
+const std::vector<biogears::SEAction*> PhysiologyDriver::GetActions() const
+{
+  return _impl->scenario->GetActions();
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::SetActions(const std::vector<biogears::SEAction>& actions)
+{
+  _impl->scenario->ClearActions();
+  for (auto& action : actions)
+  {
+    _impl->scenario->AddAction(action);
+  }
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::SetActionsAfter(const biogears::SEAction& reference, const biogears::SEAction& newAction)
+{
+  _impl->scenario->AddActionAfter(reference, newAction);
+}
+//-------------------------------------------------------------------------------
 void PhysiologyDriver::clearPatient() { _impl->patient_file = ""; }
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::clearEnvironment() { _impl->environment_file = ""; }
