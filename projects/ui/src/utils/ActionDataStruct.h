@@ -30,11 +30,11 @@ namespace biogears_ui {
 struct ActionData {
 public:
   ActionData(const std::string& name, double time)
-    : dataName(name)
-    , dataTime(time){};
+    : name(name)
+    , at(time){};
 
-  std::string dataName;
-  double dataTime;
+  std::string name;
+  double at;
 
   inline bool operator==(const std::string& rhs) const;
   inline bool operator!=(const std::string& rhs) const;
@@ -48,7 +48,7 @@ public:
 
 bool ActionData::operator==(const std::string& rhs) const
 {
-  return dataName == rhs ? true : false;
+  return name == rhs ? true : false;
 };
 //-------------------------------------------------------
 bool ActionData::operator!=(const std::string& rhs) const
@@ -58,8 +58,8 @@ bool ActionData::operator!=(const std::string& rhs) const
 //-------------------------------------------------------
 bool ActionData::operator==(const ActionData& rhs) const
 {
-  return dataName == rhs.dataName
-    && dataTime == rhs.dataTime;
+  return name == rhs.name
+    && at == rhs.at;
 };
 //-------------------------------------------------------
 bool ActionData::operator!=(const ActionData& rhs) const
@@ -69,22 +69,22 @@ bool ActionData::operator!=(const ActionData& rhs) const
 //-------------------------------------------------------
 bool ActionData::operator<(const ActionData& rhs) const
 {
-  return dataName < rhs.dataName;
+  return name < rhs.name;
 };
 //-------------------------------------------------------
 bool ActionData::operator>(const ActionData& rhs) const
 {
-  return dataName > rhs.dataName;
+  return name > rhs.name;
 };
 //-------------------------------------------------------
 bool ActionData::operator<=(const ActionData& rhs) const
 {
-  return dataName <= rhs.dataName;
+  return name <= rhs.name;
 };
 //-------------------------------------------------------
 bool ActionData::operator>=(const ActionData& rhs) const
 {
-  return dataName >= rhs.dataName;
+  return name >= rhs.name;
 };
 }
 #endif

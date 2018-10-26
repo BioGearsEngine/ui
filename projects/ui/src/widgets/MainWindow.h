@@ -38,15 +38,6 @@ public:
 protected:
   void closeEvent(QCloseEvent* event) override;
 
-private slots:
-  void about();
-  void run();
-private:
-  void createActions();
-  void createStatusBar();
-  void readSettings();
-  void writeSettings();
-
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;
   

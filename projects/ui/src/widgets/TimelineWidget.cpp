@@ -241,7 +241,7 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
     const auto& data  = actionPair.first;
     const auto& entry = actionPair.second;
 
-    double true_x = data.dataTime / timeline_length * timeline_demensions.width();
+    double true_x = data.at / timeline_length * timeline_demensions.width();
     if ( bar_position <= true_x && true_x <= bar_position + page_step)
     {
 
@@ -251,7 +251,7 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
       entry->drawAtFullDetail(timeline_painter);
     }
 
-    entry->X(data.dataTime / timeline_length * l_timeline->pixmap()->size().width());
+    entry->X(data.at / timeline_length * l_timeline->pixmap()->size().width());
     entry->drawAtMinmapDetail(minmap_painter, size_ratio);
   }
 
@@ -333,7 +333,7 @@ void TimelineWidget::addActionData(const ActionData data)
 {
   if (_impl->elementsMap.find(data) == _impl->elementsMap.end()) {
     TimelineAction* sampleAction = new TimelineAction();
-    sampleAction->X(data.dataTime / _impl->timeline_length * this->rect().width());
+    sampleAction->Data(data).X(data.at / _impl->timeline_length * this->rect().width());
     _impl->elementsMap[data] = sampleAction;
   }
 }

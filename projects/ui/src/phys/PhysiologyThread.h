@@ -29,6 +29,7 @@
 
 #include <biogears/threading/runnable.h>
 #include <biogears/threading/steppable.h>
+#include <biogears/cdm/engine/PhysiologyEngineConfiguration.h>
 
 namespace biogears {
 class PhysiologyEngine;
@@ -54,12 +55,18 @@ public:
   void stop() override;
   void join() override;
 
+protected:
+  void execute();
+
 private:
   //TODO:sawhite Upgrade to a shared PTR
   biogears::PhysiologyEngine* _physiology;
+
+  std::unique_ptr<biogears::PhysiologyEngineConfiguration> config = nullptr;
+
   std::chrono::milliseconds _tick;
   std::chrono::seconds _advance;
-
+  bool _started = false;
   std::atomic_bool _done = false;
   std::atomic_bool _paused = false;
   std::thread _thread;

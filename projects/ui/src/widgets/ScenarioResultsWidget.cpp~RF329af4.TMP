@@ -1,0 +1,373 @@
+//-------------------------------------------------------------------------------------------
+//- Copyright 2018 Applied Research Associates, Inc.
+//- Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+//- this file except in compliance with the License. You may obtain a copy of the License
+//- at:
+//- http://www.apache.org/licenses/LICENSE-2.0
+//- Unless required by applicable law or agreed to in writing, software distributed under
+//- the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+//- CONDITIONS OF ANY KIND, either express or implied. See the License for the
+//-  specific language governing permissions and limitations under the License.
+//-------------------------------------------------------------------------------------------
+
+//!
+//! \author Steven A White
+//! \date   June 24th 2018
+//!
+//!
+//! \brief Primary window of BioGears UI
+
+#include "ScenarioResultsWidget.h"
+//Standard Includes
+#include <algorithm>
+#include <iostream>
+#include <regex>
+//External Includes
+#include <QTabWidget>
+#include <QtWidgets>
+
+#include <biogears/exports.h>
+
+#include <biogears/cdm/properties/SEScalarTime.h>
+#include <biogears/cdm/properties/SEScalarTypes.h>
+#include <biogears/cdm/scenario/SEAdvanceTime.h>
+#include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
+#include <biogears/cdm/system/environment/conditions/SEEnvironmentCondition.h>
+
+#include <units.h>
+//Project Includes
+#include "../phys/PhysiologyDriver.h"
+#include "../phys/PhysiologyThread.h"
+
+#include <xercesc/dom/DOMDocument.hpp>
+
+using namespace biogears;
+namespace biogears_ui {
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::handlePatientFileChange(int index)
+  {
+    if (0 == index) {
+      _driver->clearPatient();
+    }
+    else if (_runToolbar->patientListSize() == index + 1) {
+      loadPatient();
+    }
+    else if (1 == index) {
+      _driver->clearPatient();
+    }
+    else {
+      _driver->loadPatient(_runToolbar->Patient());
+    }
+    populatePatientWidget();
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::handleEnvironmentFileChange(int index)
+  {
+    if (0 == index) {
+      _driver->clearEnvironment();
+    }
+    else if (_runToolbar->envrionmentListSize() == index + 1) {
+      loadEnvironment();
+    }
+    else if (1 == index) {
+      _driver->clearEnvironment();
+      //New Environment;
+    }
+    else {
+      _driver->loadEnvironment(_runToolbar->Environment());
+    }
+    populateEnvironmentWidget();
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::handleTimelineFileChange(int index)
+  {
+    if (0 == index) {
+      _driver->clearTimeline();
+    }
+    else if (_runToolbar->timelineListSize() == index + 1) {
+      loadTimeline();
+    }
+    else if (1 == index) {
+      _driver->clearTimeline();
+    }
+    else {
+      _driver->loadTimeline(_runToolbar->Timeline());
+    }
+    populateTimelineWidget();
+  }
+
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::handlePatientValueChange()
+  {
+    SEPatient& patient = _driver->Patient();
+    patient.SetName(patient_widget->Name().toStdString());
+    patient.SetGender((patient_widget->Gender() == EGender::Male) ? CDM::enumSex::Male : CDM::enumSex::Female);
+    patient.GetAge().SetValue(patient_widget->Age(), TimeUnit::s);
+    patient.GetWeight().SetValue(patient_widget->Weight(), MassUnit::kg);
+    patient.GetHeight().SetValue(patient_widget->Height(), LengthUnit::m);
+    patient.GetBodyFatFraction().SetValue(patient_widget->BodyFatPercentage() / 100.0);
+    patient.GetHeartRateBaseline().SetValue(patient_widget->HeartRate(), FrequencyUnit::Hz);
+    patient.GetRespirationRateBaseline().SetValue(patient_widget->RespritoryRate(), FrequencyUnit::Hz);
+    patient.GetDiastolicArterialPressureBaseline().SetValue(patient_widget->DiastolicPressureBaseline(), PressureUnit::mmHg);
+    patient.GetSystolicArterialPressureBaseline().SetValue(patient_widget->SystolicPresureBaseline(), PressureUnit::mmHg);
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::handleEnvironmentValueChange()
+  {
+    SEEnvironment& environment = _driver->Environment();
+    SEEnvironmentalConditions& conditions = environment.GetConditions();
+
+    //Surrounding Type
+    conditions.SetSurroundingType(environment_widget->Surrondings() == ESurrondings::Air ? CDM::enumSurroundingType::Air
+      : CDM::enumSurroundingType::Air);
+    conditions.GetAirVelocity().SetValue(environment_widget->AirVelocity(), LengthPerTimeUnit::m_Per_s);
+    conditions.GetAmbientTemperature().SetValue(environment_widget->AmbientTemperature(), TemperatureUnit::C);
+    conditions.GetAtmosphericPressure().SetValue(environment_widget->AtmosphericPressure(), PressureUnit::mmHg);
+    conditions.GetClothingResistance().SetValue(environment_widget->ClothingResistance(), HeatResistanceAreaUnit::clo);
+    conditions.GetEmissivity().SetValue(environment_widget->SurroundingEmissivity(), NoUnit::unitless);
+    conditions.GetMeanRadiantTemperature().SetValue(environment_widget->MeanRadientTemperature(), TemperatureUnit::C);
+    conditions.GetRelativeHumidity().SetValue(environment_widget->RelativeHumidity(), NoUnit::unitless);
+    conditions.GetRespirationAmbientTemperature().SetValue(environment_widget->ResperationAmbientTemperature(), TemperatureUnit::C);
+    //TODO:sawhite:SetAmbientGas
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::resume()
+  {
+    std::cout << "Resuming\n";
+    if (thread->paused())
+    {
+      thread->paused(false);
+    }
+    thread->run();
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::pause()
+  {
+    std::cout << "Pausing\n";
+    thread->paused(true);
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::populatePatientWidget()
+  {
+    SEPatient& patient = _driver->Patient();
+
+    bool oldState = patient_widget->blockSignals(true);
+    try
+    {
+      patient_widget->Name(patient.GetName().c_str())
+        .Gender((patient.GetGender() == CDM::enumSex::Male) ? EGender::Male : EGender::Female)
+        .Age(units::time::year_t(patient.GetAge(TimeUnit::yr)))
+        .Weight(units::mass::kilogram_t(patient.GetWeight().GetValue(MassUnit::kg)))
+        .Height(units::length::meter_t(patient.GetHeight().GetValue(LengthUnit::m)))
+        .BodyFatPercentage(patient.GetBodyFatFraction().GetValue() * 100.0)
+        .HeartRate(units::frequency::hertz_t(patient.GetHeartRateBaseline().GetValue(FrequencyUnit::Hz)))
+        .RespritoryRate(units::frequency::hertz_t(patient.GetRespirationRateBaseline().GetValue(FrequencyUnit::Hz)))
+        .DiastolicPressureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetDiastolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)))
+        .SystolicPresureBaseline(units::pressure::milimeters_of_mercury_t(patient.GetSystolicArterialPressureBaseline().GetValue(PressureUnit::mmHg)));
+    }
+    catch (std::exception e)
+    {
+      //TODO:Log Unable to load file
+      //TODO:Red Notifcation Bannor on UI
+    }
+    patient_widget->blockSignals(oldState);
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::populateEnvironmentWidget()
+  {
+    SEEnvironment& environment = _driver->Environment();
+    SEEnvironmentalConditions& conditions = environment.GetConditions();
+
+    //Surrounding Type
+    bool oldState = environment_widget->blockSignals(true);
+    environment_widget->Surrondings((conditions.GetSurroundingType() == CDM::enumSurroundingType::Air) ? ESurrondings::Air : ESurrondings::Water);
+    environment_widget->AirVelocity(units::velocity::meters_per_second_t(conditions.GetAirVelocity().GetValue(LengthPerTimeUnit::m_Per_s)));
+    environment_widget->AmbientTemperature(units::temperature::celsius_t(conditions.GetAmbientTemperature().GetValue(TemperatureUnit::C)));
+    environment_widget->AtmosphericPressure(units::pressure::milimeters_of_mercury_t(conditions.GetAtmosphericPressure().GetValue(PressureUnit::mmHg)));
+    environment_widget->ClothingResistance(units::insulation::clo_t(conditions.GetClothingResistance().GetValue(HeatResistanceAreaUnit::clo)));
+    environment_widget->SurroundingEmissivity(conditions.GetEmissivity().GetValue(NoUnit::unitless));
+    environment_widget->MeanRadientTemperature(units::temperature::celsius_t(conditions.GetMeanRadiantTemperature().GetValue(TemperatureUnit::C)));
+    environment_widget->RelativeHumidity(conditions.GetRelativeHumidity().GetValue(NoUnit::unitless));
+    environment_widget->ResperationAmbientTemperature(units::temperature::celsius_t(conditions.GetRespirationAmbientTemperature().GetValue(TemperatureUnit::C)));
+    //TODO:sawhite:SetAmbientGas
+    environment_widget->blockSignals(oldState);
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::populateTimelineWidget()
+  {
+    auto actions = _driver->GetActions();
+    double time = 0;
+    std::string name;
+
+    std::vector<ActionData> timeline;
+    for (auto action : actions) {
+      name = action->classname();
+
+      timeline.emplace_back(name, time);
+      if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
+        auto delta = dynamic_cast<SEAdvanceTime*>(action);
+        time += delta->GetTime().GetValue(TimeUnit::s);
+      }
+    }
+    timeline_widget->Actions(timeline);
+    timeline_widget->ScenarioTime(time);
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::handleTimelineValueChange()
+  {
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::loadPatient()
+  {
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+      tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+    _driver->loadPatient(fileName.toStdString());
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::loadEnvironment()
+  {
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+      tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+    _driver->loadEnvironment(fileName.toStdString());
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::loadTimeline()
+  {
+    QString fileName = QFileDialog::getOpenFileName(nullptr,
+      tr("Load Environment file"), ".", tr("Biogears Environment files (*.xml)"));
+    _driver->loadTimeline(fileName.toStdString());
+  }
+  //-------------------------------------------------------------------------------
+  ScenarioResultsWidget::ScenarioResultsWidget(QWidget* parent)
+    : QScenarioResultsWidget(parent)
+    , _impl(parent)
+  {
+    createActions();
+    createStatusBar();
+    readSettings();
+    setUnifiedTitleAndToolBarOnMac(true);
+  }
+  //-------------------------------------------------------------------------------
+  ScenarioResultsWidget::~ScenarioResultsWidget()
+  {
+    _impl = nullptr;
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::closeEvent(QCloseEvent* event)
+  {
+    event->accept();
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::about()
+  {
+    QMessageBox::about(this, tr("About Application"),
+      tr("The <b>Application</b> example demonstrates how to "
+        "write modern GUI applications using Qt, with a menu bar, "
+        "toolbars, and a status bar."));
+  }
+  void ScenarioResultsWidget::run()
+  {
+    QMessageBox::about(this, tr("About Application"),
+      tr("The <b>Application</b> example demonstrates how to "
+        "write modern GUI applications using Qt, with a menu bar, "
+        "toolbars, and a status bar."));
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::createActions()
+  {
+    //-- Create Header Menu
+    QMenu* entry = nullptr;
+    QToolBar* toolbar = nullptr;
+    QAction* action = nullptr;
+    QTabWidget* tabs = nullptr;
+    //Simualtion
+    entry = menuBar()->addMenu(tr("&Simulation"));
+    //Simulation -> Launch
+    QIcon launchIcon = QIcon::fromTheme("Launch", QIcon(":/img/play.png"));
+    QAction* launch = action = new QAction(launchIcon, tr("&Launch"), this);
+    action->setStatusTip(tr("Run current simulation"));
+    connect(action, &QAction::triggered, _impl.get(), &ScenarioResultsWidget::resume);
+    entry->addAction(action);
+
+    //Simulation -> Load Patient
+    action = new QAction(tr("&Load Patient"), this);
+    action->setStatusTip(tr("Load an existing patient file."));
+    connect(action, &QAction::triggered, _impl.get(), &ScenarioResultsWidget::loadPatient);
+    entry->addAction(action);
+    //Simulation -> Load Environment
+    action = new QAction(tr("&Load Environment"), this);
+    action->setStatusTip(tr("Load an existing environment file."));
+    connect(action, &QAction::triggered, _impl.get(), &ScenarioResultsWidget::loadEnvironment);
+    entry->addAction(action);
+    //Simulation -> Load timeline
+    action = new QAction(tr("&Load Timeline"), this);
+    action->setStatusTip(tr("Load an existing timeline file."));
+    connect(action, &QAction::triggered, _impl.get(), &ScenarioResultsWidget::loadTimeline);
+    entry->addAction(action);
+    //Simulation -> Exit
+    entry->addSeparator();
+    const QIcon exitIcon = QIcon::fromTheme("application-exit");
+    QAction* exitAct = entry->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
+    exitAct->setShortcuts(QKeySequence::Quit);
+    exitAct->setStatusTip(tr("Exit the application"));
+
+    //Help
+    entry = menuBar()->addMenu(tr("&Help"));
+    //Help -> Help
+    action = entry->addAction(tr("&About"), this, &ScenarioResultsWidget::about);
+    action->setStatusTip(tr("Show the application's About box"));
+    //Help -> About
+    action = entry->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
+    action->setStatusTip(tr("Show the Qt library's About box"));
+
+    addToolBar(_impl->runToolbar);
+
+    tabs = new QTabWidget();
+
+    tabs->addTab(_impl->timeline_widget, "Timeline");
+    tabs->addTab(_impl->patient_widget, "Patient");
+    tabs->addTab(_impl->environment_widget, "Environment");
+    tabs->addTab(_impl->physiologySelection, "Outputs");
+    setCentralWidget(tabs);
+
+    connect(_impl->runToolbar, &ScenarioToolbar::patientChanged, _impl.get(), &Implementation::handlePatientFileChange);
+    connect(_impl->runToolbar, &ScenarioToolbar::envonmentChanged, _impl.get(), &Implementation::handleEnvironmentFileChange);
+    connect(_impl->runToolbar, &ScenarioToolbar::timelineChanged, _impl.get(), &Implementation::handleTimelineFileChange);
+    connect(_impl->runToolbar, &ScenarioToolbar::resumeSimulation, _impl.get(), &Implementation::resume);
+    connect(_impl->runToolbar, &ScenarioToolbar::pauseSimulation, _impl.get(), &Implementation::pause);
+    connect(_impl->patient_widget, &PatientConfigWidget::valueChanged, _impl.get(), &Implementation::handlePatientValueChange);
+    connect(_impl->environment_widget, &EnvironmentConfigWidget::valueChanged, _impl.get(), &Implementation::handleEnvironmentValueChange);
+    connect(_impl->timeline_widget, &TimelineConfigWidget::timeChanged, _impl.get(), &Implementation::handleTimelineValueChange);
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::createStatusBar()
+  {
+    statusBar()->showMessage(tr("Ready"));
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::readSettings()
+  {
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    const QByteArray geometry = settings.value("geometry", QByteArray()).toByteArray();
+    if (geometry.isEmpty()) {
+      const QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
+      resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
+      move((availableGeometry.width() - width()) / 2,
+        (availableGeometry.height() - height()) / 2);
+    }
+    else {
+      restoreGeometry(geometry);
+    }
+  }
+  //-------------------------------------------------------------------------------
+  void ScenarioResultsWidget::writeSettings()
+  {
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    settings.setValue("geometry", saveGeometry());
+  }
+  //-------------------------------------------------------------------------------
+  auto ScenarioResultsWidget::create(QWidget* parent = nullptr)->ScenarioResultsWidgetPtr
+  {
+    return new ScenarioResultsWidget(parent);
+  }
+}

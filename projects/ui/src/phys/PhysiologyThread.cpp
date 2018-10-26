@@ -7,6 +7,7 @@
 #include <biogears/cdm/engine/PhysiologyEngine.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/engine/Controller/BioGears.h>
+#include <biogears/engine/Controller/BioGearsEngine.h>
 //Project Includes
 #include "PhysiologyDriver.h"
 
@@ -16,9 +17,11 @@ using namespace biogears;
 namespace biogears_ui {
 PhysiologyThread::PhysiologyThread(PhysiologyDriver& driver)
   : _physiology(driver.Physiology())
-  , _tick(16ms)
+  , _tick(1s)
   , _advance(1s)
+  , config(std::make_unique<PhysiologyEngineConfiguration>(_physiology->GetLogger()))
 {
+  config->Load("config/DynamicStabilization.xml");
 }
 //-----------------------------------------------------------------------------
 std::chrono::milliseconds PhysiologyThread::TickRate()
@@ -39,7 +42,13 @@ void PhysiologyThread::step()
 //-----------------------------------------------------------------------------
 std::function<void(std::chrono::milliseconds)> PhysiologyThread::step_as_func()
 {
-  return [&](std::chrono::milliseconds duration) { _physiology->AdvanceModelTime((double)duration.count(), TimeUnit::s); };
+  using namespace std::chrono;
+  using namespace std::chrono_literals;
+  return [&](std::chrono::milliseconds duration)
+  {
+    auto as_sec = duration_cast<seconds>(duration);
+    _physiology->AdvanceModelTime(static_cast<double>(as_sec.count()), TimeUnit::s);
+  };
 }
 //-----------------------------------------------------------------------------
 void PhysiologyThread::paused(bool state)
@@ -54,10 +63,26 @@ bool PhysiologyThread::paused()
 //-----------------------------------------------------------------------------
 void PhysiologyThread::run()
 {
-  _done = false;
+  if (_started) { return; }
+  auto& patient = _physiology->GetPatient();
+   
+  if( _physiology->InitializeEngine(patient, nullptr, config.get()) )
+  {
+    _started = true;
+    _done = false;
+    _thread = std::thread(&PhysiologyThread::execute, this);
+  }
+}
+//-----------------------------------------------------------------------------
+void PhysiologyThread::execute()
+{
   while (!_done) {
+    
     const auto start = std::chrono::steady_clock::now();
-    _physiology->AdvanceModelTime(_advance.count(), TimeUnit::s);
+    if(!_paused)
+    {
+      _physiology->AdvanceModelTime(_advance.count(), TimeUnit::s);
+    }
     const auto finish = std::chrono::steady_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
 
@@ -74,7 +99,10 @@ void PhysiologyThread::stop()
 //-----------------------------------------------------------------------------
 void PhysiologyThread::join()
 {
-  _thread.join();
+  if(_thread.joinable())
+  {
+    _thread.join();
+  }
 }
 //-----------------------------------------------------------------------------
 }

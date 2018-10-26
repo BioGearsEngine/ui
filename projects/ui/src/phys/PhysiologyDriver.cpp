@@ -46,7 +46,7 @@ public:
 
   std::unique_ptr<BioGearsEngine> phy = nullptr;
   std::unique_ptr<SEScenario> scenario = nullptr;
-
+ 
   std::string patient_file = "";
   std::string environment_file = "";
   std::string timeline_file = "";
@@ -55,6 +55,7 @@ public:
 PhysiologyDriver::Implementation::Implementation(const std::string& scenario)
   : phy(std::make_unique<BioGearsEngine>(scenario + ".log"))
   , scenario( std::make_unique<SEScenario>(phy->GetSubstanceManager()) )
+  
 {
 
 }

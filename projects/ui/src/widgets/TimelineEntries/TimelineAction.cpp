@@ -41,7 +41,8 @@ void TimelineAction::drawAtFullDetail(::QPainter& painter) const
   
   QPoint center(_x, windowHeight / 2);
   QPoint upper(center.x(), center.y() - 0.25 * windowHeight);
- 
+  QPoint label(center.x(), center.y() - 0.30 * windowHeight);
+
   QPen pen(Qt::GlobalColor::darkGreen, 1.0);
   QBrush fillBrush(Qt::GlobalColor::darkGreen);
   QPainterPath drawPath;
@@ -52,6 +53,8 @@ void TimelineAction::drawAtFullDetail(::QPainter& painter) const
   drawPath.addEllipse(upper, 5, 5);
   painter.fillPath(drawPath, fillBrush);
 
+  QString name = QString(_data.name.c_str());
+  painter.drawText(label, name);
 }
 //-----------------------------------------------------------------------------------------
 void TimelineAction::drawAtSimpleDetail(::QPainter& painter) const
@@ -75,6 +78,7 @@ void TimelineAction::drawAtSimpleDetail(::QPainter& painter) const
   drawPath.moveTo(upper);
   drawPath.addEllipse(upper, 5, 5);
   painter.fillPath(drawPath, fillBrush);
+
 }
 //-----------------------------------------------------------------------------------------
 void TimelineAction::drawAtMinmapDetail(::QPainter& painter, double ratio) const

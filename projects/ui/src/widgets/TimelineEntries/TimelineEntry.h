@@ -43,7 +43,6 @@ public:
   virtual QSize minimumSizeHint() const = 0;
   virtual QSize sizeHint() const = 0;
 
-  double Dpi() const { return _dpi; }
   double Scale() const { return _scale; }
   double X() const { return _x; };
   double Y() const { return _y; };
@@ -53,14 +52,13 @@ public:
 
   inline TimelineEntry& X(double x);
   inline TimelineEntry& Y(double y);
-  inline TimelineEntry& dpi(double dpi);
+  inline TimelineEntry& Data(const ActionData&);
   
 protected:
   double _x      = 0.0;
   double _y      = 0.0;
   double _height = 1.0;     
   double _width  = 1.0;
-  double _dpi   = 200;
   double _scale = 1.0;
 
   ActionData _data {"Uninitialized", 0.0};
@@ -77,9 +75,9 @@ TimelineEntry& TimelineEntry::Y(double y)
   return *this;
 };
 
-TimelineEntry& TimelineEntry::dpi(double dpi)
+TimelineEntry& TimelineEntry::Data(const ActionData& data)
 {
-  _dpi = dpi;
+  _data = data;
   return *this;
 }
 
