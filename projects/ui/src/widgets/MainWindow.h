@@ -34,7 +34,10 @@ public:
   ~MainWindow();
 
   void loadFile(const QString& fileName);
-  
+public slots:
+  void resume();
+  void pause();
+
 protected:
   void closeEvent(QCloseEvent* event) override;
 

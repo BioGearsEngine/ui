@@ -48,7 +48,8 @@ public:
   void addActionData(const ActionData data);
   bool removeActionData(const ActionData data);
 
-
+  void lock();
+  void unlock();
 
   using TimelineWidgetPtr = TimelineWidget*;
   static auto create(QWidget*) -> TimelineWidgetPtr;

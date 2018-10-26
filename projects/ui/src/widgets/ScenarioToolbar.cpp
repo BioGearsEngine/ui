@@ -162,9 +162,22 @@ int ScenarioToolbar::timelineListSize() { return _impl->timelines->count(); }
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
 //!        the caller is responsible for all memory management
-
 auto ScenarioToolbar::create(QWidget* parent) -> ScenarioToolbarPtr
 {
   return new ScenarioToolbar(parent);
+}
+//-------------------------------------------------------------------------------
+void ScenarioToolbar::lock()
+{
+  _impl->patients->setEnabled(false);
+  _impl->timelines->setEnabled(false);
+  _impl->enviroments->setEnabled(false);
+}
+//-------------------------------------------------------------------------------
+void ScenarioToolbar::unlock()
+{
+  _impl->patients->setEnabled(true);
+  _impl->timelines->setEnabled(true);
+  _impl->enviroments->setEnabled(true);
 }
 }

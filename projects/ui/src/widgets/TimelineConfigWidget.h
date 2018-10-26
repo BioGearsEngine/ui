@@ -37,6 +37,8 @@ public:
 
   void ScenarioTime(double time);
   double ScenarioTime();
+  void CurrentTime(double time);
+  double CurrentTime();
 
   void Actions(std::vector<ActionData> actions);
 
@@ -46,6 +48,8 @@ public:
 
   static auto create(QWidget* parent = nullptr) -> TimelineConfigWidgetPtr;
 
+  void lock();
+  void unlock();
 signals:
   void actionAdded(const ActionData data);
   void timeChanged(int time);

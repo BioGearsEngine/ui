@@ -46,20 +46,13 @@ namespace biogears_ui {
     
     std::unique_ptr<PhysiologyDriver> getPhysiologyDriver();
     void  setPhysiologyDriver(std::unique_ptr<PhysiologyDriver>&& driver);
-    
-  public slots: //QT5 Slots >(
-    void handlePatientFileChange(int index);
-    void handleEnvironmentFileChange(int index);
-    void handleTimelineFileChange(int index);
-    void handlePatientValueChange();
-    void handleEnvironmentValueChange();
-    void handleTimelineValueChange();
-    void loadPatient();
-    void loadEnvironment();
-    void loadTimeline();
 
-    void populatePatientWidget();
-    void populateEnvironmentWidget();
+    void setSimulationTime(double);
+
+    void lock();
+    void unlock();
+
+  public slots: //QT5 Slots >(
     void populateTimelineWidget();
 
   private:
@@ -67,10 +60,6 @@ namespace biogears_ui {
   private: //Data
     std::unique_ptr<PhysiologyDriver> _driver;
 
-    MultiSelectionWidget* _physiologySelection = nullptr;
-    ScenarioToolbar* _runToolbar = nullptr;
-    PatientConfigWidget* _patient_widget = nullptr;
-    EnvironmentConfigWidget* _environment_widget = nullptr;
     TimelineConfigWidget* _timeline_widget = nullptr;
 
   };

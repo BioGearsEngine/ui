@@ -258,5 +258,4 @@ ScenarioToolbar* ScenarioConfigWidget::getScenarioToolbar()
 {
   return _scenario_toolbar;
 }
-
 }

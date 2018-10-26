@@ -19,24 +19,22 @@
 
 #include "TimelineWidget.h"
 //External Includes
-#include <QT>
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QLineEdit>
+#include <QT>
 #include <QTextEdit>
-
 
 namespace biogears_ui {
 
-struct DrawProperties
-{
+struct DrawProperties {
   float margin;
   float scale;
 };
 
-struct TimelineWidget::Implementation: QObject {
+struct TimelineWidget::Implementation : QObject {
 public:
   Implementation(QWidget* config);
   Implementation(const Implementation&);
@@ -49,41 +47,41 @@ public:
 public slots:
   void processLengthChanged();
   void processPaintEvent(QPaintEvent*);
+
 public:
   std::map<ActionData, TimelineEntry*> elementsMap;
 
   double timeline_length;
   double current_time;
-  int    pen_width;
+  int pen_width;
 
-  QSize  timeline_demensions;
-  QSize  minmap_demensions;
-  QSize  scroll_demensions;
-  float  screen_dpi;
-  DrawProperties  timeline_config;
+  QSize timeline_demensions;
+  QSize minmap_demensions;
+  QSize scroll_demensions;
+  float screen_dpi;
+  DrawProperties timeline_config;
 
   QColor pen_color;
   QBrush background_brush;
 
-  QLineEdit*   f_timeline_length;
-  QLabel*      l_timeline;
-  QLabel*      l_minmap;
-  QLabel*      l_timeline_length;
-  QScrollBar*  scroll_bar;
+  QLineEdit* f_timeline_length;
+  QLabel* l_timeline;
+  QLabel* l_minmap;
+  QLabel* l_timeline_length;
+  QScrollBar* scroll_bar;
 };
 
 TimelineWidget::Implementation::Implementation(QWidget* parent)
   : l_timeline(new QLabel(parent))
   , l_minmap(new QLabel(parent))
-  , l_timeline_length(new QLabel("Timeline Length",parent))
+  , l_timeline_length(new QLabel("Timeline Length", parent))
   , f_timeline_length(new QLineEdit(parent))
   , timeline_demensions(parent->size().width(), 250)
   , minmap_demensions(parent->size().width(), 50)
   , scroll_demensions(parent->size().width(), 250)
-  , scroll_bar( new QScrollBar(Qt::Horizontal, parent))
+  , scroll_bar(new QScrollBar(Qt::Horizontal, parent))
 {
 
-  
   //Widget Layout
   QVBoxLayout* vlayout = new QVBoxLayout;
   parent->setLayout(vlayout);
@@ -100,10 +98,9 @@ TimelineWidget::Implementation::Implementation(QWidget* parent)
   vlayout->addWidget(l_minmap);
   vlayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
-
   //Element Configurations
   f_timeline_length->setValidator(new QIntValidator);
-  
+
   l_timeline->setBackgroundRole(QPalette::Base);
   l_timeline->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   l_timeline->setScaledContents(true);
@@ -116,25 +113,24 @@ TimelineWidget::Implementation::Implementation(QWidget* parent)
   scroll_bar->setVisible(true);
   scroll_bar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
   scroll_bar->setMinimum(0);
-  scroll_bar->setMaximum(timeline_demensions.width()- scroll_demensions.width());
+  scroll_bar->setMaximum(timeline_demensions.width() - scroll_demensions.width());
   scroll_bar->setPageStep(scroll_demensions.width());
 
   QPixmap timeline(timeline_demensions);
   QPixmap minmap(minmap_demensions);
-  
+
   //Setup Drawing Surfaces
   l_timeline->setPixmap(timeline);
   l_minmap->setPixmap(minmap);
 
   //Paramaters
   screen_dpi = QGuiApplication::primaryScreen()->logicalDotsPerInch();
-  timeline_config.margin = (1./8.) * screen_dpi;
+  timeline_config.margin = (1. / 8.) * screen_dpi;
 
   timeline_length = 0.0;
   pen_width = 3;
   pen_color = Qt::GlobalColor::darkBlue;
   background_brush = QBrush(Qt::GlobalColor::white, Qt::BrushStyle::SolidPattern);
-
 }
 //-------------------------------------------------------------------------------
 TimelineWidget::Implementation::Implementation(const Implementation& obj)
@@ -170,20 +166,18 @@ void TimelineWidget::Implementation::drawShadowRegion(QPainter& painter)
     double timeline_width = timeline_demensions.width();
     double minmap_width = minmap_demensions.width();
 
-    if(timeline_width < minmap_width)
-    {
+    if (timeline_width < minmap_width) {
       bar_position = 0;
       page_step = timeline_width;
-    } else
-    {
+    } else {
       auto pos = scroll_bar->sliderPosition();
       auto step = scroll_bar->pageStep();
-      bar_position = (minmap_width/timeline_width) * pos;
-      page_step = (minmap_width/timeline_width ) * step;
+      bar_position = (minmap_width / timeline_width) * pos;
+      page_step = (minmap_width / timeline_width) * step;
     }
     auto w_start = static_cast<int>(bar_position);
     auto w_end = static_cast<int>(page_step);
-    QRect rect{ w_start,0,w_end,minmap_demensions.height()};
+    QRect rect{ w_start, 0, w_end, minmap_demensions.height() };
     painter.setPen(Qt::lightGray);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect, Qt::Dense6Pattern);
@@ -204,7 +198,7 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
 
   double size_ratio = static_cast<double>(minmap_width) / scroll_demensions.width();
 
-  //Step 1: Backgrounds 
+  //Step 1: Backgrounds
   timeline_painter.fillRect(timeline.rect(), background_brush);
   minmap_painter.fillRect(minmap.rect(), background_brush);
 
@@ -213,41 +207,28 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
   minmap_painter.setPen(QPen(pen_color, pen_width));
 
   QLine minmap_line;
-  QLine timeline_line{ static_cast<int>(timeline_config.margin)
-                       , timeline.size().height() / 2
-                       , scroll_demensions.width() - static_cast<int>(timeline_config.margin)
-                       , timeline.size().height() / 2 
-                     };
-  if( timeline_demensions.width() < minmap_demensions.width() )
-  {
-    minmap_line.setLine(0 + static_cast<int>(timeline_config.margin)
-      , minmap.size().height()
-      , scroll_demensions.width() - static_cast<int>(timeline_config.margin)
-      , minmap.size().height());
-  } else
-  {
-    minmap_line.setLine(0 + static_cast<int>(timeline_config.margin)
-      , minmap.size().height()
-      , minmap_width - static_cast<int>(timeline_config.margin)
-      , minmap.size().height());
+  QLine timeline_line{ static_cast<int>(timeline_config.margin), timeline.size().height() / 2, scroll_demensions.width() - static_cast<int>(timeline_config.margin), timeline.size().height() / 2 };
+  if (timeline_demensions.width() < minmap_demensions.width()) {
+    minmap_line.setLine(0 + static_cast<int>(timeline_config.margin), minmap.size().height(), scroll_demensions.width() - static_cast<int>(timeline_config.margin), minmap.size().height());
+  } else {
+    minmap_line.setLine(0 + static_cast<int>(timeline_config.margin), minmap.size().height(), minmap_width - static_cast<int>(timeline_config.margin), minmap.size().height());
   }
   minmap_painter.drawLine(minmap_line);
   timeline_painter.drawLine(timeline_line);
 
-  //Step 3: Draw Events 
+  //Step 3: Draw Events
   auto bar_position = scroll_bar->sliderPosition();
-  auto page_step =  scroll_bar->pageStep();
+  auto page_step = scroll_bar->pageStep();
   for (const auto& actionPair : elementsMap) {
-    const auto& data  = actionPair.first;
+    const auto& data = actionPair.first;
     const auto& entry = actionPair.second;
 
     double true_x = data.at / timeline_length * timeline_demensions.width();
-    if ( bar_position <= true_x && true_x <= bar_position + page_step)
-    {
+    if (bar_position <= true_x && true_x <= bar_position + page_step) {
 
       auto calc_x = true_x - bar_position;
       auto mapped_x = ((calc_x / scroll_demensions.width()) * (scroll_demensions.width() - (2 * timeline_config.margin))) + timeline_config.margin;
-      entry->X( mapped_x );
+      entry->X(mapped_x);
       entry->drawAtFullDetail(timeline_painter);
     }
 
@@ -266,11 +247,11 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
 //--------------------------------------------------------------------------------
 void TimelineWidget::Implementation::processLengthChanged()
 {
-   timeline_length = f_timeline_length->displayText().toDouble();
-   timeline_demensions = QSize((timeline_length / 10.0) * screen_dpi, 250);
-   scroll_bar->setMinimum(0);
-   scroll_bar->setMaximum(timeline_demensions.width()- scroll_demensions.width());
-   scroll_bar->setPageStep(scroll_demensions.width());
+  timeline_length = f_timeline_length->displayText().toDouble();
+  timeline_demensions = QSize((timeline_length / 10.0) * screen_dpi, 250);
+  scroll_bar->setMinimum(0);
+  scroll_bar->setMaximum(timeline_demensions.width() - scroll_demensions.width());
+  scroll_bar->setPageStep(scroll_demensions.width());
 }
 //--------------------------------------------------------------------------------
 TimelineWidget::TimelineWidget(QWidget* parent)
@@ -288,13 +269,13 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
 {
   bool oldState = this->blockSignals(true);
   _impl->processPaintEvent(event);
- this->blockSignals(oldState);
+  this->blockSignals(oldState);
 }
 //----------------------------------------------------------------------------------
-void TimelineWidget::keyPressEvent(QKeyEvent *event)
+void TimelineWidget::keyPressEvent(QKeyEvent* event)
 {
-  switch (event->key() ){
-    
+  switch (event->key()) {
+
   case Qt::LeftArrow:
     _impl->scroll_bar->setValue(_impl->scroll_bar->value() - _impl->scroll_bar->singleStep());
     break;
@@ -315,13 +296,11 @@ void TimelineWidget::keyPressEvent(QKeyEvent *event)
     break;
   default:
     break;
-
   }
 }
 //----------------------------------------------------------------------------------
-void TimelineWidget::keyReleaseEvent(QKeyEvent *)
+void TimelineWidget::keyReleaseEvent(QKeyEvent*)
 {
-  
 }
 //----------------------------------------------------------------------------------
 void TimelineWidget::clear()
@@ -393,4 +372,13 @@ auto TimelineWidget::create(QWidget* parent) -> TimelineWidgetPtr
   return new TimelineWidget(parent);
 }
 //----------------------------------------------------------------------------------
+void TimelineWidget::lock()
+{
+  _impl->f_timeline_length->setEnabled(false);
+}
+//----------------------------------------------------------------------------------
+void TimelineWidget::unlock()
+{
+  _impl->f_timeline_length->setEnabled(true);
+}
 }

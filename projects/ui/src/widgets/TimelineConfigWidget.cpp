@@ -44,11 +44,13 @@ public:
 TimelineConfigWidget::Implementation::Implementation(QWidget* parent)
   : timeWidget(TimelineWidget::create(parent))
 {
-  QGridLayout* grid = new QGridLayout();
-  parent->setLayout(grid);
+  QVBoxLayout* layout = new QVBoxLayout();
+  parent->setLayout(layout);
 
-  grid->addWidget(new QLabel("Timeline"), 0, 0);
-  grid->addWidget(timeWidget, 1, 0);
+  layout->addWidget(new QLabel("Timeline"));
+  layout->addWidget(timeWidget);
+  layout->addStretch(1);
+  ;
 }
 //-------------------------------------------------------------------------------
 TimelineConfigWidget::Implementation::Implementation(const Implementation& obj)
@@ -112,7 +114,6 @@ void TimelineConfigWidget::clear()
   _impl->timeWidget->clear();
 }
 //-------------------------------------------------------------------------------
-//This is only to test functionality.  In practice, we should increment time as we add AdvanceTime actions to action struct
 void TimelineConfigWidget::ScenarioTime(double time)
 {
   _impl->timeWidget->ScenarioLength(time);
@@ -122,6 +123,16 @@ double TimelineConfigWidget::ScenarioTime()
 {
   return _impl->timeWidget->ScenarioLength();
 }
+//This is only to test functionality.  In practice, we should increment time as we add AdvanceTime actions to action struct
+void TimelineConfigWidget::CurrentTime(double time)
+{
+  _impl->timeWidget->CurrentTime(time);
+}
+//-------------------------------------------------------------------------------
+double TimelineConfigWidget::CurrentTime()
+{
+  return _impl->timeWidget->CurrentTime();
+}
 //-------------------------------------------------------------------------------
 //!
 //! \brief returns a ScenarioToolbar* which it retains no ownership of
@@ -130,5 +141,14 @@ auto TimelineConfigWidget::create(QWidget* parent) -> TimelineConfigWidgetPtr
 {
   return new TimelineConfigWidget(parent);
 }
-
+//-------------------------------------------------------------------------------
+void TimelineConfigWidget::lock()
+{
+  _impl->timeWidget->lock();
+}
+//-------------------------------------------------------------------------------
+void TimelineConfigWidget::unlock()
+{
+  _impl->timeWidget->unlock();
+}
 }

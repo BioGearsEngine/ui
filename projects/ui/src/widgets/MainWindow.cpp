@@ -56,8 +56,6 @@ public: //Functions
   Implementation& operator=(Implementation&&);
 
 public slots: //QT5 Slots >(
-  void resume();
-  void pause();
 
   void switchToResultsMode(QMainWindow* mainwindow);
   void switchToConfigMode(QMainWindow* mainwindow);
@@ -109,9 +107,10 @@ MainWindow::Implementation& MainWindow::Implementation::operator=(Implementation
   return *this;
 }
 //-------------------------------------------------------------------------------
-void MainWindow::Implementation::resume()
+void MainWindow::resume()
 {
   std::cout << "Resuming\n";
+  _impl->switchToResultsMode(this);
   //if( thread->paused() )
   {
     //thread->paused(false);
@@ -119,9 +118,10 @@ void MainWindow::Implementation::resume()
   //thread->run();
 }
 //-------------------------------------------------------------------------------
-void MainWindow::Implementation::pause()
+void MainWindow::pause()
 {
   std::cout << "Pausing\n";
+  _impl->switchToConfigMode(this);
   //thread->paused(true);
 }
 //-------------------------------------------------------------------------------
@@ -135,30 +135,37 @@ void MainWindow::Implementation::about()
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::switchToResultsMode(QMainWindow* window)
 {
-  if ( OpMode::RESULTS == mode )
+  if ( OpMode::CONFIG == mode )
   {
     config_widget = dynamic_cast<ScenarioConfigWidget*>(window->takeCentralWidget());
     if ( nullptr == results_widget)
     {
-      results_widget = ScenarioResultsWidget::create();
+      results_widget = ScenarioResultsWidget::create(window);
     }
+
     results_widget->setPhysiologyDriver(config_widget->getPhysiologyDriver());
+    results_widget->populateTimelineWidget();
+    results_widget->setSimulationTime(0);
     window->setCentralWidget(results_widget);
   }
+  results_widget->lock();
+  mode = OpMode::RESULTS;
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::switchToConfigMode(QMainWindow* window)
 {
-  if (OpMode::CONFIG == mode)
+  if (OpMode::RESULTS == mode)
   {
     results_widget = dynamic_cast<ScenarioResultsWidget*>(window->takeCentralWidget());
     if (nullptr == config_widget)
     {
-      config_widget = ScenarioConfigWidget::create();
+      config_widget = ScenarioConfigWidget::create(window);
     }
     config_widget->setPhysiologyDriver(results_widget->getPhysiologyDriver());
     window->setCentralWidget(config_widget);
   }
+  scenario_toolbar->unlock();
+  mode = OpMode::CONFIG;
 }
 //-------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget* parent)
@@ -183,16 +190,17 @@ void MainWindow::Implementation::createActions(QMainWindow* mainWindow)
 {
   //-- Create Header Menu
   QMenu* entry = nullptr;
-  QToolBar* toolbar = nullptr;
   QAction* action = nullptr;
-  QTabWidget* tabs = nullptr;
+
+  auto window = dynamic_cast<MainWindow*>(mainWindow);
+
   //Simualtion
   entry = mainWindow->menuBar()->addMenu(tr("&Simulation"));
   //Simulation -> Launch
   QIcon launchIcon = QIcon::fromTheme("Launch", QIcon(":/img/play.png"));
   QAction* launch = action = new QAction(launchIcon, tr("&Launch"), mainWindow);
   action->setStatusTip(tr("Run current simulation"));
-  connect(action, &QAction::triggered, this, &Implementation::resume);
+  connect(action, &QAction::triggered, window, &MainWindow::resume);
   entry->addAction(action);
 
   //Simulation -> Load Patient
@@ -232,8 +240,8 @@ void MainWindow::Implementation::createActions(QMainWindow* mainWindow)
   connect(scenario_toolbar, &ScenarioToolbar::patientChanged, config_widget, &ScenarioConfigWidget::handlePatientFileChange);
   connect(scenario_toolbar, &ScenarioToolbar::envonmentChanged, config_widget, &ScenarioConfigWidget::handleEnvironmentFileChange);
   connect(scenario_toolbar, &ScenarioToolbar::timelineChanged, config_widget, &ScenarioConfigWidget::handleTimelineFileChange);
-  connect(scenario_toolbar, &ScenarioToolbar::resumeSimulation, this, &Implementation::resume);
-  connect(scenario_toolbar, &ScenarioToolbar::pauseSimulation, this, &Implementation::pause);
+  connect(scenario_toolbar, &ScenarioToolbar::resumeSimulation, window, &MainWindow::resume);
+  connect(scenario_toolbar, &ScenarioToolbar::pauseSimulation, window, &MainWindow::pause);
 }
 //-------------------------------------------------------------------------------
 void MainWindow::Implementation::createStatusBar(QMainWindow* window)

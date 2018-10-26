@@ -43,6 +43,9 @@ public:
   int envrionmentListSize();
   int timelineListSize();
 
+  void lock();
+  void unlock();
+
  signals:
   void patientChanged(int index);
   void envonmentChanged(int index);
