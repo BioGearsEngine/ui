@@ -46,7 +46,8 @@ public:
 
   std::unique_ptr<BioGearsEngine> phy = nullptr;
   std::unique_ptr<SEScenario> scenario = nullptr;
- 
+  std::unique_ptr<PhysiologyEngineConfiguration> config = nullptr;
+
   std::string patient_file = "";
   std::string environment_file = "";
   std::string timeline_file = "";
@@ -55,9 +56,9 @@ public:
 PhysiologyDriver::Implementation::Implementation(const std::string& scenario)
   : phy(std::make_unique<BioGearsEngine>(scenario + ".log"))
   , scenario( std::make_unique<SEScenario>(phy->GetSubstanceManager()) )
-  
+  , config(std::make_unique<PhysiologyEngineConfiguration>(phy->GetLogger())) 
 {
-
+  config->Load("config/DynamicStabilization.xml");
 }
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation::Implementation(const Implementation& obj)
@@ -219,5 +220,11 @@ PhysiologyEngine* PhysiologyDriver::Physiology()
   //note:sawhite: We are loosing control of Physiology for now
   return static_cast<PhysiologyEngine*>(_impl->phy.get());
 }
+//-------------------------------------------------------------------------------
+bool PhysiologyDriver::initialize()
+{
+  auto& patient = _impl->phy->GetPatient();
 
+  return _impl->phy->InitializeEngine(patient, nullptr, _impl->config.get());
+}
 }

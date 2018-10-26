@@ -69,6 +69,7 @@ public:
 
   bool applyAction();
 
+  bool initialize();
 private:
   biogears::PhysiologyEngine* Physiology();
 

@@ -146,7 +146,9 @@ void MainWindow::Implementation::switchToResultsMode(QMainWindow* window)
     results_widget->setPhysiologyDriver(config_widget->getPhysiologyDriver());
     results_widget->populateTimelineWidget();
     results_widget->setSimulationTime(0);
+
     window->setCentralWidget(results_widget);
+    results_widget->initalize();
   }
   results_widget->lock();
   mode = OpMode::RESULTS;

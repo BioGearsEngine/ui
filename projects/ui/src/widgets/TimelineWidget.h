@@ -61,6 +61,7 @@ protected:
   void paintEvent(QPaintEvent* event) override;
   void keyPressEvent(QKeyEvent *) override;
   void keyReleaseEvent(QKeyEvent *) override;
+  void resizeEvent(QResizeEvent *) override;
 private:
   struct Implementation;
   biogears::unique_propagate_const<Implementation> _impl;

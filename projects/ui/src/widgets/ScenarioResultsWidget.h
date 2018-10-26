@@ -51,6 +51,7 @@ namespace biogears_ui {
 
     void lock();
     void unlock();
+    void initalize();
 
   public slots: //QT5 Slots >(
     void populateTimelineWidget();
@@ -59,7 +60,7 @@ namespace biogears_ui {
 
   private: //Data
     std::unique_ptr<PhysiologyDriver> _driver;
-
+    bool _not_initialized = true;
     TimelineConfigWidget* _timeline_widget = nullptr;
 
   };
