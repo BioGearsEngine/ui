@@ -23,9 +23,6 @@
 #include <iostream>
 #include <regex>
 //External Includes
-#include <QFutureWatcher>
-#include <QTabWidget>
-#include <QtConcurrent/QtConcurrentMap>
 #include <QtConcurrent/QtConcurrent>
 #include <QtWidgets>
 
@@ -34,21 +31,14 @@
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/scenario/SEAdvanceTime.h>
-#include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
-#include <biogears/cdm/system/environment/conditions/SEEnvironmentCondition.h>
 
 #include <units.h>
 //Project Includes
 #include "../phys/PhysiologyDriver.h"
-#include "../phys/PhysiologyThread.h"
+
 
 #include "EnvironmentConfigWidget.h"
-#include "MultiSelectionWidget.h"
-#include "PatientConfigWidget.h"
-#include "ScenarioToolbar.h"
 #include "TimelineConfigWidget.h"
-
-#include <xercesc/dom/DOMDocument.hpp>
 
 using namespace biogears;
 namespace biogears_ui {
@@ -60,15 +50,15 @@ void ScenarioResultsWidget::populateTimelineWidget()
   std::string name;
 
   std::vector<ActionData> timeline;
-  for (auto action : actions) {
-    name = action->classname();
+  //for (auto action : actions) {
+  //  name = action->classname();
 
-    timeline.emplace_back(name, time);
-    if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
-      auto delta = dynamic_cast<SEAdvanceTime*>(action);
-      time += delta->GetTime().GetValue(TimeUnit::s);
-    }
-  }
+  //  timeline.emplace_back(name, time);
+  //  if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
+  //    auto delta = dynamic_cast<SEAdvanceTime*>(action);
+  //    time += delta->GetTime().GetValue(TimeUnit::s);
+  //  }
+  //}
   _timeline_widget->Actions(timeline);
   _timeline_widget->ScenarioTime(time);
 }

@@ -53,6 +53,7 @@ UnitInputWidget::Implementation::Implementation(QWidget* parent)
   layout->addWidget(label, 0, 0);
   layout->addWidget(value, 0, 1);
   layout->addWidget(units, 0, 2);
+
   layout->setSizeConstraint(QLayout::SetMinimumSize);
   value->setDecimals(2);
   value->setSingleStep(.1);

@@ -65,25 +65,25 @@ PatientConfigWidget::Implementation::Implementation(QWidget* parent)
   , f_diastolic(PressureInputWidget::create(tr("Disatolic Pressure"), 120, parent))
   , f_systolic(PressureInputWidget::create(tr("Ststolic Pressure"), 80, parent))
 {
-  QGridLayout* grid = new QGridLayout;
-  parent->setLayout(grid);
+  QVBoxLayout* layout = new QVBoxLayout;
+  parent->setLayout(layout);
   //Labels
   int row = 0, col = 0;
 
-  parent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  grid->addWidget(new QLabel(tr("Name") + ":", parent), row, col);
-  grid->addWidget(f_name, row++, col+1);
-  grid->addWidget(new QLabel(tr("Gender") + ":", parent), row, col);
-  grid->addWidget(f_gender, row++, col+1);
-  grid->addWidget(f_age->Widget(), row++, col, 1, 3);
-  grid->addWidget(f_height->Widget(), row++, col, 1, 3);
-  grid->addWidget(f_weight->Widget(), row++, col, 1, 3);
-  grid->addWidget(f_bodyFat,row++,col,1,3);
-  grid->addWidget(f_heartRate->Widget(), row++, col,1,3);
-  grid->addWidget(f_respritoryRate->Widget(), row++, col, 1, 3);
-  grid->addWidget(f_diastolic->Widget(), row++, col, 1, 3);
-  grid->addWidget(f_systolic->Widget(), row, col, 1, 3);
-   
+  //parent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  layout->addWidget(new QLabel(tr("Name") + ":", parent));
+  layout->addWidget(f_name);
+  layout->addWidget(new QLabel(tr("Gender") + ":", parent));
+  layout->addWidget(f_gender);
+  layout->addWidget(f_age->Widget());
+  layout->addWidget(f_height->Widget());
+  layout->addWidget(f_weight->Widget());
+  layout->addWidget(f_bodyFat);
+  layout->addWidget(f_heartRate->Widget());
+  layout->addWidget(f_respritoryRate->Widget());
+  layout->addWidget(f_diastolic->Widget());
+  layout->addWidget(f_systolic->Widget());
+  layout->addStretch(1);
   f_gender->addItem(tr("Male"));
   f_gender->addItem(tr("Female"));
 

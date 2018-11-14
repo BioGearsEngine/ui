@@ -23,7 +23,7 @@
 #include <biogears/cdm/scenario/SEScenario.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/schema/cdm/Scenario.hxx>
-
+#include <biogears/schema/biogears/OverrideConfig.hxx>
 #include <boost/filesystem/path.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -177,7 +177,7 @@ const std::vector<biogears::SEAction*> PhysiologyDriver::GetActions() const
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::SetActions(const std::vector<biogears::SEAction>& actions)
 {
-  _impl->scenario->ClearActions();
+  //_impl->scenario->ClearActions();
   for (auto& action : actions)
   {
     _impl->scenario->AddAction(action);
@@ -186,7 +186,7 @@ void PhysiologyDriver::SetActions(const std::vector<biogears::SEAction>& actions
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::SetActionsAfter(const biogears::SEAction& reference, const biogears::SEAction& newAction)
 {
-  _impl->scenario->AddActionAfter(reference, newAction);
+  //_impl->scenario->AddActionAfter(reference, newAction);
 }
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::clearPatient() { _impl->patient_file = ""; }

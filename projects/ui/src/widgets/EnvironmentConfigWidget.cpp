@@ -79,27 +79,28 @@ EnvironmentConfigWidget::Implementation::Implementation(QWidget* parent)
 
   airVelocity->setUnitView(Velocity::kph);
 
-  QGridLayout* grid = new QGridLayout;
-  parent->setLayout(grid);
+  QVBoxLayout* layout = new QVBoxLayout;
+  parent->setLayout(layout);
 
   //Labels
   int row = 0, col = 0;
-  grid->setSpacing(0);
-  grid->setVerticalSpacing(0);
-  //grid->setContentsMargins(0, 0, 0, 0);
-  parent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  grid->addWidget(new QLabel(tr("Surrounding Substance") + ":", parent), row, col);
-  grid->addWidget(f_surroundings, row++, col + 1);
-  grid->addWidget(airVelocity->Widget(), row++, col, 1, 3);
-  grid->addWidget(ambientTemp->Widget(), row++, col, 1, 3);
-  grid->addWidget(clothing->Widget(), row++, col, 1, 3);
-  grid->addWidget(atmosphericPressure->Widget(), row++, col, 1, 3);
-  grid->addWidget(surroundingEmissivity, row++, col, 1, 3);
-  grid->addWidget(meanradientTemp->Widget(), row++, col, 1, 3);
-  grid->addWidget(relativeHumidity, row++, col, 1, 3);
-  grid->addWidget(resperationAmbientTemp->Widget(), row++, col, 1, 3);
-  grid->addWidget(l_ambientGas, row, col);
-  grid->addWidget(b_addAmbientGas, row, col + 2);
+  //layout->setSpacing(0);
+  //layout->setVerticalSpacing(0);
+  //layout->setContentsMargins(0, 0, 0, 0);
+  //parent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  layout->addWidget(new QLabel(tr("Surrounding Substance") + ":", parent));
+  layout->addWidget(f_surroundings);
+  layout->addWidget(airVelocity->Widget());
+  layout->addWidget(ambientTemp->Widget());
+  layout->addWidget(clothing->Widget());
+  layout->addWidget(atmosphericPressure->Widget());
+  layout->addWidget(surroundingEmissivity);
+  layout->addWidget(meanradientTemp->Widget());
+  layout->addWidget(relativeHumidity);
+  layout->addWidget(resperationAmbientTemp->Widget());
+  layout->addWidget(l_ambientGas);
+  layout->addWidget(b_addAmbientGas);
+  layout->addStretch(1);
 }
 //-------------------------------------------------------------------------------
 EnvironmentConfigWidget::Implementation::Implementation(const Implementation& obj)

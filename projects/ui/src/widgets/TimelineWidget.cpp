@@ -87,16 +87,16 @@ TimelineWidget::Implementation::Implementation(QWidget* parent)
   parent->setLayout(vlayout);
   //parent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  QWidget* subObj = new QWidget(parent);
+  QWidget* horizontal_layout_object = new QWidget(parent);
   QHBoxLayout* hlayout = new QHBoxLayout;
-  subObj->setLayout(hlayout);
+  horizontal_layout_object->setLayout(hlayout);
   hlayout->addWidget(l_timeline_length);
   hlayout->addWidget(f_timeline_length);
-  vlayout->addWidget(subObj);
+  vlayout->addWidget(horizontal_layout_object);
   vlayout->addWidget(l_timeline);
   vlayout->addWidget(scroll_bar);
   vlayout->addWidget(l_minmap);
-  vlayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Maximum, QSizePolicy::Expanding));
+  vlayout->addStretch(1);// (new QSpacerItem(1, 1, QSizePolicy::Maximum, QSizePolicy::Maximum));
 
   //Element Configurations
   f_timeline_length->setValidator(new QIntValidator);
@@ -106,7 +106,7 @@ TimelineWidget::Implementation::Implementation(QWidget* parent)
   l_timeline->setScaledContents(true);
 
   l_minmap->setBackgroundRole(QPalette::BrightText);
-  //l_minmap->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+  //_minmap->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
   l_minmap->setScaledContents(true);
 
   scroll_bar->setBackgroundRole(QPalette::Dark);
@@ -191,6 +191,7 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
   QPixmap timeline{ scroll_demensions };
   QPainter timeline_painter{ &timeline };
 
+  int timeline_width = timeline_demensions.width();
   int minmap_width = l_minmap->width();
 
   QPixmap minmap{ minmap_width, 50 };
@@ -252,8 +253,8 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
 
   l_minmap->setPixmap(minmap);
   l_timeline->setPixmap(timeline);
-  l_minmap->resize(minmap.width(), minmap.height());
-  l_timeline->resize(timeline.width(), timeline.height());
+  //l_minmap->resize(minmap.width(), minmap.height());
+  //l_timeline->resize(timeline.width(), timeline.height());
 }
 //--------------------------------------------------------------------------------
 void TimelineWidget::Implementation::processLengthChanged()
@@ -261,8 +262,10 @@ void TimelineWidget::Implementation::processLengthChanged()
   timeline_length = f_timeline_length->displayText().toDouble();
   timeline_demensions = QSize((timeline_length / 10.0) * screen_dpi, 250);
   scroll_bar->setMinimum(0);
-  scroll_bar->setMaximum(timeline_demensions.width() - scroll_demensions.width());
-  scroll_bar->setPageStep(scroll_demensions.width());
+  auto timeline_width = timeline_demensions.width();
+  auto scroll_width = scroll_demensions.width();
+  scroll_bar->setMaximum(timeline_width- scroll_width);
+  scroll_bar->setPageStep(scroll_width);
 }
 //--------------------------------------------------------------------------------
 TimelineWidget::TimelineWidget(QWidget* parent)
@@ -316,13 +319,12 @@ void TimelineWidget::keyReleaseEvent(QKeyEvent*)
 //----------------------------------------------------------------------------------
 void TimelineWidget::resizeEvent(QResizeEvent* event)
 {
-  QWidget::resizeEvent(event);
   
-  _impl->timeline_demensions = QSize(event->size().width()-50, 250);
   _impl->minmap_demensions = QSize(event->size().width() - 50, 50);
   _impl->scroll_demensions = QSize(event->size().width() - 50, 250);
   _impl->scroll_bar->setMaximum(_impl->timeline_demensions.width() - _impl->scroll_demensions.width());
   _impl->scroll_bar->setPageStep(_impl->scroll_demensions.width());
+  QWidget::resizeEvent(event);
 
 }
 //----------------------------------------------------------------------------------

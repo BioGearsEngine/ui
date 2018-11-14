@@ -171,15 +171,15 @@ void ScenarioConfigWidget::populateTimelineWidget()
   std::string name;
 
   std::vector<ActionData> timeline;
-  for (auto action : actions) {
-    name = action->classname();
+  //for (auto action : actions) {
+  //  name = action->classname();
 
-    timeline.emplace_back(name, time);
-    if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
-      auto delta = dynamic_cast<SEAdvanceTime*>(action);
-      time += delta->GetTime().GetValue(TimeUnit::s);
-    }
-  }
+  //  timeline.emplace_back(name, time);
+  //  if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
+  //    auto delta = dynamic_cast<SEAdvanceTime*>(action);
+  //    time += delta->GetTime().GetValue(TimeUnit::s);
+  //  }
+  //}
   _timeline_widget->Actions(timeline);
   _timeline_widget->ScenarioTime(time);
 }
