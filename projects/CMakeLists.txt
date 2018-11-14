@@ -49,6 +49,5 @@ if(WIN32)
 endif()
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
-add_subdirectory(biogears-common)
 add_subdirectory(ui)
 

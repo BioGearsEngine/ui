@@ -95,7 +95,7 @@ set(${PREFIX}_LIBS
     Boost::program_options
     Qt5::Widgets
     Qt5::Charts
-    Biogears::common
+    #    Biogears::common
     Biogears::libbiogears
 )
 target_link_libraries(${PROJECT_NAME}  ${${PREFIX}_LIBS} )
