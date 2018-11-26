@@ -23,12 +23,17 @@
 //Standard Includes
 #include <chrono>
 #include <string>
+#include <utility>
+#include <vector>
 //Project Includes
+#include <QStringListModel>
 #include <biogears/cdm/patient/SEPatient.h>
+#include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
+
 #include <biogears/exports.h>
 #include <biogears/framework/unique_propagate_const.h>
-#include <biogears/cdm/scenario/SEAction.h>
+#include <QTreeWidgetItem>
 
 namespace biogears {
 class PhysiologyEngine;
@@ -40,6 +45,9 @@ class PhysiologyDriver {
   friend PhysiologyThread;
 
 public:
+  using DataTrack = double;
+  using DataTrackMap = std::map<std::string, DataTrack>;
+
   PhysiologyDriver();
   PhysiologyDriver(const std::string&);
   PhysiologyDriver(const PhysiologyDriver&) = delete;
@@ -47,17 +55,28 @@ public:
   ~PhysiologyDriver();
 
   void advance(std::chrono::milliseconds deltaT);
-  void async_advance(std::chrono::milliseconds deltaT);
+  void async_start_realtime();
+  void async_start();
+  void async_pause();
+  void async_resume();
+  void async_stop();
 
   bool isPaused();
+  bool isRunning();
 
   bool loadPatient(const std::string& filepath);
   bool loadTimeline(const std::string& filepath);
   bool loadEnvironment(const std::string& filepath);
 
   const std::vector<biogears::SEAction*> GetActions() const;
-  void SetActionsAfter(const biogears::SEAction& reference,const biogears::SEAction& newAction);
+  void SetActionsAfter(const biogears::SEAction& reference, const biogears::SEAction& newAction);
   void SetActions(const std::vector<biogears::SEAction>& actions);
+
+  QTreeWidgetItem* getPossiblePhysiologyDatarequest();
+  QTreeWidgetItem* getPossibleCompartmentDataRequest();
+
+  auto dataRequests() const -> DataTrackMap;
+  auto dataRequest(std::string) const -> DataTrack;
 
   void clearPatient();
   void clearEnvironment();
@@ -70,6 +89,7 @@ public:
   bool applyAction();
 
   bool initialize();
+
 private:
   biogears::PhysiologyEngine* Physiology();
 

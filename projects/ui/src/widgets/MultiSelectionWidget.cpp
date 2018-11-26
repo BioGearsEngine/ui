@@ -21,12 +21,11 @@
 
 #include "MultiSelectionWidget.h"
 //Project Includes
-#include "TimelineWidget.h"
 #include "TimelineConfigWidget.h"
+#include "TimelineWidget.h"
 //External Includes
 #include <QtAlgorithms>
 #include <QtWidgets>
-
 
 namespace biogears_ui {
 
@@ -39,8 +38,8 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  QListWidget* choices = nullptr;
-  QListWidget* selected = nullptr;
+  QTreeWidget* choices = nullptr;
+  QTreeWidget* selected = nullptr;
 
 public slots: //QT5 Slots >(
   void clearAllPreferences();
@@ -50,8 +49,8 @@ public slots: //QT5 Slots >(
 };
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::Implementation::Implementation(QWidget* parent)
-  : choices(new QListWidget(parent))
-  , selected(new QListWidget(parent))
+  : choices(new QTreeWidget(parent))
+  , selected(new QTreeWidget(parent))
 {
 }
 //-------------------------------------------------------------------------------
@@ -82,79 +81,75 @@ MultiSelectionWidget::Implementation& MultiSelectionWidget::Implementation::oper
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::clearAllPreferences()
 {
-  int remianing = selected->count();
-  for (auto i = 0; i < remianing; ++i) {
-    choices->addItem(selected->takeItem(0));
-  }
-  choices->sortItems();
+  //int remianing = selected->count();
+  //for (auto i = 0; i < remianing; ++i) {
+  //  choices->addItem(selected->takeItem(0));
+  //}
+  //choices->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedLeft()
 {
-  auto pickList = selected->selectionModel()->selectedIndexes().toVector();
-  qSort(pickList.begin(), pickList.end());
-  for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
-    auto check = item->row();
-    choices->addItem(selected->takeItem(item->row()));   
-  }
-  choices->sortItems();
+  //auto pickList = selected->selectionModel()->selectedIndexes().toVector();
+  //qSort(pickList.begin(), pickList.end());
+  //for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
+  //  auto check = item->row();
+  //  choices->addItem(selected->takeItem(item->row()));
+  //}
+  //choices->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedRight()
 {
-  auto pickList =choices->selectionModel()->selectedIndexes().toVector();
-  qSort(pickList.begin(), pickList.end());
-  for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
-    auto check = item->row();
-    selected->addItem(choices->takeItem(item->row()));
-  }
-  selected->sortItems();
+  //auto pickList =choices->selectionModel()->selectedIndexes().toVector();
+  //qSort(pickList.begin(), pickList.end());
+  //for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
+  //  auto check = item->row();
+  //  selected->addItem(choices->takeItem(item->row()));
+  //}
+  //selected->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::selectAllPreferences()
 {
-  int remianing = choices->count();
-  for (auto i = 0; i < remianing; ++i) {
-    selected->addItem(choices->takeItem(0));
-  }
-  selected->sortItems();
+  //int remianing = choices->count();
+  //for (auto i = 0; i < remianing; ++i) {
+  //  selected->addItem(choices->takeItem(0));
+  //}
+  //selected->sortItems();
 }
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::MultiSelectionWidget(QWidget* parent)
   : QWidget(parent)
-  ,_impl(this)
+  , _impl(this)
 {
   QHBoxLayout* hLayout = new QHBoxLayout;
   QVBoxLayout* vLayout = new QVBoxLayout;
-  
+
   QVBoxLayout* combinedLayout = new QVBoxLayout;
 
-  auto& choices = _impl->choices;
-  choices->addItem("HeartRate");
-  choices->addItem("Blood Pressure");
-  choices->addItem("Breaths per Minute");
-  choices->addItem("Tidal Volume");
-  choices->addItem("Blood Surger Concentration");
-  choices->sortItems();
-
   QWidget* buttonWidget = new QWidget;
-
 
   QPushButton* clearAllButton = new QPushButton("ClearAll");
   QPushButton* moveLeftButton = new QPushButton("<<");
   QPushButton* moveRightButton = new QPushButton(">>");
   QPushButton* selectAllButton = new QPushButton("Move all");
- 
+
   connect(clearAllButton, &QPushButton::clicked, _impl.get(), &Implementation::clearAllPreferences);
   connect(moveLeftButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedLeft);
   connect(moveRightButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedRight);
   connect(selectAllButton, &QPushButton::clicked, _impl.get(), &Implementation::selectAllPreferences);
 
-  choices->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+  _impl->choices->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
   _impl->selected->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
 
+  _impl->choices->clear();
+  _impl->selected->clear();
 
-  hLayout->addWidget(choices);
+  _impl->choices->setHeaderHidden(true);
+  _impl->selected->setHeaderHidden(true);
+
+  hLayout->addWidget(_impl->choices);
   vLayout->addWidget(clearAllButton);
   vLayout->insertStretch(1);
   vLayout->addWidget(moveRightButton);
@@ -166,12 +161,16 @@ MultiSelectionWidget::MultiSelectionWidget(QWidget* parent)
 
   setLayout(hLayout);
   buttonWidget->setLayout(vLayout);
-
 }
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::~MultiSelectionWidget()
 {
   _impl = nullptr;
+}
+//-------------------------------------------------------------------------------
+void MultiSelectionWidget::setOptions(QTreeWidgetItem* model)
+{
+  _impl->choices->insertTopLevelItems(0,model->takeChildren());
 }
 //-------------------------------------------------------------------------------
 //!

@@ -50,15 +50,15 @@ void ScenarioResultsWidget::populateTimelineWidget()
   std::string name;
 
   std::vector<ActionData> timeline;
-  //for (auto action : actions) {
-  //  name = action->classname();
+  for (auto action : actions) {
+    name = action->classname();
 
-  //  timeline.emplace_back(name, time);
-  //  if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
-  //    auto delta = dynamic_cast<SEAdvanceTime*>(action);
-  //    time += delta->GetTime().GetValue(TimeUnit::s);
-  //  }
-  //}
+    timeline.emplace_back(name, time);
+    if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
+      auto delta = dynamic_cast<SEAdvanceTime*>(action);
+      time += delta->GetTime().GetValue(TimeUnit::s);
+    }
+  }
   _timeline_widget->Actions(timeline);
   _timeline_widget->ScenarioTime(time);
 }
@@ -66,10 +66,26 @@ void ScenarioResultsWidget::populateTimelineWidget()
 ScenarioResultsWidget::ScenarioResultsWidget(QWidget* parent)
   : QWidget(parent)
   , _timeline_widget(TimelineConfigWidget::create(parent))
+  , _heartRate(new QLineSeries())
+  , _bloodPressure(new QLineSeries())
 {
-  QHBoxLayout* layout = new QHBoxLayout;
-  setLayout(layout);
-  layout->addWidget(_timeline_widget);
+  QVBoxLayout* vLayout = new QVBoxLayout;
+  //QHBoxLayout* hlayout = new QHBoxLayout;
+  setLayout(vLayout);
+  vLayout->addWidget(_timeline_widget);
+
+  _heartRatePlot = new QChart();
+  _heartRatePlot->setTitle("Heart Rate");
+  _heartRatePlot->addSeries(_heartRate);
+  _heartRatePlot->createDefaultAxes();
+  vLayout->addWidget(new QChartView(_heartRatePlot));
+
+  _bloodPressurePlot = new QChart();
+  _bloodPressurePlot->setTitle("Blood Pressure");
+  _bloodPressurePlot->addSeries(_bloodPressure);
+  _bloodPressurePlot->createDefaultAxes();
+  vLayout->addWidget(new QChartView(_bloodPressurePlot));
+
 }
 //-------------------------------------------------------------------------------
 ScenarioResultsWidget::~ScenarioResultsWidget()
@@ -83,12 +99,18 @@ auto ScenarioResultsWidget::create(QWidget* parent) -> ScenarioResultsWidgetPtr
 //-------------------------------------------------------------------------------
 std::unique_ptr<PhysiologyDriver> ScenarioResultsWidget::getPhysiologyDriver()
 {
+  _updateTimer->stop();
   return std::move(_driver);
 }
 //-------------------------------------------------------------------------------
 void ScenarioResultsWidget::setPhysiologyDriver(std::unique_ptr<PhysiologyDriver>&& driver)
 {
   _driver = std::move(driver);
+
+  _updateTimer = new QTimer(this);
+  connect(_updateTimer, &QTimer::timeout, this, &ScenarioResultsWidget::updateDataTracks );
+  _updateTimer->start(1000);
+
 }
 //--------------------------------------------------------------------------------
 void ScenarioResultsWidget::setSimulationTime(double time)
@@ -130,6 +152,33 @@ void ScenarioResultsWidget::initalize()
     futureWatcher.setFuture(future);
     progress.exec();
     futureWatcher.waitForFinished();
+
+    //TODO::SetupPhysiologyRequest
+    //TODO::SetupCinoartnebtRequest
+
+    _driver->async_start();
+  }
+}
+//---------------------------------------------------------------------------------
+void ScenarioResultsWidget::updateDataTracks()
+{
+  static double timer = 0.0;
+  if(_driver && _driver->isRunning())
+  {
+    PhysiologyDriver::DataTrackMap tracks  = _driver->dataRequests();
+    auto time = _driver->timeline();
+
+    double HR = tracks["HeartRate(1/min)"];
+    double MAP = tracks["MeanArterialPressure(mmHg)"];
+    _heartRate->append(timer, HR);
+    _bloodPressure->append(timer++, MAP);
+
+    _heartRatePlot->axisX()->setRange(timer-20, timer);
+    _heartRatePlot->axisY()->setRange(0, 90);
+
+    _bloodPressurePlot->axisX()->setRange(timer - 20, timer);
+    _bloodPressurePlot->axisY()->setRange(0, 100);
+
   }
 }
 }

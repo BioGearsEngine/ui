@@ -13,29 +13,79 @@
 //-------------------------------------------------------------------------------------------
 
 //Standard Includes
+#include <atomic>
 #include <memory>
-
+#include <thread>
+#include <regex>
 //External Includes
 #include <biogears/exports.h>
 
-#include <biogears/engine/Controller/BioGearsEngine.h>
+
 #include <biogears/cdm/patient/SEPatient.h>
+#include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/cdm/scenario/SEScenario.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
-#include <biogears/schema/cdm/Scenario.hxx>
-#include <biogears/schema/biogears/OverrideConfig.hxx>
+#include <biogears/container/Tree.tci.h>
+#include <biogears/container/concurrent_ringbuffer.tci.h>
+#include <biogears/engine/Controller/BioGearsEngine.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 using namespace biogears;
+
+namespace biogears {
+QString break_camel_case(const std::string &s)
+{
+  static QRegularExpression regExp1{ R"((.)([A-Z][a-z]+))" };
+  static QRegularExpression regExp2{ R"(([a-z0-9])([A-Z]))" };
+
+  QString result{ s.c_str() };
+  result.replace(regExp1, R"(\1 \2)");
+  result.replace(regExp2, R"(\1 \2)");
+
+  return result;
+}
+
+QString to_camel_case(const QString& s)
+{
+  QStringList parts = s.split(' ', QString::SkipEmptyParts);
+  for (int i = 1; i < parts.size(); ++i)
+    parts[i].replace(0, 1, parts[i][0].toUpper());
+
+  return parts.join("");
+}
+
+
+QTreeWidgetItem* process_child(Tree<std::string> node)
+{
+  auto treeItem = new QTreeWidgetItem;
+  treeItem->setText(0, node.value().c_str());
+
+
+  size_t i = 0;
+  for (auto child : node) {
+    if (child.children().empty()) {
+      auto subtree = new QTreeWidgetItem(treeItem);
+      subtree->setText(0, break_camel_case(child.value()) );
+      treeItem->addChild(subtree);
+    } else {
+      treeItem->addChild(process_child(child));
+    }
+  }
+  return treeItem;
+}
+}
 namespace biogears_ui {
+
 struct PhysiologyDriver::Implementation {
 public:
   Implementation(const std::string&);
   Implementation(const Implementation&);
   Implementation(Implementation&&);
+  ~Implementation();
 
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
@@ -44,6 +94,9 @@ public:
   void loadTimeline();
   void loadEnvironment();
 
+  void async_realtime();
+  void async_advance();
+
   std::unique_ptr<BioGearsEngine> phy = nullptr;
   std::unique_ptr<SEScenario> scenario = nullptr;
   std::unique_ptr<PhysiologyEngineConfiguration> config = nullptr;
@@ -51,12 +104,17 @@ public:
   std::string patient_file = "";
   std::string environment_file = "";
   std::string timeline_file = "";
+
+  std::thread async_advance_thread;
+  std::atomic<bool> running = false;
+  std::atomic<bool> paused = false;
+  bool initialized = false;
 };
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation::Implementation(const std::string& scenario)
   : phy(std::make_unique<BioGearsEngine>(scenario + ".log"))
-  , scenario( std::make_unique<SEScenario>(phy->GetSubstanceManager()) )
-  , config(std::make_unique<PhysiologyEngineConfiguration>(phy->GetLogger())) 
+  , scenario(std::make_unique<SEScenario>(phy->GetSubstanceManager()))
+  , config(std::make_unique<PhysiologyEngineConfiguration>(phy->GetLogger()))
 {
   config->Load("config/DynamicStabilization.xml");
 }
@@ -71,6 +129,19 @@ PhysiologyDriver::Implementation::Implementation(Implementation&& obj)
 {
   *this = std::move(obj);
 }
+//-------------------------------------------------------------------------------
+PhysiologyDriver::Implementation::~Implementation()
+{
+  running = false;
+  paused = false;
+  if (async_advance_thread.joinable()) {
+    async_advance_thread.join();
+  }
+  config = nullptr;
+  scenario = nullptr;
+  phy = nullptr;
+}
+
 //-------------------------------------------------------------------------------
 PhysiologyDriver::Implementation& PhysiologyDriver::Implementation::operator=(const Implementation& rhs)
 {
@@ -94,9 +165,7 @@ void PhysiologyDriver::Implementation::loadPatient()
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::Implementation::loadTimeline()
 {
-  //TODO:sawhite:Walk through with Matt on what to do here
   scenario->Load(timeline_file);
-
 }
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::Implementation::loadEnvironment()
@@ -104,6 +173,38 @@ void PhysiologyDriver::Implementation::loadEnvironment()
   SEEnvironment& env = static_cast<BioGears*>(phy.get())->GetEnvironment();
   SEEnvironmentalConditions& conditions = env.GetConditions();
   conditions.Load(environment_file);
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::Implementation::async_realtime()
+{
+  using namespace std::chrono_literals;
+  while (running) {
+    if (!paused) {
+      auto start = std::chrono::steady_clock::now();
+      phy->AdvanceModelTime(1.0, biogears::TimeUnit::s);
+      phy->GetEngineTrack()->TrackData(phy->GetSimulationTime(biogears::TimeUnit::s));
+      auto finish = std::chrono::steady_clock::now();
+      if (finish - start < 1s) {
+        std::this_thread::sleep_for(1s - (finish - start));
+      }
+    } else {
+      std::this_thread::sleep_for(16ms);
+    }
+  }
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::Implementation::async_advance()
+{
+  using namespace std::chrono_literals;
+  while (running) {
+    if (!paused) {
+      auto start = std::chrono::steady_clock::now();
+      phy->AdvanceModelTime(1.0, biogears::TimeUnit::s);
+      phy->GetEngineTrack()->TrackData(phy->GetSimulationTime(biogears::TimeUnit::s));
+    } else {
+      std::this_thread::sleep_for(16ms);
+    }
+  }
 }
 //-------------------------------------------------------------------------------
 PhysiologyDriver::PhysiologyDriver()
@@ -120,7 +221,6 @@ PhysiologyDriver::~PhysiologyDriver()
 {
   _impl = nullptr;
 }
-//PhysiologyDriver(const PhysiologyDriver&);
 PhysiologyDriver::PhysiologyDriver(PhysiologyDriver&& obj)
   : _impl(std::move(obj._impl))
 {
@@ -131,15 +231,51 @@ PhysiologyDriver::PhysiologyDriver(PhysiologyDriver&& obj)
 //-------------------------------------------------------------------------------
 void PhysiologyDriver::advance(std::chrono::milliseconds deltaT)
 {
+  if (_impl->initialized) {
+    _impl->phy->AdvanceModelTime(static_cast<double>(std::chrono::duration_cast<std::chrono::seconds>(deltaT).count()), biogears::TimeUnit::s);
+    _impl->phy->GetEngineTrack()->TrackData(_impl->phy->GetSimulationTime(biogears::TimeUnit::s));
+  }
 }
 //-------------------------------------------------------------------------------
-void PhysiologyDriver::async_advance(std::chrono::milliseconds deltaT)
+void PhysiologyDriver::async_start_realtime()
 {
+  _impl->running = true;
+  _impl->paused = false;
+  _impl->async_advance_thread = std::thread(&Implementation::async_realtime, _impl.get());
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::async_start()
+{
+  _impl->running = true;
+  _impl->paused = false;
+  _impl->async_advance_thread = std::thread(&Implementation::async_advance, _impl.get());
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::async_pause()
+{
+  _impl->paused = true;
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::async_resume()
+{
+  if (_impl->running) {
+    _impl->paused = true;
+  }
+}
+//-------------------------------------------------------------------------------
+void PhysiologyDriver::async_stop()
+{
+  _impl->running = false;
 }
 //-------------------------------------------------------------------------------
 bool PhysiologyDriver::isPaused()
 {
-  return false;
+  return _impl->running && !_impl->paused;
+}
+//-------------------------------------------------------------------------------
+bool PhysiologyDriver::isRunning()
+{
+  return _impl->running;
 }
 //-------------------------------------------------------------------------------
 bool PhysiologyDriver::loadPatient(const std::string& filepath)
@@ -167,8 +303,8 @@ bool PhysiologyDriver::loadEnvironment(const std::string& filepath)
 }
 //-------------------------------------------------------------------------------
 //!
-//! \brief Passes a copy 
-//!\return 
+//! \brief Passes a copy
+//!\return
 //!
 const std::vector<biogears::SEAction*> PhysiologyDriver::GetActions() const
 {
@@ -178,8 +314,7 @@ const std::vector<biogears::SEAction*> PhysiologyDriver::GetActions() const
 void PhysiologyDriver::SetActions(const std::vector<biogears::SEAction>& actions)
 {
   //_impl->scenario->ClearActions();
-  for (auto& action : actions)
-  {
+  for (auto& action : actions) {
     _impl->scenario->AddAction(action);
   }
 }
@@ -223,8 +358,50 @@ PhysiologyEngine* PhysiologyDriver::Physiology()
 //-------------------------------------------------------------------------------
 bool PhysiologyDriver::initialize()
 {
-  auto& patient = _impl->phy->GetPatient();
-
-  return _impl->phy->InitializeEngine(patient, nullptr, _impl->config.get());
+  auto& phy = _impl->phy;
+  auto& patient = phy->GetPatient();
+  _impl->initialized = phy->InitializeEngine(patient, nullptr, _impl->config.get());
+  return _impl->initialized;
 }
+//-------------------------------------------------------------------------------
+//! \brief Allocates memory but does not take ownership of it.
+//!        It is a memory leak not to clean this memory up yourself;
+QTreeWidgetItem* PhysiologyDriver::getPossiblePhysiologyDatarequest()
+{
+  QTreeWidgetItem* item = new QTreeWidgetItem;
+  auto graph = _impl->phy->GetDataRequestGraph();
+  item->setText(0, break_camel_case(graph.value()));
+  for (auto& node : graph) {
+    if (node.children().empty()) {
+      item->setText(0, break_camel_case(node.value()));
+    } else {
+      item->addChild(process_child(node));
+    }
+  }
+  return item;
+}
+//-------------------------------------------------------------------------------
+QTreeWidgetItem* PhysiologyDriver::getPossibleCompartmentDataRequest()
+{
+  return new QTreeWidgetItem;
+}
+//-------------------------------------------------------------------------------
+auto PhysiologyDriver::dataRequests() const -> DataTrackMap
+{
+  DataTrackMap rValue;
+  auto& tracks = _impl->phy->GetEngineTrack()->GetDataTrack();
+
+  std::vector<std::string>& headings = tracks.GetHeadings();
+  for (const auto& heading : headings) {
+    rValue[heading] = tracks.GetProbe(heading);
+  }
+  return rValue;
+}
+//-------------------------------------------------------------------------------
+auto PhysiologyDriver::dataRequest(std::string key) const -> DataTrack
+{
+  auto& tracks = _impl->phy->GetEngineTrack()->GetDataTrack();
+  return tracks.GetProbe(key);
+}
+//-------------------------------------------------------------------------------
 }

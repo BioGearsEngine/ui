@@ -248,7 +248,7 @@ void TimelineWidget::Implementation::processPaintEvent(QPaintEvent* event)
     entry->drawAtMinmapDetail(minmap_painter, size_ratio);
   }
 
-  //Step 4: Fill in Shadowed Area on MinMap
+  //Step  4: Fill in Shadowed Area on MinMap
   drawShadowRegion(minmap_painter);
 
   l_minmap->setPixmap(minmap);

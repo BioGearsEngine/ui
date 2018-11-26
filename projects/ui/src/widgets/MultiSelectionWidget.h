@@ -21,6 +21,7 @@
 
 //External Includes
 #include <QWidget>
+#include <QTreeWidgetItem>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
 
@@ -31,9 +32,9 @@ public:
   MultiSelectionWidget(QWidget* parent);
   ~MultiSelectionWidget();
 
+  void setOptions(QTreeWidgetItem*);
 
   using MultiSelectionWidgetPtr = MultiSelectionWidget*;
-
   static auto create(QWidget* parent) -> MultiSelectionWidgetPtr;
 
 private:

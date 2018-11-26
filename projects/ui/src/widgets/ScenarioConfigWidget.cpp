@@ -152,7 +152,7 @@ void ScenarioConfigWidget::populateEnvironmentWidget()
   //Surrounding Type
   bool oldState = _environment_widget->blockSignals(true);
   _environment_widget->Surrondings((conditions.GetSurroundingType() == CDM::enumSurroundingType::Air) ? ESurrondings::Air : ESurrondings::Water);
-  _environment_widget->AirVelocity(units::velocity::meters_per_second_t(conditions.GetAirVelocity().GetValue(LengthPerTimeUnit::m_Per_s)));
+   _environment_widget->AirVelocity(units::velocity::meters_per_second_t(conditions.GetAirVelocity().GetValue(LengthPerTimeUnit::m_Per_s)));
   _environment_widget->AmbientTemperature(units::temperature::celsius_t(conditions.GetAmbientTemperature().GetValue(TemperatureUnit::C)));
   _environment_widget->AtmosphericPressure(units::pressure::milimeters_of_mercury_t(conditions.GetAtmosphericPressure().GetValue(PressureUnit::mmHg)));
   _environment_widget->ClothingResistance(units::insulation::clo_t(conditions.GetClothingResistance().GetValue(HeatResistanceAreaUnit::clo)));
@@ -171,15 +171,15 @@ void ScenarioConfigWidget::populateTimelineWidget()
   std::string name;
 
   std::vector<ActionData> timeline;
-  //for (auto action : actions) {
-  //  name = action->classname();
+  for (auto action : actions) {
+    name = action->classname();
 
-  //  timeline.emplace_back(name, time);
-  //  if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
-  //    auto delta = dynamic_cast<SEAdvanceTime*>(action);
-  //    time += delta->GetTime().GetValue(TimeUnit::s);
-  //  }
-  //}
+    timeline.emplace_back(name, time);
+    if (std::strcmp(action->classname(), biogears::SEAdvanceTime::TypeTag()) == 0) {
+      auto delta = dynamic_cast<SEAdvanceTime*>(action);
+      time += delta->GetTime().GetValue(TimeUnit::s);
+    }
+  }
   _timeline_widget->Actions(timeline);
   _timeline_widget->ScenarioTime(time);
 }
@@ -252,6 +252,9 @@ std::unique_ptr<PhysiologyDriver> ScenarioConfigWidget::getPhysiologyDriver()
 void  ScenarioConfigWidget::setPhysiologyDriver(std::unique_ptr<PhysiologyDriver>&& driver)
 {
   _driver = std::move(driver);
+
+  _physiologySelection->setOptions(_driver->getPossiblePhysiologyDatarequest());
+
 }
 //-------------------------------------------------------------------------------
 ScenarioToolbar* ScenarioConfigWidget::getScenarioToolbar()

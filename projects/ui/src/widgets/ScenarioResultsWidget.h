@@ -22,6 +22,7 @@
 
 //External Includes
 #include <QWidget>
+#include <QtCharts/QtCharts>
 //Project Includes
 #include <biogears/framework/unique_propagate_const.h>
 #include "phys/PhysiologyThread.h"
@@ -57,12 +58,18 @@ namespace biogears_ui {
     void populateTimelineWidget();
 
   private:
-
+    void updateDataTracks();
   private: //Data
     std::unique_ptr<PhysiologyDriver> _driver;
     bool _not_initialized = true;
     TimelineConfigWidget* _timeline_widget = nullptr;
 
+    QLineSeries  *_heartRate = nullptr;
+    QLineSeries  *_bloodPressure = nullptr;
+    QChart  *_heartRatePlot = nullptr;
+    QChart  *_bloodPressurePlot = nullptr;
+
+    QTimer *_updateTimer = nullptr;
   };
 }
 
