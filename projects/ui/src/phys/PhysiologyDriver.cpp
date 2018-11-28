@@ -36,48 +36,6 @@
 
 using namespace biogears;
 
-namespace biogears {
-QString break_camel_case(const std::string &s)
-{
-  static QRegularExpression regExp1{ R"((.)([A-Z][a-z]+))" };
-  static QRegularExpression regExp2{ R"(([a-z0-9])([A-Z]))" };
-
-  QString result{ s.c_str() };
-  result.replace(regExp1, R"(\1 \2)");
-  result.replace(regExp2, R"(\1 \2)");
-
-  return result;
-}
-
-QString to_camel_case(const QString& s)
-{
-  QStringList parts = s.split(' ', QString::SkipEmptyParts);
-  for (int i = 1; i < parts.size(); ++i)
-    parts[i].replace(0, 1, parts[i][0].toUpper());
-
-  return parts.join("");
-}
-
-
-QTreeWidgetItem* process_child(Tree<std::string> node)
-{
-  auto treeItem = new QTreeWidgetItem;
-  treeItem->setText(0, node.value().c_str());
-
-
-  size_t i = 0;
-  for (auto child : node) {
-    if (child.children().empty()) {
-      auto subtree = new QTreeWidgetItem(treeItem);
-      subtree->setText(0, break_camel_case(child.value()) );
-      treeItem->addChild(subtree);
-    } else {
-      treeItem->addChild(process_child(child));
-    }
-  }
-  return treeItem;
-}
-}
 namespace biogears_ui {
 
 struct PhysiologyDriver::Implementation {
@@ -366,24 +324,16 @@ bool PhysiologyDriver::initialize()
 //-------------------------------------------------------------------------------
 //! \brief Allocates memory but does not take ownership of it.
 //!        It is a memory leak not to clean this memory up yourself;
-QTreeWidgetItem* PhysiologyDriver::getPossiblePhysiologyDatarequest()
+DataRequestModel* PhysiologyDriver::getPossiblePhysiologyDatarequest()
 {
-  QTreeWidgetItem* item = new QTreeWidgetItem;
-  auto graph = _impl->phy->GetDataRequestGraph();
-  item->setText(0, break_camel_case(graph.value()));
-  for (auto& node : graph) {
-    if (node.children().empty()) {
-      item->setText(0, break_camel_case(node.value()));
-    } else {
-      item->addChild(process_child(node));
-    }
-  }
-  return item;
+
+  DataRequestModel* model = create_DataRequestModel(_impl->phy->GetDataRequestGraph() ).release();
+  return model;
 }
 //-------------------------------------------------------------------------------
-QTreeWidgetItem* PhysiologyDriver::getPossibleCompartmentDataRequest()
+DataRequestModel* PhysiologyDriver::getPossibleCompartmentDataRequest()
 {
-  return new QTreeWidgetItem;
+  return new DataRequestModel;
 }
 //-------------------------------------------------------------------------------
 auto PhysiologyDriver::dataRequests() const -> DataTrackMap

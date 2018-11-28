@@ -19,10 +19,12 @@
 #include <biogears/exports.h>
 #include <iostream>
 
-#include "MultiSelectionWidget.h"
 //Project Includes
+#include "../phys/DataRequestModel.h"
+#include "MultiSelectionWidget.h"
 #include "TimelineConfigWidget.h"
 #include "TimelineWidget.h"
+
 //External Includes
 #include <QtAlgorithms>
 #include <QtWidgets>
@@ -38,8 +40,9 @@ public:
   Implementation& operator=(const Implementation&);
   Implementation& operator=(Implementation&&);
 
-  QTreeWidget* choices = nullptr;
-  QTreeWidget* selected = nullptr;
+  QTreeView* choices = nullptr;
+  QTreeView* selected = nullptr;
+  DataRequestModel* data_requests = nullptr;
 
 public slots: //QT5 Slots >(
   void clearAllPreferences();
@@ -49,8 +52,8 @@ public slots: //QT5 Slots >(
 };
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::Implementation::Implementation(QWidget* parent)
-  : choices(new QTreeWidget(parent))
-  , selected(new QTreeWidget(parent))
+  : choices(new QTreeView(parent))
+  , selected(new QTreeView(parent))
 {
 }
 //-------------------------------------------------------------------------------
@@ -90,25 +93,34 @@ void MultiSelectionWidget::Implementation::clearAllPreferences()
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedLeft()
 {
-  //auto pickList = selected->selectionModel()->selectedIndexes().toVector();
-  //qSort(pickList.begin(), pickList.end());
-  //for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
-  //  auto check = item->row();
-  //  choices->addItem(selected->takeItem(item->row()));
+  //auto pickList = selected->selectedItems();
+  //for (auto& pick : pickList) {
+  //  pick->setHidden(true);
+  //  auto key = pick->text(1);
+  //  std::cout << pick->text(0).toStdString() << " | " << pick->text(1).toStdString() << "\n";
+  //  auto results = choices->findItems(key, Qt::MatchCaseSensitive, 1);
+  //  for (auto& choice : results) {
+  //    choice->setHidden(false);
+  //  }
   //}
-  //choices->sortItems();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedRight()
 {
-  //auto pickList =choices->selectionModel()->selectedIndexes().toVector();
-  //qSort(pickList.begin(), pickList.end());
-  //for (auto item = pickList.rbegin(); item != pickList.rend(); ++item) {
-  //  auto check = item->row();
-  //  selected->addItem(choices->takeItem(item->row()));
+  //auto pickList = choices->selectedItems();
+  //for (auto& pick : pickList)
+  //{
+  //  pick->setHidden(true);
+  //  auto key = pick->text(1);
+  //  std::cout << pick->text(0).toStdString() << " | " << pick->text(1).toStdString() << "\n";
+  //  auto results = selected->findItems( key, Qt::MatchCaseSensitive, 1);
+  //  for (auto& choice : results)
+  //  {
+  //    choice->setHidden(false);
+  //  }
   //}
-  //selected->sortItems();
 }
+
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::selectAllPreferences()
 {
@@ -140,11 +152,8 @@ MultiSelectionWidget::MultiSelectionWidget(QWidget* parent)
   connect(moveRightButton, &QPushButton::clicked, _impl.get(), &Implementation::moveSelectedRight);
   connect(selectAllButton, &QPushButton::clicked, _impl.get(), &Implementation::selectAllPreferences);
 
-  _impl->choices->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
-  _impl->selected->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
-
-  _impl->choices->clear();
-  _impl->selected->clear();
+  _impl->choices->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
+  _impl->selected->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
 
   _impl->choices->setHeaderHidden(true);
   _impl->selected->setHeaderHidden(true);
@@ -168,9 +177,10 @@ MultiSelectionWidget::~MultiSelectionWidget()
   _impl = nullptr;
 }
 //-------------------------------------------------------------------------------
-void MultiSelectionWidget::setOptions(QTreeWidgetItem* model)
+void MultiSelectionWidget::setOptions(QAbstractItemModel* model)
 {
-  _impl->choices->insertTopLevelItems(0,model->takeChildren());
+  _impl->choices->setModel(model);
+  _impl->selected->setModel(model);
 }
 //-------------------------------------------------------------------------------
 //!

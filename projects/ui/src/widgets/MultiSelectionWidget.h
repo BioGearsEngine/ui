@@ -32,7 +32,7 @@ public:
   MultiSelectionWidget(QWidget* parent);
   ~MultiSelectionWidget();
 
-  void setOptions(QTreeWidgetItem*);
+  void setOptions(QAbstractItemModel*);
 
   using MultiSelectionWidgetPtr = MultiSelectionWidget*;
   static auto create(QWidget* parent) -> MultiSelectionWidgetPtr;

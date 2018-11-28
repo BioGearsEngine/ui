@@ -27,13 +27,15 @@
 #include <vector>
 //Project Includes
 #include <QStringListModel>
+#include <QTreeWidgetItem>
+
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
-
 #include <biogears/exports.h>
 #include <biogears/framework/unique_propagate_const.h>
-#include <QTreeWidgetItem>
+
+#include "DataRequestModel.h"
 
 namespace biogears {
 class PhysiologyEngine;
@@ -72,8 +74,8 @@ public:
   void SetActionsAfter(const biogears::SEAction& reference, const biogears::SEAction& newAction);
   void SetActions(const std::vector<biogears::SEAction>& actions);
 
-  QTreeWidgetItem* getPossiblePhysiologyDatarequest();
-  QTreeWidgetItem* getPossibleCompartmentDataRequest();
+  DataRequestModel* getPossiblePhysiologyDatarequest();
+  DataRequestModel* getPossibleCompartmentDataRequest();
 
   auto dataRequests() const -> DataTrackMap;
   auto dataRequest(std::string) const -> DataTrack;
