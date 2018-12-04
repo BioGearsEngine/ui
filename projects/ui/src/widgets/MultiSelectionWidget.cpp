@@ -58,7 +58,6 @@ MultiSelectionWidget::Implementation::Implementation(QWidget* parent)
 }
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::Implementation::Implementation(const Implementation& obj)
-
 {
   *this = obj;
 }
@@ -84,51 +83,37 @@ MultiSelectionWidget::Implementation& MultiSelectionWidget::Implementation::oper
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::clearAllPreferences()
 {
-  //int remianing = selected->count();
-  //for (auto i = 0; i < remianing; ++i) {
-  //  choices->addItem(selected->takeItem(0));
-  //}
-  //choices->sortItems();
+  auto model = selected->model();
+  auto index = model->index(0, 0);
+  model->setData(index, false, Qt::UserRole + 1);
+  choices->reset();
+  selected->reset();
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedLeft()
 {
-  //auto pickList = selected->selectedItems();
-  //for (auto& pick : pickList) {
-  //  pick->setHidden(true);
-  //  auto key = pick->text(1);
-  //  std::cout << pick->text(0).toStdString() << " | " << pick->text(1).toStdString() << "\n";
-  //  auto results = choices->findItems(key, Qt::MatchCaseSensitive, 1);
-  //  for (auto& choice : results) {
-  //    choice->setHidden(false);
-  //  }
-  //}
+  auto remianing = selected->selectionModel()->selectedIndexes();
+  for (auto& index : remianing) {
+    selected->model()->setData(index, false, Qt::UserRole);
+  }
 }
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::moveSelectedRight()
 {
-  //auto pickList = choices->selectedItems();
-  //for (auto& pick : pickList)
-  //{
-  //  pick->setHidden(true);
-  //  auto key = pick->text(1);
-  //  std::cout << pick->text(0).toStdString() << " | " << pick->text(1).toStdString() << "\n";
-  //  auto results = selected->findItems( key, Qt::MatchCaseSensitive, 1);
-  //  for (auto& choice : results)
-  //  {
-  //    choice->setHidden(false);
-  //  }
-  //}
+  auto remianing = choices->selectionModel()->selectedIndexes();
+  for (auto& index : remianing) {
+    choices->model()->setData(index, true, Qt::UserRole);
+  }
 }
 
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::Implementation::selectAllPreferences()
 {
-  //int remianing = choices->count();
-  //for (auto i = 0; i < remianing; ++i) {
-  //  selected->addItem(choices->takeItem(0));
-  //}
-  //selected->sortItems();
+  auto model = selected->model();
+  auto index = model->index(0, 0);
+  model->setData(index, true, Qt::UserRole + 1);
+  choices->reset();
+  selected->reset();
 }
 //-------------------------------------------------------------------------------
 MultiSelectionWidget::MultiSelectionWidget(QWidget* parent)
@@ -179,8 +164,14 @@ MultiSelectionWidget::~MultiSelectionWidget()
 //-------------------------------------------------------------------------------
 void MultiSelectionWidget::setOptions(QAbstractItemModel* model)
 {
-  _impl->choices->setModel(model);
-  _impl->selected->setModel(model);
+  auto lproxy = new LeftSideDataRequestFilter(model);
+  auto rproxy = new RightSideDataRequestFilter(model);
+
+  connect(model, &QAbstractItemModel::dataChanged, lproxy, &QSortFilterProxyModel::invalidate);
+  connect(model, &QAbstractItemModel::dataChanged, rproxy, &QSortFilterProxyModel::invalidate);
+
+  _impl->choices->setModel(lproxy);
+  _impl->selected->setModel(rproxy);
 }
 //-------------------------------------------------------------------------------
 //!

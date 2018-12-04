@@ -39,6 +39,7 @@ void print_model_node(biogears::Tree<DataRequest>& node, size_t level = 0)
     print_model_node(child, level + 1);
   }
 }
+//-----------------------------------------------------------------------------
 void setup_parent_pointers(std::vector<biogears::Tree<DataRequest>>& children, biogears::Tree<DataRequest>* p)
 {
   for (auto itr = children.begin(); itr != children.end(); ++itr) {
@@ -47,6 +48,53 @@ void setup_parent_pointers(std::vector<biogears::Tree<DataRequest>>& children, b
     if (!itr->children().empty()) {
       setup_parent_pointers(itr->children(), &*itr);
     }
+  }
+}
+//-----------------------------------------------------------------------------
+void propagate_selection_up(biogears::Tree<DataRequest>& node, bool selected)
+{
+  if (selected) {
+    ++node.value().selected_children;
+    if (node.value().selected_children == node.children().size()) {
+      node.value().selected = true;
+      if (node.value().parent) {
+        propagate_selection_up(*node.value().parent, selected);
+      }
+    }
+  } else {
+    node.value().selected = false;
+    --node.value().selected_children;
+    if (0 == node.value().selected_children) {
+      if (node.value().parent) {
+        propagate_selection_up(*node.value().parent, selected);
+      }
+    }
+  }
+}
+//-----------------------------------------------------------------------------
+void propagate_selection_down(biogears::Tree<DataRequest>& node, bool selected)
+{
+  node.value().selected_children = (selected) ? node.children().size() : 0;
+  for (auto& child : node.children()) {
+    child.value().selected = selected;
+    propagate_selection_down(child, selected);
+  }
+}
+//-----------------------------------------------------------------------------
+void propagate_selection(biogears::Tree<DataRequest>& node, bool selected)
+{
+  if (selected) {
+    if (node.value().parent && !node.value().selected) {
+      propagate_selection_up(*node.value().parent, true);
+    }
+    node.value().selected = true;
+    propagate_selection_down(node, true);
+  } else if (!selected) {
+    if (node.value().parent && node.value().selected) {
+      propagate_selection_up(*node.value().parent, false);
+    }
+    node.value().selected = false;
+    propagate_selection_down(node, false);
   }
 }
 //-----------------------------------------------------------------------------
@@ -59,8 +107,7 @@ DataRequestModel::DataRequestModel(const biogears::Tree<DataRequest>& model, QOb
   : QAbstractItemModel(parent)
   , _data(model)
 {
-  setup_parent_pointers(_data.children(), nullptr);
-  print_model_node(_data);
+  setup_parent_pointers(_data.children(), &_data);
 }
 //-----------------------------------------------------------------------------
 DataRequestModel::DataRequestModel(biogears::Tree<DataRequest>&& model, QObject* parent)
@@ -99,41 +146,66 @@ QModelIndex DataRequestModel::parent(const QModelIndex& index) const
 
   biogears::Tree<DataRequest>* parent = item->value().parent;
 
-  if (nullptr == parent || nullptr == &_data) {
+  if (&_data == parent) {
+    return QModelIndex();
+  } else if (nullptr == parent || nullptr == &_data) {
     return QModelIndex();
   }
 
-  auto& children = parent->children();
-  auto begin = children.begin();
-  auto end = children.end();
-  auto pos = std::find(begin, end, *item) - begin;
-  return createIndex(pos, 0, static_cast<void*>(parent));
+  auto& children = parent->value().parent->children();
+  size_t loc = 0;
+  for (auto& child : children) {
+    if (child.value() == parent->value()) {
+      break;
+    } else {
+      ++loc;
+    }
+  }
+
+  return createIndex(static_cast<int>(loc), 0, static_cast<void*>(parent));
 }
 //-----------------------------------------------------------------------------
 int DataRequestModel::rowCount(const QModelIndex& parent) const
 {
-  biogears::Tree<DataRequest> const * parentItem;
+  biogears::Tree<DataRequest> const* parentItem;
 
   if (!parent.isValid())
     parentItem = &_data;
   else
     parentItem = static_cast<biogears::Tree<DataRequest>*>(parent.internalPointer());
 
-  return parentItem->children().size();
+  return static_cast<int>(parentItem->children().size());
 }
 //-----------------------------------------------------------------------------
-
 int DataRequestModel::columnCount(const QModelIndex& parent) const
 {
   return 1;
 }
 //-----------------------------------------------------------------------------
-
+bool DataRequestModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+  //TODO: Recursion is required to process your parents selection
+  auto item = static_cast<biogears::Tree<DataRequest>*>(index.internalPointer());
+  switch (role) {
+  case Qt::UserRole:
+    propagate_selection(*item, value.value<bool>());
+    break;
+  case Qt::UserRole + 1:
+    propagate_selection(_data, value.value<bool>());
+    break;
+  default:
+    emit dataChanged(index, index, { role });
+    return QAbstractItemModel::setData(index, value, role);
+  }
+  emit dataChanged(index, index, { role });
+  return true;
+}
+//-----------------------------------------------------------------------------
 QVariant DataRequestModel::data(const QModelIndex& index, int role) const
 {
   auto item = static_cast<biogears::Tree<DataRequest> const*>(index.internalPointer());
   auto parent = item->value().parent;
-  if ( nullptr != parent && parent->children().size() < index.row() ) {
+  if (nullptr != parent && parent->children().size() < index.row()) {
     return QVariant();
   }
 
@@ -150,12 +222,8 @@ QVariant DataRequestModel::data(const QModelIndex& index, int role) const
     }
     return font;
   } break;
-  case Qt::BackgroundRole:
-    break;
-  case Qt::TextAlignmentRole:
-    break;
-  case Qt::CheckStateRole:
-    break;
+  case Qt::UserRole:
+    return item->value().selected;
   default:
     break;
   }
@@ -214,5 +282,47 @@ std::unique_ptr<DataRequestModel> create_DataRequestModel(biogears::Tree<std::st
   return drm;
 }
 //-----------------------------------------------------------------------------
-
+bool LeftSideDataRequestFilter::filterAcceptsRow(int row, const QModelIndex& parent) const
+{
+  auto model = sourceModel();
+  auto index = model->index(row, 0, parent);
+  auto entry = static_cast<biogears::Tree<DataRequest> const*>(index.internalPointer());
+  if (entry->children().empty()) {
+    return !entry->value().selected;
+  } else {
+    return entry->value().selected_children < entry->children().size();
+  }
+};
+//-----------------------------------------------------------------------------
+bool LeftSideDataRequestFilter::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+  auto lhs = static_cast<biogears::Tree<DataRequest> const*>(left.internalPointer());
+  auto rhs = static_cast<biogears::Tree<DataRequest> const*>(right.internalPointer());
+  return lhs->value().name.compare(rhs->value().name) > 0;
+};
+//-----------------------------------------------------------------------------
+bool RightSideDataRequestFilter::filterAcceptsRow(int row, const QModelIndex& parent) const
+{
+  auto model = sourceModel();
+  auto index = model->index(row, 0, parent);
+  auto entry = static_cast<biogears::Tree<DataRequest> const*>(index.internalPointer());
+  if (entry->children().empty()) {
+    return entry->value().selected;
+  } else {
+    return 0 < entry->value().selected_children;
+  }
+};
+//-----------------------------------------------------------------------------
+bool RightSideDataRequestFilter::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+  auto lhs = static_cast<biogears::Tree<DataRequest> const*>(left.internalPointer());
+  auto rhs = static_cast<biogears::Tree<DataRequest> const*>(right.internalPointer());
+  return lhs->value().name.compare(rhs->value().name) > 0;
+};
+//-----------------------------------------------------------------------------
+bool RightSideDataRequestFilter::filterAcceptsColumn(int source_column, const QModelIndex& parent) const
+{
+  auto dr = static_cast<biogears::Tree<DataRequest> const*>(parent.internalPointer());
+  return true;
+}
 } //namespace biogears_u
