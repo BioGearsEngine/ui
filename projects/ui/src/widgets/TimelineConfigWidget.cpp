@@ -21,6 +21,7 @@
 #include "TimelineWidget.h"
 //External Includes
 #include <QtWidgets>
+#include <biogears/exports.h>
 
 
 namespace biogears_ui {

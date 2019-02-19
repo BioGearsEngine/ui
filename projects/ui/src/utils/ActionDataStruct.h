@@ -23,6 +23,7 @@
 // (i.e. TimelineConfigWidget, TimelineWidget)
 
 //External Includes
+#include <biogears/exports.h>
 
 
 namespace biogears_ui {
