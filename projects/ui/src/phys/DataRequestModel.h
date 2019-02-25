@@ -77,7 +77,7 @@ private:
   biogears::Tree<DataRequest> _data;
 };
 
-std::unique_ptr<DataRequestModel> create_DataRequestModel(biogears::Tree<std::string>);
+std::unique_ptr<DataRequestModel> create_DataRequestModel(biogears::Tree<const char*>);
 
 class LeftSideDataRequestFilter : public QSortFilterProxyModel {
   Q_OBJECT

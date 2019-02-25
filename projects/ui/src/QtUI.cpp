@@ -10,6 +10,7 @@
 #include <utils/State.h>
 #include <utils/StateManager.h>
 #include <widgets/MainWindow.h>
+#include "widgets/TextEditWindow.h"
 
 namespace biogears_ui {
 
@@ -70,6 +71,8 @@ QtUI::QtUI(int& argc, char* argv[])
 
   StateManager mgr = StateManager(argc, argv);
   _impl->application_state = mgr.state();
+  TextEditWindow actions;
+
 
   auto& scenario = _impl->application_state;
   std::cout << "State Information : " << std::endl;

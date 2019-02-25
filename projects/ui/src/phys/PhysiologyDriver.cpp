@@ -327,7 +327,7 @@ bool PhysiologyDriver::initialize()
 DataRequestModel* PhysiologyDriver::getPossiblePhysiologyDatarequest()
 {
 
-  DataRequestModel* model = create_DataRequestModel(_impl->phy->GetDataRequestGraph() ).release();
+  DataRequestModel* model = create_DataRequestModel(_impl->phy->GetDataRequestGraph()).release();
   return model;
 }
 //-------------------------------------------------------------------------------

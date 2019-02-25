@@ -248,7 +248,7 @@ std::string to_camel_case(const std::string& s)
   return result;
 }
 //-----------------------------------------------------------------------------
-biogears::Tree<DataRequest> process_child(std::string prefix, biogears::Tree<std::string> subtree)
+biogears::Tree<DataRequest> process_child(std::string prefix, biogears::Tree<const char*> subtree)
 {
   biogears::Tree<DataRequest> model;
   model.value().name = break_camel_case(subtree.value());
@@ -264,7 +264,7 @@ biogears::Tree<DataRequest> process_child(std::string prefix, biogears::Tree<std
   return model;
 }
 //-----------------------------------------------------------------------------
-std::unique_ptr<DataRequestModel> create_DataRequestModel(biogears::Tree<std::string> source)
+std::unique_ptr<DataRequestModel> create_DataRequestModel(biogears::Tree<const char*> source)
 {
 
   biogears::Tree<DataRequest> model;
