@@ -1,4 +1,5 @@
 #include "QtUI.h"
+#include "QSplashScreen"
 
 //Standard Includes
 #include <iostream>

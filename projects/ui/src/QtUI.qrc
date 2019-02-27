@@ -1,12 +1,14 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>img/copy.png</file>
-    <file>img/cut.png</file>
-    <file>img/new.png</file>
-    <file>img/open.png</file>
-    <file>img/paste.png</file>
-    <file>img/save.png</file>
-    <file>img/play.png</file>
-    <file>img/pause.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>img/copy.png</file>
+        <file>img/cut.png</file>
+        <file>img/new.png</file>
+        <file>img/open.png</file>
+        <file>img/paste.png</file>
+        <file>img/save.png</file>
+        <file>img/play.png</file>
+        <file>img/pause.png</file>
+        <file>img/BioGears_White Logo.png</file>
+        <file>img/biogears_BLKSymbol_Registered.png</file>
+    </qresource>
 </RCC>
