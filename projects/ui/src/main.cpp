@@ -4,27 +4,26 @@
 #include <iostream>
 
 //Project Inlcudes
-#include "QTimer"
+#include "QPixmap"
 #include "QSplashScreen"
+#include "QThread"
+#include "QTimer"
 #include "QtUI.h"
 #include "utils/StateManager.h"
-#include "QThread"
-#include "QPixmap"
 
+#include <QMainWindow>
 #include <biogears/cdm/CommonDataModel.h>
 #include <biogears/cdm/engine/PhysiologyEngineTrack.h>
 #include <biogears/cdm/utils/Logger.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
-#include <QMainWindow>
 
 int main(int argc, char* argv[])
 {
   biogears_ui::QtUI ui(argc, argv);
 
   //Create and show splash screen
-  QPixmap pixmap("D:/BioGears/gui/ui/projects/ui/src/img/biogears_BLKSymbol_Registered.png");
-
-  //QPixmap pixmap(":/img/biogears_BLKSymbol_Registered.png");
+  QPixmap pixmap(":/img/biogears_BLKSymbol_Registered.png");
+  //test if image doesn't load
   if (pixmap.isNull()) {
     pixmap = QPixmap(300, 300);
     pixmap.fill(Qt::magenta);
@@ -33,17 +32,18 @@ int main(int argc, char* argv[])
   QSplashScreen splash(pixmap);
   splash.show();
   ui.processEvents(QEventLoop::AllEvents);
-  //app.processEvents(QEventLoop::AllEvents);
 
+  //timing 
   std::clock_t start;
-  double duration;
+  double duration = 3.0;
   std::chrono::milliseconds timespan(1);
   start = std::clock();
 
-  while ((clock() - start) / CLOCKS_PER_SEC < 1.0) {
+  //render window for the duration
+  while ((clock() - start) / CLOCKS_PER_SEC < duration) {
     std::this_thread::sleep_for(timespan);
     ui.processEvents(QEventLoop::AllEvents);
-    }
+  }
 
   splash.finish(ui.activeWindow());
   ui.show();
