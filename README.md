@@ -22,6 +22,26 @@ BioGears® simulation UI requires the following dependencies:
 
 Building the Visualizer
 ------------------
+A submodule for BioGears is located in projects/libbiogears. It can be initialized using the git submodule commands from the root level. 
+
+`git submodule init projects/libbiogears`
+`git submodule update`
+
+BioGears should then be built either inside the submodule or at the root level in its own build folder for example
+
+```
+mkdir build-biogears
+cd build-biogears
+cmake ../projectslibbiogears -DCMAKE_INSTALL_PREFIX=${PWD}../build-gui/usr 
+cmake --build . -config Release -target install 
+```
+
+If you are going to build BioGears only once it is fine to place BioGears inside the same folder structure as its deps, but if you are planning on building BioGears multiple times and testing the different versions of BioGears against the GUI then the example above places the BioGears libraries in its own external tree so that the build system for biogears will never see the headers for a previously installed version.  
+
+You can follow the instructions for building biogears from its github page for more information, just remember to account of the unique structure layout
+
+Building the Visualizer
+------------------
 
 To begin, make sure your copies of visualizer and external (both are submodules of BioGears) are up to date. Before you CMake:
 1. Create a folder within your visualizer folder titled "build"
