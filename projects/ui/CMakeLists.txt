@@ -23,8 +23,7 @@ set(${PREFIX}_UNIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/unit" PARENT_SCOPE)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 
 find_package(Threads REQUIRED)
-find_package(Qt5Widgets CONFIG REQUIRED)
-find_package(Qt5Charts  CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS Core Charts Widgets Gui Sql Quick QuickControls2 Qml REQUIRED)
 find_package(Biogears REQUIRED)
 
 ###############################################################################
@@ -90,12 +89,15 @@ target_include_directories(${PROJECT_NAME}
 
 set(${PREFIX}_LIBS
     Threads::Threads
+
     Boost::disable_autolinking
     Boost::filesystem
     Boost::program_options
+
     Qt5::Widgets
     Qt5::Charts
-    #    Biogears::common
+    Qt5::Qml
+
     Biogears::libbiogears
 )
 target_link_libraries(${PROJECT_NAME}  ${${PREFIX}_LIBS} )
