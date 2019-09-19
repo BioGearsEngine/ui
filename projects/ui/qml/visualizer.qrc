@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>Main.qml</file>
         <file>MainForm.ui.qml</file>
+        <file>Controls.qml</file>
+        <file>ControlsForm.ui.qml</file>
+        <file>GraphArea.qml</file>
+        <file>GraphAreaForm.ui.qml</file>
     </qresource>
 </RCC>

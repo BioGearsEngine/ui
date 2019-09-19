@@ -23,7 +23,7 @@ set(${PREFIX}_UNIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/unit" PARENT_SCOPE)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 
 find_package(Threads REQUIRED)
-find_package(Qt5 COMPONENTS Core Charts Widgets Gui Sql Quick QuickControls2 Qml REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Charts Quick QuickControls2 REQUIRED)
 find_package(Biogears REQUIRED)
 
 ###############################################################################
@@ -94,9 +94,11 @@ set(${PREFIX}_LIBS
     Boost::filesystem
     Boost::program_options
 
+    Qt5::Core
     Qt5::Widgets
     Qt5::Charts
-    Qt5::Qml
+    Qt5::Quick
+    Qt5::QuickControls2
 
     Biogears::libbiogears
 )
