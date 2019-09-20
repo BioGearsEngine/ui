@@ -62,7 +62,7 @@ set_target_properties(${PROJECT_NAME}
   CXX_STANDARD 14
   VS_DEBUGGER_WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/runtime
   )
-add_dependencies(${PROJECT_NAME} stage_runtime)
+
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE _SCL_SECURE_NO_WARNINGS _CRT_SECURE_NO_WARNINGS bigobj)
   target_compile_options(${PROJECT_NAME} PRIVATE $<$<PLATFORM_ID:Windows>:/bigobj>  PRIVATE $<$<PLATFORM_ID:Windows>:/MP>)
@@ -75,8 +75,6 @@ endif()
 ###############################################################################
 # COMPILATION & LINKAGE MODIFICATIONS
 ###############################################################################
-#target_compile_definitions(lib${PROJECT_NAME} PUBLIC ${${PREFIX}_CPPFLAGS_INTERFACE})
-#target_compile_definitions(lib${PROJECT_NAME} PRIVATE ${${PREFIX}_CPPFLAGS})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE  ${${PREFIX}_INCLUDE_DIR} 
@@ -130,15 +128,40 @@ add_custom_command(
 
 stage_biogears_schema(DESTINATION ${PROJECT_BINARY_DIR}/runtime)
 stage_biogears_data  (DESTINATION ${PROJECT_BINARY_DIR}/runtime)
-add_dependencies(${PROJECT_NAME} stage_biogears_schema stage_biogears_data)
 
-list(APPEND runtime_glob_list 	"${runtime_xsd_list}"	)
 
-add_custom_target(stage_runtime 
-    DEPENDS 
-	${PROJECT_BINARY_DIR}/runtime
-	${runtime_glob_list}
-	COMMENT "Scanning for need to stage runtime dir"
-)	
+
+  set(CacheForScript ${CMAKE_BINARY_DIR}/stage_$<CONFIG>_script.cmake )
+  
+  file(GENERATE OUTPUT  ${CacheForScript} 
+    CONTENT "
+    include(BundleUtilities)
+  
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
+
+    foreach(_dir IN LISTS CMAKE_PREFIX_PATH)
+      list(APPEND THIRD_PARTY  \${_dir})
+      list(APPEND THIRD_PARTY_LIB \${_dir}/lib)
+      list(APPEND THIRD_PARTY_BIN \${_dir}/bin)
+    endforeach()
+
+    fixup_bundle(
+        $<TARGET_FILE:${PROJECT_NAME}>
+        \"\"
+        \"${THIRD_PARTY_LIB};${THIRD_PARTY_BIN}\"
+    )
+    "
+  )
+
+add_custom_target(STAGE 
+  ${CMAKE_COMMAND} 
+  -DCMAKE_INSTALL_CONFIG_NAME=$<CONFIG> -P ${CMAKE_BINARY_DIR}/stage_$<CONFIG>_script.cmake
+  )
+set_target_properties(STAGE
+    PROPERTIES
+    FOLDER "CMakePredefinedTargets"
+    PROJECT_LABEL "STAGE"
+)
+add_dependencies(STAGE stage_biogears_schema stage_biogears_data)
 
 message(STATUS "")

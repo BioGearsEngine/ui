@@ -47,11 +47,6 @@ project( ${ROOT_PROJECT_NAME}  LANGUAGES CXX C)
 add_subdirectory(projects)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT BioGearsUI)
 ###############################################################################
-# Stage Code for IDE Testing
-###############################################################################
-create_cache_file()
-create_stage()
-###############################################################################
 # Step 2:
 # You likely need to add on project to stage for every executable you would like
 # to stage (AKA move dep DLLs to the run folder for debugging.
