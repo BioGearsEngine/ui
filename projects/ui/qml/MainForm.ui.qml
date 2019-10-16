@@ -15,11 +15,9 @@ Rectangle {
         Controls {
             id: controls
             width: parent.width / 3.0
-            backgroundColor: "#ffffff"
 
             Layout.fillHeight: true
             Layout.preferredWidth: 300
-
         }
 
         GraphArea {
@@ -32,8 +30,6 @@ Rectangle {
         }
     }
 }
-
-
 
 
 

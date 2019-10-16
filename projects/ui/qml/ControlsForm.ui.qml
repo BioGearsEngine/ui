@@ -1,13 +1,10 @@
-import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
+import QtQuick 2.12
 import QtQuick.Controls.Material 2.12
 
 Item {
     property alias backgroundColor: rectangle.color
-
-    Material.theme: Material.Light
-    Material.accent: Material.LightBlue
 
     Rectangle {
         id: rectangle
@@ -18,90 +15,70 @@ Item {
         ColumnLayout {
             anchors.fill: parent
             spacing: 5
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignTop
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
-                    id: element
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
-                }
-                TextField {
-                    placeholderText: "What Ever"
-                }
+            Row {
+                Layout.preferredHeight: 25
             }
 
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignTop
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
-                }
-                TextField {
-                    text: qsTr("Text Input")
-                    font.pixelSize: 12
-                }
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
-                }
-                TextField {
-                    text: qsTr("Text Input")
-                    font.pixelSize: 12
-                }
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
-
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
-                }
-                TextField {
-                    text: qsTr("Text Input")
-                    font.pixelSize: 12
-                }
+            UITextInputForm {
+                name: "Scenario"
+                value: "Default Adult Male"
+                Layout.alignment: Qt.AlignHCenter
             }
 
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignTop
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
-                }
-                TextField {
-                    text: qsTr("Text Input")
-                    font.pixelSize: 12
-                }
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
-                }
-                TextField {
-                    text: qsTr("Text Input")
-                    font.pixelSize: 12
-                }
-                Label {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: 5
+            GridLayout {
+                columns: 4
+                rows: 2
 
-                    text: qsTr("Controls")
-                    font.pixelSize: 12
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+                UITextInputForm {
+                    name: "Age:"
+                    value: "22"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
                 }
-                TextField {
-                    text: qsTr("Text Input")
-                    font.pixelSize: 12
+                UITextInputForm {
+                    name: "Gender:"
+                    value: "Male"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
+                }
+                UITextInputForm {
+                    name: "Fat%:"
+                    value: "22.5"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
+                }
+                UITextInputForm {
+                    name: "Temp:"
+                    value: "36.2"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
+                }
+
+                UITextInputForm {
+                    name: "Height:"
+                    value: "22"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
+                }
+                UITextInputForm {
+                    name: "Weight:"
+                    value: "Male"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
+                }
+                UITextInputForm {
+                    name: "BSA%:"
+                    value: "22.5"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
+                }
+                UITextInputForm {
+                    name: "BSA:"
+                    value: "36.2"
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 75
                 }
             }
 
@@ -313,6 +290,6 @@ Item {
 
 
 /*##^## Designer {
-    D{i:0;autoSize:true;height:800;width:800}
+    D{i:0;autoSize:true;height:800;width:300}
 }
  ##^##*/

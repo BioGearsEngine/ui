@@ -6,5 +6,8 @@
         <file>ControlsForm.ui.qml</file>
         <file>GraphArea.qml</file>
         <file>GraphAreaForm.ui.qml</file>
+        <file>UITextInput.qml</file>
+        <file>UITextInputForm.ui.qml</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>
