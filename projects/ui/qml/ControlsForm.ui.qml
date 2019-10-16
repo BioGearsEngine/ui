@@ -9,12 +9,8 @@ Item {
     Rectangle {
         id: rectangle
         anchors.fill: parent
-
-        color: "White"
-
         ColumnLayout {
             anchors.fill: parent
-            margins: 5
             spacing: 5
             Row {
                 Layout.preferredHeight: 25
@@ -86,14 +82,20 @@ Item {
             }
 
             GridLayout {
-                margins: 5
+                id: gridLayout
+                antialiasing: false
                 Layout.preferredWidth: parent.width
                 Layout.fillWidth: true
                 layoutDirection: GridLayout.LeftToRight
                 columns: 2
                 rows: 3
                 UIScalarForm {
+                    id: uIScalarForm
                     name: "HR"
+                    width: 50
+                    clip: false
+                    visible: true
+                    border.width: 0
                     value: "75"
                 }
                 UIScalarForm {
@@ -118,41 +120,8 @@ Item {
                 }
             }
 
-            GridLayout {
-                Layout.preferredWidth: parent.width
+            UIPlaybackForm {
                 Layout.fillWidth: true
-                layoutDirection: GridLayout.LeftToRight
-                columns: 5
-                Rectangle {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredHeight: 50
-                    Layout.preferredWidth: 50
-                    color: 'blue'
-                }
-                Rectangle {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredHeight: 50
-                    Layout.preferredWidth: 50
-                    color: 'green'
-                }
-                Rectangle {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredHeight: 50
-                    Layout.preferredWidth: 50
-                    color: 'blue'
-                }
-                Rectangle {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredHeight: 50
-                    Layout.preferredWidth: 50
-                    color: 'green'
-                }
-                Rectangle {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredHeight: 50
-                    Layout.preferredWidth: 50
-                    color: 'blue'
-                }
             }
 
             GridLayout {

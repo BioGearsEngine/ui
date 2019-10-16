@@ -11,5 +11,16 @@
         <file>qtquickcontrols2.conf</file>
         <file>UIScalar.qml</file>
         <file>UIScalarForm.ui.qml</file>
+        <file>UIPlayback.qml</file>
+        <file>UIPlaybackForm.ui.qml</file>
     </qresource>
+  <qresource prefix="/icons/">
+    <file alias="play.png">img/play.png</file>
+    <file alias="pause.png">img/Pause.png</file>
+    <file alias="stop.png">img/Stop.png</file>
+    <file alias="next.png">img/Next.png</file>
+    <file alias="prev.png">img/Prev.png</file>
+    <file alias="foward.png">img/Foward.png</file>
+    <file alias="reverse.png">img/Reverse.png</file>
+  </qresource>
 </RCC>
