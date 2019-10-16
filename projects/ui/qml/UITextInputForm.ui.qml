@@ -7,14 +7,13 @@ RowLayout {
     id: root
     property alias name: name.text
     property alias value: value.text
-
+    Layout.preferredWidth: 50
     Label {
         id: name
         text: "Unset"
         font.pointSize: 10
         font.weight: Font.DemiBold
         font.bold: false
-
     }
 
     TextInput {
@@ -24,9 +23,6 @@ RowLayout {
         font.pixelSize: 10
     }
 }
-
-
-
 
 
 

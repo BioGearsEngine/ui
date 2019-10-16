@@ -84,8 +84,9 @@ Item {
                     Layout.preferredWidth: 75
                 }
             }
-
+            
             GridLayout {
+                antialiasing: false
                 margins: 5
                 Layout.preferredWidth: parent.width
                 Layout.fillWidth: true
@@ -94,6 +95,10 @@ Item {
                 rows: 3
                 UIScalarForm {
                     name: "HR"
+                    width: 50
+                    clip: false
+                    visible: true
+                    border.width: 0
                     value: "75"
                 }
                 UIScalarForm {

@@ -13,7 +13,9 @@ ControlsForm {
 
 
 
+
+
 /*##^## Designer {
-    D{i:0;autoSize:true;height:480;width:640}
+    D{i:0;autoSize:true;height:600;width:300}
 }
  ##^##*/

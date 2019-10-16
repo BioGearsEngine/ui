@@ -9,5 +9,7 @@
         <file>UITextInput.qml</file>
         <file>UITextInputForm.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
+        <file>UIScalar.qml</file>
+        <file>UIScalarForm.ui.qml</file>
     </qresource>
 </RCC>
