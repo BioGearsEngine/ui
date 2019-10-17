@@ -4,9 +4,6 @@ import QtQuick.Controls.Material 2.12
 
 Item {
     property alias backgroundColor: controls.color
-    width: 400
-    height: 400
-
     Rectangle {
         id: controls
         anchors.fill: parent
@@ -30,6 +27,6 @@ Item {
 
 
 /*##^## Designer {
-    D{i:1;anchors_height:200;anchors_width:200;anchors_x:109;anchors_y:119}
+    D{i:0;autoSize:true;height:669;width:960}D{i:1;anchors_height:200;anchors_width:200;anchors_x:109;anchors_y:119}
 }
  ##^##*/

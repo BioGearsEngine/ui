@@ -3,16 +3,15 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.5
 import QtQuick.Controls.Material 2.3
 
-Rectangle {
+ColumnLayout {
     property alias value: value.text
     property alias name: name.text
-    Layout.margins: 5
-    Layout.preferredWidth: 50
-    Layout.preferredHeight: 75
+
+    Layout.preferredHeight: implicitHeight
+    Layout.preferredWidth: implicitWidth
     Text {
         id: value
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
+        Layout.alignment: Qt.AlignCenter
         text: "22"
         font.pointSize: 20
     }
@@ -20,8 +19,14 @@ Rectangle {
         id: name
         text: "Age:"
         font.pointSize: 10
-
-        anchors.top: value.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
+        Layout.alignment: Qt.AlignHCenter
     }
 }
+
+
+
+
+/*##^## Designer {
+    D{i:0;height:54;width:30}
+}
+ ##^##*/

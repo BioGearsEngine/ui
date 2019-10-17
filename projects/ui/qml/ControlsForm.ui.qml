@@ -3,217 +3,131 @@ import QtQuick.Layouts 1.12
 import QtQuick 2.12
 import QtQuick.Controls.Material 2.12
 
-Item {
-    property alias backgroundColor: rectangle.color
+ColumnLayout {
+    spacing: 5
 
-    Rectangle {
-        id: rectangle
-        anchors.fill: parent
-        ColumnLayout {
-            anchors.fill: parent
-            spacing: 5
-            Row {
-                Layout.preferredHeight: 25
-            }
+    Layout.preferredHeight: implicitHeight
+    Layout.preferredWidth: implicitWidth
 
-            UITextInputForm {
-                name: "Scenario"
-                value: "Default Adult Male"
-                Layout.alignment: Qt.AlignHCenter
-            }
+    Row {
+        height: 10
+        Layout.fillWidth: true
+    }
 
-            GridLayout {
-                columns: 4
-                rows: 2
+    UITextInputForm {
+        name: "Scenario"
+        value: "Default Adult Male"
+        Layout.alignment: Qt.AlignHCenter
+    }
 
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-                UITextInputForm {
-                    name: "Age:"
-                    value: "22"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                    Layout.preferredHeight: 25
-                }
-                UITextInputForm {
-                    name: "Gender:"
-                    value: "Male"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                    Layout.preferredHeight: 25
-                }
-                UITextInputForm {
-                    name: "Fat%:"
-                    value: "22.5"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                }
-                UITextInputForm {
-                    name: "Temp:"
-                    value: "36.2"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                }
+    GridLayout {
+        columns: 4
+        rows: 2
 
-                UITextInputForm {
-                    name: "Height:"
-                    value: "22"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                }
-                UITextInputForm {
-                    name: "Weight:"
-                    value: "Male"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                }
-                UITextInputForm {
-                    name: "BSA%:"
-                    value: "22.5"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                }
-                UITextInputForm {
-                    name: "BSA:"
-                    value: "36.2"
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 75
-                }
-            }
+        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignHCenter
+        UITextInputForm {
+            name: "Age:"
+            value: "22"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+            Layout.preferredHeight: 25
+        }
+        UITextInputForm {
+            name: "Gender:"
+            value: "Male"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+            Layout.preferredHeight: 25
+        }
+        UITextInputForm {
+            name: "Fat%:"
+            value: "22.5"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+        }
+        UITextInputForm {
+            name: "Temp:"
+            value: "36.2"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+        }
 
-            GridLayout {
-                id: gridLayout
-                antialiasing: false
-                Layout.preferredWidth: parent.width
-                Layout.fillWidth: true
-                layoutDirection: GridLayout.LeftToRight
-                columns: 2
-                rows: 3
-                UIScalarForm {
-                    id: uIScalarForm
-                    name: "HR"
-                    width: 50
-                    clip: false
-                    visible: true
-                    border.width: 0
-                    value: "75"
-                }
-                UIScalarForm {
-                    name: "SBP"
-                    value: "110"
-                }
-                UIScalarForm {
-                    name: "RR"
-                    value: "12"
-                }
-                UIScalarForm {
-                    name: "DBP"
-                    value: "68"
-                }
-                UIScalarForm {
-                    name: "SAT"
-                    value: "99"
-                }
-                UIScalarForm {
-                    name: "Conditon"
-                    value: "Running"
-                }
-            }
+        UITextInputForm {
+            name: "Height:"
+            value: "22"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+        }
+        UITextInputForm {
+            name: "Weight:"
+            value: "Male"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+        }
+        UITextInputForm {
+            name: "BSA%:"
+            value: "22.5"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+        }
+        UITextInputForm {
+            name: "BSA:"
+            value: "36.2"
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 75
+        }
+    }
 
-            UIPlaybackForm {
-                Layout.fillWidth: true
-            }
+    UIControlPhysiology {
+        id: gridLayout
+        Layout.fillWidth: true
+        Layout.preferredWidth: parent.width
+    }
 
-            GridLayout {
-                Layout.preferredWidth: parent.width
-                Layout.fillWidth: true
-                layoutDirection: GridLayout.LeftToRight
-                columns: 2
-                rows: 10
-                TextArea {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: 200
-                    Layout.fillHeight: true
-                    Layout.rowSpan: 4
-                    Layout.column: 1
-                    Layout.row: 1
+    UIPlaybackForm {
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.fillWidth: true
+    }
 
-                    color: 'blue'
-                }
-
-                TextArea {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: 200
-                    Layout.fillHeight: true
-                    color: 'blue'
-                    Layout.rowSpan: 5
-                    Layout.column: 1
-                    Layout.row: 5
-                }
-                Rectangle {
-                    color: 'steelblue'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15
-                    Layout.column: 2
-                    Layout.row: 1
-                }
-                Rectangle {
-                    color: 'steelblue'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15
-                    Layout.column: 2
-                    Layout.row: 2
-                }
-                Rectangle {
-                    color: 'steelblue'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15
-                    Layout.column: 2
-                    Layout.row: 3
-                }
-                Rectangle {
-                    color: 'steelblue'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15
-                    Layout.column: 2
-                    Layout.row: 4
-                }
-                Rectangle {
-                    color: 'steelblue'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15
-                    Layout.column: 2
-                    Layout.row: 5
-                }
-                Rectangle {
-                    color: 'steelblue'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15
-                    Layout.column: 2
-                    Layout.row: 6
-                }
-                Rectangle {
-                    color: 'transparent'
-                    Layout.alignment: Qt.AlignTop
-                    Layout.preferredWidth: 200
-                    Layout.preferredHeight: 15 * 5
-                    Layout.column: 2
-                    Layout.row: 7
-                    Layout.rowSpan: 3
-                }
-            }
-
-            Rectangle {
-                color: 'steelblue'
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-            }
+    GridLayout {
+        Layout.preferredWidth: parent.width
+        Layout.fillWidth: true
+        columns: 2
+        Button {
+            text: 'Action 1'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+        }
+        Button {
+            text: 'Action 2'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+        }
+        Button {
+            text: 'Action 3'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+        }
+        Button {
+            text: 'Action 4'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+        }
+        Button {
+            text: 'Action 5'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+        }
+        Button {
+            text: 'Action 6'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+        }
+        Button {
+            text: 'Action 7'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
         }
     }
 }
@@ -222,6 +136,6 @@ Item {
 
 
 /*##^## Designer {
-    D{i:0;autoSize:true;height:800;width:300}
+    D{i:0;height:600;width:300}
 }
  ##^##*/

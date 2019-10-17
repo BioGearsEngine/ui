@@ -1,33 +1,31 @@
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
+import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 
-Rectangle {
-    id: page
+GridLayout {
+    id: root
+    columns: 2
+    rows: 2
 
-    Layout.fillHeight: true
-    Layout.fillWidth: true
+    Controls {
+        id: controls
+        Layout.fillWidth: false
+        Layout.alignment: Qt.AlignTop
+        Layout.fillHeight: false
+    }
 
-    color: 'steelblue'
-
-    RowLayout {
-        anchors.fill: parent
-        Controls {
-            id: controls
-            width: parent.width / 3.0
-
-            Layout.fillHeight: true
-            Layout.preferredWidth: 300
-        }
-
-        GraphArea {
-            id: graphArea
-
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-
-            backgroundColor: 'red'
-        }
+    GraphArea {
+        id: graphArea
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        backgroundColor: 'grey'
+    }
+    TextArea {
+        Layout.columnSpan: 2
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.preferredHeight: 200
     }
 }
 
