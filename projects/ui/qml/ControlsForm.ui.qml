@@ -23,7 +23,7 @@ ColumnLayout {
     GridLayout {
         columns: 4
         rows: 2
-
+       id:configuration
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
         UITextInputForm {
@@ -80,7 +80,7 @@ ColumnLayout {
     }
 
     UIControlPhysiology {
-        id: gridLayout
+        id: physiology
         Layout.fillWidth: true
         Layout.preferredWidth: parent.width
     }
@@ -135,7 +135,9 @@ ColumnLayout {
 
 
 
+
+
 /*##^## Designer {
-    D{i:0;height:600;width:300}
+    D{i:0;height:542;width:315}
 }
  ##^##*/
