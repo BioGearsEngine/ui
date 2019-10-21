@@ -6,7 +6,7 @@
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/threading/steppable.h>
 #include <biogears/threading/runnable.h>  
-#include <biogears/framework/scmp/scmp_channel.h>
+//#include <biogears/framework/scmp/scmp_channel.h>
 namespace bio {
 struct State
 {
@@ -43,12 +43,19 @@ public:
   void step() final;
   std::function<void(void)> step_as_func() final;
 
-  biogears::scmp::Source<biogears::SEAction> get_channel();
+  //biogears::scmp::Source<biogears::SEAction> get_channel();
 
+protected:
+  //void physiology_thread_main();
+  //void physiology_thread_step();
 private:
   std::thread _thread;
+  biogears::Logger _logger;
   std::unique_ptr<biogears::PhysiologyEngine> _engine;
-  biogears::scmp::Channel<biogears::SEAction> _action_queue;
+  //biogears::scmp::Channel<biogears::SEAction> _action_queue;
+
+  std::atomic<bool> _running = false;
+  std::atomic<bool> _throttle = true;
 
 };
 }
