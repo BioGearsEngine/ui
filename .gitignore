@@ -4,5 +4,6 @@ build*/
 #Sublime
 *.sublime-workspace
 *.swp
+*.autosave
 ~*
 
