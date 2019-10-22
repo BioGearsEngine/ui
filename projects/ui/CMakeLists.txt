@@ -126,8 +126,8 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/runtime
 )
 
-stage_biogears_schema(DESTINATION ${PROJECT_BINARY_DIR}/runtime)
-stage_biogears_data  (DESTINATION ${PROJECT_BINARY_DIR}/runtime)
+stage_biogears_schema(DESTINATION ${PROJECT_BINARY_DIR}/projects/ui)
+stage_biogears_data  (DESTINATION ${PROJECT_BINARY_DIR}/projects/ui)
 
 
 

@@ -1,4 +1,7 @@
 #include "Scenario.h"
+
+#include "Gadgets.h"
+
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 
@@ -10,12 +13,23 @@
 
 #include <chrono>
 namespace bio {
-Scenario::Scenario(QString name)
-  : _thread()
-  , _logger(name.toStdString() + ".log")
-  , _engine(biogears::CreateBioGearsEngine(&_logger))
+Scenario::Scenario(QObject* parent)
+  : QObject(parent)
+  , _thread()
+  , _logger("biogears_default.log")
+  , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
   , _action_queue()
 {
+  _engine->GetPatient().SetName("StandardMale");
+}
+Scenario::Scenario(QString name, QObject* parent)
+  : QObject(parent)
+  , _thread()
+  , _logger(name.toStdString() + ".log")
+  , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
+  , _action_queue()
+{
+  _engine->GetPatient().SetName(name.toStdString());
 }
 //-------------------------------------------------------------------------------
 Scenario::~Scenario()
@@ -52,26 +66,18 @@ QString Scenario::patient_name()
 //-------------------------------------------------------------------------------
 QString Scenario::environment_name()
 {
-  return _engine->GetEnvironment()->GetName_cStr();
+  return _engine->GetEnvironment().GetName_cStr();
 }
 //-------------------------------------------------------------------------------
-QString Scenario::config_file()
+Scenario& Scenario::patinet_name(QString& name)
 {
-  return "";
-}
-//-------------------------------------------------------------------------------
-Scenario& Scenario::patinet_name(QString&)
-{
+  _engine->GetPatient().SetName(name.toStdString());
   return *this;
 }
 //-------------------------------------------------------------------------------
-Scenario& Scenario::environment_name(QString&)
+Scenario& Scenario::environment_name(QString& name)
 {
-  return *this;
-}
-//-------------------------------------------------------------------------------
-Scenario& Scenario::config_file(QString&)
-{
+  _engine->GetEnvironment().SetName(name.toStdString());
   return *this;
 }
 //-------------------------------------------------------------------------------
@@ -111,22 +117,30 @@ void Scenario::physiology_thread_main()
 inline void Scenario::physiology_thread_step()
 {
   using namespace std::chrono_literals;
-  _engine->AdvanceModelTime(1, biogears::TimeUnit::s);
+  dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
 }
 //---------------------------------------------------------------------------------
-State Scenario::get_physiology_state()
+auto Scenario::get_physiology_state() -> State
 {
-  return {};
+  State current;
+  current.alive = _engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min) > 0.0;
+  current.tacycardia = false;
+  return current;
 }
 //---------------------------------------------------------------------------------
-Metrics Scenario::get_pysiology_metrics()
+auto Scenario::get_pysiology_metrics() -> Metrics
 {
-  return {};
+  Metrics current;
+  current.heart_rate_bpm = _engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min);
+  current.respretory_rate_bpm = _engine->GetRespiratory().GetRespirationRate().GetValue(biogears::FrequencyUnit::Per_min);
+  return current;
 }
 //---------------------------------------------------------------------------------
-Conditions Scenario::get_pysiology_conditions()
+auto Scenario::get_pysiology_conditions() -> Conditions
 {
-  return {};
+  Conditions current;
+  current.diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
+  return current;
 }
 //---------------------------------------------------------------------------------
 double Scenario::get_simulation_time()
