@@ -6,4 +6,5 @@ build*/
 *.swp
 *.autosave
 ~*
+CMakeLists.txt.user
 
