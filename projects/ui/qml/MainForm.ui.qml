@@ -3,16 +3,21 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 
+import com.biogearsengine.ui.scenario 1.0
+
 GridLayout {
     id: root
     columns: 2
     rows: 2
+
+    property Scenario scenario
 
     Controls {
         id: controls
         Layout.fillWidth: false
         Layout.alignment: Qt.AlignTop
         Layout.fillHeight: false
+        scenario: root.scenario
     }
 
     GraphArea {

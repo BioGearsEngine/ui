@@ -3,27 +3,32 @@ import QtQuick.Layouts 1.12
 import QtQuick 2.12
 import QtQuick.Controls.Material 2.12
 
+import com.biogearsengine.ui.scenario 1.0
+
 ColumnLayout {
+    id: root
     spacing: 5
 
     Layout.preferredHeight: implicitHeight
     Layout.preferredWidth: implicitWidth
 
+    property Scenario scenario
     Row {
         height: 10
         Layout.fillWidth: true
     }
 
-    UITextInputForm {
-        name: "Scenario"
-        value: "Default Adult Male"
+    UIPatientBox {
+        label.text: "Scenario"
+        //value: "Default Adult Male"
         Layout.alignment: Qt.AlignHCenter
+        scenario: root.scenario
     }
 
     GridLayout {
         columns: 4
         rows: 2
-       id:configuration
+        id: configuration
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
         UITextInputForm {
@@ -131,13 +136,3 @@ ColumnLayout {
         }
     }
 }
-
-
-
-
-
-
-/*##^## Designer {
-    D{i:0;height:542;width:315}
-}
- ##^##*/

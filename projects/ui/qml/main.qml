@@ -3,7 +3,9 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 
 import com.biogearsengine.ui.scenario 1.0
+
 ApplicationWindow {
+    id: root
     visible: true
 
     width: 1280
@@ -11,13 +13,9 @@ ApplicationWindow {
 
     MainForm {
         anchors.fill : parent
-
+        scenario : scenario
         Component.onCompleted : {
-            console.log("Completed"+scenario.patient_name())
-            //var metrics = scenario.get_pysiology_metrics()
-            //var state = scenario.get_physiology_state()
-            var conditions = scenario.get_pysiology_conditions()
-            console.log(state.alive)
+            console.log ("Starting Biogears with %1".arg(scenario.patient_name()))
         }
     }
 
@@ -27,7 +25,4 @@ ApplicationWindow {
 }
 
 
-/*##^## Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
- ##^##*/
+

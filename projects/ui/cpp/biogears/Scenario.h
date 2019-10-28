@@ -38,14 +38,15 @@ public:
   Q_INVOKABLE QString patient_name();
   Q_INVOKABLE QString environment_name();
 
-  Q_INVOKABLE Scenario& patinet_name(QString&);
-  Q_INVOKABLE Scenario& environment_name(QString&);
+  Q_INVOKABLE Scenario& patinet_name(QString);
+  Q_INVOKABLE Scenario& environment_name(QString);
 
+  Q_INVOKABLE Scenario& load_patient(QString);
 
-  Q_INVOKABLE State get_physiology_state();
-  Q_INVOKABLE Metrics get_pysiology_metrics();
-  Q_INVOKABLE Conditions get_pysiology_conditions();
-  Q_INVOKABLE double get_simulation_time();
+   State get_physiology_state();
+  Metrics get_pysiology_metrics();
+  Conditions get_pysiology_conditions();
+  double get_simulation_time();
 
   void run() final;
   void stop() final;

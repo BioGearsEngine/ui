@@ -1,5 +1,7 @@
 #include "Scenario.h"
 
+#include <exception>
+
 #include "Gadgets.h"
 
 #include <biogears/cdm/properties/SEScalarTime.h>
@@ -69,15 +71,28 @@ QString Scenario::environment_name()
   return _engine->GetEnvironment().GetName_cStr();
 }
 //-------------------------------------------------------------------------------
-Scenario& Scenario::patinet_name(QString& name)
+Scenario& Scenario::patinet_name(QString name)
 {
   _engine->GetPatient().SetName(name.toStdString());
   return *this;
 }
 //-------------------------------------------------------------------------------
-Scenario& Scenario::environment_name(QString& name)
+Scenario& Scenario::environment_name(QString name)
 {
   _engine->GetEnvironment().SetName(name.toStdString());
+  return *this;
+}
+//-------------------------------------------------------------------------------
+Scenario& Scenario::load_patient(QString file)
+{
+  auto path = file.toStdString();
+  if (!QFileInfo::exists(file)) {
+    path = "Patients/" + path;
+    if (!QFileInfo::exists("Patients/" + file)) {
+      throw std::runtime_error("Unable to locate " + file.toStdString());
+    }
+  }
+  _engine->GetPatient().Load(path);
   return *this;
 }
 //-------------------------------------------------------------------------------
