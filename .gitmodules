@@ -1,0 +1,3 @@
+[submodule "libbiogears"]
+	path = projects/libbiogears
+	url = https://github.com/BioGearsEngine/core.git
