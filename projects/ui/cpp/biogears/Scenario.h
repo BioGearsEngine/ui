@@ -72,8 +72,8 @@ private:
   std::unique_ptr<biogears::BioGears> _engine;
   Channel _action_queue;
 
-  std::atomic<bool> _running = false;
-  std::atomic<bool> _throttle = true;
+  std::atomic<bool> _running;
+  std::atomic<bool> _throttle;
 };
 
 }

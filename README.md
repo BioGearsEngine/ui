@@ -1,27 +1,22 @@
-Overview
-==========
+# Overview
 
-BioGears Simulation UI
-----------------------
-
+## BioGears Simulation UI
 BioGears® simulation UI source code is hosted here. Our latest deployment is still in a beta phase, and is intended to be an intermediate release to showcase the capabilities of the BioGears® simulation UI. This version of the software is meant to elicit feedback and enhance community involvement in establishing end product expectations.
 
-Objectives
-----------
+## Objectives
 
 * To allow users to visually compose and execute BioGears® simulation scenarios
 * To allow users to visualize BioGears® scenario actions and outputs in an intuitive timeline format
 
-Building from Source
-====================
+# Building from Source
 
 BioGears® simulation UI requires the following dependencies:
 * BioGears Physiology Engine - build requirements can be found [here](https://github.com/BioGearsEngine/core/wiki).
 * Boost - build requirements can be found [here](https://www.boost.org/doc/libs/1_68_0/more/getting_started/index.html).
 * QT 5 -  build requirements can be found [here](https://wiki.qt.io/Building_Qt_5_from_Git).
 
-Building the Visualizer
-------------------
+## Building the Visualizer with the CMake CLI
+
 A submodule for BioGears is located in projects/libbiogears. It can be initialized using the git submodule commands from the root level. 
 
 `git submodule init projects/libbiogears`
@@ -40,8 +35,7 @@ If you are going to build BioGears only once it is fine to place BioGears inside
 
 You can follow the instructions for building biogears from its github page for more information, just remember to account of the unique structure layout
 
-Building the Visualizer
-------------------
+## Building the Visualizer with the CMake GUI
 
 To begin, make sure your copies of visualizer and external (both are submodules of BioGears) are up to date. Before you CMake:
 1. Create a folder within your visualizer folder titled "build"
@@ -54,8 +48,10 @@ To begin, make sure your copies of visualizer and external (both are submodules 
      1. Click OK
 Once done, configure, generate, and open the project.
 
-Running the Visualizer
-------------------
+# Running the Visualizer
+
+## Initial Setup
+Most users will ned to run build targets *stage_biogears_data* and *stage_biogears_schema* one time each after the first build. This will seed the runtime folder for the visualizer with all the data files biogears needs at runtime
 
 Once open in Microsoft Visual Studios (MVS), right-click on BioGearsUI on the lefthand side of the screen in the Solution Explorer. Switch the configuration in the top left corner of the property page to be "All Configurations." On the left hand side of the screen, navigate to Configuration Properties→Debugging, and fill in the Environment box with the QT Path:
 
@@ -69,19 +65,24 @@ Click F5 or click the play button to run the solution. The viualizer/UI should p
 
 **Note**: For full details, visit our wiki [here]( https://github.com/BioGearsEngine/ui/wiki/Running-the-Visualizer).
 
-Additional Information
-======================
+## QT Creator Support
+QT Creator supports CMake project imports. The following is a short guide on how to setup a project with QT Creator
 
-Code of Conduct
-------------------
+# Additional Information
+
+
+##Code of Conduct
+
 We support the [contributor covenant](https://github.com/BioGearsEngine/Engine/blob/master/CODE_OF_CONDUCT.md) and the scope and enforcement it details. We reserve the right of enforcement that we feel is appropriate given the nature of the offense up to and including a permanent ban from the project.
 
-Contributing 
--------------
+##Contributing 
+
 Details will be filled in shortly. In the meantime if you have a contribution or issue to post/push feel free to contact abaird@ara.com with the details. 
 
-Additional Documentation
---------------------------
+##Additional Documentation
+
 For more detailed documentation including model discussions and implementation details can be found at www.BioGearsEngine.com
+
+
 
 

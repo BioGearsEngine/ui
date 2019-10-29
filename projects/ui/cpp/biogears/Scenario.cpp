@@ -16,11 +16,7 @@
 #include <chrono>
 namespace bio {
 Scenario::Scenario(QObject* parent)
-  : QObject(parent)
-  , _thread()
-  , _logger("biogears_default.log")
-  , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
-  , _action_queue()
+  : Scenario("biogears_default",parent)
 {
   _engine->GetPatient().SetName("StandardMale");
 }
@@ -30,6 +26,8 @@ Scenario::Scenario(QString name, QObject* parent)
   , _logger(name.toStdString() + ".log")
   , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
   , _action_queue()
+  , _running(false)
+  , _throttle(true)
 {
   _engine->GetPatient().SetName(name.toStdString());
 }
