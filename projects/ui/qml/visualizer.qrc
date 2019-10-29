@@ -25,5 +25,8 @@
         <file alias="prev.png">img/Prev.png</file>
         <file alias="foward.png">img/Foward.png</file>
         <file alias="reverse.png">img/Reverse.png</file>
+        <file alias="help.svg">img/Icon-round-Question_mark.svg</file>
+        <file alias="help.png">img/question.png</file>
+        <file alias="biogears_logo.png">img/Biogears_logo_400_400.png</file>
     </qresource>
 </RCC>

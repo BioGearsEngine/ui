@@ -4,6 +4,7 @@
 
 #include "Gadgets.h"
 
+//#include <biogears/version.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 
@@ -18,7 +19,6 @@ namespace bio {
 Scenario::Scenario(QObject* parent)
   : Scenario("biogears_default",parent)
 {
-  _engine->GetPatient().SetName("StandardMale");
 }
 Scenario::Scenario(QString name, QObject* parent)
   : QObject(parent)
@@ -159,6 +159,51 @@ auto Scenario::get_pysiology_conditions() -> Conditions
 double Scenario::get_simulation_time()
 {
   return 0.;
+}
+//---------------------------------------------------------------------------------
+QString ui_version_number()
+{
+  return "";//__UI_VERSION_NUMBER__;
+}
+//---------------------------------------------------------------------------------
+QString ui_version_hash()
+{
+  return "";//__UI_VERSION_HASH__;
+}
+//---------------------------------------------------------------------------------
+QString ui_version_date()
+{
+  return "";//__UI_TAG_DATE__;
+}
+//---------------------------------------------------------------------------------
+QString ui_build_date()
+{
+  return __DATE__;
+}
+//---------------------------------------------------------------------------------
+QString lib_version_number()
+{
+  return "";//biogears::version_string_str();
+}
+//---------------------------------------------------------------------------------
+QString lib_version_hash()
+{
+  return "";//biogears::rev_tag_str();
+}
+//---------------------------------------------------------------------------------
+QString lib_version_date()
+{
+  return "";//biogears::rev_tag_date();
+}
+//---------------------------------------------------------------------------------
+QString lib_build_date()
+{
+     return "";//biogears::rev_build_date();
+}
+//---------------------------------------------------------------------------------
+QString qt_version_number()
+{
+  return "";
 }
 //---------------------------------------------------------------------------------
 } //namspace ui
