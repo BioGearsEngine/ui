@@ -29,7 +29,7 @@ find_package(Biogears REQUIRED)
 ###############################################################################
 #Code Generation
 ###############################################################################
-
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cpp/version.cpp.in  ${CMAKE_CURRENT_BINARY_DIR}/cpp/version.cpp NEWLINE_STYLE LF)
 ###############################################################################
 #Sorce and Header Defines
 ###############################################################################
@@ -43,7 +43,7 @@ add_source_files(HDRS ${CMAKE_CURRENT_SOURCE_DIR}/cpp "*.h"   "Headers\\Private\
 add_source_files(SRCS ${CMAKE_CURRENT_SOURCE_DIR}/cpp "*.cpp" "Sources\\")
 add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/qml "*.qrc"  "Resources")
 add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/qml "*.qml"  "Resources")
-
+add_source_files(GEN_SRCS ${CMAKE_CURRENT_BINARY_DIR}/cpp/ "version.cpp" "Sources\\")
 set(${PREFIX}_HEADERS ${HDRS} ${PUBLIC_HDRS} ${GEN_HDRS})
 set(${PREFIX}_SOURCES ${SRCS} ${GEN_SRCS} ${RESOURCES})
 

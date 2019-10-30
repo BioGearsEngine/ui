@@ -41,7 +41,27 @@ project( ${ROOT_PROJECT_NAME}  LANGUAGES CXX C)
     CMAKE_INCLUDE_PATH = ${CMAKE_INCLUDE_PATH}
     CMAKE_FIND_ROOT_PATH = ${CMAKE_FIND_ROOT_PATH}
     ")
-###############################################################################
+
+find_package(Git)
+if(Git_FOUND)
+  configure_version_information(GIT_SUCESS)
+endif()
+if(NOT GIT_SUCESS)
+  # Update these variables to ensure out of source build have some sane tags
+  message(WARNING "GIT_EXECUTABLE was not found or no corrisponding GIT_REPO is avaliable.\n" 
+    "If you are building with in a git repo you should ensure GIT is in your current path. " 
+	"If you are building outside of a repo ignore this message.")
+  set(${ROOT_PROJECT_NAME}_VERSION_MAJOR 0)
+  set(${ROOT_PROJECT_NAME}_VERSION_MINOR 0)
+  set(${ROOT_PROJECT_NAME}_VERSION_PATCH 2)
+  set(${ROOT_PROJECT_NAME}_VERSION_TWEAK 0)
+  set(${ROOT_PROJECT_NAME}_LIB_VERSION ${${ROOT_PROJECT_NAME}_VERSION_MAJOR}.${${ROOT_PROJECT_NAME}_VERSION_MINOR} )
+  set(${ROOT_PROJECT_NAME}_VERSION_TAG "Beta")
+  set(${ROOT_PROJECT_NAME}_DIRTY_BUILD true)
+
+  string(TIMESTAMP ${ROOT_PROJECT_NAME}_COMMIT_DATE "%Y-%m-%d %H:%M")
+endif()
+############################# ##################################################
 # Add Repository Subdirectories
 ###############################################################################
 add_subdirectory(projects)
