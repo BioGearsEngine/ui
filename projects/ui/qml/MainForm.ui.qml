@@ -24,7 +24,7 @@ GridLayout {
         id: graphArea
         Layout.fillHeight: true
         Layout.fillWidth: true
-        backgroundColor: 'grey'
+        //backgroundColor: 'grey'
     }
     TextArea {
         Layout.columnSpan: 2
