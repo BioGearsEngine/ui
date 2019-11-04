@@ -37,6 +37,13 @@ You can follow the instructions for building biogears from its github page for m
 
 ## Building the Visualizer with the CMake GUI
 
+```
+git clone  https://github.com/BioGearsEngine/ui.git visualizer
+cd visualizer
+git submodule init
+git submodule update
+
+```
 To begin, make sure your copies of visualizer and external (both are submodules of BioGears) are up to date. Before you CMake:
 1. Create a folder within your visualizer folder titled "build"
 1. Point the source code and the binaries to the visualizer (refer to image below)
