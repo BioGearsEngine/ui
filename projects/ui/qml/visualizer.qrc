@@ -19,14 +19,14 @@
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
-        <file alias="pause.png">img/Pause.png</file>
-        <file alias="stop.png">img/Stop.png</file>
-        <file alias="next.png">img/Next.png</file>
-        <file alias="prev.png">img/Prev.png</file>
-        <file alias="foward.png">img/Foward.png</file>
-        <file alias="reverse.png">img/Reverse.png</file>
-        <file alias="help.svg">img/Icon-round-Question_mark.svg</file>
+        <file alias="pause.png">img/pause.png</file>
+        <file alias="stop.png">img/stop.png</file>
+        <file alias="next.png">img/next.png</file>
+        <file alias="prev.png">img/prev.png</file>
+        <file alias="foward.png">img/foward.png</file>
+        <file alias="reverse.png">img/reverse.png</file>
+        <file alias="help.svg">img/icon-round-question_mark.svg</file>
         <file alias="help.png">img/question.png</file>
-        <file alias="biogears_logo.png">img/Biogears_logo_400_400.png</file>
+        <file alias="biogears_logo.png">img/biogears_logo_400_400.png</file>
     </qresource>
 </RCC>
