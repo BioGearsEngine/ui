@@ -85,8 +85,8 @@ Scenario& Scenario::load_patient(QString file)
 {
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
-    path = "Patients/" + path;
-    if (!QFileInfo::exists("Patients/" + file)) {
+    path = "patients/" + path;
+    if (!QFileInfo::exists("patients/" + file)) {
       throw std::runtime_error("Unable to locate " + file.toStdString());
     }
   }
