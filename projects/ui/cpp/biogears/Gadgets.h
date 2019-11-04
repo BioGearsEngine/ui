@@ -3,6 +3,7 @@
 #include <QObject>
 
 namespace bio {
+
 struct State {
   bool alive = false;
   bool tacycardia = false;
@@ -15,6 +16,7 @@ private:
   Q_PROPERTY(bool alive MEMBER alive)
   Q_PROPERTY(bool tacycardia MEMBER tacycardia)
 };
+
 struct Conditions {
   bool diabieties = false;
 
@@ -25,6 +27,7 @@ private:
   Q_GADGET
   Q_PROPERTY(bool diabieties MEMBER diabieties)
 };
+
 struct Metrics {
   double respretory_rate_bpm = 0.0;
   double heart_rate_bpm = 0.0;
@@ -38,8 +41,8 @@ private:
   Q_PROPERTY(double heart_rate_bpm MEMBER heart_rate_bpm)
 };
 
-Q_DECLARE_METATYPE(State)
-Q_DECLARE_METATYPE(Conditions)
-Q_DECLARE_METATYPE(Metrics)
 
 }
+Q_DECLARE_METATYPE(bio::State)
+Q_DECLARE_METATYPE(bio::Conditions)
+Q_DECLARE_METATYPE(bio::Metrics)
