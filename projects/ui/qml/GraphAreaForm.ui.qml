@@ -71,30 +71,29 @@ Page {
         id: graphStackLayout
         anchors.fill: parent
         currentIndex: graphTabBar.currentIndex
-
-        UIGraph {
+        UIPlotSeries {
             id: graph1
-            eatVal: 20.0
-            eatColor: "green"
-            notEatColor: "yellow"
+			period : 4
+			amplitude : 2
+			timerOn : true
+			
         }
 
-        UIGraph {
+        UIPlotSeries {
             id: graph2
-            eatVal: 5.0
-            eatColor: "red"
-            notEatColor: "blue"
+			period : 2
+			amplitude : 4
+			timerOn : true
         }
 
-        UIGraph {
+        UIPlotSeries {
             id: graph3
-            eatVal: 60
-            eatColor: "purple"
-            notEatColor: "teal"
+			period : 10
+			amplitude: 6
+			timerOn : true
         }
     }
 }
-
 
 
 

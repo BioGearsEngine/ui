@@ -119,6 +119,7 @@ ColumnLayout {
     }
 
     UIPlaybackForm {
+		id: playForm
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         Layout.fillWidth: true
     }
