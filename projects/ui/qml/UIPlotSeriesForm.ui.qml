@@ -4,7 +4,7 @@ import QtQuick.Controls.Material 2.12
 import QtCharts 2.3
 
 ChartView {
-	id: bgChart
+	id: root
 	property double period
 	property double amplitude
 	property double x_s : 0
@@ -41,6 +41,13 @@ ChartView {
 		var y = amplitude * Math.sin(b * x_s);
 		lSeries.append(x_s, y);
 		return y;
+	}
+
+	function clear(){
+		x_s = 0
+		plotTimer.running = false
+		var numPoints = lSeries.count
+		lSeries.removePoints(0,numPoints)
 	}
 
 }

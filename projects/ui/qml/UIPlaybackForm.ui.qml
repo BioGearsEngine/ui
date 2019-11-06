@@ -5,7 +5,10 @@ import QtQuick.Controls.Material 2.3
 
 ColumnLayout {
 	id: root
-	signal playActivated()
+	signal pauseClicked()
+	signal playClicked()
+	signal stopClicked()
+
     RowLayout {
         spacing: 10
         Label {
@@ -28,6 +31,7 @@ ColumnLayout {
             icon.source: "qrc:/icons/stop.png"
             icon.name: "terminate"
             icon.color: "transparent"
+			onClicked: {root.stopClicked()}
         }
         Button {
             id: pause
@@ -36,6 +40,7 @@ ColumnLayout {
             icon.source: "qrc:/icons/pause.png"
             icon.name: "pause"
             icon.color: "transparent"
+			onClicked: {root.pauseClicked()}
         }
         Button {
             id: play
@@ -44,7 +49,7 @@ ColumnLayout {
             icon.source: "qrc:/icons/play.png"
             icon.name: "realtime"
             icon.color: "transparent"
-			onClicked: {root.playActivated()}
+			onClicked: {root.playClicked()}
         }
         Button {
             id: foward

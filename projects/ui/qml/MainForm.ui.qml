@@ -18,7 +18,9 @@ GridLayout {
         Layout.alignment: Qt.AlignTop
         Layout.fillHeight: false
         scenario: root.scenario
-		onPushPlay: graphArea.start()
+		onPlayPushed: graphArea.start()
+		onPausePushed: graphArea.pause()
+		onStopPushed: graphArea.stop()
     }
 
     GraphArea {

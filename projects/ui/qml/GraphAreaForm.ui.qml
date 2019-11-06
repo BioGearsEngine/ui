@@ -99,6 +99,18 @@ Page {
 		graph2.timerOn = true
 		graph3.timerOn = true
 	}
+
+	function pause() {
+		graph1.timerOn = false
+		graph2.timerOn = false
+		graph3.timerOn = false
+	}
+
+	function stop() {
+		graph1.clear()
+		graph2.clear()
+		graph3.clear()
+	}
 }
 
 
