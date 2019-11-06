@@ -7,6 +7,7 @@ import com.biogearsengine.ui.scenario 1.0
 
 ColumnLayout {
     id: root
+	signal pushPlay()
     spacing: 5
 
     Layout.preferredHeight: implicitHeight
@@ -119,9 +120,9 @@ ColumnLayout {
     }
 
     UIPlaybackForm {
-		id: playForm
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         Layout.fillWidth: true
+		onPlayActivated : root.pushPlay()
     }
 
     GridLayout {

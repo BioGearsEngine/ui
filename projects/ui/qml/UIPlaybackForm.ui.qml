@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.3
 
 ColumnLayout {
+	id: root
+	signal playActivated()
     RowLayout {
         spacing: 10
         Label {
@@ -42,6 +44,7 @@ ColumnLayout {
             icon.source: "qrc:/icons/play.png"
             icon.name: "realtime"
             icon.color: "transparent"
+			onClicked: {root.playActivated()}
         }
         Button {
             id: foward

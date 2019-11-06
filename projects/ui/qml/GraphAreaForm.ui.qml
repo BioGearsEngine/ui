@@ -75,7 +75,7 @@ Page {
             id: graph1
 			period : 4
 			amplitude : 2
-			timerOn : true
+			timerOn : false
 			
         }
 
@@ -83,16 +83,22 @@ Page {
             id: graph2
 			period : 2
 			amplitude : 4
-			timerOn : true
+			timerOn : false
         }
 
         UIPlotSeries {
             id: graph3
 			period : 10
 			amplitude: 6
-			timerOn : true
+			timerOn : false
         }
     }
+
+	function start() {
+		graph1.timerOn = true
+		graph2.timerOn = true
+		graph3.timerOn = true
+	}
 }
 
 

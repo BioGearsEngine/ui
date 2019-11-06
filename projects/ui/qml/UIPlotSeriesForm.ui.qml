@@ -42,6 +42,7 @@ ChartView {
 		lSeries.append(x_s, y);
 		return y;
 	}
+
 }
 
 /*##^## Designer {
