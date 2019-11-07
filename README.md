@@ -38,23 +38,32 @@ You can follow the instructions for building biogears from its github page for m
 ## Building the Visualizer with the CMake GUI
 
 ```
+#Pulling Code
 git clone  https://github.com/BioGearsEngine/ui.git visualizer
 cd visualizer
 git submodule init
-git submodule update
+git submodule update --progress
 
+#Building BioGears Example for gcc5.4 on Ubuntu 16.4
+mkdir build-libbiogears
+cd build-gcc5.4
+cmake ../projects/libbiogears -G Ninja -DCMAKE_PREFIX_PATH=/opt/biogears/external/ -DCMAKE_INSTALL_PREFIX=/opt/biogears/visualizer/build-ui/usr
+cmake -DCMAKE_BUILD_TYPE=Release .
+cmake --build . --config Release --target install  
+cmake -DCMAKE_BUILD_TYPE=Debug .
+cmake --build . --config Debug --target install 
+
+#Building the Visualizer code against biogears
+cd ..
+mkdir build-ui
+cd build-ui
+cmake .. -G Ninja -DCMAKE_PREFIX_PATH="/opt/biogears/external/;/opt/biogears/visualizer/build-ui/usr'
+cmake -DCMAKE_BUILD_TYPE=Debug .
+cmake --build . --config Debug --target install
+cmake --build . --config Debug --target STAGE
 ```
-To begin, make sure your copies of visualizer and external (both are submodules of BioGears) are up to date. Before you CMake:
-1. Create a folder within your visualizer folder titled "build"
-1. Point the source code and the binaries to the visualizer (refer to image below)
-1. Add paths for usr and the windows external
-     1. Click add entry
-     1. Specify the name as "CMAKE_PREFIX_PATH"
-     1. Specify the type as a path
-     1. Enter the path to each folder (usr and windows-vc15-amd64 respectively) as the value
-     1. Click OK
-Once done, configure, generate, and open the project.
 
+Further instructions can be found in our WIKI at our github page
 # Running the Visualizer
 
 ## Initial Setup
