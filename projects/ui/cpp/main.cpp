@@ -4,6 +4,7 @@
 
 #include "biogears/Scenario.h"
 #include "biogears/Gadgets.h"
+#include "version.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     qmlRegisterType<bio::Scenario>("com.biogearsengine.ui.scenario", 1, 0, "Scenario");
+    qmlRegisterType<bio::SystemInformation>("com.biogearsengine.ui.scenario", 1, 0, "Info");
 
     qRegisterMetaType<bio::State>();
     QMetaType::registerEqualsComparator<bio::State>();

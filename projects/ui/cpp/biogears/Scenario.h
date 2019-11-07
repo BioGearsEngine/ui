@@ -35,18 +35,6 @@ public:
   using Channel = biogears::scmp::Channel<ActionQueue>;
   using Source = biogears::scmp::Source<ActionQueue>;
 
-//  Q_INVOKABLE QString ui_version_number();
-//  Q_INVOKABLE QString ui_version_hash();
-//  Q_INVOKABLE QString ui_version_date();
-//  Q_INVOKABLE QString ui_build_date();
-
-//  Q_INVOKABLE QString lib_version_number();
-//  Q_INVOKABLE QString lib_version_hash();
-//  Q_INVOKABLE QString lib_build_date();
-
-  //Q_INVOKABLE QString qt_version_number();
-
-
   Q_INVOKABLE QString patient_name();
   Q_INVOKABLE QString environment_name();
 

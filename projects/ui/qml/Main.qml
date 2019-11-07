@@ -7,6 +7,7 @@ import QtQuick.Dialogs 1.2
 import QtGraphicalEffects 1.12
 
 import com.biogearsengine.ui.scenario 1.0
+
 ApplicationWindow {
     id: root
     visible: true
@@ -29,6 +30,10 @@ ApplicationWindow {
 
     Scenario {
         id : scenario
+    }
+
+    Info {
+        id : info
     }
 
     footer: RowLayout {
@@ -65,20 +70,7 @@ ApplicationWindow {
                 anchors.left: infoBox_image.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.leftMargin: 5
-                text : "
-                       <b>BioGears %1</b><br>
-                       Based on Qt %2   %3<br>
-                                libBioGears %4<br>
-                       Built on %5<br>
-                       From revision %6<br>
-                       Copyright 2012-%7 Applied Research Associates<br>
-                       <br>
-                       This program is provided AS IS with NO WARRENTY OF ANY KIND<br>
-                       INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS<br>
-                       FOR A PARTICULAR PURPOSE<br>
-                       ".arg(scenario.ui_version()).arg("5.12").arg("MSVC 2017")
-                        .arg(scenario.lib_version()).arg(scenario.ui_builddate).arg(scenario.ui_hash())
-                        .arg(Date.fromLocalDateString(Date()))
+                text : info.About
             }
             Button {
                 id: infoBox_button

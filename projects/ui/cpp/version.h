@@ -15,27 +15,23 @@ specific language governing permissions and limitations under the License.
 #include <sstream>
 #include <string>
 
+#include <QObject>
+
 #include <biogears/exports.h>
 
-namespace biogears {
+namespace bio {
 
-std::string version_string();
-std::string full_version_string();
+class SystemInformation : public QObject {
 
-std::string project_name();
-std::string rev_hash();
-std::string rev_tag();
+ public:
+  QString about();
 
-int rev_offset();
+private:
+  Q_OBJECT
+public:
+  //This Codes Library Info
+  Q_PROPERTY(QString About  READ about)
 
-int biogears_major_version();
-int biogears_minor_version();
-int biogears_patch_version();
-
-bool biogears_offical_release();
-
-std::string rev_commit_date();;
-std::string build_date();
-
+};
 
 }

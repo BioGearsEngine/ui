@@ -1,8 +1,78 @@
+#include "version.h"
 #include <biogears/version.h>
 
 #include <biogears/string/manipulation.h>
 
-namespace ui {
+#include <QtCore>
+#include <ctime>
+#include <locale>
+
+constexpr const char* _OS_ =
+#ifdef _WIN32
+  "Windows"
+#elif defined __unix__
+  "Linux"
+#elif defined __APPLE__
+  "MacOS"
+#endif
+  ;
+
+#if defined(_MSVC_LANG)
+constexpr const char* _COMPILER_NAME_ = "MSVC";
+constexpr const char* _COMPILER_VERSION_ =
+#  if _MSC_VER == 1200
+    "6.0"
+#  elif _MSC_VER == 1300
+    "7.0"
+#  elif _MSC_VER == 1310
+    "7.1"
+#  elif _MSC_VER == 1400
+    "8.0"
+#  elif _MSC_VER == 1500
+    "9.0"
+#  elif _MSC_VER == 1600
+    "10.0"
+#  elif _MSC_VER == 1700
+    "11.0"
+#  elif _MSC_VER == 1800
+    "12.0"
+#  elif _MSC_VER == 1900
+    "14.0"
+#  elif _MSC_VER == 1910
+    "15.0"
+#  elif _MSC_VER == 1911
+    "15.3"
+#  elif _MSC_VER == 1912
+    "15.5"
+#  elif _MSC_VER == 1913
+    "15.6"
+#  elif _MSC_VER == 1914
+    "15.7"
+#  elif _MSC_VER == 1915
+    "15.8"
+#  elif _MSC_VER == 1916
+    "15.9"
+#  elif _MSC_VER == 1920
+    "16.0"
+#  elif _MSC_VER == 1921
+    "16.1"
+#  elif _MSC_VER == 1922
+    "16.2"
+#  elif _MSC_VER == 1923
+    "16.3"
+#  endif
+  ;
+#elif defined(__clang__)
+constexpr const char* _COMPILER_NAME_ = "Clang";
+#elif defined(__GNUG__)
+constexpr const char* _COMPILER_NAME_ = "GCC";
+constexpr const char* _COMPILER_VERSION_ = "\""+"__GNUC__.__GNUC_MINOR__";
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+constexpr const char* _COMPILER_NAME_ = "MiniGW";
+constexpr const char* _COMPILER_VERSION_ = "";
+#endif
+
+namespace bio {
 
 
 //-----------------------------------------------------------------------------
@@ -21,67 +91,33 @@ constexpr int _TWEAK_VERSION_NUMBER_  = ${${ROOT_PROJECT_NAME}_VERSION_TWEAK};
 
 using namespace std::string_literals;
 //-----------------------------------------------------------------------------
-std::string rev_commit_date() {
-  return _REV_COMMIT_DATE_;
-}
-//-----------------------------------------------------------------------------
-std::string build_date() {
-  return __DATE__;
-}
-//-----------------------------------------------------------------------------
-std::string version_string()
+QString SystemInformation::about()
 {
-  if (_TWEAK_VERSION_NUMBER_)
-    return biogears::asprintf("%d.%d.%d" ,_MAJOR_VERSION_NUMBER_,_MINOR_VERSION_NUMBER_,_PATCH_VERSION_NUMBER_);
-  else 
-    return biogears::asprintf("%d.%d.%d+%d", _MAJOR_VERSION_NUMBER_,_MINOR_VERSION_NUMBER_,_PATCH_VERSION_NUMBER_,_TWEAK_VERSION_NUMBER_);
-}
-//-----------------------------------------------------------------------------
-std::string full_version_string()
-{
-  if (_TWEAK_VERSION_NUMBER_)
-    return biogears::asprintf("%d.%d.%d-%s", _MAJOR_VERSION_NUMBER_,_MINOR_VERSION_NUMBER_,_PATCH_VERSION_NUMBER_,_REV_HASH_);
-  else 
-    return biogears::asprintf("%d.%d.%d+%d-%s", _MAJOR_VERSION_NUMBER_,_MINOR_VERSION_NUMBER_,_PATCH_VERSION_NUMBER_,_TWEAK_VERSION_NUMBER_,_REV_HASH_);
-}
-//-----------------------------------------------------------------------------
-std::string project_name()
-{
-  return _PROJECT_NAME_;
-}
-//-----------------------------------------------------------------------------
-std::string rev_hash()
-{
-  return _REV_HASH_;
-}
-//-----------------------------------------------------------------------------
-std::string rev_tag()
-{
-  return _REV_TAG_; 
-}
-//-----------------------------------------------------------------------------
-int rev_offset()
-{
-  return _TWEAK_VERSION_NUMBER_;
-}
-//-----------------------------------------------------------------------------
-int major_version()
-{
-  return _MAJOR_VERSION_NUMBER_;
-}
-//-----------------------------------------------------------------------------
-int minor_version()
-{
-  return _MINOR_VERSION_NUMBER_;
-}
-//-----------------------------------------------------------------------------
-int patch_version()
-{
-  return _PATCH_VERSION_NUMBER_;
-}
-//-----------------------------------------------------------------------------
-bool offical_release()
-{
-  return _OFFICAL_RELEASE_;
+  std::locale::global(std::locale());
+  std::time_t t = std::time(nullptr);
+  char mbstr[10];
+  std::strftime(mbstr, sizeof(mbstr), "%Y", std::localtime(&t));
+
+
+  return QString("<b>BioGears %1</b><br>"
+                 "\nBased on Qt %2   %3 %4<br>"
+                 "\nlibBioGears %4<br>"
+                 "\nBuilt on %5<br>"
+                 "\nFrom revision %6<br>"
+                 "\nCopyright 2012-%7 Applied Research Associates<br>"
+                 "\n<br>"
+                 "\nThis program is provided AS IS with NO WARRENTY OF ANY KIND<br>"
+                 "\nINCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS<br>"
+                 "\nFOR A PARTICULAR PURPOSE<br>")
+    .arg(_PROJECT_NAME_)
+    .arg(QT_VERSION)
+    .arg(_COMPILER_NAME_)
+    .arg(_COMPILER_VERSION_)
+    .arg(biogears::biogears_build_date().c_str())
+    .arg(__DATE__)
+    .arg(_REV_HASH_)
+    .arg(mbstr);
+
+  
 }
 }
