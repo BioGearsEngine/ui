@@ -9,7 +9,6 @@
         <file>UITextInputForm.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>UIScalarForm.ui.qml</file>
-        <file>UIPlayback.qml</file>
         <file>UIPlaybackForm.ui.qml</file>
         <file>UIControlPhysiology.ui.qml</file>
         <file>UIPatientBox.qml</file>

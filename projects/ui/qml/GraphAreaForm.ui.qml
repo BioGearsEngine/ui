@@ -5,7 +5,9 @@ import QtQuick.Layouts 1.3
 
 Page {
     id: root
-
+    property alias graph1 : graph1
+    property alias graph2 : graph2
+    property alias graph3 : graph3
     header: TabBar {
         id: graphTabBar
         contentHeight: 40
@@ -93,24 +95,6 @@ Page {
 			timerOn : false
         }
     }
-
-	function start() {
-		graph1.timerOn = true
-		graph2.timerOn = true
-		graph3.timerOn = true
-	}
-
-	function pause() {
-		graph1.timerOn = false
-		graph2.timerOn = false
-		graph3.timerOn = false
-	}
-
-	function stop() {
-		graph1.clear()
-		graph2.clear()
-		graph3.clear()
-	}
 }
 
 

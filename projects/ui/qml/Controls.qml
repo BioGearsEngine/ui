@@ -3,7 +3,9 @@ import QtQuick 2.4
 import com.biogearsengine.ui.scenario 1.0
 ControlsForm {
     id: root
-
+    signal pauseClicked()
+    signal playClicked()
+    signal stopClicked()
 
     property Scenario scenario :biogears_scenario
 
@@ -13,11 +15,11 @@ ControlsForm {
         onPatientMetricsChanged: {
                 root.respritoryRate.value       = metrics.RespritoryRate
                 root.heartRate.value            = metrics.HeartRate 
-                root.core_temp_c.value            = metrics.CoreTemp + "c"
+                root.core_temp_c.value          = metrics.CoreTemp + "c"
                 root.oxygenSaturation.value     = metrics.OxygenSaturation
                 root.systolicBloodPressure.value= metrics.SystolicBloodPressure
                 root.dystolicBloodPressure.value= metrics.DiastolicBloodPressure
-            }
+        }
         onPatientStateChanged: {
                 root.age_yr.value    = patientState.Age
                 root.gender.value    = patientState.Gender
@@ -27,10 +29,18 @@ ControlsForm {
                 root.bodySufaceArea.value       = patientState.BodySurfaceArea
                 root.bodyMassIndex.value        = patientState.BodyMassIndex
                 root.fat_pct.value              = patientState.BodyFat
-            }
+        }
         onPatientConditionsChanged:{
-
-            }
+        }
+    }
+    playback.onPauseClicked: {
+        root.pauseClicked()
+    }
+    playback.onPlayClicked: {
+        root.playClicked()
+    }
+    playback.onStopClicked: {
+        root.stopClicked()
     }
 }
 

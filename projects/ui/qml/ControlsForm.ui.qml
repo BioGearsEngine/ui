@@ -7,9 +7,6 @@ import com.biogearsengine.ui.scenario 1.0
 
 ColumnLayout {
     id: root
-	signal pausePushed()
-	signal playPushed()
-	signal stopPushed()
     spacing: 5
 
     Layout.preferredHeight: implicitHeight
@@ -32,6 +29,7 @@ ColumnLayout {
     property alias oxygenSaturation : physiology.oxygenSaturation
     property alias condition : physiology.condition
 
+    property alias playback : playback_controls
     Row {
         height: 10
         Layout.fillWidth: true
@@ -122,11 +120,9 @@ ColumnLayout {
     }
 
     UIPlaybackForm {
+        id: playback_controls
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         Layout.fillWidth: true
-		onPlayClicked : { root.playPushed() }
-		onPauseClicked : { root.pausePushed() }
-		onStopClicked: { root.stopPushed() }
     }
 
     GridLayout {

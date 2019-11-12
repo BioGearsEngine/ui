@@ -11,16 +11,16 @@ GridLayout {
     rows: 2
 
     property Scenario scenario
-
+    property alias controls : controls
+    property alias graphArea: graphArea
+    property alias consoleArea : consoleArea
+    
     Controls {
         id: controls
         Layout.fillWidth: false
         Layout.alignment: Qt.AlignTop
         Layout.fillHeight: false
         scenario: root.scenario
-		onPlayPushed: graphArea.start()
-		onPausePushed: graphArea.pause()
-		onStopPushed: graphArea.stop()
     }
 
     GraphArea {
@@ -29,6 +29,7 @@ GridLayout {
         Layout.fillWidth: true
     }
     TextArea {
+        id:consoleArea
         Layout.columnSpan: 2
         Layout.fillWidth: true
         Layout.fillHeight: true

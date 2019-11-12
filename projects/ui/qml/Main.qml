@@ -26,6 +26,15 @@ ApplicationWindow {
         Component.onCompleted : {
             console.log ("Starting Biogears with %1".arg(biogears_scenario.patient_name()))
         }
+        controls.onPlayClicked:  {
+            graphArea.start()
+        }
+        controls.onPauseClicked: {
+            graphArea.pause()
+        }
+        controls.onStopClicked: {
+            graphArea.stop()
+        }
     }
 
     Scenario {
