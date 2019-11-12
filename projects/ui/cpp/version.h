@@ -26,11 +26,13 @@ class SystemInformation : public QObject {
  public:
   QString about();
 
-private:
+signals:
+  void aboutChanged();
+ private:
   Q_OBJECT
 public:
   //This Codes Library Info
-  Q_PROPERTY(QString About  READ about)
+  Q_PROPERTY(QString About  READ about NOTIFY aboutChanged)
 
 };
 

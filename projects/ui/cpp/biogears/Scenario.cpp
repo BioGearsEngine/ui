@@ -1,14 +1,18 @@
 #include "Scenario.h"
 
 #include <exception>
+#include <cmath>
 
-#include "Gadgets.h"
+#include "PatientConditions.h"
+#include "PatientMetrics.h"
+#include "PatientState.h"
 
 //#include <biogears/version.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 
 #include <biogears/cdm/patient/SEPatient.h>
+#include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
 #include <biogears/container/concurrent_queue.tci.h>
@@ -17,7 +21,7 @@
 #include <chrono>
 namespace bio {
 Scenario::Scenario(QObject* parent)
-  : Scenario("biogears_default",parent)
+  : Scenario("biogears_default", parent)
 {
 }
 Scenario::Scenario(QString name, QObject* parent)
@@ -85,12 +89,16 @@ Scenario& Scenario::load_patient(QString file)
 {
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
-    path = "patients/" + path;
-    if (!QFileInfo::exists("patients/" + file)) {
+    path = "states/" + path;
+    if (!QFileInfo::exists("states/" + file)) {
       throw std::runtime_error("Unable to locate " + file.toStdString());
     }
   }
-  _engine->GetPatient().Load(path);
+  if (dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->LoadState(path)) {
+    emit patientStateChanged(get_physiology_state());
+    emit patientMetricsChanged(get_physiology_metrics());
+  }
+
   return *this;
 }
 //-------------------------------------------------------------------------------
@@ -133,25 +141,68 @@ inline void Scenario::physiology_thread_step()
   dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
 }
 //---------------------------------------------------------------------------------
-auto Scenario::get_physiology_state() -> State
+auto Scenario::get_physiology_state() -> PatientState
 {
-  State current;
-  current.alive = _engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min) > 0.0;
-  current.tacycardia = false;
+  PatientState current;
+  const auto& patient = _engine->GetPatient();
+  current.alive = "True";
+  current.tacycardia = "False";
+
+  current.age = (patient.HasAge()) ? QString::number(patient.GetAge(biogears::TimeUnit::yr), 'f', 0)
+                                                   : "N/A";
+  current.height_cm = (patient.HasHeight()) ? QString::number(patient.GetHeight(biogears::LengthUnit::cm), 'f', 0)
+                                                          : "N/A";
+  current.gender = (!patient.HasGender()) ? "N/A"
+                                                        : (patient.GetGender() == CDM::enumSex::Male) ? "Male"
+                                                        : "Female";
+  current.weight_kg = (patient.HasWeight()) ? QString::number(patient.GetWeight(biogears::MassUnit::kg), 'f', 2)
+                                                          : "N/A";
+  if (patient.HasWeight() && patient.HasWeight()) {
+    auto BSA = std::sqrt(patient.GetHeight(biogears::LengthUnit::cm) * patient.GetWeight(biogears::MassUnit::kg) / 3600.0);
+    current.body_surface_area_m_sq = QString::number(BSA, 'f', 2);
+    auto BMI = patient.GetWeight(biogears::MassUnit::kg) / std::pow(patient.GetHeight(biogears::LengthUnit::m), 2);
+    current.body_mass_index_kg_per_m_sq = QString::number(BMI, 'f', 2);
+  } else {
+    current.body_surface_area_m_sq = "N/A";
+    current.body_mass_index_kg_per_m_sq = "N/A";
+  }
+  current.body_fat_pct = (patient.HasBodyFatFraction()) ? QString::number(patient.GetBodyFatFraction(), 'f', 2)
+  : "N/A";
+  //TODO: Lets take intensity and make a series of animated GIFs inspired off vault-boy 
+  current.exercise_state = (_engine->GetActions().GetPatientActions().HasExercise()) ? "Running" : "Standing";
+
+
   return current;
 }
 //---------------------------------------------------------------------------------
-auto Scenario::get_pysiology_metrics() -> Metrics
+auto Scenario::get_physiology_metrics() -> PatientMetrics
 {
-  Metrics current;
-  current.heart_rate_bpm = _engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min);
-  current.respretory_rate_bpm = _engine->GetRespiratory().GetRespirationRate().GetValue(biogears::FrequencyUnit::Per_min);
+  PatientMetrics current;
+  current.heart_rate_bpm = (_engine->GetCardiovascular().HasHeartRate())
+    ? QString::number(_engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min),'f',2)
+    : "N/A";
+  current.respiratory_rate_bpm = (_engine->GetRespiratory().HasRespirationRate())
+    ? QString::number(_engine->GetRespiratory().GetRespirationRate().GetValue(biogears::FrequencyUnit::Per_min), 'f', 2)
+    : "N/A";
+  current.core_temperature_c = (_engine->GetEnergy().HasCoreTemperature())
+    ? QString::number(_engine->GetEnergy().GetCoreTemperature(biogears::TemperatureUnit::C), 'f', 2)
+    : "N/A";
+  current.oxygen_saturation_pct = (_engine->GetBloodChemistry().HasOxygenSaturation())
+    ? QString::number(_engine->GetBloodChemistry().GetOxygenSaturation().GetValue(), 'f', 2)
+    : "N/A";
+  current.systolic_blood_pressure_mmHg = (_engine->GetCardiovascular().HasSystolicArterialPressure())
+    ? QString::number(_engine->GetCardiovascular().GetSystolicArterialPressure().GetValue(biogears::PressureUnit::mmHg), 'f', 2)
+    : "N/A";
+  current.diastolic_blood_pressure_mmHg = (_engine->GetCardiovascular().HasDiastolicArterialPressure())
+    ? QString::number(_engine->GetCardiovascular().GetDiastolicArterialPressure().GetValue(biogears::PressureUnit::mmHg), 'f', 2)
+    : "N/A";
+
   return current;
 }
 //---------------------------------------------------------------------------------
-auto Scenario::get_pysiology_conditions() -> Conditions
+auto Scenario::get_physiology_conditions() -> PatientConditions
 {
-  Conditions current;
+  PatientConditions current;
   current.diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
   return current;
 }

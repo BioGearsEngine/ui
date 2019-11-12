@@ -22,14 +22,14 @@ ApplicationWindow {
         anchors.leftMargin: 0
         anchors.topMargin: -1
         anchors.fill : parent
-        scenario : scenario
+        scenario : biogears_scenario
         Component.onCompleted : {
-            console.log ("Starting Biogears with %1".arg(scenario.patient_name()))
+            console.log ("Starting Biogears with %1".arg(biogears_scenario.patient_name()))
         }
     }
 
     Scenario {
-        id : scenario
+        id : biogears_scenario
     }
 
     Info {

@@ -12,75 +12,103 @@ ColumnLayout {
     Layout.preferredHeight: implicitHeight
     Layout.preferredWidth: implicitWidth
 
-    property Scenario scenario
+    property alias patientBox: patientBox
+    property alias age_yr: age
+    property alias gender: gender
+    property alias fat_pct: fat_pct
+    property alias core_temp_c: core_temp
+    property alias height_cm: height_cm
+    property alias weight_kg: weight
+    property alias bodySufaceArea: bodySurfaceArea
+    property alias bodyMassIndex: bodyMassIndex
+
+    property alias heartRate : physiology.heartRate
+    property alias systolicBloodPressure : physiology.systolicBloodPressure
+    property alias dystolicBloodPressure : physiology.dystolicBloodPressure
+    property alias respritoryRate : physiology.respritoryRate
+    property alias oxygenSaturation : physiology.oxygenSaturation
+    property alias condition : physiology.condition
+
     Row {
         height: 10
         Layout.fillWidth: true
     }
 
     UIPatientBox {
-        label.text: "Scenario"
+        id: patientBox
+        label: "Scenario"
         //value: "Default Adult Male"
         Layout.alignment: Qt.AlignHCenter
-        scenario: root.scenario
     }
 
-    GridLayout {
-        columns: 4
-        rows: 2
-        id: configuration
+    RowLayout {
+        // columns: 4
+        // rows: 2
+        id: configuration_row1
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
         UITextInputForm {
+            id: age
             name: "Age:"
-            value: "22"
+            value: "21"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
-            Layout.preferredHeight: 25
+            // Layout.preferredWidth: 75
+            // Layout.preferredHeight: 25
         }
         UITextInputForm {
+            id: gender
             name: "Gender:"
-            value: "Male"
+            value: "Female"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
-            Layout.preferredHeight: 25
+            // Layout.preferredWidth: 80
+            // Layout.preferredHeight: 25
         }
         UITextInputForm {
+            id: fat_pct
             name: "Fat%:"
-            value: "22.5"
+            value: "0.0%"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
+            // Layout.preferredWidth: 75
         }
         UITextInputForm {
+            id: core_temp
             name: "Temp:"
-            value: "36.2"
+            value: "100.0"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
+            // Layout.preferredWidth: 75
         }
-
+    }
+    RowLayout {
+        id:configuration_row2
+        Layout.fillWidth: true
+        Layout.alignment: Qt.AlignHCenter
         UITextInputForm {
+            id: height_cm
             name: "Height:"
-            value: "22"
+            value: "160"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
+            // Layout.preferredWidth: 75
         }
         UITextInputForm {
+            id: weight
             name: "Weight:"
             value: "Male"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
+            // Layout.preferredWidth: 75
         }
         UITextInputForm {
-            name: "BSA%:"
-            value: "22.5"
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
-        }
-        UITextInputForm {
+            id: bodySurfaceArea
             name: "BSA:"
+            value: "1.55"
+            Layout.alignment: Qt.AlignHCenter
+            // Layout.preferredWidth: 75
+        }
+        UITextInputForm {
+            id: bodyMassIndex
+            name: "BMI:"
             value: "36.2"
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 75
+            // Layout.preferredWidth: 75
         }
     }
 

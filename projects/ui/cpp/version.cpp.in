@@ -101,10 +101,10 @@ QString SystemInformation::about()
 
   return QString("<b>BioGears %1</b><br>"
                  "\nBased on Qt %2   %3 %4<br>"
-                 "\nlibBioGears %4<br>"
-                 "\nBuilt on %5<br>"
-                 "\nFrom revision %6<br>"
-                 "\nCopyright 2012-%7 Applied Research Associates<br>"
+                 "\nlibBioGears %5 - %9<br>"
+                 "\nBuilt on %6<br>"
+                 "\nFrom revision %7<br>"
+                 "\nCopyright 2012-%8 Applied Research Associates<br>"
                  "\n<br>"
                  "\nThis program is provided AS IS with NO WARRENTY OF ANY KIND<br>"
                  "\nINCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS<br>"
@@ -113,10 +113,11 @@ QString SystemInformation::about()
     .arg(QT_VERSION)
     .arg(_COMPILER_NAME_)
     .arg(_COMPILER_VERSION_)
-    .arg(biogears::biogears_build_date().c_str())
+    .arg(biogears::version_string().c_str())
     .arg(__DATE__)
     .arg(_REV_HASH_)
-    .arg(mbstr);
+    .arg(mbstr)
+    .arg(biogears::rev_hash().c_str());
 
   
 }

@@ -6,10 +6,8 @@
         <file>ControlsForm.ui.qml</file>
         <file>GraphArea.qml</file>
         <file>GraphAreaForm.ui.qml</file>
-        <file>UITextInput.qml</file>
         <file>UITextInputForm.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>UIScalar.qml</file>
         <file>UIScalarForm.ui.qml</file>
         <file>UIPlayback.qml</file>
         <file>UIPlaybackForm.ui.qml</file>

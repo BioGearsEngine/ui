@@ -6,7 +6,7 @@ import QtQuick.Controls.Material 2.3
 RowLayout {
     id: root
 
-    property alias label: name
+    property alias label: name.text
     property alias comboBox: value
 
     Layout.preferredWidth: 50

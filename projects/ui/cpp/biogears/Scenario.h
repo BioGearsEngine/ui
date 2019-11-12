@@ -11,20 +11,18 @@
 #include <biogears/framework/scmp/scmp_channel.h>
 #include <biogears/threading/runnable.h>
 #include <biogears/threading/steppable.h>
+
+#include "PatientConditions.h"
+#include "PatientMetrics.h"
+#include "PatientState.h"
 namespace bio {
 
-  struct State;
-  struct Metrics;
-  struct Conditions;
+
 
 class Scenario : public QObject, public biogears::Runnable, public biogears::Steppable<void(void)> {
 
   Q_OBJECT
-  Q_PROPERTY(State state READ get_physiology_state NOTIFY stateChanged)
-  Q_PROPERTY(Metrics metrics READ get_pysiology_metrics NOTIFY metricsChanged)
-  Q_PROPERTY(Conditions conditions READ get_pysiology_conditions NOTIFY conditionsChanged)
   Q_PROPERTY(double time READ get_simulation_time NOTIFY timeAdvance)
-
 
 public:
   Scenario(QObject* parent = Q_NULLPTR);
@@ -44,9 +42,6 @@ public:
   Q_INVOKABLE Scenario& load_patient(QString);
 
 
-   State get_physiology_state();
-  Metrics get_pysiology_metrics();
-  Conditions get_pysiology_conditions();
   double get_simulation_time();
 
   void run() final;
@@ -58,10 +53,16 @@ public:
   Source get_channel();
 
 signals:
-  void stateChanged();
-  void metricsChanged();
-  void conditionsChanged();
+  void patientStateChanged(PatientState patientState);
+  void patientMetricsChanged(PatientMetrics metrics);
+  void patientConditionsChanged(PatientConditions conditions);
   void timeAdvance();
+
+protected:
+  PatientState get_physiology_state();
+  PatientMetrics get_physiology_metrics();
+  PatientConditions get_physiology_conditions();
+
 
 protected:
   void physiology_thread_main();
