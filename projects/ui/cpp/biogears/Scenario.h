@@ -19,7 +19,7 @@ namespace bio {
 
 
 
-class Scenario : public QObject, public biogears::Runnable, public biogears::Steppable<void(void)> {
+class Scenario : public QObject, public biogears::Runnable {
 
   Q_OBJECT
   Q_PROPERTY(double time READ get_simulation_time NOTIFY timeAdvance)
@@ -42,13 +42,12 @@ public:
   Q_INVOKABLE Scenario& load_patient(QString);
 
 
-  double get_simulation_time();
+  Q_INVOKABLE double get_simulation_time();
 
-  void run() final;
-  void stop() final;
-  void join() final;
-  void step() final;
-  std::function<void(void)> step_as_func() final;
+  Q_INVOKABLE void run() final;
+  Q_INVOKABLE void stop() final;
+  Q_INVOKABLE void join() final;
+  Q_INVOKABLE void step();
 
   Source get_channel();
 

@@ -61,6 +61,7 @@ void Scenario::join()
 //-------------------------------------------------------------------------------
 void Scenario::step()
 {
+  dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1.0,biogears::TimeUnit::s);
 }
 //-------------------------------------------------------------------------------
 QString Scenario::patient_name()
@@ -97,22 +98,13 @@ Scenario& Scenario::load_patient(QString file)
   if (dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->LoadState(path)) {
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
+  } else {
+      _engine->GetLogger()->Error("Could not load state, check the error");
   }
 
   return *this;
 }
-//-------------------------------------------------------------------------------
-std::function<void(void)> Scenario::step_as_func()
-{
-  return std::function<void(void)>([this]() {
-    if (this->_running) {
-      return;
-    } else {
-      this->physiology_thread_step();
-    }
-    return;
-  });
-}
+
 auto Scenario::get_channel() -> Source
 {
   return Channel().as_source();
@@ -125,7 +117,7 @@ void Scenario::physiology_thread_main()
   auto current_time = std::chrono::steady_clock::now();
   auto prev = current_time;
   while (_running) {
-    physiology_thread_main();
+    step();
     if (_throttle) {
       while ((current_time - prev) > 1s) {
         std::this_thread::sleep_for(16ms);

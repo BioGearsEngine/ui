@@ -13,7 +13,6 @@ UIPlotSeriesForm {
     var b = 2 * Math.PI / period;
     var y = amplitude * Math.sin(b * x_s);
     lSeries.append(x_s, y);
-    console.log("lSeries.append(%1, %2);".arg(x_s).arg(y))
     return y;
   }
 

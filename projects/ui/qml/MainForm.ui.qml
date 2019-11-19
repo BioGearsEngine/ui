@@ -10,17 +10,16 @@ GridLayout {
     columns: 2
     rows: 2
 
-    property Scenario scenario
+    property alias scenario : controls.scenario
     property alias controls : controls
     property alias graphArea: graphArea
     property alias consoleArea : consoleArea
-    
+
     Controls {
         id: controls
         Layout.fillWidth: false
         Layout.alignment: Qt.AlignTop
         Layout.fillHeight: false
-        scenario: root.scenario
     }
 
     GraphArea {

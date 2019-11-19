@@ -7,6 +7,7 @@ ControlsForm {
     signal playClicked()
     signal stopClicked()
 
+    property alias running : advanceTimer.running
     property Scenario scenario :biogears_scenario
 
     patientBox.scenario : biogears_scenario
@@ -35,12 +36,22 @@ ControlsForm {
     }
     playback.onPauseClicked: {
         root.pauseClicked()
+        console.log("Pausing BioGears")
+        root.running = false
     }
     playback.onPlayClicked: {
         root.playClicked()
+        root.running = true
+        console.log("Starting BioGears")
     }
     playback.onStopClicked: {
         root.stopClicked()
+        console.log("Stoping BioGears")
+    }
+    Timer {
+      id: advanceTimer
+      interval: 100; running: false; repeat: true
+      onTriggered: biogears_scenario.step()
     }
 }
 

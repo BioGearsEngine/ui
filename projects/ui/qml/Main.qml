@@ -22,9 +22,8 @@ ApplicationWindow {
         anchors.leftMargin: 0
         anchors.topMargin: -1
         anchors.fill : parent
-        scenario : biogears_scenario
         Component.onCompleted : {
-            console.log ("Starting Biogears with %1".arg(biogears_scenario.patient_name()))
+            console.log ("Starting Biogears with %1".arg(scenario.patient_name()))
         }
         controls.onPlayClicked:  {
             graphArea.start()
@@ -35,10 +34,6 @@ ApplicationWindow {
         controls.onStopClicked: {
             graphArea.stop()
         }
-    }
-
-    Scenario {
-        id : biogears_scenario
     }
 
     Info {
