@@ -1,4 +1,3 @@
 [submodule "libbiogears"]
 	path = extern/biogears
 	url = https://github.com/BioGearsEngine/core.git
-	branch = master
