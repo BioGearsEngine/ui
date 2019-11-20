@@ -149,11 +149,27 @@ endfunction()
 ########################################################################################################
 
 function(configure_version_information _SUCESS_CHECK)
+  cmake_parse_arguments( "_"  "" "MAJOR;MINOR;PATCH;TWEAK"
+                         "" ${ARGN} )
+
+  if(NOT _MAJOR) 
+    set(_MAJOR -1)
+  endif()
+  if(NOT _MINOR) 
+    set(_MINOR -1)
+  endif()
+  if(NOT _PATCH) 
+    set(_PATCH -1)
+  endif()
+  if(NOT _TWEAK) 
+    set(_TWEAK  "source" )
+  endif()
   execute_process(COMMAND ${GIT_EXECUTABLE}  describe --tags
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                   OUTPUT_VARIABLE _GIT_REV
-                  RESULT_VARIABLE _RESULT_VARIABLE
-                                  )
+                  RESULT_VARIABLE  _RESULT_VARIABLE
+                                  ERROR_QUIET)
+  
   if(_RESULT_VARIABLE EQUAL 0)
     message(STATUS "GIT_REV=${_GIT_REV}")
     string(REPLACE "-" ";"  _GIT_REV_LIST "${_GIT_REV}" )
@@ -173,7 +189,9 @@ function(configure_version_information _SUCESS_CHECK)
     if(_len GREATER 4)
       set(_DIRTY_BUILD true)
       list(GET _GIT_FULL_REV_LIST 3 _VERSION_TWEAK)
-      list(GET _GIT_FULL_REV_LIST 4 _VERSION_HASH )
+      math(EXPR _last "${_len} - 1")
+      list(GET _GIT_FULL_REV_LIST ${_last}  _VERSION_HASH )
+      
     else()
       set(_DIRTY_BUILD false)
       set(_VERSION_TWEAK 0)
@@ -183,10 +201,26 @@ function(configure_version_information _SUCESS_CHECK)
  
 
     set( ${ROOT_PROJECT_NAME}_VERSION_TAG ${_VERSION_TAG} PARENT_SCOPE)
-    set( ${ROOT_PROJECT_NAME}_VERSION_MAJOR ${_VERSION_MAJOR} PARENT_SCOPE)
-    set( ${ROOT_PROJECT_NAME}_VERSION_MINOR ${_VERSION_MINOR} PARENT_SCOPE)
-    set( ${ROOT_PROJECT_NAME}_VERSION_PATCH ${_VERSION_PATCH} PARENT_SCOPE)
-    set( ${ROOT_PROJECT_NAME}_VERSION_TWEAK ${_VERSION_TWEAK} PARENT_SCOPE)
+    if( _VERSION_MAJOR MATCHES "[0-9]+")
+	    set( ${ROOT_PROJECT_NAME}_VERSION_MAJOR ${_VERSION_MAJOR} PARENT_SCOPE)
+    else()
+      set( ${ROOT_PROJECT_NAME}_VERSION_MAJOR ${_MAJOR} PARENT_SCOPE)  
+    endif()
+    if( _VERSION_MINOR MATCHES "[0-9]+")
+      set( ${ROOT_PROJECT_NAME}_VERSION_MINOR ${_VERSION_MINOR} PARENT_SCOPE)
+    else()
+      set( ${ROOT_PROJECT_NAME}_VERSION_MINOR ${_MINOR} PARENT_SCOPE)  
+    endif()
+    if( _VERSION_PATCH MATCHES "[0-9]+")
+      set( ${ROOT_PROJECT_NAME}_VERSION_PATCH ${_VERSION_PATCH} PARENT_SCOPE)
+    else()
+      set( ${ROOT_PROJECT_NAME}_VERSION_PATCH ${_PATCH} PARENT_SCOPE)  
+    endif()
+    if( _VERSION_TWEAK MATCHES "[0-9]+")
+      set( ${ROOT_PROJECT_NAME}_VERSION_TWEAK ${_VERSION_TWEAK} PARENT_SCOPE)
+    else()
+      set( ${ROOT_PROJECT_NAME}_VERSION_TWEAK ${_TWEAK} PARENT_SCOPE)  
+    endif()
     set( ${ROOT_PROJECT_NAME}_VERSION_HASH  ${_VERSION_HASH}  PARENT_SCOPE)
     set( ${ROOT_PROJECT_NAME}_DIRTY_BUILD ${_DIRTY_BUILD} PARENT_SCOPE)
     set( ${ROOT_PROJECT_NAME}_LIB_VERSION "${_VERSION_MAJOR}.${_VERSION_MINOR}" PARENT_SCOPE)
@@ -235,5 +269,22 @@ if(MSVC AND NOT __PROJECT_SUFFIX_SET)
     project(${CMAKE_PROJECT_NAME}_msvc14)
     project(cmake-test_msvc15)
   endif()
+endif()
+endfunction()
+#######################################################################################################
+# 
+#  By default cmake setups up multi configuration directories as {lib,bin}/{debug,release}/<product>
+#  This just sets it to {debug,release}/{lib,bin}/<product> which is more natural to me.
+# 
+#  Optional Cache Value OUTPUT_PREFIX allows you add an additional later to this layout
+#######################################################################################################
+function(setup_unified_output_directory )
+  cmake_parse_arguments( "_"  "UNIFIED" "PREFIX"
+                         "" ${ARGN} )
+if(NOT __UNIFIED_DIR) 
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_PREFIX}/$<CONFIG>/lib" PARENT_SCOPE)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_PREFIX}/$<CONFIG>/$<IF:$<PLATFORM_ID:Windows>,bin,lib>" PARENT_SCOPE)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_PREFIX}/$<CONFIG>/bin" PARENT_SCOPE)
+  set(__UNIFIED_DIR ON PARENT_SCOPE)
 endif()
 endfunction()

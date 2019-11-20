@@ -13,26 +13,8 @@ endif()
 set(CMAKE_STATIC_LIBRARY_PREFIX "lib")
 set(CMAKE_STATIC_LIBRARY_SUFFIX "_st${CMAKE_STATIC_LIBRARY_SUFFIX}")
 set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
-  
-set(OUTPUT_PREFIX ${CMAKE_BINARY_DIR})
 
-
-if(CMAKE_CONFIGURATION_TYPES)
-    foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-        string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/${OUTPUTCONFIG}/lib")
-        set(CMAKE_PDB_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/${OUTPUTCONFIG}/lib")
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/${OUTPUTCONFIG}/bin")
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/${OUTPUTCONFIG}/bin")
-    endforeach(OUTPUTCONFIG)
-else()
-    foreach(OUTPUTCONFIG Release Debug)
-        string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/lib")
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/lib")
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} "${OUTPUT_PREFIX}/bin")
-    endforeach(OUTPUTCONFIG)
-endif()
+setup_unified_output_directory()
 ###############################################################################
 # Step 2: Project Includes are generally order dependent.  So manually maintain
 #         this list
@@ -52,4 +34,51 @@ endif()
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
 add_subdirectory(ui)
+
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+# Update submodules as needed
+    option(BUILD_Biogears "Build Biogears using provided submodule" ON)
+    if(BUILD_Biogears)
+        message(STATUS "Updating Biogears Submodule")
+        execute_process(
+                        COMMAND ${CMAKE_COMMAND} -E echo ${GIT_EXECUTABLE} submodule init extern/biogears
+                        COMMAND ${GIT_EXECUTABLE} submodule init extern/biogears
+                        COMMAND ${CMAKE_COMMAND} -E echo ${GIT_EXECUTABLE} submodule update --progress --init extern/biogears/
+                        COMMAND ${GIT_EXECUTABLE} submodule update --progress --init :/extern/biogears/
+                        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT
+                        ERROR_VARIABLE GIT_ERROR
+                        OUTPUT_VARIABLE GIT_LOG
+                       )
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "Git operation failed with ${GIT_ERROR}, please checkout submodules")
+        endif()
+    endif()
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/biogears/CMakeLists.txt")
+    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+
+
+set(Biogears_BUILD_CIRCUIT_PROFILER CACHE BOOL OFF)
+set(Biogears_BUILD_CIRCUIT_TESTS   CACHE BOOL  OFF)
+set(Biogears_BUILD_CMD_TOOLS   CACHE BOOL OFF)
+set(Biogears_BUILD_DOCUMENTATION  CACHE BOOL OFF)
+set(Biogears_BUILD_HOWTOS         CACHE BOOL OFF)
+set(Biogears_BUILD_TEST           CACHE BOOL OFF)
+set(Biogears_BUILD_TEST_DRIVER    CACHE BOOL OFF)
+set(Biogears_BUILD_SCENARIO_DRIVER CACHE BOOL OFF)
+set(Biogears_RUNTIME_DIR ${PROJECT_BINARY_DIR}/runtime)
+if(BUILD_Biogears AND GIT_FOUND)
+	add_subdirectory(${PROJECT_SOURCE_DIR}/extern/biogears libbiogears)
+else()
+  find_package(Biogears QUIET)
+  if(NOT Biogears_FOUND)
+    message(FATAL_ERROR "Unable to find Biogears. Biogears must match the requested revision for this code base.  
+                         Eitehr turn on BUILD_Biogears or provide it using CMAKE_PREFIX_PATH")
+  endif()
+endif()
+
 

@@ -24,7 +24,6 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 
 find_package(Threads REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets Charts Quick QuickControls2 REQUIRED)
-find_package(Biogears REQUIRED)
 
 ###############################################################################
 #Code Generation
@@ -55,7 +54,7 @@ set_target_properties(${PROJECT_NAME}
   PROPERTIES
   DEFINE_SYMBOL ${PROJECT_NAME}_EXPORTS
   FOLDER "Binaries"
-  OUTPUT_NAME "BioGears"
+  OUTPUT_NAME "BioGearsUI"
   COMPILE_PDB_NAME "${PROJECT_NAME}"
   PROJECT_LABEL "${PROJECT_NAME}"
   DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
@@ -126,8 +125,8 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/runtime
 )
 
-stage_biogears_schema(DESTINATION ${PROJECT_BINARY_DIR}/runtime)
-stage_biogears_data  (DESTINATION ${PROJECT_BINARY_DIR}/runtime)
+#stage_biogears_schema(DESTINATION ${PROJECT_BINARY_DIR}/runtime)
+#stage_biogears_data  (DESTINATION ${PROJECT_BINARY_DIR}/runtime)
 
 
 
@@ -162,6 +161,6 @@ set_target_properties(STAGE
     FOLDER "CMakePredefinedTargets"
     PROJECT_LABEL "STAGE"
 )
-add_dependencies(STAGE stage_biogears_schema stage_biogears_data)
+#add_dependencies(STAGE stage_biogears_schema stage_biogears_data)
 
 message(STATUS "")
