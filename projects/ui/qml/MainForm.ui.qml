@@ -37,9 +37,6 @@ GridLayout {
 
 }
 
-
-
-
 /*##^## Designer {
     D{i:0;autoSize:true;height:720;width:1280}
 }

@@ -5,66 +5,24 @@ import QtQuick.Layouts 1.3
 
 Page {
     id: root
-    property alias graph1 : graph1
-    property alias graph2 : graph2
-    property alias graph3 : graph3
+    property alias graph1: graph1
+    property alias graph2: graph2
+    property alias graph3: graph3
     header: TabBar {
         id: graphTabBar
         contentHeight: 40
         font.pointSize: 12
-        TabButton {
+        UITabButtonForm {
             id: vitalsButton
             text: qsTr("Vitals")
-
-            contentItem: Text {
-                text: vitalsButton.text
-                font: vitalsButton.font
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                opacity: enabled ? 1.0 : 0.3
-            }
-            background: Rectangle {
-                color: "steelblue"
-                border.color: "steelblue"
-                opacity: enabled ? 1 : 0.3
-            }
         }
-        TabButton {
+        UITabButtonForm {
             id: cvButton
             text: qsTr("Cardiovascular")
-
-            contentItem: Text {
-                text: cvButton.text
-                font: cvButton.font
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                opacity: enabled ? 1.0 : 0.3
-            }
-            background: Rectangle {
-                color: "steelblue"
-                border.color: "steelblue"
-                opacity: enabled ? 1.0 : 0.3
-            }
         }
-        TabButton {
+        UITabButtonForm {
             id: respButton
-            text: "Respiratory"
-
-            contentItem: Text {
-                text: respButton.text
-                font: respButton.font
-                color: "white"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                opacity: enabled ? 1.0 : 0.3
-            }
-            background: Rectangle {
-                color: "steelblue"
-                border.color: "steelblue"
-                opacity: enabled ? 1.0 : 0.3
-            }
+            text: qsTr("Respiratory")
         }
         currentIndex: 0
     }
@@ -75,27 +33,25 @@ Page {
         currentIndex: graphTabBar.currentIndex
         UIPlotSeries {
             id: graph1
-			period : 4
-			amplitude : 2
-			timerOn : false
-			
+            period: 4
+            amplitude: 2
+            timerOn: false
         }
-
         UIPlotSeries {
             id: graph2
-			period : 2
-			amplitude : 4
-			timerOn : false
+            period: 2
+            amplitude: 4
+            timerOn: false
         }
-
         UIPlotSeries {
             id: graph3
-			period : 10
-			amplitude: 6
-			timerOn : false
+            period: 10
+            amplitude: 6
+            timerOn: false
         }
     }
 }
+
 
 
 

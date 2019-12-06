@@ -15,6 +15,7 @@
         <file>UIComboBoxForm.ui.qml</file>
         <file>UIPlotSeries.qml</file>
         <file>UIPlotSeriesForm.ui.qml</file>
+        <file>UITabButtonForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

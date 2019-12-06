@@ -107,7 +107,7 @@ Scenario& Scenario::load_patient(QString file)
     _data_requests.clear();
     auto engine = dynamic_cast<biogears::BioGearsEngine*>(_engine.get());
     auto bootstrap_physiology_request = [&, engine](const biogears::Tree<const char*>& tree, const auto& lambda, biogears::SESystem* system = nullptr, std::string prefix = "", biogears::Tree<const char*> const * parent = nullptr) -> void {
-      std::cout << prefix << tree.value() << "\n";
+      qInfo() << (prefix + tree.value()).c_str();
 
       if (system) {
         using namespace std::string_literals;
@@ -115,7 +115,7 @@ Scenario& Scenario::load_patient(QString file)
         biogears::SEScalar const* scalar = system->GetScalar(key);
 
         if (nullptr == scalar) {
-          //Handles hyp
+          //Handles hypenated request
           key = parent->value() + "-"s + tree.value();
           scalar = system->GetScalar(key);
         }
