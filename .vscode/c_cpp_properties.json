@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "D:/remotes/sed-stash/biogears/external/windows-vc16-amd64/include/",
+                "C:/Qt/5.12.2/msvc2017_64/include/**",
+                "${workspaceFolder}/extern/biogears/projects/biogears/libBiogears/include",
+                "${workspaceFolder}/extern/biogears/projects/biogears/libCDM/include",
+                "${workspaceFolder}/extern/biogears/projects/biogears/libCircuitTest/include",
+                "${workspaceFolder}/extern/biogears/projects/biogears-common/include",
+                "${workspaceFolder}/build-msvc16/projects/libbiogears/projects/biogears"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.23.28105/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}

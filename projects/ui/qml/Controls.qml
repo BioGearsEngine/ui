@@ -8,9 +8,10 @@ ControlsForm {
     signal stopClicked()
 
     property alias running : advanceTimer.running
-    property Scenario scenario :biogears_scenario
+    property Scenario scenario : biogears_scenario
 
     patientBox.scenario : biogears_scenario
+
     Scenario {
         id: biogears_scenario
         onPatientMetricsChanged: {
@@ -32,6 +33,7 @@ ControlsForm {
                 root.fat_pct.value              = patientState.BodyFat
         }
         onPatientConditionsChanged:{
+
         }
     }
     playback.onPauseClicked: {
@@ -47,6 +49,30 @@ ControlsForm {
     playback.onStopClicked: {
         root.stopClicked()
         console.log("Stoping BioGears")
+    } 
+    action_1.onPressed:{
+        console.log("Hemorrhage Stop") 
+        biogears_scenario.create_hemorrhage_action("Left Arm",0.0);
+    } 
+    action_2.onPressed:{
+        console.log("Hemorrhage Mild")
+        biogears_scenario.create_hemorrhage_action("Left Arm",5.0);
+    } 
+    action_3.onPressed:{
+        console.log("Hemorrhage Extreme") 
+        biogears_scenario.create_hemorrhage_action("Left Arm",100.0);
+    } 
+    action_4.onPressed:{
+        console.log("ASthma Attack") 
+    } 
+    action_5.onPressed:{
+        console.log("Morphine Drip") 
+    } 
+    action_6.onPressed:{
+        console.log("Burn Patient 25%") 
+    } 
+    action_7.onPressed:{
+        console.log("Mild Infection") 
     }
     Timer {
       id: advanceTimer

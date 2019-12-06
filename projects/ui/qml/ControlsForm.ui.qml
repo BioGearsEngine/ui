@@ -30,6 +30,14 @@ ColumnLayout {
     property alias condition : physiology.condition
 
     property alias playback : playback_controls
+    property alias action_1 : action_1
+    property alias action_2 : action_2
+    property alias action_3 : action_3
+    property alias action_4 : action_4
+    property alias action_5 : action_5
+    property alias action_6 : action_6
+    property alias action_7 : action_7
+
     Row {
         height: 10
         Layout.fillWidth: true
@@ -38,7 +46,6 @@ ColumnLayout {
     UIPatientBox {
         id: patientBox
         label: "Scenario"
-        //value: "Default Adult Male"
         Layout.alignment: Qt.AlignHCenter
     }
 
@@ -53,30 +60,24 @@ ColumnLayout {
             name: "Age:"
             value: "21"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
-            // Layout.preferredHeight: 25
         }
         UITextInputForm {
             id: gender
             name: "Gender:"
             value: "Female"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 80
-            // Layout.preferredHeight: 25
         }
         UITextInputForm {
             id: fat_pct
             name: "Fat%:"
             value: "0.0%"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
         }
         UITextInputForm {
             id: core_temp
             name: "Temp:"
             value: "100.0"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
         }
     }
     RowLayout {
@@ -88,28 +89,24 @@ ColumnLayout {
             name: "Height:"
             value: "160"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
         }
         UITextInputForm {
             id: weight
             name: "Weight:"
             value: "Male"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
         }
         UITextInputForm {
             id: bodySurfaceArea
             name: "BSA:"
             value: "1.55"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
         }
         UITextInputForm {
             id: bodyMassIndex
             name: "BMI:"
             value: "36.2"
             Layout.alignment: Qt.AlignHCenter
-            // Layout.preferredWidth: 75
         }
     }
 
@@ -130,45 +127,56 @@ ColumnLayout {
         Layout.fillWidth: true
         columns: 2
         Button {
-            text: 'Action 1'
+            id : action_1
+            text: 'Hemorrhage Stop'
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
         Button {
-            text: 'Action 2'
+            id : action_2
+            text: 'Hemorrhage Mild '
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
         Button {
-            text: 'Action 3'
+            id : action_3
+            text: 'Hemorrhage Extreme'
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
         Button {
-            text: 'Action 4'
+            id : action_4
+            text: 'Asthma Attack'
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
         Button {
-            text: 'Action 5'
+            id : action_5
+            text: 'Morphine Drip'
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
         Button {
-            text: 'Action 6'
+            id : action_6
+            text: 'Burn Patient 25%'
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
         Button {
-            text: 'Action 7'
+            id : action_7
+            text: 'Mild Infection'
+            font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
     }
 }
-
-
-
 
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

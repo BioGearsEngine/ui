@@ -1,8 +1,12 @@
 #pragma once
 #include <functional>
+#include <memory>
+#include <vector>
+#include <map>
 
 #include <QString>
 #include <QtQuick>
+#include <QVariant>
 
 #include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/container/concurrent_queue.h>
@@ -15,9 +19,10 @@
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
 #include "PatientState.h"
+#include "DataRequest.h"
+#include "DataRequestModel.h"
+
 namespace bio {
-
-
 
 class Scenario : public QObject, public biogears::Runnable {
 
@@ -29,7 +34,7 @@ public:
   Scenario(QString name, QObject* parent = Q_NULLPTR);
   ~Scenario();
 
-  using ActionQueue = biogears::ConcurrentQueue<std::queue<biogears::SEAction>>;
+  using ActionQueue = biogears::ConcurrentQueue<std::unique_ptr<biogears::SEAction>>;
   using Channel = biogears::scmp::Channel<ActionQueue>;
   using Source = biogears::scmp::Source<ActionQueue>;
 
@@ -49,7 +54,12 @@ public:
   Q_INVOKABLE void join() final;
   Q_INVOKABLE void step();
 
-  Source get_channel();
+public: //Action Factory Interface;
+  Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
+  Q_INVOKABLE void create_asthma_action();
+  Q_INVOKABLE void create_substance_infusion_action();
+  Q_INVOKABLE void create_burn_action();
+  Q_INVOKABLE void create_infection_action();
 
 signals:
   void patientStateChanged(PatientState patientState);
@@ -75,6 +85,10 @@ private:
 
   std::atomic<bool> _running;
   std::atomic<bool> _throttle;
+
+  std::vector<std::pair<biogears::SEScalar const *, std::string>> _data_requests;
+  std::unordered_map<std::string, size_t> _data_request_table;
+
 };
 
 }
