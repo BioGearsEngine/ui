@@ -7,7 +7,7 @@ import "./data" as Requests
 
 Page {
     id: root
-    property alias bloodChemistry: bloodChemistry
+    property alias bloodChemistry: bloodChemistrySeries
     property alias cardiovascular: cardiovascular
     property alias drugs: drugs
     property alias endocrine: endocrine
@@ -74,58 +74,41 @@ Page {
     SwipeView {
         id: plots
         anchors.fill: parent
-        currentIndex:1
+        currentIndex:0
         clip:true 
         UIPlotSeries {
-            id: bloodChemistry
-            period: 4
-            amplitude: 2
-            timerOn: false
+            id: bloodChemistrySeries
+            property alias requests : bloodChemistryRequests
             Requests.BloodChemistry {
                 id : bloodChemistryRequests
             }
         }
         UIPlotSeries {
             id: cardiovascular
-            period: 2
-            amplitude: 4
-            timerOn: false
             Requests.Cardiovascular {
                 id : cardiovascularRequests
             }
         }
         UIPlotSeries {
             id: drugs
-            period: 2
-            amplitude: 4
-            timerOn: false
             Requests.Drugs {
                 id : drugRequests
             }
         }
         UIPlotSeries {
             id: endocrine
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Endocrine {
                 id : endocrineRequests
             }
         }
         UIPlotSeries {
             id: energy
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Energy {
                 id : energyRequests
             }
         }
         UIPlotSeries {
             id: gastrointestinal
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Gastrointestinal {
                 id : gastrointestinalRequests
             }
@@ -133,45 +116,30 @@ Page {
         UIPlotSeries {
             id: hepatic
             
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Hepatic {
                 id : hepaticRequests
             }
         }
         UIPlotSeries {
             id: nervous
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Nervous {
                 id : nervousRequests
             }
         }
         UIPlotSeries {
             id: renal
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Renal {
                 id : renalRequests
             }
         }
         UIPlotSeries {
             id: respiratory
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Respiratory {
                 id : respiratoryRequests
             }
         }
         UIPlotSeries {
             id: tissue
-            period: 10
-            amplitude: 6
-            timerOn: false
             Requests.Tissue {
                 id : tissueRequests
             }

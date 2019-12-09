@@ -106,7 +106,7 @@ Scenario& Scenario::load_patient(QString file)
     _data_request_table.clear();
     _data_requests.clear();
     auto engine = dynamic_cast<biogears::BioGearsEngine*>(_engine.get());
-    auto bootstrap_physiology_request = [&, engine](const biogears::Tree<const char*>& tree, const auto& lambda, biogears::SESystem* system = nullptr, std::string prefix = "", biogears::Tree<const char*> const * parent = nullptr) -> void {
+    auto bootstrap_physiology_request = [&, engine](const biogears::Tree<const char*>& tree, const auto& lambda, biogears::SESystem* system = nullptr, std::string prefix = "", biogears::Tree<const char*> const* parent = nullptr) -> void {
       qInfo() << (prefix + tree.value()).c_str();
 
       if (system) {
@@ -128,7 +128,7 @@ Scenario& Scenario::load_patient(QString file)
             _data_requests.emplace_back(unitScalar, "");
           }
         } else if (scalar) {
-          
+
           _data_request_table[prefix + tree.value()] = _data_requests.size();
           _data_requests.emplace_back(scalar, "unitless");
         }
@@ -281,6 +281,62 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics
   current.diastolic_blood_pressure_mmHg = (_engine->GetCardiovascular().HasDiastolicArterialPressure())
     ? QString::number(_engine->GetCardiovascular().GetDiastolicArterialPressure().GetValue(biogears::PressureUnit::mmHg), 'f', 2)
     : "N/A";
+
+  auto& bloodChemistry = _engine->GetBloodChemistry();
+  current.arterialBloodPH = (bloodChemistry.HasArterialBloodPH()) ? bloodChemistry.GetArterialBloodPH().GetValue() : 0.0;
+  current.arterialBloodPHBaseline = (bloodChemistry.HasArterialBloodPHBaseline()) ? bloodChemistry.GetArterialBloodPHBaseline().GetValue() : 0.0;
+  current.bloodDensity = (bloodChemistry.HasBloodDensity()) ? bloodChemistry.GetBloodDensity().GetValue( *bloodChemistry.GetBloodDensity().GetUnit() ) : 0.0;
+  current.bloodSpecificHeat = (bloodChemistry.HasBloodSpecificHeat()) ? bloodChemistry.GetBloodSpecificHeat().GetValue(*bloodChemistry.GetBloodSpecificHeat().GetUnit()) : 0.0;
+  current.bloodUreaNitrogenConcentration = (bloodChemistry.HasBloodUreaNitrogenConcentration()) ? bloodChemistry.GetBloodUreaNitrogenConcentration().GetValue(*bloodChemistry.GetBloodUreaNitrogenConcentration().GetUnit()) : 0.0;
+  current.carbonDioxideSaturation = (bloodChemistry.HasCarbonDioxideSaturation()) ? bloodChemistry.GetCarbonDioxideSaturation().GetValue() : 0.0;
+  current.carbonMonoxideSaturation = (bloodChemistry.HasCarbonMonoxideSaturation()) ? bloodChemistry.GetCarbonMonoxideSaturation().GetValue() : 0.0;
+  current.hematocrit = (bloodChemistry.HasHematocrit()) ? bloodChemistry.GetHematocrit().GetValue() : 0.0;
+  current.hemoglobinContent = (bloodChemistry.HasHemoglobinContent()) ? bloodChemistry.GetHemoglobinContent().GetValue(*bloodChemistry.GetHemoglobinContent().GetUnit()) : 0.0;
+  current.oxygenSaturation = (bloodChemistry.HasOxygenSaturation()) ? bloodChemistry.GetOxygenSaturation().GetValue() : 0.0;
+  current.phosphate = (bloodChemistry.HasPhosphate()) ? bloodChemistry.GetPhosphate().GetValue(*bloodChemistry.GetPhosphate().GetUnit()) : 0.0;
+  current.plasmaVolume = (bloodChemistry.HasPlasmaVolume()) ? bloodChemistry.GetPlasmaVolume().GetValue(*bloodChemistry.GetPlasmaVolume().GetUnit()) : 0.0;
+  current.pulseOximetry = (bloodChemistry.HasPulseOximetry()) ? bloodChemistry.GetPulseOximetry().GetValue() : 0.0;
+  current.redBloodCellAcetylcholinesterase = (bloodChemistry.HasRedBloodCellAcetylcholinesterase()) ? bloodChemistry.GetRedBloodCellAcetylcholinesterase().GetValue(*bloodChemistry.GetRedBloodCellAcetylcholinesterase().GetUnit()) : 0.0;
+  current.redBloodCellCount = (bloodChemistry.HasRedBloodCellCount()) ? bloodChemistry.GetRedBloodCellCount().GetValue(*bloodChemistry.GetRedBloodCellCount().GetUnit()) : 0.0;
+  current.shuntFraction = (bloodChemistry.HasShuntFraction()) ? bloodChemistry.GetShuntFraction().GetValue() : 0.0;
+  current.strongIonDifference = (bloodChemistry.HasStrongIonDifference()) ? bloodChemistry.GetStrongIonDifference().GetValue(*bloodChemistry.GetStrongIonDifference().GetUnit()) : 0.0;
+  current.totalBilirubin = (bloodChemistry.HasTotalBilirubin()) ? bloodChemistry.GetTotalBilirubin().GetValue(*bloodChemistry.GetTotalBilirubin().GetUnit()) : 0.0;
+  current.totalProteinConcentration = (bloodChemistry.HasTotalProteinConcentration()) ? bloodChemistry.GetTotalProteinConcentration().GetValue(*bloodChemistry.GetTotalProteinConcentration().GetUnit()) : 0.0;
+  current.venousBloodPH = (bloodChemistry.HasVenousBloodPH()) ? bloodChemistry.GetVenousBloodPH().GetValue() : 0.0;
+  current.volumeFractionNeutralPhospholipidInPlasma = (bloodChemistry.HasVolumeFractionNeutralPhospholipidInPlasma()) ? bloodChemistry.GetVolumeFractionNeutralPhospholipidInPlasma().GetValue() : 0.0;
+  current.volumeFractionNeutralLipidInPlasma = (bloodChemistry.HasVolumeFractionNeutralLipidInPlasma()) ? bloodChemistry.GetVolumeFractionNeutralLipidInPlasma().GetValue() : 0.0;
+  current.arterialCarbonDioxidePressure = (bloodChemistry.HasArterialCarbonDioxidePressure()) ? bloodChemistry.GetArterialCarbonDioxidePressure().GetValue(*bloodChemistry.GetArterialCarbonDioxidePressure().GetUnit()) : 0.0;
+  current.arterialOxygenPressure = (bloodChemistry.HasArterialOxygenPressure()) ? bloodChemistry.GetArterialOxygenPressure().GetValue(*bloodChemistry.GetArterialOxygenPressure().GetUnit()) : 0.0;
+  current.pulmonaryArterialCarbonDioxidePressure = (bloodChemistry.HasPulmonaryArterialCarbonDioxidePressure()) ? bloodChemistry.GetPulmonaryArterialCarbonDioxidePressure().GetValue(*bloodChemistry.GetPulmonaryArterialCarbonDioxidePressure().GetUnit()) : 0.0;
+  current.pulmonaryArterialOxygenPressure = (bloodChemistry.HasPulmonaryArterialOxygenPressure()) ? bloodChemistry.GetPulmonaryArterialOxygenPressure().GetValue(*bloodChemistry.GetPulmonaryArterialOxygenPressure().GetUnit()) : 0.0;
+  current.pulmonaryVenousCarbonDioxidePressure = (bloodChemistry.HasPulmonaryVenousCarbonDioxidePressure()) ? bloodChemistry.GetPulmonaryVenousCarbonDioxidePressure().GetValue(*bloodChemistry.GetPulmonaryVenousCarbonDioxidePressure().GetUnit()) : 0.0;
+  current.pulmonaryVenousOxygenPressure = (bloodChemistry.HasPulmonaryVenousOxygenPressure()) ? bloodChemistry.GetPulmonaryVenousOxygenPressure().GetValue(*bloodChemistry.GetPulmonaryVenousOxygenPressure().GetUnit()) : 0.0;
+  current.venousCarbonDioxidePressure = (bloodChemistry.HasVenousCarbonDioxidePressure()) ? bloodChemistry.GetVenousCarbonDioxidePressure().GetValue(*bloodChemistry.GetVenousCarbonDioxidePressure().GetUnit()) : 0.0;
+  current.venousOxygenPressure = (bloodChemistry.HasVenousOxygenPressure()) ? bloodChemistry.GetVenousOxygenPressure().GetValue(*bloodChemistry.GetVenousOxygenPressure().GetUnit()) : 0.0;
+  current.inflammatoryResponse = bloodChemistry.HasInflammatoryResponse();
+
+  auto& inflamatoryResponse = bloodChemistry.GetInflammatoryResponse();
+  current.inflammatoryResponseLocalPathogen = (inflamatoryResponse.HasLocalPathogen()) ? inflamatoryResponse.GetLocalPathogen().GetValue() : 0.0;
+  current.inflammatoryResponseLocalMacrophage = (inflamatoryResponse.HasLocalMacrophage()) ? inflamatoryResponse.GetLocalMacrophage().GetValue() : 0.0;
+  current.inflammatoryResponseLocalNeutrophil = (inflamatoryResponse.HasLocalNeutrophil()) ? inflamatoryResponse.GetLocalNeutrophil().GetValue() : 0.0;
+  current.inflammatoryResponseLocalBarrier = (inflamatoryResponse.HasLocalBarrier()) ? inflamatoryResponse.GetLocalBarrier().GetValue() : 0.0;
+  current.inflammatoryResponseBloodPathogen = (inflamatoryResponse.HasBloodPathogen()) ? inflamatoryResponse.GetBloodPathogen().GetValue() : 0.0;
+  current.inflammatoryResponseTrauma = (inflamatoryResponse.HasTrauma()) ? inflamatoryResponse.GetTrauma().GetValue() : 0.0;
+  current.inflammatoryResponseMacrophageResting = (inflamatoryResponse.HasMacrophageResting()) ? inflamatoryResponse.GetMacrophageResting().GetValue() : 0.0;
+  current.inflammatoryResponseMacrophageActive = (inflamatoryResponse.HasMacrophageActive()) ? inflamatoryResponse.GetMacrophageActive().GetValue() : 0.0;
+  current.inflammatoryResponseNeutrophilResting = (inflamatoryResponse.HasNeutrophilResting()) ? inflamatoryResponse.GetNeutrophilResting().GetValue() : 0.0;
+  current.inflammatoryResponseNeutrophilActive = (inflamatoryResponse.HasNeutrophilActive()) ? inflamatoryResponse.GetNeutrophilActive().GetValue() : 0.0;
+  current.inflammatoryResponseInducibleNOSPre = (inflamatoryResponse.HasInducibleNOSPre()) ? inflamatoryResponse.GetInducibleNOSPre().GetValue() : 0.0;
+  current.inflammatoryResponseInducibleNOS = (inflamatoryResponse.HasInducibleNOS()) ? inflamatoryResponse.GetInducibleNOS().GetValue() : 0.0;
+  current.inflammatoryResponseConstitutiveNOS = (inflamatoryResponse.HasConstitutiveNOS()) ? inflamatoryResponse.GetConstitutiveNOS().GetValue() : 0.0;
+  current.inflammatoryResponseNitrate = (inflamatoryResponse.HasNitrate()) ? inflamatoryResponse.GetNitrate().GetValue() : 0.0;
+  current.inflammatoryResponseNitricOxide = (inflamatoryResponse.HasNitricOxide()) ? inflamatoryResponse.GetNitricOxide().GetValue() : 0.0;
+  current.inflammatoryResponseTumorNecrosisFactor = (inflamatoryResponse.HasTumorNecrosisFactor()) ? inflamatoryResponse.GetTumorNecrosisFactor().GetValue() : 0.0;
+  current.inflammatoryResponseInterleukin6 = (inflamatoryResponse.HasInterleukin6()) ? inflamatoryResponse.GetInterleukin6().GetValue() : 0.0;
+  current.inflammatoryResponseInterleukin10 = (inflamatoryResponse.HasInterleukin10()) ? inflamatoryResponse.GetInterleukin10().GetValue() : 0.0;
+  current.inflammatoryResponseInterleukin12 = (inflamatoryResponse.HasInterleukin12()) ? inflamatoryResponse.GetInterleukin12().GetValue() : 0.0;
+  current.inflammatoryResponseCatecholamines = (inflamatoryResponse.HasCatecholamines()) ? inflamatoryResponse.GetCatecholamines().GetValue() : 0.0;
+  current.inflammatoryResponseTissueIntegrity = (inflamatoryResponse.HasTissueIntegrity()) ? inflamatoryResponse.GetTissueIntegrity().GetValue() : 0.0;
 
   return current;
 }
