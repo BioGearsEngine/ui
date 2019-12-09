@@ -60,6 +60,13 @@ GraphAreaForm {
     bloodChemistry.requests.venousOxygenPressure.axisY.min = 0.
     bloodChemistry.requests.venousOxygenPressure.axisY.max = 25.
 
-    
-}
+    bloodChemistry.requests.venousOxygenPressure.pointAdded.connect (handleNewPoint)
+  }
+
+  function handleNewPoint() {
+      console.log("Been a long road.")
+  }
+  // bloodChemistry.requests.redBloodCellCount.onPointAdded: {
+  //   console.log("Five by Five in the Pipe")
+  // }
 }

@@ -94,7 +94,7 @@ Item {
       name: "redBloodCellCount"
       axisX : ValueAxis {}
       axisY : ValueAxis {}
-    }   
+    }
   property LineSeries shuntFraction : LineSeries {
       
       name: "shuntFraction"
