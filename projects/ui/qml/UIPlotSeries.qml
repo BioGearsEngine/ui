@@ -1,11 +1,10 @@
 import QtQuick 2.4
 
 UIPlotSeriesForm {
-  property double period
-  property double amplitude
+  property double period : 1.0
+  property double amplitude : 1.0
   property double x_s : 0
-  property bool timerOn
-
+  property bool timerOn : false
 
   Timer {
     id: plotTimer

@@ -1,11 +1,17 @@
 import QtQuick 2.4
 
 import com.biogearsengine.ui.scenario 1.0
+
 ControlsForm {
     id: root
     signal pauseClicked()
     signal playClicked()
     signal stopClicked()
+
+    signal patientMetricsChanged( PatientMetrics metrics )
+    signal patientStateChanged( PatientState patientState )
+    signal patientConditionsChanged( PatientConditions conditions )
+    
 
     property alias running : advanceTimer.running
     property Scenario scenario : biogears_scenario
@@ -15,12 +21,14 @@ ControlsForm {
     Scenario {
         id: biogears_scenario
         onPatientMetricsChanged: {
-                root.respritoryRate.value       = metrics.RespritoryRate
-                root.heartRate.value            = metrics.HeartRate 
-                root.core_temp_c.value          = metrics.CoreTemp + "c"
-                root.oxygenSaturation.value     = metrics.OxygenSaturation
-                root.systolicBloodPressure.value= metrics.SystolicBloodPressure
-                root.dystolicBloodPressure.value= metrics.DiastolicBloodPressure
+                root.respritoryRate.value        = metrics.RespritoryRate
+                root.heartRate.value             = metrics.HeartRate 
+                root.core_temp_c.value           = metrics.CoreTemp + "c"
+                root.oxygenSaturation.value      = metrics.OxygenSaturation
+                root.systolicBloodPressure.value = metrics.SystolicBloodPressure
+                root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
+
+                root.patientMetricsChanged(metrics)
         }
         onPatientStateChanged: {
                 root.age_yr.value    = patientState.Age
@@ -31,9 +39,11 @@ ControlsForm {
                 root.bodySufaceArea.value       = patientState.BodySurfaceArea
                 root.bodyMassIndex.value        = patientState.BodyMassIndex
                 root.fat_pct.value              = patientState.BodyFat
+                
+                root.patientMetricsChanged(patientState)
         }
         onPatientConditionsChanged:{
-
+            root.patientMetricsChanged(conditions)
         }
     }
     playback.onPauseClicked: {

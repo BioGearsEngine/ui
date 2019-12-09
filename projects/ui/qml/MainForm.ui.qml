@@ -20,10 +20,21 @@ GridLayout {
         Layout.fillWidth: false
         Layout.alignment: Qt.AlignTop
         Layout.fillHeight: false
+
+        onPatientMetricsChanged : {
+            graphArea.plotUpdates(metrics)
+        }
+        onPatientConditionsChanged : {
+
+        }
+        onPatientStateChanged : {
+
+        }
     }
 
     GraphArea {
         id: graphArea
+
         Layout.fillHeight: true
         Layout.fillWidth: true
     }

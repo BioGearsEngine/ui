@@ -3,23 +3,31 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.3
 
-TabButton {
+Rectangle {
     id: root
+    property string text : "unasigned"
 
-    text: qsTr("Unset")
+    Layout.fillWidth: true
+    Layout.fillHeight: true
 
-    contentItem: Text {
+    Rectangle {
+        anchors.fill : parent
+        id:backgroundRect
+        color: "steelblue"
+        border.color: "steelblue"
+        opacity: enabled ? 1.0 : 0.3
+
+        Text {
+        id:content
+        anchors.centerIn : parent
         text: root.text
-        font: root.font
+        font: Qt.application.font
         color: "white"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         opacity: enabled ? 1.0 : 0.3
+        elide: Text.ElideRight
     }
-    background: Rectangle {
-        color: "steelblue"
-        border.color: "steelblue"
-        opacity: enabled ? 1.0 : 0.3
     }
 }
 

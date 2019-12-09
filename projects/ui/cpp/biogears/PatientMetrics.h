@@ -10,6 +10,9 @@ struct PatientMetrics {
   QString systolic_blood_pressure_mmHg ;
   QString diastolic_blood_pressure_mmHg ;
 
+  
+
+
   bool operator==(const PatientMetrics& rhs) const
   { return
     respiratory_rate_bpm == rhs.respiratory_rate_bpm

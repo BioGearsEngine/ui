@@ -66,7 +66,7 @@ void Scenario::join()
 //-------------------------------------------------------------------------------
 void Scenario::step()
 {
-  dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1.0, biogears::TimeUnit::s);
+  physiology_thread_step();
 }
 //-------------------------------------------------------------------------------
 QString Scenario::patient_name()
@@ -196,7 +196,6 @@ Scenario& Scenario::load_patient(QString file)
 
   return *this;
 }
-
 //-------------------------------------------------------------------------------
 void Scenario::physiology_thread_main()
 {
@@ -222,6 +221,10 @@ inline void Scenario::physiology_thread_step()
     dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
   }
   dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
+
+  emit patientStateChanged(get_physiology_state());
+  emit patientMetricsChanged(get_physiology_metrics());
+  emit patientConditionsChanged(get_physiology_conditions());
 }
 //---------------------------------------------------------------------------------
 auto Scenario::get_physiology_state() -> PatientState
