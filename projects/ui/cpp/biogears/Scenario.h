@@ -63,13 +63,13 @@ public: //Action Factory Interface;
 
 signals:
   void patientStateChanged(PatientState patientState);
-  void patientMetricsChanged(PatientMetrics metrics);
+  void patientMetricsChanged(PatientMetrics* metrics);
   void patientConditionsChanged(PatientConditions conditions);
   void timeAdvance();
 
 protected:
   PatientState get_physiology_state();
-  PatientMetrics get_physiology_metrics();
+  PatientMetrics* get_physiology_metrics();
   PatientConditions get_physiology_conditions();
 
 

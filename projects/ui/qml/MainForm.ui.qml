@@ -22,13 +22,13 @@ GridLayout {
         Layout.fillHeight: false
 
         onPatientMetricsChanged : {
-            graphArea.plotUpdates(metrics)
+            graphArea.metricUpdates(metrics)
         }
         onPatientConditionsChanged : {
-
+            graphArea.conditionUpdates(conditions)
         }
         onPatientStateChanged : {
-
+            graphArea.stateUpdates(state)
         }
     }
 

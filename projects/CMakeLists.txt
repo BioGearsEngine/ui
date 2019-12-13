@@ -39,7 +39,7 @@ find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 # Update submodules as needed
     option(BUILD_Biogears "Build Biogears using provided submodule" ON)
-    if(BUILD_Biogears)
+    if(BUILD_Biogears AND NOT Biogears_SUBMODULE_PULLED )
         message(STATUS "Updating Biogears Submodule")
         execute_process(
                         COMMAND ${CMAKE_COMMAND} -E echo ${GIT_EXECUTABLE} submodule init extern/biogears
@@ -53,6 +53,8 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
                        )
         if(NOT GIT_SUBMOD_RESULT EQUAL "0")
             message(FATAL_ERROR "Git operation failed with ${GIT_ERROR}, please checkout submodules")
+       else ()
+            set (Biogears_SUBMODULE_PULLED "The Cmake Build Machine has Initialized the Build System" CACHE BOOL ON)
         endif()
     endif()
 endif()

@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
   QQmlApplicationEngine engine;
 
   qmlRegisterType<bio::Scenario>("com.biogearsengine.ui.scenario", 1, 0, "Scenario");
+  qmlRegisterType<PatientMetrics>("com.biogearsengine.ui.scenario", 1, 0, "PatientMetrics");
   qmlRegisterType<bio::SystemInformation>("com.biogearsengine.ui.scenario", 1, 0, "Info");
 
   qRegisterMetaType<PatientState>();
@@ -26,11 +27,11 @@ int main(int argc, char* argv[])
 
   qRegisterMetaType<PatientConditions>();
   QMetaType::registerEqualsComparator<PatientConditions>();
-  qmlRegisterUncreatableType<PatientConditions>("com.biogearsengine.ui.scenario", 1, 0, "PatientConditions", "Conditions of the Patient");
+  qmlRegisterUncreatableType<PatientConditions>("com.biogearsengine.ui.scenario", 1,  0, "PatientConditions", "Conditions of the Patient");
 
-  qRegisterMetaType<PatientMetrics>();
-  QMetaType::registerEqualsComparator<PatientMetrics>();
-  qmlRegisterUncreatableType<PatientMetrics>("com.biogearsengine.ui.scenario", 1, 0, "PatientMetrics", "Metrics of the Patient");
+  //qRegisterMetaType<PatientMetrics>();
+  //QMetaType::registerEqualsComparator<PatientMetrics>();
+  //qmlRegisterUncreatableType<PatientMetrics>("com.biogearsengine.ui.scenario", 1, 0, "PatientMetrics", "Metrics of the Patient");
 
   engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
 

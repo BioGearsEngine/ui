@@ -94,6 +94,10 @@ Item {
       name: "redBloodCellCount"
       axisX : ValueAxis {}
       axisY : ValueAxis {}
+
+      onPointAdded : {
+        console.log("THE ROOF THE ROOF THE ROOF IS ON FIRE.")
+      }
     }
   property LineSeries shuntFraction : LineSeries {
       

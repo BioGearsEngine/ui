@@ -2,13 +2,21 @@
 
 #include <QObject>
 
-struct PatientMetrics {
+struct PatientMetrics : QObject{
+  PatientMetrics(QObject* parent = nullptr)
+    : QObject(parent)
+  {
+  }
+
   QString respiratory_rate_bpm;
   QString heart_rate_bpm;
   QString core_temperature_c;
   QString oxygen_saturation_pct;
   QString systolic_blood_pressure_mmHg;
   QString diastolic_blood_pressure_mmHg;
+
+  double simulationTime;
+  double timeStep;
 
   //Blood Chemistry 
   double arterialBloodPH;
@@ -126,18 +134,23 @@ struct PatientMetrics {
       && inflammatoryResponseInterleukin12 == rhs.inflammatoryResponseInterleukin12
       && inflammatoryResponseCatecholamines == rhs.inflammatoryResponseCatecholamines
       && inflammatoryResponseTissueIntegrity == rhs.inflammatoryResponseTissueIntegrity
+      && simulationTime == rhs.simulationTime
+      && timeStep == rhs.timeStep
     ;
   }
   bool operator!=(const PatientMetrics& rhs) const { return !(*this == rhs); }
 
 private:
-  Q_GADGET
+  Q_OBJECT
   Q_PROPERTY(QString RespritoryRate MEMBER respiratory_rate_bpm)
   Q_PROPERTY(QString HeartRate MEMBER heart_rate_bpm)
   Q_PROPERTY(QString CoreTemp MEMBER core_temperature_c)
   Q_PROPERTY(QString OxygenSaturation MEMBER oxygen_saturation_pct)
   Q_PROPERTY(QString SystolicBloodPressure MEMBER systolic_blood_pressure_mmHg)
   Q_PROPERTY(QString DiastolicBloodPressure MEMBER diastolic_blood_pressure_mmHg)
+
+  Q_PROPERTY(double simulationTime MEMBER simulationTime)
+  Q_PROPERTY(double timeStep MEMBER timeStep)
 
   Q_PROPERTY(double arterialBloodPH MEMBER arterialBloodPH )
   Q_PROPERTY(double arterialBloodPHBaseline MEMBER arterialBloodPHBaseline )
@@ -192,5 +205,3 @@ private:
   Q_PROPERTY(double inflammatoryResponseCatecholamines MEMBER inflammatoryResponseCatecholamines )
   Q_PROPERTY(double inflammatoryResponseTissueIntegrity MEMBER inflammatoryResponseTissueIntegrity )
 };
-
-Q_DECLARE_METATYPE(PatientMetrics)

@@ -9,7 +9,9 @@ GraphAreaForm {
   signal stop()
   signal pause()
 
-  signal plotUpdates(PatientMetrics metrics)
+  signal metricUpdates(PatientMetrics metrics)
+  signal stateUpdates(PatientState state)
+  signal conditionUpdates(PatientConditions conditions)
 
   property double count_1 : 0.0
   property double count_2 : 0.0
@@ -26,45 +28,92 @@ GraphAreaForm {
     console.log("GraphAreaForm " + "pause")
   }
 
-  onPlotUpdates: {
-    bloodChemistry.requests.redBloodCellCount.append(count_1,count_1)
-    bloodChemistry.requests.venousOxygenPressure.append(count_2,count_2)
-
-    count_1 = count_1 + 0.1
-    count_2 = count_2 + 0.2
-
-    console.log("redBloodCellCount + %1,%2".arg(count_1).arg(count_1))
-    console.log("venousOxygenPressure + %1,%2".arg(count_2).arg(count_2))
+   onMetricUpdates: {
+    console.log ("GraphArea.onMetricUpdates redBloodCellCount(%1 %2)".arg(metrics.simulationTime).arg(metrics.redBloodCellCount))
+    console.log ("GraphArea.onMetricUpdates venousOxygenPressure (%1 %2)".arg(metrics.simulationTime).arg(metrics.redBloodCellCount))
+    bloodChemistry.requests.redBloodCellCount.append(metrics.simulationTime, metrics.redBloodCellCount)
+    bloodChemistry.requests.venousOxygenPressure.append(metrics.simulationTime, metrics.venousOxygenPressure)
   }
 
+  onStateUpdates: {
+  }
+
+  onConditionUpdates: {
+  }
+  ValueAxis {
+    id: timeAxis
+    property int tickCount : 0
+    titleText : "Simulation Time"
+    min: 0
+    max : 60
+  }
   Component.onCompleted: {
-    console.log("GraphaArea Componet.onCompleted")
 
     // lineSeries is a LineSeries object that has already been added to the ChartView; re-use its axes
-    bloodChemistry.requests.redBloodCellCount = bloodChemistry.createSeries(bloodChemistry.requests.redBloodCellCount, "Red Blood Cell Count", bloodChemistry.requests.redBloodCellCount.axisX, bloodChemistry.requests.redBloodCellCount.axisY);
-    bloodChemistry.requests.venousOxygenPressure  = bloodChemistry.createSeries(ChartView.SeriesTypeLine, "Venous Oxygen Pressure", bloodChemistry.requests.venousOxygenPressure.axisX, bloodChemistry.requests.venousOxygenPressure.axisY);
+    bloodChemistry.requests.redBloodCellCount = bloodChemistry.createSeries(bloodChemistry.requests.redBloodCellCount, "Red Blood Cell Count"
+    , timeAxis, bloodChemistry.requests.redBloodCellCount.axisY);
 
-    bloodChemistry.requests.redBloodCellCount.axisX = bloodChemistry.axisX(bloodChemistry.requests.redBloodCellCount)
     bloodChemistry.requests.redBloodCellCount.axisY = bloodChemistry.axisY(bloodChemistry.requests.redBloodCellCount)
-    
-    bloodChemistry.requests.redBloodCellCount.axisX.min = 0.
-    bloodChemistry.requests.redBloodCellCount.axisX.max = 10.
     bloodChemistry.requests.redBloodCellCount.axisY.min = 0.
-    bloodChemistry.requests.redBloodCellCount.axisY.max = 10.
+    bloodChemistry.requests.redBloodCellCount.axisY.max = 1.
+    bloodChemistry.requests.redBloodCellCount.axisY.titleText = "redBloodCellCount"
+bloodChemistry.requests.redBloodCellCount.axisY.labelFormat = '%0.2e'
+    //Trying to get a Right sided Axis seems ignored because axisY and axisYRight are mutually exlusive
+    //I figure bloodChemistry.axisY automatically asigns to axisY
+    bloodChemistry.requests.venousOxygenPressure  = bloodChemistry.createSeries(ChartView.SeriesTypeLine, "Venous Oxygen Pressure",
+    timeAxis, bloodChemistry.requests.venousOxygenPressure.axisY);
 
-    bloodChemistry.requests.venousOxygenPressure.axisX = bloodChemistry.axisX(bloodChemistry.requests.venousOxygenPressure)
-    bloodChemistry.requests.venousOxygenPressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.venousOxygenPressure)
+    bloodChemistry.requests.venousOxygenPressure.axisYRight = bloodChemistry.axisY(bloodChemistry.requests.venousOxygenPressure)
+    bloodChemistry.requests.venousOxygenPressure.axisYRight.min = 0.
+    bloodChemistry.requests.venousOxygenPressure.axisYRight.max = 1.
+    bloodChemistry.requests.venousOxygenPressure.axisYRight.labelFormat = '%0.2d'
+    bloodChemistry.requests.venousOxygenPressure.axisYRight.titleText = "venousOxygenPressure"
 
-    bloodChemistry.requests.venousOxygenPressure.axisX.min = 0.
-    bloodChemistry.requests.venousOxygenPressure.axisX.max = 25.
-    bloodChemistry.requests.venousOxygenPressure.axisY.min = 0.
-    bloodChemistry.requests.venousOxygenPressure.axisY.max = 25.
-
-    bloodChemistry.requests.venousOxygenPressure.pointAdded.connect (handleNewPoint)
+    // bloodChemistry.requests.venousOxygenPressure.pointAdded.connect (handleNewPoint)
   }
 
-  function handleNewPoint() {
-      console.log("Been a long road.")
+
+  function newPointHandler(series,pointIndex) {
+      var start = ( series.count < 3600 ) ? 0 : series.count - 3600;
+      var min = series.at(start).y;
+      var max = series.at(start).y;
+
+      for(var i = start; i < series.count; ++i){
+          min = Math.min(min >= series.at(i).y) ? series.at(i).y : min;
+          max = (max <= series.at(i).y) ? series.at(i).y : max;
+      }
+      if(series.axisY){
+        series.axisY.min = Math.max(0,min * .90)
+        series.axisY.max = Math.max(1,max * 1.10)
+      } else if (series.axisYRight) {
+        series.axisYRight.min = Math.max(0,min * .90)
+        series.axisYRight.max = Math.max(1,max * 1.10)
+      }
+  }
+function domainUpdate() {
+  timeAxis.tickCount = timeAxis.tickCount + 1;
+  const interval =  60 * 15
+  if ( timeAxis.tickCount > interval ){
+    timeAxis.min = timeAxis.tickCount - interval
+    timeAxis.max = timeAxis.tickCount
+  } else {
+    timeAxis.min = 0
+    timeAxis.max = interval
+  }
+}
+  Connections {
+    target : 
+      bloodChemistry.requests.venousOxygenPressure
+    onPointAdded : newPointHandler(bloodChemistry.requests.venousOxygenPressure, index)
+  }
+  // Connections {
+  //   target : 
+  //   bloodChemistry.requests.redBloodCellCount
+  //   onPointAdded : newPointHandler(bloodChemistry.requests.redBloodCellCount, index)
+  // }
+    Connections {
+    target : bloodChemistry.requests.venousOxygenPressure
+    onPointAdded : domainUpdate()
   }
   // bloodChemistry.requests.redBloodCellCount.onPointAdded: {
   //   console.log("Five by Five in the Pipe")

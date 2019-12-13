@@ -8,27 +8,26 @@ ControlsForm {
     signal playClicked()
     signal stopClicked()
 
-    signal patientMetricsChanged( PatientMetrics metrics )
-    signal patientStateChanged( PatientState patientState )
-    signal patientConditionsChanged( PatientConditions conditions )
-    
+    signal patientMetricsChanged(PatientMetrics metrics )
+    signal patientStateChanged(PatientState patientState )
+    signal patientConditionsChanged(PatientConditions conditions )
 
     property alias running : advanceTimer.running
     property Scenario scenario : biogears_scenario
-
     patientBox.scenario : biogears_scenario
 
     Scenario {
         id: biogears_scenario
         onPatientMetricsChanged: {
+            if(metrics){
                 root.respritoryRate.value        = metrics.RespritoryRate
                 root.heartRate.value             = metrics.HeartRate 
                 root.core_temp_c.value           = metrics.CoreTemp + "c"
                 root.oxygenSaturation.value      = metrics.OxygenSaturation
                 root.systolicBloodPressure.value = metrics.SystolicBloodPressure
                 root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
-
                 root.patientMetricsChanged(metrics)
+            }
         }
         onPatientStateChanged: {
                 root.age_yr.value    = patientState.Age
@@ -40,10 +39,10 @@ ControlsForm {
                 root.bodyMassIndex.value        = patientState.BodyMassIndex
                 root.fat_pct.value              = patientState.BodyFat
                 
-                root.patientMetricsChanged(patientState)
+                root.patientStateChanged(patientState)
         }
         onPatientConditionsChanged:{
-            root.patientMetricsChanged(conditions)
+            root.patientConditionsChanged(conditions)
         }
     }
     playback.onPauseClicked: {
@@ -86,7 +85,7 @@ ControlsForm {
     }
     Timer {
       id: advanceTimer
-      interval: 100; running: false; repeat: true
+      interval: 1000; running: false; repeat: true
       onTriggered: biogears_scenario.step()
     }
 }

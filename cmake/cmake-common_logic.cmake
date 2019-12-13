@@ -280,10 +280,12 @@ endfunction()
 function(setup_unified_output_directory )
   cmake_parse_arguments( "_"  "UNIFIED" "PREFIX"
                          "" ${ARGN} )
+						 
 if(NOT __UNIFIED_DIR) 
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_PREFIX}/$<CONFIG>/lib" PARENT_SCOPE)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_PREFIX}/$<CONFIG>/$<IF:$<PLATFORM_ID:Windows>,bin,lib>" PARENT_SCOPE)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_PREFIX}/$<CONFIG>/bin" PARENT_SCOPE)
   set(__UNIFIED_DIR ON PARENT_SCOPE)
 endif()
+message(STATUS ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 endfunction()
