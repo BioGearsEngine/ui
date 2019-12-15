@@ -23,7 +23,6 @@ ApplicationWindow {
         anchors.topMargin: -1
         anchors.fill : parent
         Component.onCompleted : {
-            console.log ("Starting Biogears with %1".arg(scenario.patient_name()))
         }
         controls.onPlayClicked:  {
             graphArea.start()

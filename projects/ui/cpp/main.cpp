@@ -35,5 +35,5 @@ int main(int argc, char* argv[])
 
   engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
 
-  return app.exec();
+    return app.exec();
 }

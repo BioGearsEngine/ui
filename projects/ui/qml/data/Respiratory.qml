@@ -4,88 +4,230 @@ import QtCharts 2.3
 
 Item {
   id: root
-
-property alias alveolarArterialGradient: alveolarArterialGradient
-property alias carricoIndex: carricoIndex
-property alias endTidalCarbonDioxideFraction: endTidalCarbonDioxideFraction
-property alias endTidalCarbonDioxidePressure: endTidalCarbonDioxidePressure
-property alias expiratoryFlow: expiratoryFlow
-property alias inspiratoryExpiratoryRatio: inspiratoryExpiratoryRatio
-property alias inspiratoryFlow: inspiratoryFlow
-property alias pulmonaryCompliance: pulmonaryCompliance
-property alias pulmonaryResistance: pulmonaryResistance
-property alias respirationDriverPressure: respirationDriverPressure
-property alias respirationMusclePressure: respirationMusclePressure
-property alias respirationRate: respirationRate
-property alias specificVentilation: specificVentilation
-property alias targetPulmonaryVentilation: targetPulmonaryVentilation
-property alias tidalVolume: tidalVolume
-property alias totalAlveolarVentilation: totalAlveolarVentilation
-property alias totalDeadSpaceVentilation: totalDeadSpaceVentilation
-property alias totalLungVolume: totalLungVolume
-property alias totalPulmonaryVentilation: totalPulmonaryVentilation
-property alias transpulmonaryPressure: transpulmonaryPressure
-
-property list<LineSeries> requests : [
-  LineSeries {
-    id: alveolarArterialGradient
+  property ValueAxis axisX : ValueAxis {
+    property int tickCount : 0
+    titleText : "Simulation Time"
+    min: 0
+    max : 60
   }
- ,LineSeries {
-    id: carricoIndex
+  property LineSeries  alveolarArterialGradient : LineSeries {
+    name : "alveolarArterialGradient"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: endTidalCarbonDioxideFraction
+  property LineSeries  carricoIndex : LineSeries {
+    name : "carricoIndex"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: endTidalCarbonDioxidePressure
+  property LineSeries  endTidalCarbonDioxideFraction : LineSeries {
+    name : "endTidalCarbonDioxideFraction"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: expiratoryFlow
+  property LineSeries  endTidalCarbonDioxidePressure : LineSeries {
+    name : "endTidalCarbonDioxidePressure"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: inspiratoryExpiratoryRatio
+  property LineSeries  expiratoryFlow : LineSeries {
+    name : "expiratoryFlow"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: inspiratoryFlow
+  property LineSeries  inspiratoryExpiratoryRatio : LineSeries {
+    name : "inspiratoryExpiratoryRatio"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: pulmonaryCompliance
+  property LineSeries  inspiratoryFlow : LineSeries {
+    name : "inspiratoryFlow"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: pulmonaryResistance
+  property LineSeries  pulmonaryCompliance : LineSeries {
+    name : "pulmonaryCompliance"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: respirationDriverPressure
+  property LineSeries  pulmonaryResistance : LineSeries {
+    name : "pulmonaryResistance"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: respirationMusclePressure
+  property LineSeries  respirationDriverPressure : LineSeries {
+    name : "respirationDriverPressure"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: respirationRate
+  property LineSeries  respirationMusclePressure : LineSeries {
+    name : "respirationMusclePressure"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: specificVentilation
+  property LineSeries  respirationRate : LineSeries {
+    name : "respirationRate"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: targetPulmonaryVentilation
+  property LineSeries  specificVentilation : LineSeries {
+    name : "specificVentilation"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: tidalVolume
+  property LineSeries  targetPulmonaryVentilation : LineSeries {
+    name : "targetPulmonaryVentilation"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: totalAlveolarVentilation
+  property LineSeries  tidalVolume : LineSeries {
+    name : "tidalVolume"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: totalDeadSpaceVentilation
+  property LineSeries  totalAlveolarVentilation : LineSeries {
+    name : "totalAlveolarVentilation"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: totalLungVolume
+  property LineSeries  totalDeadSpaceVentilation : LineSeries {
+    name : "totalDeadSpaceVentilation"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: totalPulmonaryVentilation
+  property LineSeries  totalLungVolume : LineSeries {
+    name : "totalLungVolume"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: transpulmonaryPressure
+  property LineSeries  totalPulmonaryVentilation : LineSeries {
+    name : "totalPulmonaryVentilation"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
-  ]
+  property LineSeries  transpulmonaryPressure : LineSeries {
+    name : "transpulmonaryPressure"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
+  }
 }

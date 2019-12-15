@@ -4,323 +4,580 @@ import QtCharts 2.3
 
 Item {
   id:root
-
+  
   property LineSeries arterialBloodPH : LineSeries {
-      
       name: "arterialBloodPH"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries arterialBloodPHBaseline : LineSeries {
-      
-      name: "arterialBloodPHBaseline"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries bloodDensity : LineSeries {
-      
-      name: "bloodDensity"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries bloodSpecificHeat : LineSeries {
-      
-      name: "bloodSpecificHeat"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries bloodUreaNitrogenConcentration : LineSeries {
-      
-      name: "bloodUreaNitrogenConcentration"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries carbonDioxideSaturation : LineSeries {
-      
-      name: "carbonDioxideSaturation"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries carbonMonoxideSaturation : LineSeries {
-      
-      name: "carbonMonoxideSaturation"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries hematocrit : LineSeries {
-      
-      name: "hematocrit"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-   property LineSeries hemoglobinContent : LineSeries {
-      
-      name: "hemoglobinContent"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries oxygenSaturation : LineSeries {
-      
-      name: "oxygenSaturation"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-  property LineSeries phosphate : LineSeries {
-      
-      name: "phosphate"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }   
-  property LineSeries plasmaVolume : LineSeries {
-      
-      name: "plasmaVolume"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }   
-  property LineSeries pulseOximetry : LineSeries {
-      
-      name: "pulseOximetry"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }   
-  property LineSeries redBloodCellAcetylcholinesterase : LineSeries {
-      
-      name: "redBloodCellAcetylcholinesterase"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }   
-  property LineSeries redBloodCellCount : LineSeries {
-      
-      name: "redBloodCellCount"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
+      axisY : ValueAxis {
+            min : 0.
+            max : 1.
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
 
-      onPointAdded : {
-        console.log("THE ROOF THE ROOF THE ROOF IS ON FIRE.")
       }
-    }
+  }
+  property LineSeries arterialBloodPHBaseline : LineSeries {
+      name: "arterialBloodPHBaseline"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Arterial BloodPH Baseline"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries bloodDensity : LineSeries {
+      name: "bloodDensity"     
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Blood Density"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries bloodSpecificHeat : LineSeries {
+      name: "bloodSpecificHeat"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Blood Specific Heat"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries bloodUreaNitrogenConcentration : LineSeries {
+      name: "bloodUreaNitrogenConcentration"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Blood Urea N<sup>2</sup> Concentration"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries carbonDioxideSaturation : LineSeries {
+      name: "carbonDioxideSaturation"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "CO<sup>2</sup> Saturation"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries carbonMonoxideSaturation : LineSeries {
+      name: "carbonMonoxideSaturation"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "CO Saturation"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries hematocrit : LineSeries {
+      name: "hematocrit"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Hematocrit"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries hemoglobinContent : LineSeries {
+      name: "hemoglobinContent"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Hemoglobin Content"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries oxygenSaturation : LineSeries {
+      name: "oxygenSaturation"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "O<sup>2</sup> Saturation"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries phosphate : LineSeries {
+      name: "phosphate"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Phosphate"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }   
+  property LineSeries plasmaVolume : LineSeries {
+      name: "plasmaVolume"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Plasma Volume"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }   
+  property LineSeries pulseOximetry : LineSeries {
+      name: "pulseOximetry"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Pulse Oximetry"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }   
+  property LineSeries redBloodCellAcetylcholinesterase : LineSeries {
+      name: "redBloodCellAcetylcholinesterase"
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "RBC Acetylchol Cholinesterase"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }   
+  property LineSeries redBloodCellCount : LineSeries {
+      name: "redBloodCellCount"
+      axisY : ValueAxis {
+      min : 0.
+      max : 1.
+      property string label : "Red Blood Cell Count"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      labelFormat : (max < 100)?  '%0.2d': '%0.2e'
+      }
+  }
   property LineSeries shuntFraction : LineSeries {
-      
       name: "shuntFraction"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }     
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Shunt Fraction"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }     
   property LineSeries strongIonDifference : LineSeries {
-      
       name: "strongIonDifference"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Strong Ion Difference"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries totalBilirubin : LineSeries {
-      
       name: "totalBilirubin"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Total Billirubin"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries totalProteinConcentration : LineSeries {
-      
       name: "totalProteinConcentration"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Total Protein Concentration"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries venousBloodPH : LineSeries {
-      
       name: "venousBloodPH"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Venous BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries volumeFractionNeutralPhospholipidInPlasma : LineSeries {
-      
       name: "volumeFractionNeutralPhospholipidInPlasma"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Volume Fraction Netural Phospholipid In Plasma"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries volumeFractionNeutralLipidInPlasma : LineSeries {
-      
       name: "volumeFractionNeutralLipidInPlasma"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Volume Fraction Neutrual Lipid In Plasma"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries arterialCarbonDioxidePressure : LineSeries {
-      
       name: "arterialCarbonDioxidePressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Arterial CO<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries arterialOxygenPressure : LineSeries {
-      
       name: "arterialOxygenPressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Pulmonary arterial  CO<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries pulmonaryArterialCarbonDioxidePressure : LineSeries {
-      
       name: "pulmonaryArterialCarbonDioxidePressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Pulmonary Arterial CO<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries pulmonaryArterialOxygenPressure :LineSeries {
-      
       name: "pulmonaryArterialOxygenPressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Pulmonary Arterial O<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries pulmonaryVenousCarbonDioxidePressure : LineSeries {
-      
       name: "pulmonaryVenousCarbonDioxidePressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Pulmonary Venous CO<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries pulmonaryVenousOxygenPressure : LineSeries {
-      
       name: "pulmonaryVenousOxygenPressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Pulmonary Venous O<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries venousCarbonDioxidePressure : LineSeries {
-      
       name: "venousCarbonDioxidePressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-   property LineSeries venousOxygenPressure : LineSeries {
-      
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Venous CO<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
+  property LineSeries venousOxygenPressure : LineSeries {
       name: "venousOxygenPressure"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
-    property LineSeries inflammatoryResponse : LineSeries {
-      
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Venous O<sup>2</sup> Pressure"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+   }
+   property LineSeries inflammatoryResponse : LineSeries {
       name: "inflammatoryResponse"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseLocalPathogen : LineSeries {
-      
       name: "inflammatoryResponseLocalPathogen"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Local Pathogen"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseLocalMacrophage : LineSeries {
-      
       name: "inflammatoryResponseLocalMacrophage"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Local Macrophage"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseLocalNeutrophil : LineSeries {
-      
       name: "inflammatoryResponseLocalNeutrophil"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Local Neutrophil"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseLocalBarrier : LineSeries {
-      
       name: "inflammatoryResponseLocalBarrier"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Local Barrier"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseBloodPathogen : LineSeries {
-      
       name: "inflammatoryResponseBloodPathogen"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    } 
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Blood Pathogen"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  } 
   property LineSeries inflammatoryResponseTrauma : LineSeries {
-      
       name: "inflammatoryResponseTrauma"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Trauma"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
    property LineSeries inflammatoryResponseMacrophageResting : LineSeries {
-      
       name: "inflammatoryResponseMacrophageResting"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Macrophage Resting"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseMacrophageActive : LineSeries {
-      
       name: "inflammatoryResponseMacrophageActive"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Macrophage Active"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseNeutrophilResting : LineSeries {
-      
       name: "inflammatoryResponseNeutrophilResting"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Neutrophil Resting"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseNeutrophilActive : LineSeries {
-      
       name: "inflammatoryResponseNeutrophilActive"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Neutrophil Active"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseInducibleNOSPre : LineSeries {
-      
       name: "inflammatoryResponseInducibleNOSPre"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Inducible NOS Pre"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseInducibleNOS : LineSeries {
-      
       name: "inflammatoryResponseInducibleNOS"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Inducible NOS"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseConstitutiveNOS : LineSeries {
-      
       name: "inflammatoryResponseConstitutiveNOS"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Consitutive NOS"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseNitrate : LineSeries {
-      
       name: "inflammatoryResponseNitrate"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Nitrate"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseNitricOxide : LineSeries {
-      
       name: "inflammatoryResponseNitricOxide"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Nitric Oxide"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseTumorNecrosisFactor : LineSeries {
-      
       name: "inflammatoryResponseTumorNecrosisFactor"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Tumor Necrosis Factor"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseInterleukin6 : LineSeries {
-      
       name: "inflammatoryResponseInterleukin6"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Inter Lukin 6"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseInterleukin10 : LineSeries {
-      
       name: "inflammatoryResponseInterleukin10"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Inter Lukin 10"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseInterleukin12 : LineSeries {
-      
       name: "inflammatoryResponseInterleukin12"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Inter Lukin 12"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseCatecholamines : LineSeries {
-      
       name: "inflammatoryResponseCatecholamines"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Catecholamines"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
   property LineSeries inflammatoryResponseTissueIntegrity : LineSeries {
-      
       name: "inflammatoryResponseTissueIntegrity"
-      axisX : ValueAxis {}
-      axisY : ValueAxis {}
-    }
+      axisY : ValueAxis {
+            min:0.0
+            max:1.0
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+            property string label : "Inflammatory Response Tissue Integrity"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+      }
+  }
 
 }
 

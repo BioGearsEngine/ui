@@ -4,16 +4,32 @@ import QtCharts 2.3
 
 Item {
   id: root
-
-property alias ketoneproductionRate: ketoneproductionRate
-property alias hepaticGluconeogenesisRate: hepaticGluconeogenesisRate
-
-property list<LineSeries> requests : [
-  LineSeries {
-    id: ketoneproductionRate
+  property ValueAxis axisX : ValueAxis {
+    property int tickCount : 0
+    titleText : "Simulation Time"
+    min: 0
+    max : 60
   }
- ,LineSeries {
-    id: hepaticGluconeogenesisRate
+  property LineSeries  ketoneproductionRate : LineSeries {
+    name : "ketoneproductionRate"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "ketoneproductionRate"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
-  ]
+  property LineSeries  hepaticGluconeogenesisRate : LineSeries {
+    name : "hepaticGluconeogenesisRate"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "hepaticGluconeogenesisRate"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
+  }
 }

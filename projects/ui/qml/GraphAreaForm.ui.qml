@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.3
+import QtCharts 2.3
 
 import "./data" as Requests
 
@@ -78,70 +79,145 @@ Page {
         clip:true 
         UIPlotSeries {
             id: bloodChemistrySeries
-            property alias requests : bloodChemistryRequests
+            property Item requests : 
             Requests.BloodChemistry {
                 id : bloodChemistryRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: cardiovascular
+            property Item requests : 
             Requests.Cardiovascular {
                 id : cardiovascularRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: drugs
+            property Item requests :
             Requests.Drugs {
                 id : drugRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: endocrine
+            property Item requests :
             Requests.Endocrine {
                 id : endocrineRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: energy
+            property Item requests :
             Requests.Energy {
                 id : energyRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: gastrointestinal
+            property Item requests :
             Requests.Gastrointestinal {
                 id : gastrointestinalRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: hepatic
-            
+            property Item requests :
             Requests.Hepatic {
                 id : hepaticRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: nervous
+            property Item requests :
             Requests.Nervous {
                 id : nervousRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: renal
+            property Item requests :
             Requests.Renal {
                 id : renalRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: respiratory
+            property Item requests :
             Requests.Respiratory {
                 id : respiratoryRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
         UIPlotSeries {
             id: tissue
+            property Item requests :
             Requests.Tissue {
                 id : tissueRequests
+            }
+            property ValueAxis axisX : ValueAxis {
+                property int tickCount : 0
+                titleText : "Simulation Time"
+                min: 0
+                max : 60
             }
         }
     }

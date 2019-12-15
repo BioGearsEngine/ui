@@ -4,52 +4,131 @@ import QtCharts 2.3
 
 Item {
   id: root
-
-property alias bronchodilationLevel: bronchodilationLevel
-property alias heartRateChange: heartRateChange
-property alias hemorrhageChange: hemorrhageChange
-property alias meanBloodPressureChange: meanBloodPressureChange
-property alias neuromuscularBlockLevel: neuromuscularBlockLevel
-property alias pulsePressureChange: pulsePressureChange
-property alias respirationRateChange: respirationRateChange
-property alias sedationLevel: sedationLevel
-property alias tidalVolumeChange: tidalVolumeChange
-property alias tubularPermeabilityChange: tubularPermeabilityChange
-property alias centralNervousResponse: centralNervousResponse
-
-property list<LineSeries> requests : [
-  LineSeries {
-    id: bronchodilationLevel
+  property ValueAxis axisX : ValueAxis {
+    property int tickCount : 0
+    titleText : "Simulation Time"
+    min: 0
+    max : 60
   }
- ,LineSeries {
-    id: heartRateChange
+  property LineSeries  bronchodilationLevel : LineSeries {
+    name : "bronchodilationLevel"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "bronchodilationLevel"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: hemorrhageChange
+  property LineSeries  heartRateChange : LineSeries {
+    name : "heartRateChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "heartRateChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: meanBloodPressureChange
+  property LineSeries  hemorrhageChange : LineSeries {
+    name : "hemorrhageChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "hemorrhageChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: neuromuscularBlockLevel
+  property LineSeries  meanBloodPressureChange : LineSeries {
+    name : "meanBloodPressureChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "meanBloodPressureChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: pulsePressureChange
+  property LineSeries  neuromuscularBlockLevel : LineSeries {
+    name : "neuromuscularBlockLevel"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "neuromuscularBlockLevel"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: respirationRateChange
+  property LineSeries  pulsePressureChange : LineSeries {
+    name : "pulsePressureChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "pulsePressureChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: sedationLevel
+  property LineSeries  respirationRateChange : LineSeries {
+    name : "respirationRateChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "respirationRateChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: tidalVolumeChange
+  property LineSeries  sedationLevel : LineSeries {
+    name : "sedationLevel"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "sedationLevel"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: tubularPermeabilityChange
+  property LineSeries  tidalVolumeChange : LineSeries {
+    name : "tidalVolumeChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "tidalVolumeChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: centralNervousResponse
+  property LineSeries  tubularPermeabilityChange : LineSeries {
+    name : "tubularPermeabilityChange"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "tubularPermeabilityChange"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
-  ]
+  property LineSeries  centralNervousResponse : LineSeries {
+    name : "centralNervousResponse"
+    axisY: ValueAxis {
+            min : 0.
+            max : 1.
+            property string label : "centralNervousResponse"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
+  }
 }

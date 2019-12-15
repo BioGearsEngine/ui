@@ -4,84 +4,219 @@ import QtCharts 2.3
 
 Item {
   id: root
-
-property alias carbonDioxideProductionRate: carbonDioxideProductionRate
-property alias dehydrationFraction: dehydrationFraction
-property alias extracellularFluidVolume: extracellularFluidVolume
-property alias extravascularFluidVolume: extravascularFluidVolume
-property alias intracellularFluidPH: intracellularFluidPH
-property alias intracellularFluidVolume: intracellularFluidVolume
-property alias totalBodyFluidVolume: totalBodyFluidVolume
-property alias oxygenConsumptionRate: oxygenConsumptionRate
-property alias respiratoryExchangeRatio: respiratoryExchangeRatio
-property alias liverInsulinSetPoint: liverInsulinSetPoint
-property alias liverGlucagonSetPoint: liverGlucagonSetPoint
-property alias muscleInsulinSetPoint: muscleInsulinSetPoint
-property alias muscleGlucagonSetPoint: muscleGlucagonSetPoint
-property alias fatInsulinSetPoint: fatInsulinSetPoint
-property alias fatGlucagonSetPoint: fatGlucagonSetPoint
-property alias liverGlycogen: liverGlycogen
-property alias muscleGlycogen: muscleGlycogen
-property alias storedProtein: storedProtein
-property alias storedFat: storedFat
-
-property list<LineSeries> requests : [
- LineSeries {
-    id: carbonDioxideProductionRate
+  property ValueAxis axisX : ValueAxis {
+    property int tickCount : 0
+    titleText : "Simulation Time"
+    min: 0
+    max : 60
   }
- ,LineSeries {
-    id: dehydrationFraction
+  property LineSeries  carbonDioxideProductionRate : LineSeries {
+    name : "carbonDioxideProductionRate"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: extracellularFluidVolume
+  property LineSeries  dehydrationFraction : LineSeries {
+    name : "dehydrationFraction"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: extravascularFluidVolume
+  property LineSeries  extracellularFluidVolume : LineSeries {
+    name : "extracellularFluidVolume"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: intracellularFluidPH
+  property LineSeries  extravascularFluidVolume : LineSeries {
+    name : "extravascularFluidVolume"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: intracellularFluidVolume
+  property LineSeries  intracellularFluidPH : LineSeries {
+    name : "intracellularFluidPH"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: totalBodyFluidVolume
+  property LineSeries  intracellularFluidVolume : LineSeries {
+    name : "intracellularFluidVolume"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: oxygenConsumptionRate
+  property LineSeries  totalBodyFluidVolume : LineSeries {
+    name : "totalBodyFluidVolume"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: respiratoryExchangeRatio
+  property LineSeries  oxygenConsumptionRate : LineSeries {
+    name : "oxygenConsumptionRate"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: liverInsulinSetPoint
+  property LineSeries  respiratoryExchangeRatio : LineSeries {
+    name : "respiratoryExchangeRatio"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: liverGlucagonSetPoint
+  property LineSeries  liverInsulinSetPoint : LineSeries {
+    name : "liverInsulinSetPoint"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: muscleInsulinSetPoint
+  property LineSeries  liverGlucagonSetPoint : LineSeries {
+    name : "liverGlucagonSetPoint"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: muscleGlucagonSetPoint
+  property LineSeries  muscleInsulinSetPoint : LineSeries {
+    name : "muscleInsulinSetPoint"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: fatInsulinSetPoint
+  property LineSeries  muscleGlucagonSetPoint : LineSeries {
+    name : "muscleGlucagonSetPoint"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: fatGlucagonSetPoint
+  property LineSeries  fatInsulinSetPoint : LineSeries {
+    name : "fatInsulinSetPoint"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: liverGlycogen
+  property LineSeries  fatGlucagonSetPoint : LineSeries {
+    name : "fatGlucagonSetPoint"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: muscleGlycogen
+  property LineSeries  liverGlycogen : LineSeries {
+    name : "liverGlycogen"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: storedProtein
+  property LineSeries  muscleGlycogen : LineSeries {
+    name : "muscleGlycogen"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
- ,LineSeries {
-    id: storedFat
+  property LineSeries  storedProtein : LineSeries {
+    name : "storedProtein"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
   }
-  ]
+  property LineSeries  storedFat : LineSeries {
+    name : "storedFat"
+    axisY: ValueAxis {
+                  min : 0.
+            max : 1.
+            property string label : "Arterial BloodPH"
+            property string unit   : ""
+            titleText : "%1 %2".arg(label).arg(unit)
+            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+    }
+  }
 }
