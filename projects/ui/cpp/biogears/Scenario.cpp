@@ -73,7 +73,7 @@ QString Scenario::patient_name()
 {
   return _engine->GetPatient().GetName_cStr();
 }
-//-------------------------------------------------------------------------------
+//--------      -----------------------------------------------------------------------
 QString Scenario::environment_name()
 {
   return _engine->GetEnvironment().GetName_cStr();

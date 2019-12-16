@@ -5,8 +5,16 @@ import QtCharts 2.3
 Item {
   id:root
   
+  property ValueAxis axisX : ValueAxis {
+    property int tickCount : 0
+    titleText : "Simulation Time"
+    min: 0
+    max : 60
+  }
+
   property LineSeries arterialBloodPH : LineSeries {
       name: "arterialBloodPH"
+
       axisY : ValueAxis {
             min : 0.
             max : 1.
@@ -19,6 +27,7 @@ Item {
   }
   property LineSeries arterialBloodPHBaseline : LineSeries {
       name: "arterialBloodPHBaseline"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -41,6 +50,7 @@ Item {
   }
   property LineSeries bloodSpecificHeat : LineSeries {
       name: "bloodSpecificHeat"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -52,6 +62,7 @@ Item {
   }
   property LineSeries bloodUreaNitrogenConcentration : LineSeries {
       name: "bloodUreaNitrogenConcentration"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -63,6 +74,7 @@ Item {
   }
   property LineSeries carbonDioxideSaturation : LineSeries {
       name: "carbonDioxideSaturation"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -74,6 +86,7 @@ Item {
   }
   property LineSeries carbonMonoxideSaturation : LineSeries {
       name: "carbonMonoxideSaturation"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -85,6 +98,7 @@ Item {
   }
   property LineSeries hematocrit : LineSeries {
       name: "hematocrit"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -96,6 +110,7 @@ Item {
   }
   property LineSeries hemoglobinContent : LineSeries {
       name: "hemoglobinContent"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -107,6 +122,7 @@ Item {
   }
   property LineSeries oxygenSaturation : LineSeries {
       name: "oxygenSaturation"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -118,6 +134,7 @@ Item {
   }
   property LineSeries phosphate : LineSeries {
       name: "phosphate"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -129,6 +146,7 @@ Item {
   }   
   property LineSeries plasmaVolume : LineSeries {
       name: "plasmaVolume"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -140,6 +158,7 @@ Item {
   }   
   property LineSeries pulseOximetry : LineSeries {
       name: "pulseOximetry"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -151,6 +170,7 @@ Item {
   }   
   property LineSeries redBloodCellAcetylcholinesterase : LineSeries {
       name: "redBloodCellAcetylcholinesterase"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -162,6 +182,7 @@ Item {
   }   
   property LineSeries redBloodCellCount : LineSeries {
       name: "redBloodCellCount"
+
       axisY : ValueAxis {
       min : 0.
       max : 1.
@@ -173,6 +194,7 @@ Item {
   }
   property LineSeries shuntFraction : LineSeries {
       name: "shuntFraction"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -184,6 +206,7 @@ Item {
   }     
   property LineSeries strongIonDifference : LineSeries {
       name: "strongIonDifference"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -195,6 +218,7 @@ Item {
   }
   property LineSeries totalBilirubin : LineSeries {
       name: "totalBilirubin"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -206,6 +230,7 @@ Item {
   }
   property LineSeries totalProteinConcentration : LineSeries {
       name: "totalProteinConcentration"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -217,6 +242,7 @@ Item {
   }
   property LineSeries venousBloodPH : LineSeries {
       name: "venousBloodPH"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -228,6 +254,7 @@ Item {
   }
   property LineSeries volumeFractionNeutralPhospholipidInPlasma : LineSeries {
       name: "volumeFractionNeutralPhospholipidInPlasma"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -239,6 +266,7 @@ Item {
   }
   property LineSeries volumeFractionNeutralLipidInPlasma : LineSeries {
       name: "volumeFractionNeutralLipidInPlasma"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -250,6 +278,7 @@ Item {
   }
   property LineSeries arterialCarbonDioxidePressure : LineSeries {
       name: "arterialCarbonDioxidePressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -261,6 +290,7 @@ Item {
   }
   property LineSeries arterialOxygenPressure : LineSeries {
       name: "arterialOxygenPressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -272,6 +302,7 @@ Item {
   }
   property LineSeries pulmonaryArterialCarbonDioxidePressure : LineSeries {
       name: "pulmonaryArterialCarbonDioxidePressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -283,6 +314,7 @@ Item {
   }
   property LineSeries pulmonaryArterialOxygenPressure :LineSeries {
       name: "pulmonaryArterialOxygenPressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -294,6 +326,7 @@ Item {
   }
   property LineSeries pulmonaryVenousCarbonDioxidePressure : LineSeries {
       name: "pulmonaryVenousCarbonDioxidePressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -305,6 +338,7 @@ Item {
   }
   property LineSeries pulmonaryVenousOxygenPressure : LineSeries {
       name: "pulmonaryVenousOxygenPressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -316,6 +350,7 @@ Item {
   }
   property LineSeries venousCarbonDioxidePressure : LineSeries {
       name: "venousCarbonDioxidePressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -327,6 +362,7 @@ Item {
   }
   property LineSeries venousOxygenPressure : LineSeries {
       name: "venousOxygenPressure"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -338,6 +374,7 @@ Item {
    }
    property LineSeries inflammatoryResponse : LineSeries {
       name: "inflammatoryResponse"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -349,6 +386,7 @@ Item {
   }
   property LineSeries inflammatoryResponseLocalPathogen : LineSeries {
       name: "inflammatoryResponseLocalPathogen"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -360,6 +398,7 @@ Item {
   }
   property LineSeries inflammatoryResponseLocalMacrophage : LineSeries {
       name: "inflammatoryResponseLocalMacrophage"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -371,6 +410,7 @@ Item {
   }
   property LineSeries inflammatoryResponseLocalNeutrophil : LineSeries {
       name: "inflammatoryResponseLocalNeutrophil"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -382,6 +422,7 @@ Item {
   }
   property LineSeries inflammatoryResponseLocalBarrier : LineSeries {
       name: "inflammatoryResponseLocalBarrier"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -393,6 +434,7 @@ Item {
   }
   property LineSeries inflammatoryResponseBloodPathogen : LineSeries {
       name: "inflammatoryResponseBloodPathogen"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -404,6 +446,7 @@ Item {
   } 
   property LineSeries inflammatoryResponseTrauma : LineSeries {
       name: "inflammatoryResponseTrauma"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -415,6 +458,7 @@ Item {
   }
    property LineSeries inflammatoryResponseMacrophageResting : LineSeries {
       name: "inflammatoryResponseMacrophageResting"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -426,6 +470,7 @@ Item {
   }
   property LineSeries inflammatoryResponseMacrophageActive : LineSeries {
       name: "inflammatoryResponseMacrophageActive"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -437,6 +482,7 @@ Item {
   }
   property LineSeries inflammatoryResponseNeutrophilResting : LineSeries {
       name: "inflammatoryResponseNeutrophilResting"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -448,6 +494,7 @@ Item {
   }
   property LineSeries inflammatoryResponseNeutrophilActive : LineSeries {
       name: "inflammatoryResponseNeutrophilActive"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -459,6 +506,7 @@ Item {
   }
   property LineSeries inflammatoryResponseInducibleNOSPre : LineSeries {
       name: "inflammatoryResponseInducibleNOSPre"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -470,6 +518,7 @@ Item {
   }
   property LineSeries inflammatoryResponseInducibleNOS : LineSeries {
       name: "inflammatoryResponseInducibleNOS"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -481,6 +530,7 @@ Item {
   }
   property LineSeries inflammatoryResponseConstitutiveNOS : LineSeries {
       name: "inflammatoryResponseConstitutiveNOS"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -492,6 +542,7 @@ Item {
   }
   property LineSeries inflammatoryResponseNitrate : LineSeries {
       name: "inflammatoryResponseNitrate"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -503,6 +554,7 @@ Item {
   }
   property LineSeries inflammatoryResponseNitricOxide : LineSeries {
       name: "inflammatoryResponseNitricOxide"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -514,6 +566,7 @@ Item {
   }
   property LineSeries inflammatoryResponseTumorNecrosisFactor : LineSeries {
       name: "inflammatoryResponseTumorNecrosisFactor"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -525,6 +578,7 @@ Item {
   }
   property LineSeries inflammatoryResponseInterleukin6 : LineSeries {
       name: "inflammatoryResponseInterleukin6"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -536,6 +590,7 @@ Item {
   }
   property LineSeries inflammatoryResponseInterleukin10 : LineSeries {
       name: "inflammatoryResponseInterleukin10"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -547,6 +602,7 @@ Item {
   }
   property LineSeries inflammatoryResponseInterleukin12 : LineSeries {
       name: "inflammatoryResponseInterleukin12"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -558,6 +614,7 @@ Item {
   }
   property LineSeries inflammatoryResponseCatecholamines : LineSeries {
       name: "inflammatoryResponseCatecholamines"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
@@ -569,6 +626,7 @@ Item {
   }
   property LineSeries inflammatoryResponseTissueIntegrity : LineSeries {
       name: "inflammatoryResponseTissueIntegrity"
+
       axisY : ValueAxis {
             min:0.0
             max:1.0
