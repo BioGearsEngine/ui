@@ -27,6 +27,7 @@
         <file alias="reverse.png">img/reverse.png</file>
         <file alias="help.svg">img/icon-round-question_mark.svg</file>
         <file alias="help.png">img/question.png</file>
+        <file alias="menu.png">img/menu.png</file>
         <file alias="biogears_logo.png">img/biogears_logo_400_400.png</file>
     </qresource>
       <qresource prefix="/data">

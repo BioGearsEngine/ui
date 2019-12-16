@@ -15,7 +15,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "alveolarArterialGradient"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -26,7 +26,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "carricoIndex"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -37,7 +37,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "endTidalCarbonDioxideFraction"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -48,7 +48,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "endTidalCarbonDioxidePressure"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -59,7 +59,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "expiratoryFlow"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -70,7 +70,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "inspiratoryExpiratoryRatio"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -81,7 +81,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "inspiratoryFlow"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -92,7 +92,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "pulmonaryCompliance"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -103,7 +103,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "pulmonaryResistance"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -114,7 +114,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "respirationDriverPressure"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -125,7 +125,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "respirationMusclePressure"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -136,7 +136,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "respirationRate"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -147,7 +147,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "specificVentilation"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -158,7 +158,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "targetPulmonaryVentilation"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -169,7 +169,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "tidalVolume"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -180,7 +180,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "totalAlveolarVentilation"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -191,7 +191,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "totalDeadSpaceVentilation"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -202,7 +202,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "totalLungVolume"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -213,7 +213,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "totalPulmonaryVentilation"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
@@ -224,7 +224,7 @@ Item {
     axisY: ValueAxis {
             min : 0.
             max : 1.
-            property string label : "Arterial BloodPH"
+            property string label : "transpulmonaryPressure"
             property string unit   : ""
             titleText : "%1 %2".arg(label).arg(unit)
             labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
