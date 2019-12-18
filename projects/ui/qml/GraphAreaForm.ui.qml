@@ -341,7 +341,7 @@ ListModel {
    ListElement {
       system : "BloodChemistry"
       requests:  [
-          ListElement {request:"arterialBloodPH"; active: false}
+          ListElement {request:"arterialBloodPH"; active: true}
          ,ListElement {request:"arterialBloodPHBaseline"; active: false}
          ,ListElement {request:"bloodDensity"; active: false}
          ,ListElement {request:"bloodSpecificHeat"; active: false}
@@ -350,12 +350,12 @@ ListModel {
          ,ListElement {request:"carbonMonoxideSaturation"; active: false}
          ,ListElement {request:"hematocrit"; active: false}
          ,ListElement {request:"hemoglobinContent"; active: false}
-         ,ListElement {request:"oxygenSaturation"; active: false}
+         ,ListElement {request:"oxygenSaturation"; active: true}
          ,ListElement {request:"phosphate"; active: false}
          ,ListElement {request:"plasmaVolume"; active: false}
          ,ListElement {request:"pulseOximetry"; active: false}
          ,ListElement {request:"redBloodCellAcetylcholinesterase"; active: false}
-         ,ListElement {request:"redBloodCellCount"; active: false}
+         ,ListElement {request:"redBloodCellCount"; active: true}
          ,ListElement {request:"shuntFraction"; active: false}
          ,ListElement {request:"strongIonDifference"; active: false}
          ,ListElement {request:"totalBilirubin"; active: false}
@@ -405,7 +405,7 @@ ListModel {
         ,ListElement {request:"centralVenousPressure"; active: false}
         ,ListElement {request:"cerebralBloodFlow"; active: false}
         ,ListElement {request:"cerebralPerfusionPressure"; active: false}
-        ,ListElement {request:"diastolicArterialPressure"; active: false}
+        ,ListElement {request:"diastolicArterialPressure"; active: true}
         ,ListElement {request:"heartEjectionFraction"; active: false}
         ,ListElement {request:"heartRate"; active: false}
         ,ListElement {request:"heartStrokeVolume"; active: false}
@@ -417,23 +417,23 @@ ListModel {
         ,ListElement {request:"meanSkinFlow"; active: false}
         ,ListElement {request:"pulmonaryArterialPressure"; active: false}
         ,ListElement {request:"pulmonaryCapillariesWedgePressure"; active: false}
-        ,ListElement {request:"pulmonaryDiastolicArterialPressure"; active: false}
+        ,ListElement {request:"pulmonaryDiastolicArterialPressure"; active: true}
         ,ListElement {request:"pulmonaryMeanArterialPressure"; active: false}
         ,ListElement {request:"pulmonaryMeanCapillaryFlow"; active: false}
         ,ListElement {request:"pulmonaryMeanShuntFlow"; active: false}
-        ,ListElement {request:"pulmonarySystolicArterialPressure"; active: false}
+        ,ListElement {request:"pulmonarySystolicArterialPressure"; active: true}
         ,ListElement {request:"pulmonaryVascularResistance"; active: false}
         ,ListElement {request:"pulmonaryVascularResistanceIndex"; active: false}
         ,ListElement {request:"pulsePressure"; active: false}
         ,ListElement {request:"systemicVascularResistance"; active: false}
-        ,ListElement {request:"systolicArterialPressure  "; active: false}
+        ,ListElement {request:"systolicArterialPressure  "; active: true}
       ]
   }
   ListElement {
       system : "Drugs"
       requests:  [
-        ListElement {request:"bronchodilationLevel"; active: false}
-        ,ListElement {request:"heartRateChange"; active: false}
+        ListElement {request:"bronchodilationLevel"; active: true}
+        ,ListElement {request:"heartRateChange"; active: true}
         ,ListElement {request:"hemorrhageChange"; active: false}
         ,ListElement {request:"meanBloodPressureChange"; active: false}
         ,ListElement {request:"neuromuscularBlockLevel"; active: false}
@@ -448,7 +448,7 @@ ListModel {
   ListElement {
       system : "Endocrine"
       requests:  [
-         ListElement {request:"insulinSynthesisRate"; active: false}
+         ListElement {request:"insulinSynthesisRate"; active: true}
         ,ListElement {request:"glucagonSynthesisRate"; active: false}
       ]
   }
@@ -457,15 +457,15 @@ ListModel {
       requests:  [
         ListElement {request:"achievedExerciseLevel"; active: false}
         ,ListElement {request:"chlorideLostToSweat"; active: false}
-        ,ListElement {request:"coreTemperature"; active: false}
+        ,ListElement {request:"coreTemperature"; active: true}
         ,ListElement {request:"creatinineProductionRate"; active: false}
         ,ListElement {request:"exerciseMeanArterialPressureDelta"; active: false}
         ,ListElement {request:"fatigueLevel"; active: false}
         ,ListElement {request:"lactateProductionRate"; active: false}
         ,ListElement {request:"potassiumLostToSweat"; active: false}
-        ,ListElement {request:"skinTemperature"; active: false}
+        ,ListElement {request:"skinTemperature"; active: true}
         ,ListElement {request:"sodiumLostToSweat"; active: false}
-        ,ListElement {request:"sweatRate"; active: false}
+        ,ListElement {request:"sweatRate"; active: true}
         ,ListElement {request:"totalMetabolicRate"; active: false}
         ,ListElement {request:"totalWorkRateLevel"; active: false}
       ]
@@ -474,21 +474,21 @@ ListModel {
       system: "Gastrointestinal"
       requests: [
         ListElement {request:"chymeAbsorptionRate"; active: false}
-        ,ListElement {request:"stomachContents_calcium"; active: false}
+        ,ListElement {request:"stomachContents_calcium"; active: true}
         ,ListElement {request:"stomachContents_carbohydrates"; active: false}
         ,ListElement {request:"stomachContents_carbohydrateDigationRate"; active: false}
         ,ListElement {request:"stomachContents_fat"; active: false}
         ,ListElement {request:"stomachContents_fatDigtationRate"; active: false}
         ,ListElement {request:"stomachContents_protien"; active: false}
         ,ListElement {request:"stomachContents_protienDigtationRate"; active: false}
-        ,ListElement {request:"stomachContents_sodium"; active: false}
-        ,ListElement {request:"stomachContents_water"; active: false}
+        ,ListElement {request:"stomachContents_sodium"; active: true}
+        ,ListElement {request:"stomachContents_water"; active: true}
       ]
   }
   ListElement {
       system: "Hepatic"
       requests: [
-        ListElement {request:"ketoneproductionRate"; active : false}
+        ListElement {request:"ketoneproductionRate"; active : true}
         ,ListElement {request:"hepaticGluconeogenesisRate"; active : false}
       ]
   }
@@ -501,7 +501,7 @@ ListModel {
         ,ListElement {request: "baroreceptorComplianceScale"; active: false}
         ,ListElement {request: "chemoreceptorHeartRateScale"; active: false}
         ,ListElement {request: "chemoreceptorHeartElastanceScale"; active: false}
-        ,ListElement {request: "painVisualAnalogueScale"; active: false}
+        ,ListElement {request: "painVisualAnalogueScale"; active: true}
         ,ListElement {request: "leftEyePupillaryResponse"; active: false}
         ,ListElement {request: "rightEyePupillaryResponse"; active: false}
       ]
@@ -532,7 +532,7 @@ ListModel {
         ,ListElement{request:"leftTubularReabsorptionFluidPermeability"; active: false}
         ,ListElement{request:"leftTubularHydrostaticPressure"; active: false}
         ,ListElement{request:"leftTubularOsmoticPressure"; active: false}
-        ,ListElement{request:"renalBloodFlow"; active: false}
+        ,ListElement{request:"renalBloodFlow"; active: true}
         ,ListElement{request:"renalPlasmaFlow"; active: false}
         ,ListElement{request:"renalVascularResistance"; active: false}
         ,ListElement{request:"rightAfferentArterioleResistance"; active: false}
@@ -556,7 +556,7 @@ ListModel {
         ,ListElement{request:"rightTubularReabsorptionFluidPermeability"; active: false}
         ,ListElement{request:"rightTubularHydrostaticPressure"; active: false}
         ,ListElement{request:"rightTubularOsmoticPressure"; active: false}
-        ,ListElement{request:"urinationRate"; active: false}
+        ,ListElement{request:"urinationRate"; active: true}
         ,ListElement{request:"urineOsmolality"; active: false}
         ,ListElement{request:"urineOsmolarity"; active: false}
         ,ListElement{request:"urineProductionRate"; active: false}
@@ -573,9 +573,9 @@ ListModel {
         ,ListElement{request:"carricoIndex"; active: false}
         ,ListElement{request:"endTidalCarbonDioxideFraction"; active: false}
         ,ListElement{request:"endTidalCarbonDioxidePressure"; active: false}
-        ,ListElement{request:"expiratoryFlow"; active: false}
+        ,ListElement{request:"expiratoryFlow"; active: true}
         ,ListElement{request:"inspiratoryExpiratoryRatio"; active: false}
-        ,ListElement{request:"inspiratoryFlow"; active: false}
+        ,ListElement{request:"inspiratoryFlow"; active: true}
         ,ListElement{request:"pulmonaryCompliance"; active: false}
         ,ListElement{request:"pulmonaryResistance"; active: false}
         ,ListElement{request:"respirationDriverPressure"; active: false}
@@ -583,7 +583,7 @@ ListModel {
         ,ListElement{request:"respirationRate"; active: false}
         ,ListElement{request:"specificVentilation"; active: false}
         ,ListElement{request:"targetPulmonaryVentilation"; active: false}
-        ,ListElement{request:"tidalVolume"; active: false}
+        ,ListElement{request:"tidalVolume"; active: true}
         ,ListElement{request:"totalAlveolarVentilation"; active: false}
         ,ListElement{request:"totalDeadSpaceVentilation"; active: false}
         ,ListElement{request:"totalLungVolume"; active: false}
@@ -594,15 +594,15 @@ ListModel {
   ListElement{
       system:"Tissue"
       requests:[
-         ListElement{request:"carbonDioxideProductionRate"; active: false}
-        ,ListElement{request:"dehydrationFraction"; active: false}
+         ListElement{request:"carbonDioxideProductionRate"; active: true}
+        ,ListElement{request:"dehydrationFraction"; active: true}
         ,ListElement{request:"extracellularFluidVolume"; active: false}
         ,ListElement{request:"extravascularFluidVolume"; active: false}
         ,ListElement{request:"intracellularFluidPH"; active: false}
         ,ListElement{request:"intracellularFluidVolume"; active: false}
         ,ListElement{request:"totalBodyFluidVolume"; active: false}
         ,ListElement{request:"oxygenConsumptionRate"; active: false}
-        ,ListElement{request:"respiratoryExchangeRatio"; active: false}
+        ,ListElement{request:"respiratoryExchangeRatio"; active: true}
         ,ListElement{request:"liverInsulinSetPoint"; active: false}
         ,ListElement{request:"liverGlucagonSetPoint"; active: false}
         ,ListElement{request:"muscleInsulinSetPoint"; active: false}

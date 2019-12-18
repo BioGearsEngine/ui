@@ -5,229 +5,230 @@ import QtCharts 2.3
 Item {
   id: root
   property ValueAxis axisX : ValueAxis {
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     property int tickCount : 0
     titleText : "Simulation Time"
     min: 0
     max : 60
   }
   property LineSeries  alveolarArterialGradient : LineSeries {
+    id: alveolarArterialGradient
     name : "alveolarArterialGradient"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "alveolarArterialGradient"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  carricoIndex : LineSeries {
+    id: carricoIndex
     name : "carricoIndex"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "carricoIndex"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  endTidalCarbonDioxideFraction : LineSeries {
+    id: endTidalCarbonDioxideFraction
     name : "endTidalCarbonDioxideFraction"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "endTidalCarbonDioxideFraction"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  endTidalCarbonDioxidePressure : LineSeries {
+    id: endTidalCarbonDioxidePressure
     name : "endTidalCarbonDioxidePressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "endTidalCarbonDioxidePressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  expiratoryFlow : LineSeries {
+    id: expiratoryFlow
     name : "expiratoryFlow"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "expiratoryFlow"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  inspiratoryExpiratoryRatio : LineSeries {
+    id: inspiratoryExpiratoryRatio
     name : "inspiratoryExpiratoryRatio"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "inspiratoryExpiratoryRatio"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  inspiratoryFlow : LineSeries {
+    id: inspiratoryFlow
     name : "inspiratoryFlow"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "inspiratoryFlow"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryCompliance : LineSeries {
+    id: pulmonaryCompliance
     name : "pulmonaryCompliance"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "pulmonaryCompliance"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryResistance : LineSeries {
+    id: pulmonaryResistance
     name : "pulmonaryResistance"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "pulmonaryResistance"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  respirationDriverPressure : LineSeries {
+    id: respirationDriverPressure
     name : "respirationDriverPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "respirationDriverPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  respirationMusclePressure : LineSeries {
+    id: respirationMusclePressure
     name : "respirationMusclePressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "respirationMusclePressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  respirationRate : LineSeries {
+    id: respirationRate
     name : "respirationRate"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "respirationRate"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  specificVentilation : LineSeries {
+    id: specificVentilation
     name : "specificVentilation"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "specificVentilation"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  targetPulmonaryVentilation : LineSeries {
+    id: targetPulmonaryVentilation
     name : "targetPulmonaryVentilation"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "targetPulmonaryVentilation"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  tidalVolume : LineSeries {
+    id: tidalVolume
     name : "tidalVolume"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "tidalVolume"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  totalAlveolarVentilation : LineSeries {
+    id: totalAlveolarVentilation
     name : "totalAlveolarVentilation"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "totalAlveolarVentilation"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  totalDeadSpaceVentilation : LineSeries {
+    id: totalDeadSpaceVentilation
     name : "totalDeadSpaceVentilation"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "totalDeadSpaceVentilation"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  totalLungVolume : LineSeries {
+    id: totalLungVolume
     name : "totalLungVolume"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "totalLungVolume"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  totalPulmonaryVentilation : LineSeries {
+    id: totalPulmonaryVentilation
     name : "totalPulmonaryVentilation"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "totalPulmonaryVentilation"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  transpulmonaryPressure : LineSeries {
+    id: transpulmonaryPressure
     name : "transpulmonaryPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "transpulmonaryPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
 }

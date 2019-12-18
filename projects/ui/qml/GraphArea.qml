@@ -49,69 +49,106 @@ GraphAreaForm {
   }
 
   Component.onCompleted: {
-    // var bc_requests = physiologyRequestModel.get(0).requests
-    // for ( var i = 0; i < bc_requests.count; ++i){
-    //    toggleBloodChemistrySeries(bc_requests.get(i).request, bc_requests.get(i).active)
-    // }
-    // var cardiovascular = physiologyRequestModel.get(1).requests
-    // for ( var i = 0; i < cardiovascular.count; ++i){
-    //    toggleCardiovascularSeries(cardiovascular.get(i).request, cardiovascular.get(i).active)
-    // }
-    // var drugs = physiologyRequestModel.get(2).requests
-    // for ( var i = 0; i < drugs.count; ++i){
-    //    toggleDrugsSeries(drugs.get(i).request, drugs.get(i).active)
-    // }
-    // var endocrine = physiologyRequestModel.get(3).requests
-    // for ( var i = 0; i < endocrine.count; ++i){
-    //    toggleEndocrineSeries(endocrine.get(i).request, endocrine.get(i).active)
-    // }
-    // var energy = physiologyRequestModel.get(4).requests
-    // for ( var i = 0; i < energy.count; ++i){
-    //    toggleEnergySeries(energy.get(i).request, energy.get(i).active)
-    // }
-    // var gastrointestinal = physiologyRequestModel.get(5).requests
-    // for ( var i = 0; i < gastrointestinal.count; ++i){
-    //    toggleGastrointestinalSeries(gastrointestinal.get(i).request, gastrointestinal.get(i).active)
-    // }
-    // var hepatic = physiologyRequestModel.get(6).requests
-    // for ( var i = 0; i < hepatic.count; ++i){
-    //    toggleHepaticSeries(hepatic.get(i).request, hepatic.get(i).active)
-    // }
-    // var nervous = physiologyRequestModel.get(7).requests
-    // for ( var i = 0; i < nervous.count; ++i){
-    //    toggleNervousSeries(nervous.get(i).request, nervous.get(i).active)
-    // }
-    // var renal = physiologyRequestModel.get(8).requests
-    // for ( var i = 0; i < renal.count; ++i){
-    //    toggleRenalSeries(renal.get(i).request, renal.get(i).active)
-    // }
-    // var respiratory = physiologyRequestModel.get(9).requests
-    // for ( var i = 0; i < respiratory.count; ++i){
-    //    toggleRespiratorySeries(respiratory.get(i).request, respiratory.get(i).active)
-    // }
-    // var tissue = physiologyRequestModel.get(10).requests
-    // for ( var i = 0; i < tissue.count; ++i){
-    //    toggleTissueSeries(tissue.get(i).request, tissue.get(i).active)
-    // }
+    var bloodChemistry = physiologyRequestModel.get(0).requests
+    for ( var i = 0; i < bloodChemistry.count ; ++i){
+      if(bloodChemistry.get(i).active)
+       toggleBloodChemistrySeries(bloodChemistry.get(i).request, bloodChemistry.get(i).active)
+    }
+    var cardiovascular = physiologyRequestModel.get(1).requests
+    for ( var i = 0; i < cardiovascular.count; ++i){
+      if( cardiovascular.get(i).active)
+       toggleCardiovascularSeries(cardiovascular.get(i).request, cardiovascular.get(i).active)
+    }
+    var drugs = physiologyRequestModel.get(2).requests
+    for ( var i = 0; i < drugs.count; ++i){
+      if( drugs.get(i).active)
+       toggleDrugsSeries(drugs.get(i).request, drugs.get(i).active)
+    }
+    var endocrine = physiologyRequestModel.get(3).requests
+    for ( var i = 0; i < endocrine.count ; ++i){
+      if(endocrine.get(i).active)
+       toggleEndocrineSeries(endocrine.get(i).request, endocrine.get(i).active)
+    }
+    var energy = physiologyRequestModel.get(4).requests
+    for ( var i = 0; i < energy.count ; ++i){
+      if(energy.get(i).active)
+       toggleEnergySeries(energy.get(i).request, energy.get(i).active)
+    }
+    var gastrointestinal = physiologyRequestModel.get(5).requests
+    for ( var i = 0; i < gastrointestinal.count ; ++i){
+      if( gastrointestinal.get(i).active)
+       toggleGastrointestinalSeries(gastrointestinal.get(i).request, gastrointestinal.get(i).active)
+    }
+    var hepatic = physiologyRequestModel.get(6).requests
+    for ( var i = 0; i < hepatic.count ; ++i){
+      if(hepatic.get(i).active)
+       toggleHepaticSeries(hepatic.get(i).request, hepatic.get(i).active)
+    }
+    var nervous = physiologyRequestModel.get(7).requests
+    for ( var i = 0; i < nervous.count; ++i){
+      if( nervous.get(i).active)
+       toggleNervousSeries(nervous.get(i).request, nervous.get(i).active)
+    }
+    var renal = physiologyRequestModel.get(8).requests
+    for ( var i = 0; i < renal.count ; ++i){
+      if(renal.get(i).active)
+       toggleRenalSeries(renal.get(i).request, renal.get(i).active)
+    }
+    var respiratory = physiologyRequestModel.get(9).requests
+    for ( var i = 0; i < respiratory.count ; ++i){
+      if(respiratory.get(i).active)
+       toggleRespiratorySeries(respiratory.get(i).request, respiratory.get(i).active)
+    }
+    var tissue = physiologyRequestModel.get(10).requests
+    for ( var i = 0; i < tissue.count ; ++i){
+      if(tissue.get(i).active)
+       toggleTissueSeries(tissue.get(i).request, tissue.get(i).active)
+    }
   }
 
   function newPointHandler(series,pointIndex) {
-      var start = ( series.count < 3600 ) ? 0 : series.count - 3600;
-      var min = series.at(start).y;
-      var max = series.at(start).y;
+      const MAX_INTERVAL = 3600
+      var start = ( series.count < MAX_INTERVAL ) ? 0 : series.count - MAX_INTERVAL;
 
-      for(var i = start; i < series.count; ++i){
-          min = Math.min(min >= series.at(i).y) ? series.at(i).y : min;
-          max = (max <= series.at(i).y) ? series.at(i).y : max;
+      if ( !series.min || !series.max)  {
+        series.min = series.at(series.count-1).y
+        series.max = series.at(series.count-1).y
+        series.min_count = 0
+        series.max_count = 0
       }
-      if(series.axisY){
-        series.axisY.min = Math.max(0,min * .90)
-        series.axisY.max = Math.max(1,max * 1.10)
-      } else if (series.axisYRight) {
-        series.axisYRight.min = Math.max(0,min * .90)
-        series.axisYRight.max = Math.max(1,max * 1.10)
+
+      //New Poiunts
+      if ( series.at(series.count-1).y < series.min) {
+         series.min = series.at(series.count-1).y
+         series.min_count = 1
+      } else if ( series.at(series.count-1).y ==  series.min) {
+          series.min_count += 1
       }
+
+      if ( series.at(series.count-1).y > series.max) {
+         series.max = series.at(series.count-1).y
+         series.max_count = 1
+      } else if ( series.at(series.count-1).y ==  series.max) {
+          series.max_count += 1
+      }
+      //Deleting Points
+      if ( series.at(start).y == series.min && series.count > MAX_INTERVAL ) {
+         series.min_count -= 1
+         if ( series.min_count == 0 ) {
+          series.min = series.at(start - 1).y
+         }
+      }
+      if ( series.at(start).y == series.max && series.count > MAX_INTERVAL ) {
+         series.max_count -= 1
+         if (series.max_count == 0 ) {
+           series.max = series.at(series.count - 2 ).y
+         }
+      }
+      
+      series.axisY.min = (series.min == -1.0 || series.min == 0.0 ) ? series.min : series.min * 0.9
+      series.axisY.max = (series.max == 1.0 ) ? series.max :series.max * 1.1
   }
+
 
   function updateDomain(axisX) {
     axisX.tickCount = axisX.tickCount + 1;
@@ -1327,10 +1364,10 @@ GraphAreaForm {
     updateDomain(endocrine.axisX)
     var end_requests = physiologyRequestModel.get(3).requests
     if(end_requests.get(0).active){
-      endocrine.requests.insulinSynthesisRate.append(metrics.simulationTime,metrics.insulinSynthesisRate)
+        endocrine.requests.insulinSynthesisRate.append(metrics.simulationTime,metrics.insulinSynthesisRate)
     }
     if(end_requests.get(1).active){
-      endocrine.requests.glucagonSynthesisRate.append(metrics.simulationTime,metrics.glucagonSynthesisRate)
+        endocrine.requests.glucagonSynthesisRate.append(metrics.simulationTime,metrics.glucagonSynthesisRate)
     }
   }
   function updateEnergy(metrics){
@@ -1755,1829 +1792,2739 @@ GraphAreaForm {
   //!  Setup Functions for creating all the axis plots
   //!
   function toggleBloodChemistrySeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
+
     switch (request) {
       case "arterialBloodPH":
       if(active){
-       bloodChemistry.requests.arterialBloodPH = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialBloodPH.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.arterialBloodPH.axisY);
-       bloodChemistry.requests.arterialBloodPH.axisY = bloodChemistry.axisY(bloodChemistry.requests.arterialBloodPH)
-      } else  if(bloodChemistry.series(bloodChemistry.requests.arterialBloodPH.axisY.label)){
-        bloodChemistry.setAxisX(undefined, bloodChemistry.requests.arterialBloodPH);
+        bloodChemistry.requests.arterialBloodPH = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialBloodPH.name, bloodChemistry.axisX, bloodChemistry.requests.arterialBloodPH.axisY);
+        bloodChemistry.requests.arterialBloodPH.axisY = bloodChemistry.axisY(bloodChemistry.requests.arterialBloodPH)
+        bloodChemistry.requests.arterialBloodPH.axisY.visible = true
+        bloodChemistry.requests.arterialBloodPH.axisY.titleText = bloodChemistry.requests.arterialBloodPH.name
+        
+
+      } else  if(bloodChemistry.series(bloodChemistry.requests.arterialBloodPH.name)){
+        bloodChemistry.requests.arterialBloodPH.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.arterialBloodPH);
       }
       break;
       case "arterialBloodPHBaseline":
       if(active){
-        bloodChemistry.requests.arterialBloodPHBaseline = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialBloodPHBaseline.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.arterialBloodPHBaseline.axisY);
+        bloodChemistry.requests.arterialBloodPHBaseline = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialBloodPHBaseline.name, bloodChemistry.axisX, bloodChemistry.requests.arterialBloodPHBaseline.axisY);
         bloodChemistry.requests.arterialBloodPHBaseline.axisY = bloodChemistry.axisY(bloodChemistry.requests.arterialBloodPHBaseline)
-      } else  if(bloodChemistry.series(bloodChemistry.requests.arterialBloodPHBaseline.axisY.label)){
+        bloodChemistry.requests.arterialBloodPHBaseline.axisY.visible = true
+        bloodChemistry.requests.arterialBloodPHBaseline.axisY.titleText = bloodChemistry.requests.arterialBloodPHBaseline.name
+        
+      } else  if(bloodChemistry.series(bloodChemistry.requests.arterialBloodPHBaseline.name)){
+        bloodChemistry.requests.arterialBloodPHBaseline.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.arterialBloodPHBaseline);
       }
       break;
       case "bloodDensity":
       if(active){
-        bloodChemistry.requests.bloodDensity = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.bloodDensity.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.bloodDensity.axisY);
+        bloodChemistry.requests.bloodDensity = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.bloodDensity.name, bloodChemistry.axisX, bloodChemistry.requests.bloodDensity.axisY);
         bloodChemistry.requests.bloodDensity.axisY = bloodChemistry.axisY(bloodChemistry.requests.bloodDensity)
-      } else if(bloodChemistry.series(bloodChemistry.requests.bloodDensity.axisY.label)) {
+        bloodChemistry.requests.bloodDensity.axisY.visible = true
+        bloodChemistry.requests.bloodDensity.axisY.titleText = bloodChemistry.requests.bloodDensity.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.bloodDensity.name)) {
+        bloodChemistry.requests.bloodDensity.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.bloodDensity);
       }
       break;
       case "bloodSpecificHeat":
       if(active){
-        bloodChemistry.requests.bloodSpecificHeat = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.bloodSpecificHeat.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.bloodSpecificHeat.axisY);
+        bloodChemistry.requests.bloodSpecificHeat = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.bloodSpecificHeat.name, bloodChemistry.axisX, bloodChemistry.requests.bloodSpecificHeat.axisY);
         bloodChemistry.requests.bloodSpecificHeat.axisY = bloodChemistry.axisY(bloodChemistry.requests.bloodSpecificHeat)
-      } else if(bloodChemistry.series(bloodChemistry.requests.bloodSpecificHeat.axisY.label)){
+        bloodChemistry.requests.bloodSpecificHeat.axisY.visible = true
+        bloodChemistry.requests.bloodSpecificHeat.axisY.titleText = bloodChemistry.requests.bloodSpecificHeat.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.bloodSpecificHeat.name)){
+        bloodChemistry.requests.bloodSpecificHeat.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.bloodSpecificHeat);
       }
       break;
       case "bloodUreaNitrogenConcentration":
       if(active){
-        bloodChemistry.requests.bloodUreaNitrogenConcentration = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY);
+        bloodChemistry.requests.bloodUreaNitrogenConcentration = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.bloodUreaNitrogenConcentration.name, bloodChemistry.axisX, bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY);
         bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY = bloodChemistry.axisY(bloodChemistry.requests.bloodUreaNitrogenConcentration)
-      } else if(bloodChemistry.series(bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY.label)){
+        bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY.visible = true
+        bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY.titleText = bloodChemistry.requests.bloodUreaNitrogenConcentration.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.bloodUreaNitrogenConcentration.name)){
+        bloodChemistry.requests.bloodUreaNitrogenConcentration.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.bloodUreaNitrogenConcentration);
       }
       break;
       case "carbonDioxideSaturation":
       if(active){
-        bloodChemistry.requests.carbonDioxideSaturation = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.carbonDioxideSaturation.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.carbonDioxideSaturation.axisY);
+        bloodChemistry.requests.carbonDioxideSaturation = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.carbonDioxideSaturation.name, bloodChemistry.axisX, bloodChemistry.requests.carbonDioxideSaturation.axisY);
         bloodChemistry.requests.carbonDioxideSaturation.axisY = bloodChemistry.axisY(bloodChemistry.requests.carbonDioxideSaturation)
-      } else if(bloodChemistry.series(bloodChemistry.requests.carbonDioxideSaturation.axisY.label)){
+        bloodChemistry.requests.carbonDioxideSaturation.axisY.visible = true
+        bloodChemistry.requests.carbonDioxideSaturation.axisY.titleText = bloodChemistry.requests.carbonDioxideSaturation.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.carbonDioxideSaturation.name)){
+        bloodChemistry.requests.carbonDioxideSaturation.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.carbonDioxideSaturation);
       }
       break;
       case "carbonMonoxideSaturation":
       if(active){
-        bloodChemistry.requests.carbonMonoxideSaturation = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.carbonMonoxideSaturation.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.carbonMonoxideSaturation.axisY);
+        bloodChemistry.requests.carbonMonoxideSaturation = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.carbonMonoxideSaturation.name, bloodChemistry.axisX, bloodChemistry.requests.carbonMonoxideSaturation.axisY);
         bloodChemistry.requests.carbonMonoxideSaturation.axisY = bloodChemistry.axisY(bloodChemistry.requests.carbonMonoxideSaturation)
-      } else if(bloodChemistry.series(bloodChemistry.requests.carbonMonoxideSaturation.axisY.label)){
+        bloodChemistry.requests.carbonMonoxideSaturation.axisY.visible = true
+        bloodChemistry.requests.carbonMonoxideSaturation.axisY.titleText = bloodChemistry.requests.carbonMonoxideSaturation.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.carbonMonoxideSaturation.name)){
+        bloodChemistry.requests.carbonMonoxideSaturation.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.carbonMonoxideSaturation);
       }
       break;
       case "hematocrit":
       if(active){
-        bloodChemistry.requests.hematocrit = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.hematocrit.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.hematocrit.axisY);
+        bloodChemistry.requests.hematocrit = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.hematocrit.name, bloodChemistry.axisX, bloodChemistry.requests.hematocrit.axisY);
         bloodChemistry.requests.hematocrit.axisY = bloodChemistry.axisY(bloodChemistry.requests.hematocrit)
-      } else if(bloodChemistry.series(bloodChemistry.requests.hematocrit.axisY.label)){
+        bloodChemistry.requests.hematocrit.axisY.visible = true
+        bloodChemistry.requests.hematocrit.axisY.titleText = bloodChemistry.requests.hematocrit.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.hematocrit.name)){
+        bloodChemistry.requests.hematocrit.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.hematocrit);
       }
       break;
       case "hemoglobinContent":
       if(active){
-        bloodChemistry.requests.hemoglobinContent = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.hemoglobinContent.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.hemoglobinContent.axisY);
+        bloodChemistry.requests.hemoglobinContent = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.hemoglobinContent.name, bloodChemistry.axisX, bloodChemistry.requests.hemoglobinContent.axisY);
         bloodChemistry.requests.hemoglobinContent.axisY = bloodChemistry.axisY(bloodChemistry.requests.hemoglobinContent)
-      } else if(bloodChemistry.series(bloodChemistry.requests.hemoglobinContent.axisY.label)){
+        bloodChemistry.requests.hemoglobinContent.axisY.visible = true
+        bloodChemistry.requests.hemoglobinContent.axisY.titleText = bloodChemistry.requests.hemoglobinContent.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.hemoglobinContent.name)){
+        bloodChemistry.requests.hemoglobinContent.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.hemoglobinContent);
       }
       break;
       case "oxygenSaturation":
       if(active){
-        bloodChemistry.requests.oxygenSaturation = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.oxygenSaturation.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.oxygenSaturation.axisY);
+        bloodChemistry.requests.oxygenSaturation = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.oxygenSaturation.name, bloodChemistry.axisX, bloodChemistry.requests.oxygenSaturation.axisY);
         bloodChemistry.requests.oxygenSaturation.axisY = bloodChemistry.axisY(bloodChemistry.requests.oxygenSaturation)
-      } else if(bloodChemistry.series(bloodChemistry.requests.oxygenSaturation.axisY.label)){
+        bloodChemistry.requests.oxygenSaturation.axisY.visible = true
+        bloodChemistry.requests.oxygenSaturation.axisY.titleText = bloodChemistry.requests.oxygenSaturation.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.oxygenSaturation.name)){
+        bloodChemistry.requests.oxygenSaturation.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.oxygenSaturation);
       }
       break;
       case "phosphate":
       if(active){
-        bloodChemistry.requests.phosphate = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.phosphate.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.phosphate.axisY);
+        bloodChemistry.requests.phosphate = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.phosphate.name, bloodChemistry.axisX, bloodChemistry.requests.phosphate.axisY);
         bloodChemistry.requests.phosphate.axisY = bloodChemistry.axisY(bloodChemistry.requests.phosphate)
-      } else if(bloodChemistry.series(bloodChemistry.requests.phosphate.axisY.label)){
+        bloodChemistry.requests.phosphate.axisY.visible = true
+        bloodChemistry.requests.phosphate.axisY.titleText = bloodChemistry.requests.phosphate.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.phosphate.name)){
+        bloodChemistry.requests.phosphate.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.phosphate);
       }
       break;
       case "plasmaVolume":
       if(active){
-        bloodChemistry.requests.plasmaVolume = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.plasmaVolume.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.plasmaVolume.axisY);
+        bloodChemistry.requests.plasmaVolume = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.plasmaVolume.name, bloodChemistry.axisX, bloodChemistry.requests.plasmaVolume.axisY);
         bloodChemistry.requests.plasmaVolume.axisY = bloodChemistry.axisY(bloodChemistry.requests.plasmaVolume)
-      } else if(bloodChemistry.series(bloodChemistry.requests.plasmaVolume.axisY.label)){
+        bloodChemistry.requests.plasmaVolume.axisY.visible = true
+        bloodChemistry.requests.plasmaVolume.axisY.titleText = bloodChemistry.requests.plasmaVolume.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.plasmaVolume.name)){
+        bloodChemistry.requests.plasmaVolume.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.plasmaVolume);
       }
       break;
       case "pulseOximetry":
       if(active){
-        bloodChemistry.requests.pulseOximetry = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulseOximetry.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.pulseOximetry.axisY);
+        bloodChemistry.requests.pulseOximetry = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulseOximetry.name, bloodChemistry.axisX, bloodChemistry.requests.pulseOximetry.axisY);
         bloodChemistry.requests.pulseOximetry.axisY = bloodChemistry.axisY(bloodChemistry.requests.pulseOximetry)
-      } else if(bloodChemistry.series(bloodChemistry.requests.pulseOximetry.axisY.label)){
+        bloodChemistry.requests.pulseOximetry.axisY.visible = true
+        bloodChemistry.requests.pulseOximetry.axisY.titleText = bloodChemistry.requests.pulseOximetry.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.pulseOximetry.name)){
+        bloodChemistry.requests.pulseOximetry.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.pulseOximetry);
       }
       break;
       case "redBloodCellAcetylcholinesterase":
       if(active){
-        bloodChemistry.requests.redBloodCellAcetylcholinesterase = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY);
+        bloodChemistry.requests.redBloodCellAcetylcholinesterase = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.redBloodCellAcetylcholinesterase.name, bloodChemistry.axisX, bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY);
         bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY = bloodChemistry.axisY(bloodChemistry.requests.redBloodCellAcetylcholinesterase)
-      } else if(bloodChemistry.series(bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY.label)){
+        bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY.visible = true
+        bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY.titleText = bloodChemistry.requests.redBloodCellAcetylcholinesterase.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.redBloodCellAcetylcholinesterase.name)){
+        bloodChemistry.requests.redBloodCellAcetylcholinesterase.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.redBloodCellAcetylcholinesterase);
       }
       break;
       case "redBloodCellCount":
       if(active){
-        bloodChemistry.requests.redBloodCellCount = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.redBloodCellCount.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.redBloodCellCount.axisY);
+        bloodChemistry.requests.redBloodCellCount = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.redBloodCellCount.name, bloodChemistry.axisX, bloodChemistry.requests.redBloodCellCount.axisY);
         bloodChemistry.requests.redBloodCellCount.axisY = bloodChemistry.axisY(bloodChemistry.requests.redBloodCellCount)
-      } else if(bloodChemistry.series(bloodChemistry.requests.redBloodCellCount.axisY.label)){
+        bloodChemistry.requests.redBloodCellCount.axisY.visible = true
+        bloodChemistry.requests.redBloodCellCount.axisY.titleText = bloodChemistry.requests.redBloodCellCount.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.redBloodCellCount.name)){
+        bloodChemistry.requests.redBloodCellCount.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.redBloodCellCount);
       }
       break;
       case "shuntFraction":
       if(active){
-        bloodChemistry.requests.shuntFraction = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.shuntFraction.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.shuntFraction.axisY);
+        bloodChemistry.requests.shuntFraction = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.shuntFraction.name, bloodChemistry.axisX, bloodChemistry.requests.shuntFraction.axisY);
         bloodChemistry.requests.shuntFraction.axisY = bloodChemistry.axisY(bloodChemistry.requests.shuntFraction)
-      } else if(bloodChemistry.series(bloodChemistry.requests.shuntFraction.axisY.label)){
+        bloodChemistry.requests.shuntFraction.axisY.visible = true
+        bloodChemistry.requests.shuntFraction.axisY.titleText = bloodChemistry.requests.shuntFraction.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.shuntFraction.name)){
+        bloodChemistry.requests.shuntFraction.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.shuntFraction);
       }
       break;
       case "strongIonDifference":
       if(active){
-        bloodChemistry.requests.strongIonDifference = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.strongIonDifference.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.strongIonDifference.axisY);
+        bloodChemistry.requests.strongIonDifference = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.strongIonDifference.name, bloodChemistry.axisX, bloodChemistry.requests.strongIonDifference.axisY);
         bloodChemistry.requests.strongIonDifference.axisY = bloodChemistry.axisY(bloodChemistry.requests.strongIonDifference)
-      } else if(bloodChemistry.series(bloodChemistry.requests.strongIonDifference.axisY.label)){
+        bloodChemistry.requests.strongIonDifference.axisY.visible = true
+        bloodChemistry.requests.strongIonDifference.axisY.titleText = bloodChemistry.requests.strongIonDifference.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.strongIonDifference.name)){
+        bloodChemistry.requests.strongIonDifference.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.strongIonDifference);
       }
       break;
       case "totalBilirubin":
       if(active){
-        bloodChemistry.requests.totalBilirubin = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.totalBilirubin.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.totalBilirubin.axisY);
+        bloodChemistry.requests.totalBilirubin = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.totalBilirubin.name, bloodChemistry.axisX, bloodChemistry.requests.totalBilirubin.axisY);
         bloodChemistry.requests.totalBilirubin.axisY = bloodChemistry.axisY(bloodChemistry.requests.totalBilirubin)
-      } else if(bloodChemistry.series(bloodChemistry.requests.totalBilirubin.axisY.label)){
+        bloodChemistry.requests.totalBilirubin.axisY.visible = true
+        bloodChemistry.requests.totalBilirubin.axisY.titleText = bloodChemistry.requests.totalBilirubin.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.totalBilirubin.name)){
+        bloodChemistry.requests.totalBilirubin.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.totalBilirubin);
       }
       break;
       case "totalProteinConcentration":
       if(active){
-        bloodChemistry.requests.totalProteinConcentration = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.totalProteinConcentration.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.totalProteinConcentration.axisY);
+        bloodChemistry.requests.totalProteinConcentration = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.totalProteinConcentration.name, bloodChemistry.axisX, bloodChemistry.requests.totalProteinConcentration.axisY);
         bloodChemistry.requests.totalProteinConcentration.axisY = bloodChemistry.axisY(bloodChemistry.requests.totalProteinConcentration)
-      } else if(bloodChemistry.series(bloodChemistry.requests.totalProteinConcentration.axisY.label)){
+        bloodChemistry.requests.totalProteinConcentration.axisY.visible = true
+        bloodChemistry.requests.totalProteinConcentration.axisY.titleText = bloodChemistry.requests.totalProteinConcentration.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.totalProteinConcentration.name)){
+        bloodChemistry.requests.totalProteinConcentration.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.totalProteinConcentration);
       }
       break;
       case "venousBloodPH":
       if(active){
-        bloodChemistry.requests.venousBloodPH = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.venousBloodPH.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.venousBloodPH.axisY);
+        bloodChemistry.requests.venousBloodPH = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.venousBloodPH.name, bloodChemistry.axisX, bloodChemistry.requests.venousBloodPH.axisY);
         bloodChemistry.requests.venousBloodPH.axisY = bloodChemistry.axisY(bloodChemistry.requests.venousBloodPH)
-      } else if(bloodChemistry.series(bloodChemistry.requests.venousBloodPH.axisY.label)){
+        bloodChemistry.requests.venousBloodPH.axisY.visible = true
+        bloodChemistry.requests.venousBloodPH.axisY.titleText = bloodChemistry.requests.venousBloodPH.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.venousBloodPH.name)){
+        bloodChemistry.requests.venousBloodPH.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.venousBloodPH);
       }
       break;
       case "volumeFractionNeutralPhospholipidInPlasma":
       if(active){
-        bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY);
+        bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.name, bloodChemistry.axisX, bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY);
         bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY = bloodChemistry.axisY(bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma)
-      } else if(bloodChemistry.series(bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY.label)){
+        bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY.visible = true
+        bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY.titleText = bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.name)){
+        bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.volumeFractionNeutralPhospholipidInPlasma);
       }
       break;
       case "volumeFractionNeutralLipidInPlasma":
       if(active){
-        bloodChemistry.requests.volumeFractionNeutralLipidInPlasma = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY);
+        bloodChemistry.requests.volumeFractionNeutralLipidInPlasma = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.name, bloodChemistry.axisX, bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY);
         bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY = bloodChemistry.axisY(bloodChemistry.requests.volumeFractionNeutralLipidInPlasma)
-      } else if(bloodChemistry.series(bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY.label)){
+        bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY.visible = true
+        bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY.titleText = bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.name)){
+        bloodChemistry.requests.volumeFractionNeutralLipidInPlasma.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.volumeFractionNeutralLipidInPlasma);
       }
       break;
       case "arterialCarbonDioxidePressure":
       if(active){
-        bloodChemistry.requests.arterialCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialCarbonDioxidePressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.arterialCarbonDioxidePressure.axisY);
+        bloodChemistry.requests.arterialCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialCarbonDioxidePressure.name, bloodChemistry.axisX, bloodChemistry.requests.arterialCarbonDioxidePressure.axisY);
         bloodChemistry.requests.arterialCarbonDioxidePressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.arterialCarbonDioxidePressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.arterialCarbonDioxidePressure.axisY.label)){
+        bloodChemistry.requests.arterialCarbonDioxidePressure.axisY.visible = true
+        bloodChemistry.requests.arterialCarbonDioxidePressure.axisY.titleText = bloodChemistry.requests.arterialCarbonDioxidePressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.arterialCarbonDioxidePressure.name)){
+        bloodChemistry.requests.arterialCarbonDioxidePressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.arterialCarbonDioxidePressure);
       }
       break;
       case "arterialOxygenPressure":
       if(active){
-        bloodChemistry.requests.arterialOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialOxygenPressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.arterialOxygenPressure.axisY);
+        bloodChemistry.requests.arterialOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.arterialOxygenPressure.name, bloodChemistry.axisX, bloodChemistry.requests.arterialOxygenPressure.axisY);
         bloodChemistry.requests.arterialOxygenPressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.arterialOxygenPressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.arterialOxygenPressure.axisY.label)){
+        bloodChemistry.requests.arterialOxygenPressure.axisY.visible = true
+        bloodChemistry.requests.arterialOxygenPressure.axisY.titleText = bloodChemistry.requests.arterialOxygenPressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.arterialOxygenPressure.name)){
+        bloodChemistry.requests.arterialOxygenPressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.arterialOxygenPressure);
       }
       break;
       case "pulmonaryArterialCarbonDioxidePressure":
       if(active){
-        bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY);
+        bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.name, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY);
         bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY.label)){
+        bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY.visible = true
+        bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY.titleText = bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.name)){
+        bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.pulmonaryArterialCarbonDioxidePressure);
       }
       break;
       case "pulmonaryArterialOxygenPressure":
       if(active){
-        bloodChemistry.requests.pulmonaryArterialOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY);
+        bloodChemistry.requests.pulmonaryArterialOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryArterialOxygenPressure.name, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY);
         bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.pulmonaryArterialOxygenPressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY.label)){
+        bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY.visible = true
+        bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY.titleText = bloodChemistry.requests.pulmonaryArterialOxygenPressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryArterialOxygenPressure.name)){
+        bloodChemistry.requests.pulmonaryArterialOxygenPressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.pulmonaryArterialOxygenPressure);
       }
       break;
       case "pulmonaryVenousCarbonDioxidePressure":
       if(active){
-        bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY);
+        bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.name, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY);
         bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY.label)){
+        bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY.visible = true
+        bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY.titleText = bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.name)){
+        bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.pulmonaryVenousCarbonDioxidePressure);
       }
       break;
       case "pulmonaryVenousOxygenPressure":
       if(active){
-        bloodChemistry.requests.pulmonaryVenousOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY);
+        bloodChemistry.requests.pulmonaryVenousOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.pulmonaryVenousOxygenPressure.name, bloodChemistry.axisX, bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY);
         bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.pulmonaryVenousOxygenPressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY.label)){
+        bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY.visible = true
+        bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY.titleText = bloodChemistry.requests.pulmonaryVenousOxygenPressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.pulmonaryVenousOxygenPressure.name)){
+        bloodChemistry.requests.pulmonaryVenousOxygenPressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.pulmonaryVenousOxygenPressure);
       }
       break;
       case "venousCarbonDioxidePressure":
       if(active){
-        bloodChemistry.requests.venousCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.venousCarbonDioxidePressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.venousCarbonDioxidePressure.axisY);
+        bloodChemistry.requests.venousCarbonDioxidePressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.venousCarbonDioxidePressure.name, bloodChemistry.axisX, bloodChemistry.requests.venousCarbonDioxidePressure.axisY);
         bloodChemistry.requests.venousCarbonDioxidePressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.venousCarbonDioxidePressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.venousCarbonDioxidePressure.axisY.label)){
+        bloodChemistry.requests.venousCarbonDioxidePressure.axisY.visible = true
+        bloodChemistry.requests.venousCarbonDioxidePressure.axisY.titleText = bloodChemistry.requests.venousCarbonDioxidePressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.venousCarbonDioxidePressure.name)){
+        bloodChemistry.requests.venousCarbonDioxidePressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.venousCarbonDioxidePressure);
       }
       break;
       case "venousOxygenPressure":
       if(active){
-        bloodChemistry.requests.venousOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.venousOxygenPressure.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.venousOxygenPressure.axisY);
+        bloodChemistry.requests.venousOxygenPressure = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.venousOxygenPressure.name, bloodChemistry.axisX, bloodChemistry.requests.venousOxygenPressure.axisY);
         bloodChemistry.requests.venousOxygenPressure.axisY = bloodChemistry.axisY(bloodChemistry.requests.venousOxygenPressure)
-      } else if(bloodChemistry.series(bloodChemistry.requests.venousOxygenPressure.axisY.label)){
+        bloodChemistry.requests.venousOxygenPressure.axisY.visible = true
+        bloodChemistry.requests.venousOxygenPressure.axisY.titleText = bloodChemistry.requests.venousOxygenPressure.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.venousOxygenPressure.name)){
+        bloodChemistry.requests.venousOxygenPressure.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.venousOxygenPressure);
       }
       break;
       case "inflammatoryResponse":
       if(active){
-        bloodChemistry.requests.inflammatoryResponse = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponse.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponse.axisY);
+        bloodChemistry.requests.inflammatoryResponse = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponse.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponse.axisY);
         bloodChemistry.requests.inflammatoryResponse.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponse)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponse.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponse.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponse.axisY.titleText = bloodChemistry.requests.inflammatoryResponse.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponse.name)){
+        bloodChemistry.requests.inflammatoryResponse.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponse);
       }
       break;
       case "inflammatoryResponseLocalPathogen":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseLocalPathogen = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY);
+        bloodChemistry.requests.inflammatoryResponseLocalPathogen = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalPathogen.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY);
         bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseLocalPathogen)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY.titleText = bloodChemistry.requests.inflammatoryResponseLocalPathogen.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalPathogen.name)){
+        bloodChemistry.requests.inflammatoryResponseLocalPathogen.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseLocalPathogen);
       }
       break;
       case "inflammatoryResponseLocalMacrophage":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseLocalMacrophage = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY);
+        bloodChemistry.requests.inflammatoryResponseLocalMacrophage = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalMacrophage.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY);
         bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseLocalMacrophage)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY.titleText = bloodChemistry.requests.inflammatoryResponseLocalMacrophage.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalMacrophage.name)){
+        bloodChemistry.requests.inflammatoryResponseLocalMacrophage.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseLocalMacrophage);
       }
       break;
       case "inflammatoryResponseLocalNeutrophil":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseLocalNeutrophil = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY);
+        bloodChemistry.requests.inflammatoryResponseLocalNeutrophil = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY);
         bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseLocalNeutrophil)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY.titleText = bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.name)){
+        bloodChemistry.requests.inflammatoryResponseLocalNeutrophil.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseLocalNeutrophil);
       }
       break;
       case "inflammatoryResponseLocalBarrier":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseLocalBarrier = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY);
+        bloodChemistry.requests.inflammatoryResponseLocalBarrier = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseLocalBarrier.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY);
         bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseLocalBarrier)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY.titleText = bloodChemistry.requests.inflammatoryResponseLocalBarrier.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseLocalBarrier.name)){
+        bloodChemistry.requests.inflammatoryResponseLocalBarrier.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseLocalBarrier);
       }
       break;
       case "inflammatoryResponseBloodPathogen":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseBloodPathogen = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY);
+        bloodChemistry.requests.inflammatoryResponseBloodPathogen = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseBloodPathogen.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY);
         bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseBloodPathogen)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY.titleText = bloodChemistry.requests.inflammatoryResponseBloodPathogen.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseBloodPathogen.name)){
+        bloodChemistry.requests.inflammatoryResponseBloodPathogen.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseBloodPathogen);
       }
       break;
       case "inflammatoryResponseTrauma":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseTrauma = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseTrauma.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseTrauma.axisY);
+        bloodChemistry.requests.inflammatoryResponseTrauma = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseTrauma.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseTrauma.axisY);
         bloodChemistry.requests.inflammatoryResponseTrauma.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseTrauma)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseTrauma.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseTrauma.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseTrauma.axisY.titleText = bloodChemistry.requests.inflammatoryResponseTrauma.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseTrauma.name)){
+        bloodChemistry.requests.inflammatoryResponseTrauma.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseTrauma);
       }
       break;
       case "inflammatoryResponseMacrophageResting":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseMacrophageResting = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY);
+        bloodChemistry.requests.inflammatoryResponseMacrophageResting = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseMacrophageResting.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY);
         bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseMacrophageResting)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY.titleText = bloodChemistry.requests.inflammatoryResponseMacrophageResting.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseMacrophageResting.name)){
+        bloodChemistry.requests.inflammatoryResponseMacrophageResting.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseMacrophageResting);
       }
       break;
       case "inflammatoryResponseMacrophageActive":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseMacrophageActive = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY);
+        bloodChemistry.requests.inflammatoryResponseMacrophageActive = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseMacrophageActive.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY);
         bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseMacrophageActive)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY.titleText = bloodChemistry.requests.inflammatoryResponseMacrophageActive.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseMacrophageActive.name)){
+        bloodChemistry.requests.inflammatoryResponseMacrophageActive.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseMacrophageActive);
       }
       break;
       case "inflammatoryResponseNeutrophilResting":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseNeutrophilResting = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY);
+        bloodChemistry.requests.inflammatoryResponseNeutrophilResting = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNeutrophilResting.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY);
         bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseNeutrophilResting)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY.titleText = bloodChemistry.requests.inflammatoryResponseNeutrophilResting.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNeutrophilResting.name)){
+        bloodChemistry.requests.inflammatoryResponseNeutrophilResting.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseNeutrophilResting);
       }
       break;
       case "inflammatoryResponseNeutrophilActive":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseNeutrophilActive = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY);
+        bloodChemistry.requests.inflammatoryResponseNeutrophilActive = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNeutrophilActive.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY);
         bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseNeutrophilActive)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY.titleText = bloodChemistry.requests.inflammatoryResponseNeutrophilActive.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNeutrophilActive.name)){
+        bloodChemistry.requests.inflammatoryResponseNeutrophilActive.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseNeutrophilActive);
       }
       break;
       case "inflammatoryResponseInducibleNOSPre":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseInducibleNOSPre = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY);
+        bloodChemistry.requests.inflammatoryResponseInducibleNOSPre = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY);
         bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseInducibleNOSPre)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY.titleText = bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.name)){
+        bloodChemistry.requests.inflammatoryResponseInducibleNOSPre.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseInducibleNOSPre);
       }
       break;
       case "inflammatoryResponseInducibleNOS":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseInducibleNOS = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY);
+        bloodChemistry.requests.inflammatoryResponseInducibleNOS = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInducibleNOS.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY);
         bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseInducibleNOS)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY.titleText = bloodChemistry.requests.inflammatoryResponseInducibleNOS.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInducibleNOS.name)){
+        bloodChemistry.requests.inflammatoryResponseInducibleNOS.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseInducibleNOS);
       }
       break;
       case "inflammatoryResponseConstitutiveNOS":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseConstitutiveNOS = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY);
+        bloodChemistry.requests.inflammatoryResponseConstitutiveNOS = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY);
         bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseConstitutiveNOS)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY.titleText = bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.name)){
+        bloodChemistry.requests.inflammatoryResponseConstitutiveNOS.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseConstitutiveNOS);
       }
       break;
       case "inflammatoryResponseNitrate":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseNitrate = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNitrate.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNitrate.axisY);
+        bloodChemistry.requests.inflammatoryResponseNitrate = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNitrate.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNitrate.axisY);
         bloodChemistry.requests.inflammatoryResponseNitrate.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseNitrate)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNitrate.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseNitrate.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseNitrate.axisY.titleText = bloodChemistry.requests.inflammatoryResponseNitrate.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNitrate.name)){
+        bloodChemistry.requests.inflammatoryResponseNitrate.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseNitrate);
       }
       break;
       case "inflammatoryResponseNitricOxide":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseNitricOxide = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY);
+        bloodChemistry.requests.inflammatoryResponseNitricOxide = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseNitricOxide.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY);
         bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseNitricOxide)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY.titleText = bloodChemistry.requests.inflammatoryResponseNitricOxide.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseNitricOxide.name)){
+        bloodChemistry.requests.inflammatoryResponseNitricOxide.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseNitricOxide);
       }
       break;
       case "inflammatoryResponseTumorNecrosisFactor":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY);
+        bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY);
         bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY.titleText = bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.name)){
+        bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseTumorNecrosisFactor);
       }
       break;
       case "inflammatoryResponseInterleukin6":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseInterleukin6 = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY);
+        bloodChemistry.requests.inflammatoryResponseInterleukin6 = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInterleukin6.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY);
         bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseInterleukin6)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY.titleText = bloodChemistry.requests.inflammatoryResponseInterleukin6.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInterleukin6.name)){
+        bloodChemistry.requests.inflammatoryResponseInterleukin6.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseInterleukin6);
       }
       break;
       case "inflammatoryResponseInterleukin10":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseInterleukin10 = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY);
+        bloodChemistry.requests.inflammatoryResponseInterleukin10 = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInterleukin10.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY);
         bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseInterleukin10)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY.titleText = bloodChemistry.requests.inflammatoryResponseInterleukin10.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInterleukin10.name)){
+        bloodChemistry.requests.inflammatoryResponseInterleukin10.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseInterleukin10);
       }
       break;
       case "inflammatoryResponseInterleukin12":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseInterleukin12 = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY);
+        bloodChemistry.requests.inflammatoryResponseInterleukin12 = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseInterleukin12.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY);
         bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseInterleukin12)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY.titleText = bloodChemistry.requests.inflammatoryResponseInterleukin12.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseInterleukin12.name)){
+        bloodChemistry.requests.inflammatoryResponseInterleukin12.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseInterleukin12);
       }
       break;
       case "inflammatoryResponseCatecholamines":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseCatecholamines = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY);
+        bloodChemistry.requests.inflammatoryResponseCatecholamines = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseCatecholamines.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY);
         bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseCatecholamines)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY.titleText = bloodChemistry.requests.inflammatoryResponseCatecholamines.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseCatecholamines.name)){
+        bloodChemistry.requests.inflammatoryResponseCatecholamines.axisY.visible = false
         bloodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseCatecholamines);
       }
       break;
       case "inflammatoryResponseTissueIntegrity":
       if(active){
-        bloodChemistry.requests.inflammatoryResponseTissueIntegrity = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY.label, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY);
+        bloodChemistry.requests.inflammatoryResponseTissueIntegrity = bloodChemistry.createSeries(ChartView.SeriesTypeLine, bloodChemistry.requests.inflammatoryResponseTissueIntegrity.name, bloodChemistry.axisX, bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY);
         bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY = bloodChemistry.axisY(bloodChemistry.requests.inflammatoryResponseTissueIntegrity)
-      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY.label)){
+        bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY.visible = true
+        bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY.titleText = bloodChemistry.requests.inflammatoryResponseTissueIntegrity.name
+        
+      } else if(bloodChemistry.series(bloodChemistry.requests.inflammatoryResponseTissueIntegrity.name)){
+        bloodChemistry.requests.inflammatoryResponseTissueIntegrity.axisY.visible = false
         loodChemistry.removeSeries(bloodChemistry.requests.inflammatoryResponseTissueIntegrity);
       }
       break;
     }
   }
   function toggleCardiovascularSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch (request) {
       case "arterialPressure":
       if(active){
-      cardiovascular.requests.arterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.arterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.arterialPressure.axisY);
-      cardiovascular.requests.arterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.arterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.arterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.arterialPressure);
+        cardiovascular.requests.arterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.arterialPressure.name, cardiovascular.axisX, cardiovascular.requests.arterialPressure.axisY);
+        cardiovascular.requests.arterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.arterialPressure)
+        cardiovascular.requests.arterialPressure.axisY.visible = true
+        cardiovascular.requests.arterialPressure.axisY.titleText = cardiovascular.requests.arterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.arterialPressure.name)){
+        cardiovascular.requests.arterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.arterialPressure);
       }
       break;
       case "bloodVolume":
       if(active){
-        cardiovascular.requests.bloodVolume = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.bloodVolume.axisY.label, cardiovascular.axisX, cardiovascular.requests.bloodVolume.axisY);
+        cardiovascular.requests.bloodVolume = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.bloodVolume.name, cardiovascular.axisX, cardiovascular.requests.bloodVolume.axisY);
         cardiovascular.requests.bloodVolume.axisY = cardiovascular.axisY(cardiovascular.requests.bloodVolume)
-      } else  if(cardiovascular.series(cardiovascular.requests.bloodVolume.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.bloodVolume);
+        cardiovascular.requests.bloodVolume.axisY.visible = true
+        cardiovascular.requests.bloodVolume.axisY.titleText = cardiovascular.requests.bloodVolume.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.bloodVolume.name)){
+        cardiovascular.requests.bloodVolume.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.bloodVolume);
       }
       break;
       case "cardiacIndex":
       if(active){
-        cardiovascular.requests.cardiacIndex = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cardiacIndex.axisY.label, cardiovascular.axisX, cardiovascular.requests.cardiacIndex.axisY);
+        cardiovascular.requests.cardiacIndex = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cardiacIndex.name, cardiovascular.axisX, cardiovascular.requests.cardiacIndex.axisY);
         cardiovascular.requests.cardiacIndex.axisY = cardiovascular.axisY(cardiovascular.requests.cardiacIndex)
-      } else  if(cardiovascular.series(cardiovascular.requests.cardiacIndex.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.cardiacIndex);
+        cardiovascular.requests.cardiacIndex.axisY.visible = true
+        cardiovascular.requests.cardiacIndex.axisY.titleText = cardiovascular.requests.cardiacIndex.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.cardiacIndex.name)){
+        cardiovascular.requests.cardiacIndex.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.cardiacIndex);
       }
       break;
       case "cardiacOutput":
       if(active){
-        cardiovascular.requests.cardiacOutput = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cardiacOutput.axisY.label, cardiovascular.axisX, cardiovascular.requests.cardiacOutput.axisY);
+        cardiovascular.requests.cardiacOutput = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cardiacOutput.name, cardiovascular.axisX, cardiovascular.requests.cardiacOutput.axisY);
         cardiovascular.requests.cardiacOutput.axisY = cardiovascular.axisY(cardiovascular.requests.cardiacOutput)
-      } else  if(cardiovascular.series(cardiovascular.requests.cardiacOutput.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.cardiacOutput);
+        cardiovascular.requests.cardiacOutput.axisY.visible = true
+        cardiovascular.requests.cardiacOutput.axisY.titleText = cardiovascular.requests.cardiacOutput.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.cardiacOutput.name)){
+        cardiovascular.requests.cardiacOutput.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.cardiacOutput);
       }
       break;
       case "centralVenousPressure":
       if(active){
-        cardiovascular.requests.centralVenousPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.centralVenousPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.centralVenousPressure.axisY);
+        cardiovascular.requests.centralVenousPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.centralVenousPressure.name, cardiovascular.axisX, cardiovascular.requests.centralVenousPressure.axisY);
         cardiovascular.requests.centralVenousPressure.axisY = cardiovascular.axisY(cardiovascular.requests.centralVenousPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.centralVenousPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.centralVenousPressure);
+        cardiovascular.requests.centralVenousPressure.axisY.visible = true
+        cardiovascular.requests.centralVenousPressure.axisY.titleText = cardiovascular.requests.centralVenousPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.centralVenousPressure.name)){
+        cardiovascular.requests.centralVenousPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.centralVenousPressure);
       }
       break;
       case "cerebralBloodFlow":
       if(active){
-        cardiovascular.requests.cerebralBloodFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cerebralBloodFlow.axisY.label, cardiovascular.axisX, cardiovascular.requests.cerebralBloodFlow.axisY);
+        cardiovascular.requests.cerebralBloodFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cerebralBloodFlow.name, cardiovascular.axisX, cardiovascular.requests.cerebralBloodFlow.axisY);
         cardiovascular.requests.cerebralBloodFlow.axisY = cardiovascular.axisY(cardiovascular.requests.cerebralBloodFlow)
-      } else  if(cardiovascular.series(cardiovascular.requests.cerebralBloodFlow.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.cerebralBloodFlow);
+        cardiovascular.requests.cerebralBloodFlow.axisY.visible = true
+        cardiovascular.requests.cerebralBloodFlow.axisY.titleText = cardiovascular.requests.cerebralBloodFlow.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.cerebralBloodFlow.name)){
+        cardiovascular.requests.cerebralBloodFlow.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.cerebralBloodFlow);
       }
       break;
       case "cerebralPerfusionPressure":
       if(active){
-        cardiovascular.requests.cerebralPerfusionPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cerebralPerfusionPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.cerebralPerfusionPressure.axisY);
+        cardiovascular.requests.cerebralPerfusionPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.cerebralPerfusionPressure.name, cardiovascular.axisX, cardiovascular.requests.cerebralPerfusionPressure.axisY);
         cardiovascular.requests.cerebralPerfusionPressure.axisY = cardiovascular.axisY(cardiovascular.requests.cerebralPerfusionPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.cerebralPerfusionPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.cerebralPerfusionPressure);
+        cardiovascular.requests.cerebralPerfusionPressure.axisY.visible = true
+        cardiovascular.requests.cerebralPerfusionPressure.axisY.titleText = cardiovascular.requests.cerebralPerfusionPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.cerebralPerfusionPressure.name)){
+        cardiovascular.requests.cerebralPerfusionPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.cerebralPerfusionPressure);
       }
       break;
       case "diastolicArterialPressure":
       if(active){
-        cardiovascular.requests.diastolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.diastolicArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.diastolicArterialPressure.axisY);
+        cardiovascular.requests.diastolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.diastolicArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.diastolicArterialPressure.axisY);
         cardiovascular.requests.diastolicArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.diastolicArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.diastolicArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.diastolicArterialPressure);
+        cardiovascular.requests.diastolicArterialPressure.axisY.visible = true
+        cardiovascular.requests.diastolicArterialPressure.axisY.titleText = cardiovascular.requests.diastolicArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.diastolicArterialPressure.name)){
+        cardiovascular.requests.diastolicArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.diastolicArterialPressure);
       }
       break;
       case "heartEjectionFraction":
       if(active){
-        cardiovascular.requests.heartEjectionFraction = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.heartEjectionFraction.axisY.label, cardiovascular.axisX, cardiovascular.requests.heartEjectionFraction.axisY);
+        cardiovascular.requests.heartEjectionFraction = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.heartEjectionFraction.name, cardiovascular.axisX, cardiovascular.requests.heartEjectionFraction.axisY);
         cardiovascular.requests.heartEjectionFraction.axisY = cardiovascular.axisY(cardiovascular.requests.heartEjectionFraction)
-      } else  if(cardiovascular.series(cardiovascular.requests.heartEjectionFraction.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.heartEjectionFraction);
+        cardiovascular.requests.heartEjectionFraction.axisY.visible = true
+        cardiovascular.requests.heartEjectionFraction.axisY.titleText = cardiovascular.requests.heartEjectionFraction.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.heartEjectionFraction.name)){
+        cardiovascular.requests.heartEjectionFraction.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.heartEjectionFraction);
       }
       break;
       case "heartRate":
       if(active){
-        cardiovascular.requests.heartRate = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.heartRate.axisY.label, cardiovascular.axisX, cardiovascular.requests.heartRate.axisY);
+        cardiovascular.requests.heartRate = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.heartRate.name, cardiovascular.axisX, cardiovascular.requests.heartRate.axisY);
         cardiovascular.requests.heartRate.axisY = cardiovascular.axisY(cardiovascular.requests.heartRate)
-      } else  if(cardiovascular.series(cardiovascular.requests.heartRate.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.heartRate);
+        cardiovascular.requests.heartRate.axisY.visible = true
+        cardiovascular.requests.heartRate.axisY.titleText = cardiovascular.requests.heartRate.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.heartRate.name)){
+        cardiovascular.requests.heartRate.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.heartRate);
       }
       break;
       case "heartStrokeVolume":
       if(active){
-        cardiovascular.requests.heartStrokeVolume = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.heartStrokeVolume.axisY.label, cardiovascular.axisX, cardiovascular.requests.heartStrokeVolume.axisY);
+        cardiovascular.requests.heartStrokeVolume = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.heartStrokeVolume.name, cardiovascular.axisX, cardiovascular.requests.heartStrokeVolume.axisY);
         cardiovascular.requests.heartStrokeVolume.axisY = cardiovascular.axisY(cardiovascular.requests.heartStrokeVolume)
-      } else  if(cardiovascular.series(cardiovascular.requests.heartStrokeVolume.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.heartStrokeVolume);
+        cardiovascular.requests.heartStrokeVolume.axisY.visible = true
+        cardiovascular.requests.heartStrokeVolume.axisY.titleText = cardiovascular.requests.heartStrokeVolume.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.heartStrokeVolume.name)){
+        cardiovascular.requests.heartStrokeVolume.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.heartStrokeVolume);
       }
       break;
       case "intracranialPressure":
       if(active){
-        cardiovascular.requests.intracranialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.intracranialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.intracranialPressure.axisY);
+        cardiovascular.requests.intracranialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.intracranialPressure.name, cardiovascular.axisX, cardiovascular.requests.intracranialPressure.axisY);
         cardiovascular.requests.intracranialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.intracranialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.intracranialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.intracranialPressure);
+        cardiovascular.requests.intracranialPressure.axisY.visible = true
+        cardiovascular.requests.intracranialPressure.axisY.titleText = cardiovascular.requests.intracranialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.intracranialPressure.name)){
+        cardiovascular.requests.intracranialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.intracranialPressure);
       }
       break;
       case "meanArterialPressure":
       if(active){
-        cardiovascular.requests.meanArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.meanArterialPressure.axisY);
+        cardiovascular.requests.meanArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.meanArterialPressure.axisY);
         cardiovascular.requests.meanArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.meanArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.meanArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.meanArterialPressure);
+        cardiovascular.requests.meanArterialPressure.axisY.visible = true
+        cardiovascular.requests.meanArterialPressure.axisY.titleText = cardiovascular.requests.meanArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.meanArterialPressure.name)){
+        cardiovascular.requests.meanArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.meanArterialPressure);
       }
       break;
       case "meanArterialCarbonDioxidePartialPressure":
       if(active){
-        cardiovascular.requests.meanArterialCarbonDioxidePartialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY);
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.name, cardiovascular.axisX, cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY);
         cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.meanArterialCarbonDioxidePartialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.meanArterialCarbonDioxidePartialPressure);
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY.visible = true
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY.titleText = cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.name)){
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.meanArterialCarbonDioxidePartialPressure);
       }
       break;
       case "meanArterialCarbonDioxidePartialPressureDelta":
       if(active){
-        cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY.label, cardiovascular.axisX, cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY);
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.name, cardiovascular.axisX, cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY);
         cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY = cardiovascular.axisY(cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta)
-      } else  if(cardiovascular.series(cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta);
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY.visible = true
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY.titleText = cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.name)){
+        cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.meanArterialCarbonDioxidePartialPressureDelta);
       }
       break;
       case "meanCentralVenousPressure":
       if(active){
-        cardiovascular.requests.meanCentralVenousPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanCentralVenousPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.meanCentralVenousPressure.axisY);
+        cardiovascular.requests.meanCentralVenousPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanCentralVenousPressure.name, cardiovascular.axisX, cardiovascular.requests.meanCentralVenousPressure.axisY);
         cardiovascular.requests.meanCentralVenousPressure.axisY = cardiovascular.axisY(cardiovascular.requests.meanCentralVenousPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.meanCentralVenousPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.meanCentralVenousPressure);
+        cardiovascular.requests.meanCentralVenousPressure.axisY.visible = true
+        cardiovascular.requests.meanCentralVenousPressure.axisY.titleText = cardiovascular.requests.meanCentralVenousPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.meanCentralVenousPressure.name)){
+        cardiovascular.requests.meanCentralVenousPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.meanCentralVenousPressure);
       }
       break;
       case "meanSkinFlow":
       if(active){
-        cardiovascular.requests.meanSkinFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanSkinFlow.axisY.label, cardiovascular.axisX, cardiovascular.requests.meanSkinFlow.axisY);
+        cardiovascular.requests.meanSkinFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.meanSkinFlow.name, cardiovascular.axisX, cardiovascular.requests.meanSkinFlow.axisY);
         cardiovascular.requests.meanSkinFlow.axisY = cardiovascular.axisY(cardiovascular.requests.meanSkinFlow)
-      } else  if(cardiovascular.series(cardiovascular.requests.meanSkinFlow.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.meanSkinFlow);
+        cardiovascular.requests.meanSkinFlow.axisY.visible = true
+        cardiovascular.requests.meanSkinFlow.axisY.titleText = cardiovascular.requests.meanSkinFlow.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.meanSkinFlow.name)){
+        cardiovascular.requests.meanSkinFlow.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.meanSkinFlow);
       }
       break;
       case "pulmonaryArterialPressure":
       if(active){
-        cardiovascular.requests.pulmonaryArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryArterialPressure.axisY);
+        cardiovascular.requests.pulmonaryArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryArterialPressure.axisY);
         cardiovascular.requests.pulmonaryArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryArterialPressure);
+        cardiovascular.requests.pulmonaryArterialPressure.axisY.visible = true
+        cardiovascular.requests.pulmonaryArterialPressure.axisY.titleText = cardiovascular.requests.pulmonaryArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryArterialPressure.name)){
+        cardiovascular.requests.pulmonaryArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryArterialPressure);
       }
       break;
       case "pulmonaryCapillariesWedgePressure":
       if(active){
-        cardiovascular.requests.pulmonaryCapillariesWedgePressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY);
+        cardiovascular.requests.pulmonaryCapillariesWedgePressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryCapillariesWedgePressure.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY);
         cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryCapillariesWedgePressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryCapillariesWedgePressure);
+        cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY.visible = true
+        cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY.titleText = cardiovascular.requests.pulmonaryCapillariesWedgePressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryCapillariesWedgePressure.name)){
+        cardiovascular.requests.pulmonaryCapillariesWedgePressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryCapillariesWedgePressure);
       }
       break;
       case "pulmonaryDiastolicArterialPressure":
       if(active){
-        cardiovascular.requests.pulmonaryDiastolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY);
+        cardiovascular.requests.pulmonaryDiastolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryDiastolicArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY);
         cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryDiastolicArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryDiastolicArterialPressure);
+        cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY.visible = true
+        cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY.titleText = cardiovascular.requests.pulmonaryDiastolicArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryDiastolicArterialPressure.name)){
+        cardiovascular.requests.pulmonaryDiastolicArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryDiastolicArterialPressure);
       }
       break;
       case "pulmonaryMeanArterialPressure":
       if(active){
-        cardiovascular.requests.pulmonaryMeanArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryMeanArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryMeanArterialPressure.axisY);
+        cardiovascular.requests.pulmonaryMeanArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryMeanArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryMeanArterialPressure.axisY);
         cardiovascular.requests.pulmonaryMeanArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryMeanArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryMeanArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryMeanArterialPressure);
+        cardiovascular.requests.pulmonaryMeanArterialPressure.axisY.visible = true
+        cardiovascular.requests.pulmonaryMeanArterialPressure.axisY.titleText = cardiovascular.requests.pulmonaryMeanArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryMeanArterialPressure.name)){
+        cardiovascular.requests.pulmonaryMeanArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryMeanArterialPressure);
       }
       break;
       case "pulmonaryMeanCapillaryFlow":
       if(active){
-        cardiovascular.requests.pulmonaryMeanCapillaryFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY);
+        cardiovascular.requests.pulmonaryMeanCapillaryFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryMeanCapillaryFlow.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY);
         cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryMeanCapillaryFlow)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryMeanCapillaryFlow);
+        cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY.visible = true
+        cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY.titleText = cardiovascular.requests.pulmonaryMeanCapillaryFlow.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryMeanCapillaryFlow.name)){
+        cardiovascular.requests.pulmonaryMeanCapillaryFlow.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryMeanCapillaryFlow);
       }
       break;
       case "pulmonaryMeanShuntFlow":
       if(active){
-        cardiovascular.requests.pulmonaryMeanShuntFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryMeanShuntFlow.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryMeanShuntFlow.axisY);
+        cardiovascular.requests.pulmonaryMeanShuntFlow = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryMeanShuntFlow.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryMeanShuntFlow.axisY);
         cardiovascular.requests.pulmonaryMeanShuntFlow.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryMeanShuntFlow)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryMeanShuntFlow.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryMeanShuntFlow);
+        cardiovascular.requests.pulmonaryMeanShuntFlow.axisY.visible = true
+        cardiovascular.requests.pulmonaryMeanShuntFlow.axisY.titleText = cardiovascular.requests.pulmonaryMeanShuntFlow.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryMeanShuntFlow.name)){
+        cardiovascular.requests.pulmonaryMeanShuntFlow.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryMeanShuntFlow);
       }
       break;
       case "pulmonarySystolicArterialPressure":
       if(active){
-        cardiovascular.requests.pulmonarySystolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonarySystolicArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonarySystolicArterialPressure.axisY);
+        cardiovascular.requests.pulmonarySystolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonarySystolicArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.pulmonarySystolicArterialPressure.axisY);
         cardiovascular.requests.pulmonarySystolicArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonarySystolicArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonarySystolicArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonarySystolicArterialPressure);
+        cardiovascular.requests.pulmonarySystolicArterialPressure.axisY.visible = true
+        cardiovascular.requests.pulmonarySystolicArterialPressure.axisY.titleText = cardiovascular.requests.pulmonarySystolicArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonarySystolicArterialPressure.name)){
+        cardiovascular.requests.pulmonarySystolicArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonarySystolicArterialPressure);
       }
       break;
       case "pulmonaryVascularResistance":
       if(active){
-        cardiovascular.requests.pulmonaryVascularResistance = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryVascularResistance.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryVascularResistance.axisY);
+        cardiovascular.requests.pulmonaryVascularResistance = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryVascularResistance.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryVascularResistance.axisY);
         cardiovascular.requests.pulmonaryVascularResistance.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryVascularResistance)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryVascularResistance.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryVascularResistance);
+        cardiovascular.requests.pulmonaryVascularResistance.axisY.visible = true
+        cardiovascular.requests.pulmonaryVascularResistance.axisY.titleText = cardiovascular.requests.pulmonaryVascularResistance.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryVascularResistance.name)){
+        cardiovascular.requests.pulmonaryVascularResistance.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryVascularResistance);
       }
       break;
       case "pulmonaryVascularResistanceIndex":
       if(active){
-        cardiovascular.requests.pulmonaryVascularResistanceIndex = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY);
+        cardiovascular.requests.pulmonaryVascularResistanceIndex = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulmonaryVascularResistanceIndex.name, cardiovascular.axisX, cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY);
         cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY = cardiovascular.axisY(cardiovascular.requests.pulmonaryVascularResistanceIndex)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulmonaryVascularResistanceIndex);
+        cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY.visible = true
+        cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY.titleText = cardiovascular.requests.pulmonaryVascularResistanceIndex.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulmonaryVascularResistanceIndex.name)){
+        cardiovascular.requests.pulmonaryVascularResistanceIndex.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulmonaryVascularResistanceIndex);
       }
       break;
       case "pulsePressure":
       if(active){
-        cardiovascular.requests.pulsePressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulsePressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.pulsePressure.axisY);
+        cardiovascular.requests.pulsePressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.pulsePressure.name, cardiovascular.axisX, cardiovascular.requests.pulsePressure.axisY);
         cardiovascular.requests.pulsePressure.axisY = cardiovascular.axisY(cardiovascular.requests.pulsePressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.pulsePressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.pulsePressure);
+        cardiovascular.requests.pulsePressure.axisY.visible = true
+        cardiovascular.requests.pulsePressure.axisY.titleText = cardiovascular.requests.pulsePressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.pulsePressure.name)){
+        cardiovascular.requests.pulsePressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.pulsePressure);
       }
       break;
       case "systemicVascularResistance":
       if(active){
-        cardiovascular.requests.systemicVascularResistance = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.systemicVascularResistance.axisY.label, cardiovascular.axisX, cardiovascular.requests.systemicVascularResistance.axisY);
+        cardiovascular.requests.systemicVascularResistance = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.systemicVascularResistance.name, cardiovascular.axisX, cardiovascular.requests.systemicVascularResistance.axisY);
         cardiovascular.requests.systemicVascularResistance.axisY = cardiovascular.axisY(cardiovascular.requests.systemicVascularResistance)
-      } else  if(cardiovascular.series(cardiovascular.requests.systemicVascularResistance.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.systemicVascularResistance);
+        cardiovascular.requests.systemicVascularResistance.axisY.visible = true
+        cardiovascular.requests.systemicVascularResistance.axisY.titleText = cardiovascular.requests.systemicVascularResistance.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.systemicVascularResistance.name)){
+        cardiovascular.requests.systemicVascularResistance.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.systemicVascularResistance);
       }
       break;
       case "systolicArterialPressure":
       if(active){
-        cardiovascular.requests.systolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.systolicArterialPressure.axisY.label, cardiovascular.axisX, cardiovascular.requests.systolicArterialPressure.axisY);
+        cardiovascular.requests.systolicArterialPressure = cardiovascular.createSeries(ChartView.SeriesTypeLine, cardiovascular.requests.systolicArterialPressure.name, cardiovascular.axisX, cardiovascular.requests.systolicArterialPressure.axisY);
         cardiovascular.requests.systolicArterialPressure.axisY = cardiovascular.axisY(cardiovascular.requests.systolicArterialPressure)
-      } else  if(cardiovascular.series(cardiovascular.requests.systolicArterialPressure.axisY.label)){
-          cardiovascular.removeSeries(cardiovascular.requests.systolicArterialPressure);
+        cardiovascular.requests.systolicArterialPressure.axisY.visible = true
+        cardiovascular.requests.systolicArterialPressure.axisY.titleText = cardiovascular.requests.systolicArterialPressure.name
+        
+      } else  if(cardiovascular.series(cardiovascular.requests.systolicArterialPressure.name)){
+        cardiovascular.requests.systolicArterialPressure.axisY.visible = false
+        cardiovascular.removeSeries(cardiovascular.requests.systolicArterialPressure);
       }
       break;
     }
   }
   function toggleDrugsSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
      switch(request){
       case "systolicArterialPressure":
       if(active){
-        drugs.requests.bronchodilationLevel = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.bronchodilationLevel.axisY.label, drugs.axisX, drugs.requests.bronchodilationLevel.axisY);
+        drugs.requests.bronchodilationLevel = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.bronchodilationLevel.name, drugs.axisX, drugs.requests.bronchodilationLevel.axisY);
         drugs.requests.bronchodilationLevel.axisY = drugs.axisY(drugs.requests.bronchodilationLevel)
-      } else  if(drugs.series(drugs.requests.bronchodilationLevel.axisY.label)){
-          drugs.removeSeries(drugs.requests.bronchodilationLevel);
+        drugs.requests.bronchodilationLevel.axisY.visible = true
+        drugs.requests.bronchodilationLevel.axisY.titleText = drugs.requests.bronchodilationLevel.name
+        
+      } else  if(drugs.series(drugs.requests.bronchodilationLevel.name)){
+        drugs.requests.bronchodilationLevel.axisY.visible = false
+        drugs.removeSeries(drugs.requests.bronchodilationLevel);
       }
       break;
       case "heartRateChange":
       if(active){
-      drugs.requests.heartRateChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.heartRateChange.axisY.label, drugs.axisX, drugs.requests.heartRateChange.axisY);
+      drugs.requests.heartRateChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.heartRateChange.name, drugs.axisX, drugs.requests.heartRateChange.axisY);
       drugs.requests.heartRateChange.axisY = drugs.axisY(drugs.requests.heartRateChange)
-      } else  if(drugs.series(drugs.requests.heartRateChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.heartRateChange);
+        drugs.requests.heartRateChange.axisY.visible = true
+        drugs.requests.heartRateChange.axisY.titleText = drugs.requests.heartRateChange.name
+        
+      } else  if(drugs.series(drugs.requests.heartRateChange.name)){
+        drugs.requests.heartRateChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.heartRateChange);
       }
       break;
       case "hemorrhageChange":
       if(active){
-      drugs.requests.hemorrhageChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.hemorrhageChange.axisY.label, drugs.axisX, drugs.requests.hemorrhageChange.axisY);
+      drugs.requests.hemorrhageChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.hemorrhageChange.name, drugs.axisX, drugs.requests.hemorrhageChange.axisY);
       drugs.requests.hemorrhageChange.axisY = drugs.axisY(drugs.requests.hemorrhageChange)
-      } else  if(drugs.series(drugs.requests.hemorrhageChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.hemorrhageChange);
+        drugs.requests.hemorrhageChange.axisY.visible = true
+        drugs.requests.hemorrhageChange.axisY.titleText = drugs.requests.hemorrhageChange.name
+        
+      } else  if(drugs.series(drugs.requests.hemorrhageChange.name)){
+        drugs.requests.hemorrhageChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.hemorrhageChange);
       }
       break;
       case "meanBloodPressureChange":
       if(active){
-      drugs.requests.meanBloodPressureChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.meanBloodPressureChange.axisY.label, drugs.axisX, drugs.requests.meanBloodPressureChange.axisY);
+      drugs.requests.meanBloodPressureChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.meanBloodPressureChange.name, drugs.axisX, drugs.requests.meanBloodPressureChange.axisY);
       drugs.requests.meanBloodPressureChange.axisY = drugs.axisY(drugs.requests.meanBloodPressureChange)
-      } else  if(drugs.series(drugs.requests.meanBloodPressureChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.meanBloodPressureChange);
+        drugs.requests.meanBloodPressureChange.axisY.visible = true
+        drugs.requests.meanBloodPressureChange.axisY.titleText = drugs.requests.meanBloodPressureChange.name
+        
+      } else  if(drugs.series(drugs.requests.meanBloodPressureChange.name)){
+        drugs.requests.meanBloodPressureChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.meanBloodPressureChange);
       }
       break;
       case "neuromuscularBlockLevel":
       if(active){
-      drugs.requests.neuromuscularBlockLevel = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.neuromuscularBlockLevel.axisY.label, drugs.axisX, drugs.requests.neuromuscularBlockLevel.axisY);
+      drugs.requests.neuromuscularBlockLevel = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.neuromuscularBlockLevel.name, drugs.axisX, drugs.requests.neuromuscularBlockLevel.axisY);
       drugs.requests.neuromuscularBlockLevel.axisY = drugs.axisY(drugs.requests.neuromuscularBlockLevel)
-      } else  if(drugs.series(drugs.requests.neuromuscularBlockLevel.axisY.label)){
-          drugs.removeSeries(drugs.requests.neuromuscularBlockLevel);
+        drugs.requests.neuromuscularBlockLevel.axisY.visible = true
+        drugs.requests.neuromuscularBlockLevel.axisY.titleText = drugs.requests.neuromuscularBlockLevel.name
+        
+      } else  if(drugs.series(drugs.requests.neuromuscularBlockLevel.name)){
+        drugs.requests.neuromuscularBlockLevel.axisY.visible = false
+        drugs.removeSeries(drugs.requests.neuromuscularBlockLevel);
       }
       break;
       case "pulsePressureChange":
       if(active){
-      drugs.requests.pulsePressureChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.pulsePressureChange.axisY.label, drugs.axisX, drugs.requests.pulsePressureChange.axisY);
+      drugs.requests.pulsePressureChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.pulsePressureChange.name, drugs.axisX, drugs.requests.pulsePressureChange.axisY);
       drugs.requests.pulsePressureChange.axisY = drugs.axisY(drugs.requests.pulsePressureChange)
-      } else  if(drugs.series(drugs.requests.pulsePressureChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.pulsePressureChange);
+        drugs.requests.pulsePressureChange.axisY.visible = true
+        drugs.requests.pulsePressureChange.axisY.titleText = drugs.requests.pulsePressureChange.name
+        
+      } else  if(drugs.series(drugs.requests.pulsePressureChange.name)){
+        drugs.requests.pulsePressureChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.pulsePressureChange);
       }
       break;
       case "respirationRateChange":
       if(active){
-      drugs.requests.respirationRateChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.respirationRateChange.axisY.label, drugs.axisX, drugs.requests.respirationRateChange.axisY);
+      drugs.requests.respirationRateChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.respirationRateChange.name, drugs.axisX, drugs.requests.respirationRateChange.axisY);
       drugs.requests.respirationRateChange.axisY = drugs.axisY(drugs.requests.respirationRateChange)
-      } else  if(drugs.series(drugs.requests.respirationRateChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.respirationRateChange);
+        drugs.requests.respirationRateChange.axisY.visible = true
+        drugs.requests.respirationRateChange.axisY.titleText = drugs.requests.respirationRateChange.name
+        
+      } else  if(drugs.series(drugs.requests.respirationRateChange.name)){
+        drugs.requests.respirationRateChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.respirationRateChange);
       }
       break;
       case "sedationLevel":
       if(active){
-      drugs.requests.sedationLevel = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.sedationLevel.axisY.label, drugs.axisX, drugs.requests.sedationLevel.axisY);
+      drugs.requests.sedationLevel = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.sedationLevel.name, drugs.axisX, drugs.requests.sedationLevel.axisY);
       drugs.requests.sedationLevel.axisY = drugs.axisY(drugs.requests.sedationLevel)
-      } else  if(drugs.series(drugs.requests.sedationLevel.axisY.label)){
-          drugs.removeSeries(drugs.requests.sedationLevel);
+        drugs.requests.sedationLevel.axisY.visible = true
+        drugs.requests.sedationLevel.axisY.titleText = drugs.requests.sedationLevel.name
+        
+      } else  if(drugs.series(drugs.requests.sedationLevel.name)){
+        drugs.requests.sedationLevel.axisY.visible = false
+        drugs.removeSeries(drugs.requests.sedationLevel);
       }
       break;
       case "tidalVolumeChange":
       if(active){
-      drugs.requests.tidalVolumeChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.tidalVolumeChange.axisY.label, drugs.axisX, drugs.requests.tidalVolumeChange.axisY);
+      drugs.requests.tidalVolumeChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.tidalVolumeChange.name, drugs.axisX, drugs.requests.tidalVolumeChange.axisY);
       drugs.requests.tidalVolumeChange.axisY = drugs.axisY(drugs.requests.tidalVolumeChange)
-      } else  if(drugs.series(drugs.requests.tidalVolumeChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.tidalVolumeChange);
+        drugs.requests.tidalVolumeChange.axisY.visible = true
+        drugs.requests.tidalVolumeChange.axisY.titleText = drugs.requests.tidalVolumeChange.name
+        
+      } else  if(drugs.series(drugs.requests.tidalVolumeChange.name)){
+        drugs.requests.tidalVolumeChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.tidalVolumeChange);
       }
       break;
       case "tubularPermeabilityChange":
       if(active){
-      drugs.requests.tubularPermeabilityChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.tubularPermeabilityChange.axisY.label, drugs.axisX, drugs.requests.tubularPermeabilityChange.axisY);
+      drugs.requests.tubularPermeabilityChange = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.tubularPermeabilityChange.name, drugs.axisX, drugs.requests.tubularPermeabilityChange.axisY);
       drugs.requests.tubularPermeabilityChange.axisY = drugs.axisY(drugs.requests.tubularPermeabilityChange)
-      } else  if(drugs.series(drugs.requests.tubularPermeabilityChange.axisY.label)){
-          drugs.removeSeries(drugs.requests.tubularPermeabilityChange);
+        drugs.requests.tubularPermeabilityChange.axisY.visible = true
+        drugs.requests.tubularPermeabilityChange.axisY.titleText = drugs.requests.tubularPermeabilityChange.name
+        
+      } else  if(drugs.series(drugs.requests.tubularPermeabilityChange.name)){
+        drugs.requests.tubularPermeabilityChange.axisY.visible = false
+        drugs.removeSeries(drugs.requests.tubularPermeabilityChange);
       }
       break;
       case "centralNervousResponse":
       if(active){
-      drugs.requests.centralNervousResponse = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.centralNervousResponse.axisY.label, drugs.axisX, drugs.requests.centralNervousResponse.axisY);
-      drugs.requests.centralNervousResponse.axisY = drugs.axisY(drugs.requests.centralNervousResponse)
-      } else  if  (drugs.series(drugs.requests.centralNervousResponse.axisY.label)){
-          drugs.removeSeries(drugs.requests.centralNervousResponse);
+        drugs.requests.centralNervousResponse = drugs.createSeries(ChartView.SeriesTypeLine, drugs.requests.centralNervousResponse.name, drugs.axisX, drugs.requests.centralNervousResponse.axisY);
+        drugs.requests.centralNervousResponse.axisY = drugs.axisY(drugs.requests.centralNervousResponse)
+        drugs.requests.centralNervousResponse.axisY.visible = true
+        drugs.requests.centralNervousResponse.axisY.titleText = drugs.requests.centralNervousResponse.name
+        
+      } else  if  (drugs.series(drugs.requests.centralNervousResponse.name)){
+        drugs.requests.centralNervousResponse.axisY.visible = false
+        drugs.removeSeries(drugs.requests.centralNervousResponse);
       }
       break;
 
      }
   }
   function toggleEndocrineSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch(request){
       case "insulinSynthesisRate":
       if(active){
-      endocrine.requests.insulinSynthesisRate = endocrine.createSeries(ChartView.SeriesTypeLine, endocrine.requests.insulinSynthesisRate.axisY.label, endocrine.axisX, endocrine.requests.insulinSynthesisRate.axisY);
-      endocrine.requests.insulinSynthesisRate.axisY = endocrine.axisY(endocrine.requests.insulinSynthesisRate)
-      } else  if  (endocrine.series(endocrine.requests.insulinSynthesisRate.axisY.label)){
-          endocrine.removeSeries(endocrine.requests.insulinSynthesisRate);
+        endocrine.requests.insulinSynthesisRate = endocrine.createSeries(ChartView.SeriesTypeLine, endocrine.requests.insulinSynthesisRate.name, endocrine.axisX, endocrine.requests.insulinSynthesisRate.axisY);
+        endocrine.requests.insulinSynthesisRate.axisY = endocrine.axisY(endocrine.requests.insulinSynthesisRate)
+        endocrine.requests.insulinSynthesisRate.axisY.visible = true
+        endocrine.requests.insulinSynthesisRate.axisY.titleText = endocrine.requests.insulinSynthesisRate.name
+        
+      } else  if  (endocrine.series(endocrine.requests.insulinSynthesisRate.name)){
+        endocrine.requests.insulinSynthesisRate.axisY.visible = false
+        endocrine.removeSeries(endocrine.requests.insulinSynthesisRate);
       }
       break;
       case "glucagonSynthesisRate":
       if(active){
-      endocrine.requests.glucagonSynthesisRate = endocrine.createSeries(ChartView.SeriesTypeLine, endocrine.requests.glucagonSynthesisRate.axisY.label, endocrine.axisX, endocrine.requests.glucagonSynthesisRate.axisY);
-      endocrine.requests.glucagonSynthesisRate.axisY = endocrine.axisY(endocrine.requests.glucagonSynthesisRate)
-      } else  if  (endocrine.series(endocrine.requests.glucagonSynthesisRate.axisY.label)){
-          endocrine.removeSeries(endocrine.requests.glucagonSynthesisRate);
+        endocrine.requests.glucagonSynthesisRate = endocrine.createSeries(ChartView.SeriesTypeLine, endocrine.requests.glucagonSynthesisRate.name, endocrine.axisX, endocrine.requests.glucagonSynthesisRate.axisY);
+        endocrine.requests.glucagonSynthesisRate.axisY = endocrine.axisY(endocrine.requests.glucagonSynthesisRate)
+        endocrine.requests.glucagonSynthesisRate.axisY.visible = true
+        endocrine.requests.glucagonSynthesisRate.axisY.titleText = endocrine.requests.glucagonSynthesisRate.name
+        
+      } else  if  (endocrine.series(endocrine.requests.glucagonSynthesisRate.name)){
+        endocrine.requests.glucagonSynthesisRate.axisY.visible = false
+        endocrine.removeSeries(endocrine.requests.glucagonSynthesisRate);
       }
       break;
     }
   }
   function toggleEnergySeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch(request){
       case "achievedExerciseLevel":
       if(active){
-        energy.requests.achievedExerciseLevel = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.achievedExerciseLevel.axisY.label, energy.axisX, energy.requests.achievedExerciseLevel.axisY);
+        energy.requests.achievedExerciseLevel = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.achievedExerciseLevel.name, energy.axisX, energy.requests.achievedExerciseLevel.axisY);
         energy.requests.achievedExerciseLevel.axisY = energy.axisY(energy.requests.achievedExerciseLevel)
-      } else  if  (energy.series(energy.requests.achievedExerciseLevel.axisY.label)){
-          energy.removeSeries(energy.requests.achievedExerciseLevel);
+        energy.requests.achievedExerciseLevel.axisY.visible = true
+        energy.requests.achievedExerciseLevel.axisY.titleText = energy.requests.achievedExerciseLevel.name
+        
+      } else  if  (energy.series(energy.requests.achievedExerciseLevel.name)){
+        energy.requests.achievedExerciseLevel.axisY.visible = false
+        energy.removeSeries(energy.requests.achievedExerciseLevel);
       }
       break;
       case "chlorideLostToSweat":
       if(active){
-        energy.requests.chlorideLostToSweat = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.chlorideLostToSweat.axisY.label, energy.axisX, energy.requests.chlorideLostToSweat.axisY);
+        energy.requests.chlorideLostToSweat = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.chlorideLostToSweat.name, energy.axisX, energy.requests.chlorideLostToSweat.axisY);
         energy.requests.chlorideLostToSweat.axisY = energy.axisY(energy.requests.chlorideLostToSweat)
-      } else  if  (energy.series(energy.requests.chlorideLostToSweat.axisY.label)){
-          energy.removeSeries(energy.requests.chlorideLostToSweat);
+        energy.requests.chlorideLostToSweat.axisY.visible = true
+        energy.requests.chlorideLostToSweat.axisY.titleText = energy.requests.chlorideLostToSweat.name
+        
+      } else  if  (energy.series(energy.requests.chlorideLostToSweat.name)){
+        energy.requests.chlorideLostToSweat.axisY.visible = false
+        energy.removeSeries(energy.requests.chlorideLostToSweat);
       }
       break;
       case "coreTemperature":
       if(active){
-        energy.requests.coreTemperature = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.coreTemperature.axisY.label, energy.axisX, energy.requests.coreTemperature.axisY);
+        energy.requests.coreTemperature = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.coreTemperature.name, energy.axisX, energy.requests.coreTemperature.axisY);
         energy.requests.coreTemperature.axisY = energy.axisY(energy.requests.coreTemperature)
-      } else  if  (energy.series(energy.requests.coreTemperature.axisY.label)){
-          energy.removeSeries(energy.requests.coreTemperature);
+        energy.requests.coreTemperature.axisY.visible = true
+        energy.requests.coreTemperature.axisY.titleText = energy.requests.coreTemperature.name
+        
+      } else  if  (energy.series(energy.requests.coreTemperature.name)){
+        energy.requests.coreTemperature.axisY.visible = false
+        energy.removeSeries(energy.requests.coreTemperature);
       }
       break;
       case "creatinineProductionRate":
       if(active){
-        energy.requests.creatinineProductionRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.creatinineProductionRate.axisY.label, energy.axisX, energy.requests.creatinineProductionRate.axisY);
+        energy.requests.creatinineProductionRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.creatinineProductionRate.name, energy.axisX, energy.requests.creatinineProductionRate.axisY);
         energy.requests.creatinineProductionRate.axisY = energy.axisY(energy.requests.creatinineProductionRate)
-      } else  if  (energy.series(energy.requests.creatinineProductionRate.axisY.label)){
-          energy.removeSeries(energy.requests.creatinineProductionRate);
+        energy.requests.creatinineProductionRate.axisY.visible = true
+        energy.requests.creatinineProductionRate.axisY.titleText = energy.requests.creatinineProductionRate.name
+        
+      } else  if  (energy.series(energy.requests.creatinineProductionRate.name)){
+        energy.requests.creatinineProductionRate.axisY.visible = false
+        energy.removeSeries(energy.requests.creatinineProductionRate);
       }
       break;
       case "exerciseMeanArterialPressureDelta":
       if(active){
-        energy.requests.exerciseMeanArterialPressureDelta = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.exerciseMeanArterialPressureDelta.axisY.label, energy.axisX, energy.requests.exerciseMeanArterialPressureDelta.axisY);
+        energy.requests.exerciseMeanArterialPressureDelta = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.exerciseMeanArterialPressureDelta.name, energy.axisX, energy.requests.exerciseMeanArterialPressureDelta.axisY);
         energy.requests.exerciseMeanArterialPressureDelta.axisY = energy.axisY(energy.requests.exerciseMeanArterialPressureDelta)
-      } else  if  (energy.series(energy.requests.exerciseMeanArterialPressureDelta.axisY.label)){
-          energy.removeSeries(energy.requests.exerciseMeanArterialPressureDelta);
+        energy.requests.exerciseMeanArterialPressureDelta.axisY.visible = true
+        energy.requests.exerciseMeanArterialPressureDelta.axisY.titleText = energy.requests.exerciseMeanArterialPressureDelta.name
+        
+      } else  if  (energy.series(energy.requests.exerciseMeanArterialPressureDelta.name)){
+        energy.requests.exerciseMeanArterialPressureDelta.axisY.visible = false
+        energy.removeSeries(energy.requests.exerciseMeanArterialPressureDelta);
       }
       break;
       case "fatigueLevel":
       if(active){
-        energy.requests.fatigueLevel = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.fatigueLevel.axisY.label, energy.axisX, energy.requests.fatigueLevel.axisY);
+        energy.requests.fatigueLevel = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.fatigueLevel.name, energy.axisX, energy.requests.fatigueLevel.axisY);
         energy.requests.fatigueLevel.axisY = energy.axisY(energy.requests.fatigueLevel)
-      } else  if  (energy.series(energy.requests.fatigueLevel.axisY.label)){
-          energy.removeSeries(energy.requests.fatigueLevel);
+        energy.requests.fatigueLevel.axisY.visible = true
+        energy.requests.fatigueLevel.axisY.titleText = energy.requests.fatigueLevel.name
+        
+      } else  if  (energy.series(energy.requests.fatigueLevel.name)){
+        energy.requests.fatigueLevel.axisY.visible = false
+        energy.removeSeries(energy.requests.fatigueLevel);
       }
       break;
       case "lactateProductionRate":
       if(active){
-        energy.requests.lactateProductionRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.lactateProductionRate.axisY.label, energy.axisX, energy.requests.lactateProductionRate.axisY);
+        energy.requests.lactateProductionRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.lactateProductionRate.name, energy.axisX, energy.requests.lactateProductionRate.axisY);
         energy.requests.lactateProductionRate.axisY = energy.axisY(energy.requests.lactateProductionRate)
-      } else  if  (energy.series(energy.requests.lactateProductionRate.axisY.label)){
-          energy.removeSeries(energy.requests.lactateProductionRate);
+        energy.requests.lactateProductionRate.axisY.visible = true
+        energy.requests.lactateProductionRate.axisY.titleText = energy.requests.lactateProductionRate.name
+        
+      } else  if  (energy.series(energy.requests.lactateProductionRate.name)){
+        energy.requests.lactateProductionRate.axisY.visible = false
+        energy.removeSeries(energy.requests.lactateProductionRate);
       }
       break;
       case "potassiumLostToSweat":
       if(active){
-        energy.requests.potassiumLostToSweat = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.potassiumLostToSweat.axisY.label, energy.axisX, energy.requests.potassiumLostToSweat.axisY);
+        energy.requests.potassiumLostToSweat = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.potassiumLostToSweat.name, energy.axisX, energy.requests.potassiumLostToSweat.axisY);
         energy.requests.potassiumLostToSweat.axisY = energy.axisY(energy.requests.potassiumLostToSweat)
-      } else  if  (energy.series(energy.requests.potassiumLostToSweat.axisY.label)){
-          energy.removeSeries(energy.requests.potassiumLostToSweat);
+        energy.requests.potassiumLostToSweat.axisY.visible = true
+        energy.requests.potassiumLostToSweat.axisY.titleText = energy.requests.potassiumLostToSweat.name
+        
+      } else  if  (energy.series(energy.requests.potassiumLostToSweat.name)){
+        energy.requests.potassiumLostToSweat.axisY.visible = false
+        energy.removeSeries(energy.requests.potassiumLostToSweat);
       }
       break;
       case "skinTemperature":
       if(active){
-        energy.requests.skinTemperature = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.skinTemperature.axisY.label, energy.axisX, energy.requests.skinTemperature.axisY);
+        energy.requests.skinTemperature = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.skinTemperature.name, energy.axisX, energy.requests.skinTemperature.axisY);
         energy.requests.skinTemperature.axisY = energy.axisY(energy.requests.skinTemperature)
-      } else  if  (energy.series(energy.requests.skinTemperature.axisY.label)){
-          energy.removeSeries(energy.requests.skinTemperature);
+        energy.requests.skinTemperature.axisY.visible = true
+        energy.requests.skinTemperature.axisY.titleText = energy.requests.skinTemperature.name
+        
+      } else  if  (energy.series(energy.requests.skinTemperature.name)){
+        energy.requests.skinTemperature.axisY.visible = false
+        energy.removeSeries(energy.requests.skinTemperature);
       }
       break;
       case "sodiumLostToSweat":
       if(active){
-        energy.requests.sodiumLostToSweat = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.sodiumLostToSweat.axisY.label, energy.axisX, energy.requests.sodiumLostToSweat.axisY);
+        energy.requests.sodiumLostToSweat = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.sodiumLostToSweat.name, energy.axisX, energy.requests.sodiumLostToSweat.axisY);
         energy.requests.sodiumLostToSweat.axisY = energy.axisY(energy.requests.sodiumLostToSweat)
-      } else  if  (energy.series(energy.requests.sodiumLostToSweat.axisY.label)){
-          energy.removeSeries(energy.requests.sodiumLostToSweat);
+        energy.requests.sodiumLostToSweat.axisY.visible = true
+        energy.requests.sodiumLostToSweat.axisY.titleText = energy.requests.sodiumLostToSweat.name
+        
+      } else  if  (energy.series(energy.requests.sodiumLostToSweat.name)){
+        energy.requests.sodiumLostToSweat.axisY.visible = false
+        energy.removeSeries(energy.requests.sodiumLostToSweat);
       }
       break;
       case "sweatRate":
       if(active){
-        energy.requests.sweatRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.sweatRate.axisY.label, energy.axisX, energy.requests.sweatRate.axisY);
+        energy.requests.sweatRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.sweatRate.name, energy.axisX, energy.requests.sweatRate.axisY);
         energy.requests.sweatRate.axisY = energy.axisY(energy.requests.sweatRate)
-      } else  if  (energy.series(energy.requests.sweatRate.axisY.label)){
-          energy.removeSeries(energy.requests.sweatRate);
+        energy.requests.sweatRate.axisY.visible = true
+        energy.requests.sweatRate.axisY.titleText = energy.requests.sweatRate.name
+        
+      } else  if  (energy.series(energy.requests.sweatRate.name)){
+        energy.requests.sweatRate.axisY.visible = false
+        energy.removeSeries(energy.requests.sweatRate);
       }
       break;
       case "totalMetabolicRate":
       if(active){
-        energy.requests.totalMetabolicRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.totalMetabolicRate.axisY.label, energy.axisX, energy.requests.totalMetabolicRate.axisY);
+        energy.requests.totalMetabolicRate = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.totalMetabolicRate.name, energy.axisX, energy.requests.totalMetabolicRate.axisY);
         energy.requests.totalMetabolicRate.axisY = energy.axisY(energy.requests.totalMetabolicRate)
-      } else  if  (energy.series(energy.requests.totalMetabolicRate.axisY.label)){
-          energy.removeSeries(energy.requests.totalMetabolicRate);
+        energy.requests.totalMetabolicRate.axisY.visible = true
+        energy.requests.totalMetabolicRate.axisY.titleText = energy.requests.totalMetabolicRate.name
+        
+      } else  if  (energy.series(energy.requests.totalMetabolicRate.name)){
+        energy.requests.totalMetabolicRate.axisY.visible = false
+        energy.removeSeries(energy.requests.totalMetabolicRate);
       }
       break;
       case "totalWorkRateLevel":
       if(active){
-        energy.requests.totalWorkRateLevel = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.totalWorkRateLevel.axisY.label, energy.axisX, energy.requests.totalWorkRateLevel.axisY);
+        energy.requests.totalWorkRateLevel = energy.createSeries(ChartView.SeriesTypeLine, energy.requests.totalWorkRateLevel.name, energy.axisX, energy.requests.totalWorkRateLevel.axisY);
         energy.requests.totalWorkRateLevel.axisY = energy.axisY(energy.requests.totalWorkRateLevel)
-      } else  if  (energy.series(energy.requests.totalWorkRateLevel.axisY.label)){
-          energy.removeSeries(energy.requests.totalWorkRateLevel);
+        energy.requests.totalWorkRateLevel.axisY.visible = true
+        energy.requests.totalWorkRateLevel.axisY.titleText = energy.requests.totalWorkRateLevel.name
+        
+      } else  if  (energy.series(energy.requests.totalWorkRateLevel.name)){
+        energy.requests.totalWorkRateLevel.axisY.visible = false
+        energy.removeSeries(energy.requests.totalWorkRateLevel);
       }
       break;
     }
   }
   function toggleGastrointestinalSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch(request){
       case "chymeAbsorptionRate":
       if(active){
-        gastrointestinal.requests.chymeAbsorptionRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.chymeAbsorptionRate.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.chymeAbsorptionRate.axisY);
+        gastrointestinal.requests.chymeAbsorptionRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.chymeAbsorptionRate.name, gastrointestinal.axisX, gastrointestinal.requests.chymeAbsorptionRate.axisY);
         gastrointestinal.requests.chymeAbsorptionRate.axisY = gastrointestinal.axisY(gastrointestinal.requests.chymeAbsorptionRate)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.chymeAbsorptionRate.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.chymeAbsorptionRate);
+        gastrointestinal.requests.chymeAbsorptionRate.axisY.visible = true
+        gastrointestinal.requests.chymeAbsorptionRate.axisY.titleText = gastrointestinal.requests.chymeAbsorptionRate.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.chymeAbsorptionRate.name)){
+        gastrointestinal.requests.chymeAbsorptionRate.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.chymeAbsorptionRate);
       }
       break;
       case "stomachContents_calcium":
       if(active){
-        gastrointestinal.requests.stomachContents_calcium = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_calcium.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_calcium.axisY);
+        gastrointestinal.requests.stomachContents_calcium = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_calcium.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_calcium.axisY);
         gastrointestinal.requests.stomachContents_calcium.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_calcium)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_calcium.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_calcium);
+        gastrointestinal.requests.stomachContents_calcium.axisY.visible = true
+        gastrointestinal.requests.stomachContents_calcium.axisY.titleText = gastrointestinal.requests.stomachContents_calcium.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_calcium.name)){
+        gastrointestinal.requests.stomachContents_calcium.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_calcium);
       }
       break;
       case "stomachContents_carbohydrates":
       if(active){
-        gastrointestinal.requests.stomachContents_carbohydrates = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_carbohydrates.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_carbohydrates.axisY);
+        gastrointestinal.requests.stomachContents_carbohydrates = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_carbohydrates.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_carbohydrates.axisY);
         gastrointestinal.requests.stomachContents_carbohydrates.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_carbohydrates)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_carbohydrates.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_carbohydrates);
+        gastrointestinal.requests.stomachContents_carbohydrates.axisY.visible = true
+        gastrointestinal.requests.stomachContents_carbohydrates.axisY.titleText = gastrointestinal.requests.stomachContents_carbohydrates.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_carbohydrates.name)){
+        gastrointestinal.requests.stomachContents_carbohydrates.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_carbohydrates);
       }
       break;
       case "stomachContents_carbohydrateDigationRate":
       if(active){
-        gastrointestinal.requests.stomachContents_carbohydrateDigationRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY);
+        gastrointestinal.requests.stomachContents_carbohydrateDigationRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_carbohydrateDigationRate.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY);
         gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_carbohydrateDigationRate)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_carbohydrateDigationRate);
+        gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY.visible = true
+        gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY.titleText = gastrointestinal.requests.stomachContents_carbohydrateDigationRate.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_carbohydrateDigationRate.name)){
+        gastrointestinal.requests.stomachContents_carbohydrateDigationRate.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_carbohydrateDigationRate);
       }
       break;
       case "stomachContents_fat":
       if(active){
-        gastrointestinal.requests.stomachContents_fat = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_fat.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_fat.axisY);
+        gastrointestinal.requests.stomachContents_fat = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_fat.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_fat.axisY);
         gastrointestinal.requests.stomachContents_fat.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_fat)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_fat.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_fat);
+        gastrointestinal.requests.stomachContents_fat.axisY.visible = true
+        gastrointestinal.requests.stomachContents_fat.axisY.titleText = gastrointestinal.requests.stomachContents_fat.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_fat.name)){
+        gastrointestinal.requests.stomachContents_fat.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_fat);
       }
       break;
       case "stomachContents_fatDigtationRate":
       if(active){
-        gastrointestinal.requests.stomachContents_fatDigtationRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_fatDigtationRate.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_fatDigtationRate.axisY);
+        gastrointestinal.requests.stomachContents_fatDigtationRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_fatDigtationRate.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_fatDigtationRate.axisY);
         gastrointestinal.requests.stomachContents_fatDigtationRate.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_fatDigtationRate)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_fatDigtationRate.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_fatDigtationRate);
+        gastrointestinal.requests.stomachContents_fatDigtationRate.axisY.visible = true
+        gastrointestinal.requests.stomachContents_fatDigtationRate.axisY.titleText = gastrointestinal.requests.stomachContents_fatDigtationRate.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_fatDigtationRate.name)){
+        gastrointestinal.requests.stomachContents_fatDigtationRate.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_fatDigtationRate);
       }
       break;
       case "stomachContents_protien":
       if(active){
-        gastrointestinal.requests.stomachContents_protien = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_protien.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_protien.axisY);
+        gastrointestinal.requests.stomachContents_protien = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_protien.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_protien.axisY);
         gastrointestinal.requests.stomachContents_protien.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_protien)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_protien.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_protien);
+        gastrointestinal.requests.stomachContents_protien.axisY.visible = true
+        gastrointestinal.requests.stomachContents_protien.axisY.titleText = gastrointestinal.requests.stomachContents_protien.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_protien.name)){
+        gastrointestinal.requests.stomachContents_protien.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_protien);
       }
       break;
       case "stomachContents_protienDigtationRate":
       if(active){
-        gastrointestinal.requests.stomachContents_protienDigtationRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_protienDigtationRate.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_protienDigtationRate.axisY);
+        gastrointestinal.requests.stomachContents_protienDigtationRate = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_protienDigtationRate.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_protienDigtationRate.axisY);
         gastrointestinal.requests.stomachContents_protienDigtationRate.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_protienDigtationRate)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_protienDigtationRate.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_protienDigtationRate);
+        gastrointestinal.requests.stomachContents_protienDigtationRate.axisY.visible = true
+        gastrointestinal.requests.stomachContents_protienDigtationRate.axisY.titleText = gastrointestinal.requests.stomachContents_protienDigtationRate.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_protienDigtationRate.name)){
+        gastrointestinal.requests.stomachContents_protienDigtationRate.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_protienDigtationRate);
       }
       break;
       case "stomachContents_sodium":
       if(active){
-        gastrointestinal.requests.stomachContents_sodium = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_sodium.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_sodium.axisY);
+        gastrointestinal.requests.stomachContents_sodium = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_sodium.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_sodium.axisY);
         gastrointestinal.requests.stomachContents_sodium.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_sodium)
-      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_sodium.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_sodium);
+        gastrointestinal.requests.stomachContents_sodium.axisY.visible = true
+        gastrointestinal.requests.stomachContents_sodium.axisY.titleText = gastrointestinal.requests.stomachContents_sodium.name
+        
+      } else  if  (engastrointestinalergy.series(gastrointestinal.requests.stomachContents_sodium.name)){
+        gastrointestinal.requests.stomachContents_sodium.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_sodium);
       }
       break;
       case "stomachContents_water":
       if(active){
-        gastrointestinal.requests.stomachContents_water = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_water.axisY.label, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_water.axisY);
+        gastrointestinal.requests.stomachContents_water = gastrointestinal.createSeries(ChartView.SeriesTypeLine, gastrointestinal.requests.stomachContents_water.name, gastrointestinal.axisX, gastrointestinal.requests.stomachContents_water.axisY);
         gastrointestinal.requests.stomachContents_water.axisY = gastrointestinal.axisY(gastrointestinal.requests.stomachContents_water)
-      } else  if  (gastrointestinal.series(gastrointestinal.requests.stomachContents_water.axisY.label)){
-          gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_water);
+        gastrointestinal.requests.stomachContents_water.axisY.visible = true
+        gastrointestinal.requests.stomachContents_water.axisY.titleText = gastrointestinal.requests.stomachContents_water.name
+        
+      } else  if  (gastrointestinal.series(gastrointestinal.requests.stomachContents_water.name)){
+        gastrointestinal.requests.stomachContents_water.axisY.visible = false
+        gastrointestinal.removeSeries(gastrointestinal.requests.stomachContents_water);
       }
       break;
     }
   }
   function toggleHepaticSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch(request){
-      case "chymeAbsorptionRate":
+      case "ketoneproductionRate":
       if(active){
-        hepatic.requests.ketoneproductionRate = hepatic.createSeries(ChartView.SeriesTypeLine, hepatic.requests.ketoneproductionRate.axisY.label, hepatic.axisX, hepatic.requests.ketoneproductionRate.axisY);
+        hepatic.requests.ketoneproductionRate = hepatic.createSeries(ChartView.SeriesTypeLine, hepatic.requests.ketoneproductionRate.name, hepatic.axisX, hepatic.requests.ketoneproductionRate.axisY);
         hepatic.requests.ketoneproductionRate.axisY = hepatic.axisY(hepatic.requests.ketoneproductionRate)
-      } else  if  (hepatic.series(hepatic.requests.ketoneproductionRate.axisY.label)){
-          hepatic.removeSeries(hepatic.requests.ketoneproductionRate);
+        hepatic.requests.ketoneproductionRate.axisY.visible = true
+        hepatic.requests.ketoneproductionRate.axisY.titleText = hepatic.requests.ketoneproductionRate.name
+        
+      } else  if  (hepatic.series(hepatic.requests.ketoneproductionRate.name)){
+        hepatic.requests.ketoneproductionRate.axisY.visible = false
+        hepatic.removeSeries(hepatic.requests.ketoneproductionRate);
       }
       break;
       case "hepaticGluconeogenesisRate":
       if(active){
-        hepatic.requests.hepaticGluconeogenesisRate = hepatic.createSeries(ChartView.SeriesTypeLine, hepatic.requests.hepaticGluconeogenesisRate.axisY.label, hepatic.axisX, hepatic.requests.hepaticGluconeogenesisRate.axisY);
+        hepatic.requests.hepaticGluconeogenesisRate = hepatic.createSeries(ChartView.SeriesTypeLine, hepatic.requests.hepaticGluconeogenesisRate.name, hepatic.axisX, hepatic.requests.hepaticGluconeogenesisRate.axisY);
         hepatic.requests.hepaticGluconeogenesisRate.axisY = hepatic.axisY(hepatic.requests.hepaticGluconeogenesisRate)
-      } else  if  (hepatic.series(hepatic.requests.hepaticGluconeogenesisRate.axisY.label)){
-          hepatic.removeSeries(hepatic.requests.hepaticGluconeogenesisRate);
+        hepatic.requests.hepaticGluconeogenesisRate.axisY.visible = true
+        hepatic.requests.hepaticGluconeogenesisRate.axisY.titleText = hepatic.requests.hepaticGluconeogenesisRate.name
+        
+      } else  if  (hepatic.series(hepatic.requests.hepaticGluconeogenesisRate.name)){
+        hepatic.requests.hepaticGluconeogenesisRate.axisY.visible = false
+        hepatic.removeSeries(hepatic.requests.hepaticGluconeogenesisRate);
       }
       break;
     }
   }
-  function toggleNervousSeries(request, active){  
+  function toggleNervousSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )  ]
     switch(request){
       case "baroreceptorHeartRateScale":
       if(active){
-          nervous.requests.baroreceptorHeartRateScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorHeartRateScale.axisY.label, nervous.axisX, nervous.requests.baroreceptorHeartRateScale.axisY);
-          nervous.requests.baroreceptorHeartRateScale.axisY = nervous.axisY(nervous.requests.baroreceptorHeartRateScale)
-      } else  if  (nervous.series(nervous.requests.baroreceptorHeartRateScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.baroreceptorHeartRateScale);
+        nervous.requests.baroreceptorHeartRateScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorHeartRateScale.name, nervous.axisX, nervous.requests.baroreceptorHeartRateScale.axisY);
+        nervous.requests.baroreceptorHeartRateScale.axisY = nervous.axisY(nervous.requests.baroreceptorHeartRateScale)
+        nervous.requests.baroreceptorHeartRateScale.axisY.visible = true
+        nervous.requests.baroreceptorHeartRateScale.axisY.titleText = nervous.requests.baroreceptorHeartRateScale.name
+        
+      } else  if  (nervous.series(nervous.requests.baroreceptorHeartRateScale.name)){
+        nervous.requests.baroreceptorHeartRateScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.baroreceptorHeartRateScale);
       }
       break;
       case "baroreceptorHeartElastanceScale":
       if(active){
-          nervous.requests.baroreceptorHeartElastanceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorHeartElastanceScale.axisY.label, nervous.axisX, nervous.requests.baroreceptorHeartElastanceScale.axisY);
-          nervous.requests.baroreceptorHeartElastanceScale.axisY = nervous.axisY(nervous.requests.baroreceptorHeartElastanceScale)
-      } else  if  (nervous.series(nervous.requests.baroreceptorHeartElastanceScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.baroreceptorHeartElastanceScale);
+        nervous.requests.baroreceptorHeartElastanceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorHeartElastanceScale.name, nervous.axisX, nervous.requests.baroreceptorHeartElastanceScale.axisY);
+        nervous.requests.baroreceptorHeartElastanceScale.axisY = nervous.axisY(nervous.requests.baroreceptorHeartElastanceScale)
+        nervous.requests.baroreceptorHeartElastanceScale.axisY.visible = true
+        nervous.requests.baroreceptorHeartElastanceScale.axisY.titleText = nervous.requests.baroreceptorHeartElastanceScale.name
+        
+      } else  if  (nervous.series(nervous.requests.baroreceptorHeartElastanceScale.name)){
+        nervous.requests.baroreceptorHeartElastanceScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.baroreceptorHeartElastanceScale);
       }
       break;
       case "baroreceptorResistanceScale":
       if(active){
-          nervous.requests.baroreceptorResistanceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorResistanceScale.axisY.label, nervous.axisX, nervous.requests.baroreceptorResistanceScale.axisY);
-          nervous.requests.baroreceptorResistanceScale.axisY = nervous.axisY(nervous.requests.baroreceptorResistanceScale)
-      } else  if  (nervous.series(nervous.requests.baroreceptorResistanceScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.baroreceptorResistanceScale);
+        nervous.requests.baroreceptorResistanceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorResistanceScale.name, nervous.axisX, nervous.requests.baroreceptorResistanceScale.axisY);
+        nervous.requests.baroreceptorResistanceScale.axisY = nervous.axisY(nervous.requests.baroreceptorResistanceScale)
+        nervous.requests.baroreceptorResistanceScale.axisY.visible = true
+        nervous.requests.baroreceptorResistanceScale.axisY.titleText = nervous.requests.baroreceptorResistanceScale.name
+        
+      } else  if  (nervous.series(nervous.requests.baroreceptorResistanceScale.name)){
+        nervous.requests.baroreceptorResistanceScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.baroreceptorResistanceScale);
       }
       break;
       case "baroreceptorComplianceScale":
       if(active){
-          nervous.requests.baroreceptorComplianceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorComplianceScale.axisY.label, nervous.axisX, nervous.requests.baroreceptorComplianceScale.axisY);
-          nervous.requests.baroreceptorComplianceScale.axisY = nervous.axisY(nervous.requests.baroreceptorComplianceScale)
-      } else  if  (nervous.series(nervous.requests.baroreceptorComplianceScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.baroreceptorComplianceScale);
+        nervous.requests.baroreceptorComplianceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.baroreceptorComplianceScale.name, nervous.axisX, nervous.requests.baroreceptorComplianceScale.axisY);
+        nervous.requests.baroreceptorComplianceScale.axisY = nervous.axisY(nervous.requests.baroreceptorComplianceScale)
+        nervous.requests.baroreceptorComplianceScale.axisY.visible = true
+        nervous.requests.baroreceptorComplianceScale.axisY.titleText = nervous.requests.baroreceptorComplianceScale.name
+        
+      } else  if  (nervous.series(nervous.requests.baroreceptorComplianceScale.name)){
+        nervous.requests.baroreceptorComplianceScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.baroreceptorComplianceScale);
       }
       break;
       case "chemoreceptorHeartRateScale":
       if(active){
-          nervous.requests.chemoreceptorHeartRateScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.chemoreceptorHeartRateScale.axisY.label, nervous.axisX, nervous.requests.chemoreceptorHeartRateScale.axisY);
-          nervous.requests.chemoreceptorHeartRateScale.axisY = nervous.axisY(nervous.requests.chemoreceptorHeartRateScale)
-      } else  if  (nervous.series(nervous.requests.chemoreceptorHeartRateScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.chemoreceptorHeartRateScale);
+        nervous.requests.chemoreceptorHeartRateScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.chemoreceptorHeartRateScale.name, nervous.axisX, nervous.requests.chemoreceptorHeartRateScale.axisY);
+        nervous.requests.chemoreceptorHeartRateScale.axisY = nervous.axisY(nervous.requests.chemoreceptorHeartRateScale)
+        nervous.requests.chemoreceptorHeartRateScale.axisY.visible = true
+        nervous.requests.chemoreceptorHeartRateScale.axisY.titleText = nervous.requests.chemoreceptorHeartRateScale.name
+        
+      } else  if  (nervous.series(nervous.requests.chemoreceptorHeartRateScale.name)){
+        nervous.requests.chemoreceptorHeartRateScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.chemoreceptorHeartRateScale);
       }
       break;
       case "chemoreceptorHeartElastanceScale":
       if(active){
-          nervous.requests.chemoreceptorHeartElastanceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.chemoreceptorHeartElastanceScale.axisY.label, nervous.axisX, nervous.requests.chemoreceptorHeartElastanceScale.axisY);
-          nervous.requests.chemoreceptorHeartElastanceScale.axisY = nervous.axisY(nervous.requests.chemoreceptorHeartElastanceScale)
-      } else  if  (nervous.series(nervous.requests.chemoreceptorHeartElastanceScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.chemoreceptorHeartElastanceScale);
+        nervous.requests.chemoreceptorHeartElastanceScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.chemoreceptorHeartElastanceScale.name, nervous.axisX, nervous.requests.chemoreceptorHeartElastanceScale.axisY);
+        nervous.requests.chemoreceptorHeartElastanceScale.axisY = nervous.axisY(nervous.requests.chemoreceptorHeartElastanceScale)
+        nervous.requests.chemoreceptorHeartElastanceScale.axisY.visible = true
+        nervous.requests.chemoreceptorHeartElastanceScale.axisY.titleText = nervous.requests.chemoreceptorHeartElastanceScale.name
+        
+      } else  if  (nervous.series(nervous.requests.chemoreceptorHeartElastanceScale.name)){
+        nervous.requests.chemoreceptorHeartElastanceScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.chemoreceptorHeartElastanceScale);
       }
       break;
       case "painVisualAnalogueScale":
       if(active){
-          nervous.requests.painVisualAnalogueScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.painVisualAnalogueScale.axisY.label, nervous.axisX, nervous.requests.painVisualAnalogueScale.axisY);
-          nervous.requests.painVisualAnalogueScale.axisY = nervous.axisY(nervous.requests.painVisualAnalogueScale)
-      } else  if  (nervous.series(nervous.requests.painVisualAnalogueScale.axisY.label)){
-          nervous.removeSeries(nervous.requests.painVisualAnalogueScale);
+        nervous.requests.painVisualAnalogueScale = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.painVisualAnalogueScale.name, nervous.axisX, nervous.requests.painVisualAnalogueScale.axisY);
+        nervous.requests.painVisualAnalogueScale.axisY = nervous.axisY(nervous.requests.painVisualAnalogueScale)
+        nervous.requests.painVisualAnalogueScale.axisY.visible = true
+        nervous.requests.painVisualAnalogueScale.axisY.titleText = nervous.requests.painVisualAnalogueScale.name
+        
+      } else  if  (nervous.series(nervous.requests.painVisualAnalogueScale.name)){
+        nervous.requests.painVisualAnalogueScale.axisY.visible = false
+        nervous.removeSeries(nervous.requests.painVisualAnalogueScale);
       }
       break;
       case "leftEyePupillaryResponse":
       if(active){
-          nervous.requests.leftEyePupillaryResponse = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.leftEyePupillaryResponse.axisY.label, nervous.axisX, nervous.requests.leftEyePupillaryResponse.axisY);
-          nervous.requests.leftEyePupillaryResponse.axisY = nervous.axisY(nervous.requests.leftEyePupillaryResponse)
-      } else  if  (nervous.series(nervous.requests.leftEyePupillaryResponse.axisY.label)){
-          nervous.removeSeries(nervous.requests.leftEyePupillaryResponse);
+        nervous.requests.leftEyePupillaryResponse = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.leftEyePupillaryResponse.name, nervous.axisX, nervous.requests.leftEyePupillaryResponse.axisY);
+        nervous.requests.leftEyePupillaryResponse.axisY = nervous.axisY(nervous.requests.leftEyePupillaryResponse)
+        nervous.requests.leftEyePupillaryResponse.axisY.visible = true
+        nervous.requests.leftEyePupillaryResponse.axisY.titleText = nervous.requests.leftEyePupillaryResponse.name
+        
+      } else  if  (nervous.series(nervous.requests.leftEyePupillaryResponse.name)){
+        nervous.requests.leftEyePupillaryResponse.axisY.visible = false
+        nervous.removeSeries(nervous.requests.leftEyePupillaryResponse);
       }
       break;
       case "rightEyePupillaryResponse":
       if(active){
-          nervous.requests.rightEyePupillaryResponse = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.rightEyePupillaryResponse.axisY.label, nervous.axisX, nervous.requests.rightEyePupillaryResponse.axisY);
-          nervous.requests.rightEyePupillaryResponse.axisY = nervous.axisY(nervous.requests.rightEyePupillaryResponse)
-      } else  if  (nervous.series(nervous.requests.rightEyePupillaryResponse.axisY.label)){
-          nervous.removeSeries(nervous.requests.rightEyePupillaryResponse);
+        nervous.requests.rightEyePupillaryResponse = nervous.createSeries(ChartView.SeriesTypeLine, nervous.requests.rightEyePupillaryResponse.name, nervous.axisX, nervous.requests.rightEyePupillaryResponse.axisY);
+        nervous.requests.rightEyePupillaryResponse.axisY = nervous.axisY(nervous.requests.rightEyePupillaryResponse)
+        nervous.requests.rightEyePupillaryResponse.axisY.visible = true
+        nervous.requests.rightEyePupillaryResponse.axisY.titleText = nervous.requests.rightEyePupillaryResponse.name
+        
+      } else  if  (nervous.series(nervous.requests.rightEyePupillaryResponse.name)){
+        nervous.requests.rightEyePupillaryResponse.axisY.visible = false
+        nervous.removeSeries(nervous.requests.rightEyePupillaryResponse);
       }
       break;
     } 
   }
   function toggleRenalSeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch(request){
       case "glomerularFiltrationRate":
       if(active){
-        renal.requests.glomerularFiltrationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.glomerularFiltrationRate.axisY.label, renal.axisX, renal.requests.glomerularFiltrationRate.axisY);
+        renal.requests.glomerularFiltrationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.glomerularFiltrationRate.name, renal.axisX, renal.requests.glomerularFiltrationRate.axisY);
         renal.requests.glomerularFiltrationRate.axisY = renal.axisY(renal.requests.glomerularFiltrationRate)
-      } else  if  (renal.series(renal.requests.glomerularFiltrationRate.axisY.label)){
-          renal.removeSeries(renal.requests.glomerularFiltrationRate);
+        renal.requests.glomerularFiltrationRate.axisY.visible = true
+        renal.requests.glomerularFiltrationRate.axisY.titleText = renal.requests.glomerularFiltrationRate.name
+        
+      } else  if  (renal.series(renal.requests.glomerularFiltrationRate.name)){
+        renal.requests.glomerularFiltrationRate.axisY.visible = false
+        renal.removeSeries(renal.requests.glomerularFiltrationRate);
       }
       break;
       case "filtrationFraction":
       if(active){
-        renal.requests.filtrationFraction = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.filtrationFraction.axisY.label, renal.axisX, renal.requests.filtrationFraction.axisY);
+        renal.requests.filtrationFraction = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.filtrationFraction.name, renal.axisX, renal.requests.filtrationFraction.axisY);
         renal.requests.filtrationFraction.axisY = renal.axisY(renal.requests.filtrationFraction)
-      } else  if  (renal.series(renal.requests.filtrationFraction.axisY.label)){
-          renal.removeSeries(renal.requests.filtrationFraction);
+        renal.requests.filtrationFraction.axisY.visible = true
+        renal.requests.filtrationFraction.axisY.titleText = renal.requests.filtrationFraction.name
+        
+      } else  if  (renal.series(renal.requests.filtrationFraction.name)){
+        renal.requests.filtrationFraction.axisY.visible = false
+        renal.removeSeries(renal.requests.filtrationFraction);
       }
       break;
       case "leftAfferentArterioleResistance":
       if(active){
-        renal.requests.leftAfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftAfferentArterioleResistance.axisY.label, renal.axisX, renal.requests.leftAfferentArterioleResistance.axisY);
+        renal.requests.leftAfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftAfferentArterioleResistance.name, renal.axisX, renal.requests.leftAfferentArterioleResistance.axisY);
         renal.requests.leftAfferentArterioleResistance.axisY = renal.axisY(renal.requests.leftAfferentArterioleResistance)
-      } else  if  (renal.series(renal.requests.leftAfferentArterioleResistance.axisY.label)){
-          renal.removeSeries(renal.requests.leftAfferentArterioleResistance);
+        renal.requests.leftAfferentArterioleResistance.axisY.visible = true
+        renal.requests.leftAfferentArterioleResistance.axisY.titleText = renal.requests.leftAfferentArterioleResistance.name
+        
+      } else  if  (renal.series(renal.requests.leftAfferentArterioleResistance.name)){
+        renal.requests.leftAfferentArterioleResistance.axisY.visible = false
+        renal.removeSeries(renal.requests.leftAfferentArterioleResistance);
       }
       break;
       case "leftBowmansCapsulesHydrostaticPressure":
       if(active){
-        renal.requests.leftBowmansCapsulesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY.label, renal.axisX, renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY);
+        renal.requests.leftBowmansCapsulesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftBowmansCapsulesHydrostaticPressure.name, renal.axisX, renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY);
         renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY = renal.axisY(renal.requests.leftBowmansCapsulesHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftBowmansCapsulesHydrostaticPressure);
+        renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY.visible = true
+        renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY.titleText = renal.requests.leftBowmansCapsulesHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftBowmansCapsulesHydrostaticPressure.name)){
+        renal.requests.leftBowmansCapsulesHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftBowmansCapsulesHydrostaticPressure);
       }
       break;
       case "leftBowmansCapsulesOsmoticPressure":
       if(active){
-        renal.requests.leftBowmansCapsulesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftBowmansCapsulesOsmoticPressure.axisY.label, renal.axisX, renal.requests.leftBowmansCapsulesOsmoticPressure.axisY);
+        renal.requests.leftBowmansCapsulesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftBowmansCapsulesOsmoticPressure.name, renal.axisX, renal.requests.leftBowmansCapsulesOsmoticPressure.axisY);
         renal.requests.leftBowmansCapsulesOsmoticPressure.axisY = renal.axisY(renal.requests.leftBowmansCapsulesOsmoticPressure)
-      } else  if  (renal.series(renal.requests.leftBowmansCapsulesOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftBowmansCapsulesOsmoticPressure);
+        renal.requests.leftBowmansCapsulesOsmoticPressure.axisY.visible = true
+        renal.requests.leftBowmansCapsulesOsmoticPressure.axisY.titleText = renal.requests.leftBowmansCapsulesOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftBowmansCapsulesOsmoticPressure.name)){
+        renal.requests.leftBowmansCapsulesOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftBowmansCapsulesOsmoticPressure);
       }
       break;
       case "leftEfferentArterioleResistance":
       if(active){
-        renal.requests.leftEfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftEfferentArterioleResistance.axisY.label, renal.axisX, renal.requests.leftEfferentArterioleResistance.axisY);
+        renal.requests.leftEfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftEfferentArterioleResistance.name, renal.axisX, renal.requests.leftEfferentArterioleResistance.axisY);
         renal.requests.leftEfferentArterioleResistance.axisY = renal.axisY(renal.requests.leftEfferentArterioleResistance)
-      } else  if  (renal.series(renal.requests.leftEfferentArterioleResistance.axisY.label)){
-          renal.removeSeries(renal.requests.leftEfferentArterioleResistance);
+        renal.requests.leftEfferentArterioleResistance.axisY.visible = true
+        renal.requests.leftEfferentArterioleResistance.axisY.titleText = renal.requests.leftEfferentArterioleResistance.name
+        
+      } else  if  (renal.series(renal.requests.leftEfferentArterioleResistance.name)){
+        renal.requests.leftEfferentArterioleResistance.axisY.visible = false
+        renal.removeSeries(renal.requests.leftEfferentArterioleResistance);
       }
       break;
       case "leftGlomerularCapillariesHydrostaticPressure":
       if(active){
-        renal.requests.leftGlomerularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY.label, renal.axisX, renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY);
+        renal.requests.leftGlomerularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularCapillariesHydrostaticPressure.name, renal.axisX, renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY);
         renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY = renal.axisY(renal.requests.leftGlomerularCapillariesHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftGlomerularCapillariesHydrostaticPressure);
+        renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY.visible = true
+        renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY.titleText = renal.requests.leftGlomerularCapillariesHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftGlomerularCapillariesHydrostaticPressure.name)){
+        renal.requests.leftGlomerularCapillariesHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftGlomerularCapillariesHydrostaticPressure);
       }
       break;
       case "leftGlomerularCapillariesOsmoticPressure":
       if(active){
-        renal.requests.leftGlomerularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY.label, renal.axisX, renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY);
+        renal.requests.leftGlomerularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularCapillariesOsmoticPressure.name, renal.axisX, renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY);
         renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY = renal.axisY(renal.requests.leftGlomerularCapillariesOsmoticPressure)
-      } else  if  (renal.series(renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftGlomerularCapillariesOsmoticPressure);
+        renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY.visible = true
+        renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY.titleText = renal.requests.leftGlomerularCapillariesOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftGlomerularCapillariesOsmoticPressure.name)){
+        renal.requests.leftGlomerularCapillariesOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftGlomerularCapillariesOsmoticPressure);
       }
       break;
       case "leftGlomerularFiltrationCoefficient":
       if(active){
-        renal.requests.leftGlomerularFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFiltrationCoefficient.axisY.label, renal.axisX, renal.requests.leftGlomerularFiltrationCoefficient.axisY);
+        renal.requests.leftGlomerularFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFiltrationCoefficient.name, renal.axisX, renal.requests.leftGlomerularFiltrationCoefficient.axisY);
         renal.requests.leftGlomerularFiltrationCoefficient.axisY = renal.axisY(renal.requests.leftGlomerularFiltrationCoefficient)
-      } else  if  (renal.series(renal.requests.leftGlomerularFiltrationCoefficient.axisY.label)){
-          renal.removeSeries(renal.requests.leftGlomerularFiltrationCoefficient);
+        renal.requests.leftGlomerularFiltrationCoefficient.axisY.visible = true
+        renal.requests.leftGlomerularFiltrationCoefficient.axisY.titleText = renal.requests.leftGlomerularFiltrationCoefficient.name
+        
+      } else  if  (renal.series(renal.requests.leftGlomerularFiltrationCoefficient.name)){
+        renal.requests.leftGlomerularFiltrationCoefficient.axisY.visible = false
+        renal.removeSeries(renal.requests.leftGlomerularFiltrationCoefficient);
       }
       break;
       case "leftGlomerularFiltrationRate":
       if(active){
-        renal.requests.leftGlomerularFiltrationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFiltrationRate.axisY.label, renal.axisX, renal.requests.leftGlomerularFiltrationRate.axisY);
+        renal.requests.leftGlomerularFiltrationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFiltrationRate.name, renal.axisX, renal.requests.leftGlomerularFiltrationRate.axisY);
         renal.requests.leftGlomerularFiltrationRate.axisY = renal.axisY(renal.requests.leftGlomerularFiltrationRate)
-      } else  if  (renal.series(renal.requests.leftGlomerularFiltrationRate.axisY.label)){
-          renal.removeSeries(renal.requests.leftGlomerularFiltrationRate);
+        renal.requests.leftGlomerularFiltrationRate.axisY.visible = true
+        renal.requests.leftGlomerularFiltrationRate.axisY.titleText = renal.requests.leftGlomerularFiltrationRate.name
+        
+      } else  if  (renal.series(renal.requests.leftGlomerularFiltrationRate.name)){
+        renal.requests.leftGlomerularFiltrationRate.axisY.visible = false
+        renal.removeSeries(renal.requests.leftGlomerularFiltrationRate);
       }
       break;
       case "leftGlomerularFiltrationSurfaceArea":
       if(active){
-        renal.requests.leftGlomerularFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFiltrationSurfaceArea.axisY.label, renal.axisX, renal.requests.leftGlomerularFiltrationSurfaceArea.axisY);
+        renal.requests.leftGlomerularFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFiltrationSurfaceArea.name, renal.axisX, renal.requests.leftGlomerularFiltrationSurfaceArea.axisY);
         renal.requests.leftGlomerularFiltrationSurfaceArea.axisY = renal.axisY(renal.requests.leftGlomerularFiltrationSurfaceArea)
-      } else  if  (renal.series(renal.requests.leftGlomerularFiltrationSurfaceArea.axisY.label)){
-          renal.removeSeries(renal.requests.leftGlomerularFiltrationSurfaceArea);
+        renal.requests.leftGlomerularFiltrationSurfaceArea.axisY.visible = true
+        renal.requests.leftGlomerularFiltrationSurfaceArea.axisY.titleText = renal.requests.leftGlomerularFiltrationSurfaceArea.name
+        
+      } else  if  (renal.series(renal.requests.leftGlomerularFiltrationSurfaceArea.name)){
+        renal.requests.leftGlomerularFiltrationSurfaceArea.axisY.visible = false
+        renal.removeSeries(renal.requests.leftGlomerularFiltrationSurfaceArea);
       }
       break;
       case "leftGlomerularFluidPermeability":
       if(active){
-        renal.requests.leftGlomerularFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFluidPermeability.axisY.label, renal.axisX, renal.requests.leftGlomerularFluidPermeability.axisY);
+        renal.requests.leftGlomerularFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftGlomerularFluidPermeability.name, renal.axisX, renal.requests.leftGlomerularFluidPermeability.axisY);
         renal.requests.leftGlomerularFluidPermeability.axisY = renal.axisY(renal.requests.leftGlomerularFluidPermeability)
-      } else  if  (renal.series(renal.requests.leftGlomerularFluidPermeability.axisY.label)){
-          renal.removeSeries(renal.requests.leftGlomerularFluidPermeability);
+        renal.requests.leftGlomerularFluidPermeability.axisY.visible = true
+        renal.requests.leftGlomerularFluidPermeability.axisY.titleText = renal.requests.leftGlomerularFluidPermeability.name
+        
+      } else  if  (renal.series(renal.requests.leftGlomerularFluidPermeability.name)){
+        renal.requests.leftGlomerularFluidPermeability.axisY.visible = false
+        renal.removeSeries(renal.requests.leftGlomerularFluidPermeability);
       }
       break;
       case "leftFiltrationFraction":
       if(active){
-        renal.requests.leftFiltrationFraction = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftFiltrationFraction.axisY.label, renal.axisX, renal.requests.leftFiltrationFraction.axisY);
+        renal.requests.leftFiltrationFraction = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftFiltrationFraction.name, renal.axisX, renal.requests.leftFiltrationFraction.axisY);
         renal.requests.leftFiltrationFraction.axisY = renal.axisY(renal.requests.leftFiltrationFraction)
-      } else  if  (renal.series(renal.requests.leftFiltrationFraction.axisY.label)){
-          renal.removeSeries(renal.requests.leftFiltrationFraction);
+        renal.requests.leftFiltrationFraction.axisY.visible = true
+        renal.requests.leftFiltrationFraction.axisY.titleText = renal.requests.leftFiltrationFraction.name
+        
+      } else  if  (renal.series(renal.requests.leftFiltrationFraction.name)){
+        renal.requests.leftFiltrationFraction.axisY.visible = false
+        renal.removeSeries(renal.requests.leftFiltrationFraction);
       }
       break;
       case "leftNetFiltrationPressure":
       if(active){
-        renal.requests.leftNetFiltrationPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftNetFiltrationPressure.axisY.label, renal.axisX, renal.requests.leftNetFiltrationPressure.axisY);
+        renal.requests.leftNetFiltrationPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftNetFiltrationPressure.name, renal.axisX, renal.requests.leftNetFiltrationPressure.axisY);
         renal.requests.leftNetFiltrationPressure.axisY = renal.axisY(renal.requests.leftNetFiltrationPressure)
-      } else  if  (renal.series(renal.requests.leftNetFiltrationPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftNetFiltrationPressure);
+        renal.requests.leftNetFiltrationPressure.axisY.visible = true
+        renal.requests.leftNetFiltrationPressure.axisY.titleText = renal.requests.leftNetFiltrationPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftNetFiltrationPressure.name)){
+        renal.requests.leftNetFiltrationPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftNetFiltrationPressure);
       }
       break;
       case "leftNetReabsorptionPressure":
       if(active){
-        renal.requests.leftNetReabsorptionPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftNetReabsorptionPressure.axisY.label, renal.axisX, renal.requests.leftNetReabsorptionPressure.axisY);
+        renal.requests.leftNetReabsorptionPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftNetReabsorptionPressure.name, renal.axisX, renal.requests.leftNetReabsorptionPressure.axisY);
         renal.requests.leftNetReabsorptionPressure.axisY = renal.axisY(renal.requests.leftNetReabsorptionPressure)
-      } else  if  (renal.series(renal.requests.leftNetReabsorptionPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftNetReabsorptionPressure);
+        renal.requests.leftNetReabsorptionPressure.axisY.visible = true
+        renal.requests.leftNetReabsorptionPressure.axisY.titleText = renal.requests.leftNetReabsorptionPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftNetReabsorptionPressure.name)){
+        renal.requests.leftNetReabsorptionPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftNetReabsorptionPressure);
       }
       break;
       case "leftPeritubularCapillariesHydrostaticPressure":
       if(active){
-        renal.requests.leftPeritubularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY.label, renal.axisX, renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY);
+        renal.requests.leftPeritubularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftPeritubularCapillariesHydrostaticPressure.name, renal.axisX, renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY);
         renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY = renal.axisY(renal.requests.leftPeritubularCapillariesHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftPeritubularCapillariesHydrostaticPressure);
+        renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY.visible = true
+        renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY.titleText = renal.requests.leftPeritubularCapillariesHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftPeritubularCapillariesHydrostaticPressure.name)){
+        renal.requests.leftPeritubularCapillariesHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftPeritubularCapillariesHydrostaticPressure);
       }
       break;
       case "leftPeritubularCapillariesOsmoticPressure":
       if(active){
-        renal.requests.leftPeritubularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY.label, renal.axisX, renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY);
+        renal.requests.leftPeritubularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftPeritubularCapillariesOsmoticPressure.name, renal.axisX, renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY);
         renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY = renal.axisY(renal.requests.leftPeritubularCapillariesOsmoticPressure)
-      } else  if  (renal.series(renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftPeritubularCapillariesOsmoticPressure);
+        renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY.visible = true
+        renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY.titleText = renal.requests.leftPeritubularCapillariesOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftPeritubularCapillariesOsmoticPressure.name)){
+        renal.requests.leftPeritubularCapillariesOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftPeritubularCapillariesOsmoticPressure);
       }
       break;
       case "leftReabsorptionFiltrationCoefficient":
       if(active){
-        renal.requests.leftReabsorptionFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftReabsorptionFiltrationCoefficient.axisY.label, renal.axisX, renal.requests.leftReabsorptionFiltrationCoefficient.axisY);
+        renal.requests.leftReabsorptionFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftReabsorptionFiltrationCoefficient.name, renal.axisX, renal.requests.leftReabsorptionFiltrationCoefficient.axisY);
         renal.requests.leftReabsorptionFiltrationCoefficient.axisY = renal.axisY(renal.requests.leftReabsorptionFiltrationCoefficient)
-      } else  if  (renal.series(renal.requests.leftReabsorptionFiltrationCoefficient.axisY.label)){
-          renal.removeSeries(renal.requests.leftReabsorptionFiltrationCoefficient);
+        renal.requests.leftReabsorptionFiltrationCoefficient.axisY.visible = true
+        renal.requests.leftReabsorptionFiltrationCoefficient.axisY.titleText = renal.requests.leftReabsorptionFiltrationCoefficient.name
+        
+      } else  if  (renal.series(renal.requests.leftReabsorptionFiltrationCoefficient.name)){
+        renal.requests.leftReabsorptionFiltrationCoefficient.axisY.visible = false
+        renal.removeSeries(renal.requests.leftReabsorptionFiltrationCoefficient);
       }
       break;
       case "leftReabsorptionRate":
       if(active){
-        renal.requests.leftReabsorptionRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftReabsorptionRate.axisY.label, renal.axisX, renal.requests.leftReabsorptionRate.axisY);
+        renal.requests.leftReabsorptionRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftReabsorptionRate.name, renal.axisX, renal.requests.leftReabsorptionRate.axisY);
         renal.requests.leftReabsorptionRate.axisY = renal.axisY(renal.requests.leftReabsorptionRate)
-      } else  if  (renal.series(renal.requests.leftReabsorptionRate.axisY.label)){
-          renal.removeSeries(renal.requests.leftReabsorptionRate);
+        renal.requests.leftReabsorptionRate.axisY.visible = true
+        renal.requests.leftReabsorptionRate.axisY.titleText = renal.requests.leftReabsorptionRate.name
+        
+      } else  if  (renal.series(renal.requests.leftReabsorptionRate.name)){
+        renal.requests.leftReabsorptionRate.axisY.visible = false
+        renal.removeSeries(renal.requests.leftReabsorptionRate);
       }
       break;
       case "leftTubularReabsorptionFiltrationSurfaceArea":
       if(active){
-        renal.requests.leftTubularReabsorptionFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY.label, renal.axisX, renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY);
+        renal.requests.leftTubularReabsorptionFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.name, renal.axisX, renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY);
         renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY = renal.axisY(renal.requests.leftTubularReabsorptionFiltrationSurfaceArea)
-      } else  if  (renal.series(renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY.label)){
-          renal.removeSeries(renal.requests.leftTubularReabsorptionFiltrationSurfaceArea);
+        renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY.visible = true
+        renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY.titleText = renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.name
+        
+      } else  if  (renal.series(renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.name)){
+        renal.requests.leftTubularReabsorptionFiltrationSurfaceArea.axisY.visible = false
+        renal.removeSeries(renal.requests.leftTubularReabsorptionFiltrationSurfaceArea);
       }
       break;
       case "leftTubularReabsorptionFluidPermeability":
       if(active){
-        renal.requests.leftTubularReabsorptionFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularReabsorptionFluidPermeability.axisY.label, renal.axisX, renal.requests.leftTubularReabsorptionFluidPermeability.axisY);
+        renal.requests.leftTubularReabsorptionFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularReabsorptionFluidPermeability.name, renal.axisX, renal.requests.leftTubularReabsorptionFluidPermeability.axisY);
         renal.requests.leftTubularReabsorptionFluidPermeability.axisY = renal.axisY(renal.requests.leftTubularReabsorptionFluidPermeability)
-      } else  if  (renal.series(renal.requests.leftTubularReabsorptionFluidPermeability.axisY.label)){
-          renal.removeSeries(renal.requests.leftTubularReabsorptionFluidPermeability);
+        renal.requests.leftTubularReabsorptionFluidPermeability.axisY.visible = true
+        renal.requests.leftTubularReabsorptionFluidPermeability.axisY.titleText = renal.requests.leftTubularReabsorptionFluidPermeability.name
+        
+      } else  if  (renal.series(renal.requests.leftTubularReabsorptionFluidPermeability.name)){
+        renal.requests.leftTubularReabsorptionFluidPermeability.axisY.visible = false
+        renal.removeSeries(renal.requests.leftTubularReabsorptionFluidPermeability);
       }
       break;
       case "leftTubularHydrostaticPressure":
       if(active){
-        renal.requests.leftTubularHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularHydrostaticPressure.axisY.label, renal.axisX, renal.requests.leftTubularHydrostaticPressure.axisY);
+        renal.requests.leftTubularHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularHydrostaticPressure.name, renal.axisX, renal.requests.leftTubularHydrostaticPressure.axisY);
         renal.requests.leftTubularHydrostaticPressure.axisY = renal.axisY(renal.requests.leftTubularHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.leftTubularHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftTubularHydrostaticPressure);
+        renal.requests.leftTubularHydrostaticPressure.axisY.visible = true
+        renal.requests.leftTubularHydrostaticPressure.axisY.titleText = renal.requests.leftTubularHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftTubularHydrostaticPressure.name)){
+        renal.requests.leftTubularHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftTubularHydrostaticPressure);
       }
       break;
       case "leftTubularOsmoticPressure":
       if(active){
-        renal.requests.leftTubularOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularOsmoticPressure.axisY.label, renal.axisX, renal.requests.leftTubularOsmoticPressure.axisY);
+        renal.requests.leftTubularOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.leftTubularOsmoticPressure.name, renal.axisX, renal.requests.leftTubularOsmoticPressure.axisY);
         renal.requests.leftTubularOsmoticPressure.axisY = renal.axisY(renal.requests.leftTubularOsmoticPressure)
-      } else  if  (renal.series(renal.requests.leftTubularOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.leftTubularOsmoticPressure);
+        renal.requests.leftTubularOsmoticPressure.axisY.visible = true
+        renal.requests.leftTubularOsmoticPressure.axisY.titleText = renal.requests.leftTubularOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.leftTubularOsmoticPressure.name)){
+        renal.requests.leftTubularOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.leftTubularOsmoticPressure);
       }
       break;
       case "renalBloodFlow":
       if(active){
-        renal.requests.renalBloodFlow = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.renalBloodFlow.axisY.label, renal.axisX, renal.requests.renalBloodFlow.axisY);
+        renal.requests.renalBloodFlow = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.renalBloodFlow.name, renal.axisX, renal.requests.renalBloodFlow.axisY);
         renal.requests.renalBloodFlow.axisY = renal.axisY(renal.requests.renalBloodFlow)
-      } else  if  (renal.series(renal.requests.renalBloodFlow.axisY.label)){
-          renal.removeSeries(renal.requests.renalBloodFlow);
+        renal.requests.renalBloodFlow.axisY.visible = true
+        renal.requests.renalBloodFlow.axisY.titleText = renal.requests.renalBloodFlow.name
+        
+      } else  if  (renal.series(renal.requests.renalBloodFlow.name)){
+        renal.requests.renalBloodFlow.axisY.visible = false
+        renal.removeSeries(renal.requests.renalBloodFlow);
       }
       break;
       case "renalPlasmaFlow":
       if(active){
-        renal.requests.renalPlasmaFlow = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.renalPlasmaFlow.axisY.label, renal.axisX, renal.requests.renalPlasmaFlow.axisY);
+        renal.requests.renalPlasmaFlow = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.renalPlasmaFlow.name, renal.axisX, renal.requests.renalPlasmaFlow.axisY);
         renal.requests.renalPlasmaFlow.axisY = renal.axisY(renal.requests.renalPlasmaFlow)
-      } else  if  (renal.series(renal.requests.renalPlasmaFlow.axisY.label)){
-          renal.removeSeries(renal.requests.renalPlasmaFlow);
+        renal.requests.renalPlasmaFlow.axisY.visible = true
+        renal.requests.renalPlasmaFlow.axisY.titleText = renal.requests.renalPlasmaFlow.name
+        
+      } else  if  (renal.series(renal.requests.renalPlasmaFlow.name)){
+        renal.requests.renalPlasmaFlow.axisY.visible = false
+        renal.removeSeries(renal.requests.renalPlasmaFlow);
       }
       break;
       case "renalVascularResistance":
       if(active){
-        renal.requests.renalVascularResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.renalVascularResistance.axisY.label, renal.axisX, renal.requests.renalVascularResistance.axisY);
+        renal.requests.renalVascularResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.renalVascularResistance.name, renal.axisX, renal.requests.renalVascularResistance.axisY);
         renal.requests.renalVascularResistance.axisY = renal.axisY(renal.requests.renalVascularResistance)
-      } else  if  (renal.series(renal.requests.renalVascularResistance.axisY.label)){
-          renal.removeSeries(renal.requests.renalVascularResistance);
+        renal.requests.renalVascularResistance.axisY.visible = true
+        renal.requests.renalVascularResistance.axisY.titleText = renal.requests.renalVascularResistance.name
+        
+      } else  if  (renal.series(renal.requests.renalVascularResistance.name)){
+        renal.requests.renalVascularResistance.axisY.visible = false
+        renal.removeSeries(renal.requests.renalVascularResistance);
       }
       break;
       case "rightAfferentArterioleResistance":
       if(active){
-        renal.requests.rightAfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightAfferentArterioleResistance.axisY.label, renal.axisX, renal.requests.rightAfferentArterioleResistance.axisY);
+        renal.requests.rightAfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightAfferentArterioleResistance.name, renal.axisX, renal.requests.rightAfferentArterioleResistance.axisY);
         renal.requests.rightAfferentArterioleResistance.axisY = renal.axisY(renal.requests.rightAfferentArterioleResistance)
-      } else  if  (renal.series(renal.requests.rightAfferentArterioleResistance.axisY.label)){
-          renal.removeSeries(renal.requests.rightAfferentArterioleResistance);
+        renal.requests.rightAfferentArterioleResistance.axisY.visible = true
+        renal.requests.rightAfferentArterioleResistance.axisY.titleText = renal.requests.rightAfferentArterioleResistance.name
+        
+      } else  if  (renal.series(renal.requests.rightAfferentArterioleResistance.name)){
+        renal.requests.rightAfferentArterioleResistance.axisY.visible = false
+        renal.removeSeries(renal.requests.rightAfferentArterioleResistance);
       }
       break;
       case "rightBowmansCapsulesHydrostaticPressure":
       if(active){
-        renal.requests.rightBowmansCapsulesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY.label, renal.axisX, renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY);
+        renal.requests.rightBowmansCapsulesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightBowmansCapsulesHydrostaticPressure.name, renal.axisX, renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY);
         renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY = renal.axisY(renal.requests.rightBowmansCapsulesHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightBowmansCapsulesHydrostaticPressure);
+        renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY.visible = true
+        renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY.titleText = renal.requests.rightBowmansCapsulesHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightBowmansCapsulesHydrostaticPressure.name)){
+        renal.requests.rightBowmansCapsulesHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightBowmansCapsulesHydrostaticPressure);
       }
       break;
       case "rightBowmansCapsulesOsmoticPressure":
       if(active){
-        renal.requests.rightBowmansCapsulesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightBowmansCapsulesOsmoticPressure.axisY.label, renal.axisX, renal.requests.rightBowmansCapsulesOsmoticPressure.axisY);
+        renal.requests.rightBowmansCapsulesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightBowmansCapsulesOsmoticPressure.name, renal.axisX, renal.requests.rightBowmansCapsulesOsmoticPressure.axisY);
         renal.requests.rightBowmansCapsulesOsmoticPressure.axisY = renal.axisY(renal.requests.rightBowmansCapsulesOsmoticPressure)
-      } else  if  (renal.series(renal.requests.rightBowmansCapsulesOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightBowmansCapsulesOsmoticPressure);
+        renal.requests.rightBowmansCapsulesOsmoticPressure.axisY.visible = true
+        renal.requests.rightBowmansCapsulesOsmoticPressure.axisY.titleText = renal.requests.rightBowmansCapsulesOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightBowmansCapsulesOsmoticPressure.name)){
+        renal.requests.rightBowmansCapsulesOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightBowmansCapsulesOsmoticPressure);
       }
       break;
       case "rightEfferentArterioleResistance":
       if(active){
-        renal.requests.rightEfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightEfferentArterioleResistance.axisY.label, renal.axisX, renal.requests.rightEfferentArterioleResistance.axisY);
+        renal.requests.rightEfferentArterioleResistance = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightEfferentArterioleResistance.name, renal.axisX, renal.requests.rightEfferentArterioleResistance.axisY);
         renal.requests.rightEfferentArterioleResistance.axisY = renal.axisY(renal.requests.rightEfferentArterioleResistance)
-      } else  if  (renal.series(renal.requests.rightEfferentArterioleResistance.axisY.label)){
-          renal.removeSeries(renal.requests.rightEfferentArterioleResistance);
+        renal.requests.rightEfferentArterioleResistance.axisY.visible = true
+        renal.requests.rightEfferentArterioleResistance.axisY.titleText = renal.requests.rightEfferentArterioleResistance.name
+        
+      } else  if  (renal.series(renal.requests.rightEfferentArterioleResistance.name)){
+        renal.requests.rightEfferentArterioleResistance.axisY.visible = false
+        renal.removeSeries(renal.requests.rightEfferentArterioleResistance);
       }
       break;
       case "rightGlomerularCapillariesHydrostaticPressure":
       if(active){
-        renal.requests.rightGlomerularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY.label, renal.axisX, renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY);
+        renal.requests.rightGlomerularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularCapillariesHydrostaticPressure.name, renal.axisX, renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY);
         renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY = renal.axisY(renal.requests.rightGlomerularCapillariesHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightGlomerularCapillariesHydrostaticPressure);
+        renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY.visible = true
+        renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY.titleText = renal.requests.rightGlomerularCapillariesHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightGlomerularCapillariesHydrostaticPressure.name)){
+        renal.requests.rightGlomerularCapillariesHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightGlomerularCapillariesHydrostaticPressure);
       }
       break;
       case "rightGlomerularCapillariesOsmoticPressure":
       if(active){
-        renal.requests.rightGlomerularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY.label, renal.axisX, renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY);
+        renal.requests.rightGlomerularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularCapillariesOsmoticPressure.name, renal.axisX, renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY);
         renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY = renal.axisY(renal.requests.rightGlomerularCapillariesOsmoticPressure)
-      } else  if  (renal.series(renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightGlomerularCapillariesOsmoticPressure);
+        renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY.visible = true
+        renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY.titleText = renal.requests.rightGlomerularCapillariesOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightGlomerularCapillariesOsmoticPressure.name)){
+        renal.requests.rightGlomerularCapillariesOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightGlomerularCapillariesOsmoticPressure);
       }
       break;
       case "rightGlomerularFiltrationCoefficient":
       if(active){
-        renal.requests.rightGlomerularFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFiltrationCoefficient.axisY.label, renal.axisX, renal.requests.rightGlomerularFiltrationCoefficient.axisY);
+        renal.requests.rightGlomerularFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFiltrationCoefficient.name, renal.axisX, renal.requests.rightGlomerularFiltrationCoefficient.axisY);
         renal.requests.rightGlomerularFiltrationCoefficient.axisY = renal.axisY(renal.requests.rightGlomerularFiltrationCoefficient)
-      } else  if  (renal.series(renal.requests.rightGlomerularFiltrationCoefficient.axisY.label)){
-          renal.removeSeries(renal.requests.rightGlomerularFiltrationCoefficient);
+        renal.requests.rightGlomerularFiltrationCoefficient.axisY.visible = true
+        renal.requests.rightGlomerularFiltrationCoefficient.axisY.titleText = renal.requests.rightGlomerularFiltrationCoefficient.name
+        
+      } else  if  (renal.series(renal.requests.rightGlomerularFiltrationCoefficient.name)){
+        renal.requests.rightGlomerularFiltrationCoefficient.axisY.visible = false
+        renal.removeSeries(renal.requests.rightGlomerularFiltrationCoefficient);
       }
       break;
       case "rightGlomerularFiltrationRate":
       if(active){
-        renal.requests.rightGlomerularFiltrationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFiltrationRate.axisY.label, renal.axisX, renal.requests.rightGlomerularFiltrationRate.axisY);
+        renal.requests.rightGlomerularFiltrationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFiltrationRate.name, renal.axisX, renal.requests.rightGlomerularFiltrationRate.axisY);
         renal.requests.rightGlomerularFiltrationRate.axisY = renal.axisY(renal.requests.rightGlomerularFiltrationRate)
-      } else  if  (renal.series(renal.requests.rightGlomerularFiltrationRate.axisY.label)){
-          renal.removeSeries(renal.requests.rightGlomerularFiltrationRate);
+        renal.requests.rightGlomerularFiltrationRate.axisY.visible = true
+        renal.requests.rightGlomerularFiltrationRate.axisY.titleText = renal.requests.rightGlomerularFiltrationRate.name
+        
+      } else  if  (renal.series(renal.requests.rightGlomerularFiltrationRate.name)){
+        renal.requests.rightGlomerularFiltrationRate.axisY.visible = false
+        renal.removeSeries(renal.requests.rightGlomerularFiltrationRate);
       }
       break;
       case "rightGlomerularFiltrationSurfaceArea":
       if(active){
-        renal.requests.rightGlomerularFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFiltrationSurfaceArea.axisY.label, renal.axisX, renal.requests.rightGlomerularFiltrationSurfaceArea.axisY);
+        renal.requests.rightGlomerularFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFiltrationSurfaceArea.name, renal.axisX, renal.requests.rightGlomerularFiltrationSurfaceArea.axisY);
         renal.requests.rightGlomerularFiltrationSurfaceArea.axisY = renal.axisY(renal.requests.rightGlomerularFiltrationSurfaceArea)
-      } else  if  (renal.series(renal.requests.rightGlomerularFiltrationSurfaceArea.axisY.label)){
-          renal.removeSeries(renal.requests.rightGlomerularFiltrationSurfaceArea);
+        renal.requests.rightGlomerularFiltrationSurfaceArea.axisY.visible = true
+        renal.requests.rightGlomerularFiltrationSurfaceArea.axisY.titleText = renal.requests.rightGlomerularFiltrationSurfaceArea.name
+        
+      } else  if  (renal.series(renal.requests.rightGlomerularFiltrationSurfaceArea.name)){
+        renal.requests.rightGlomerularFiltrationSurfaceArea.axisY.visible = false
+        renal.removeSeries(renal.requests.rightGlomerularFiltrationSurfaceArea);
       }
       break;
       case "rightGlomerularFluidPermeability":
       if(active){
-        renal.requests.rightGlomerularFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFluidPermeability.axisY.label, renal.axisX, renal.requests.rightGlomerularFluidPermeability.axisY);
+        renal.requests.rightGlomerularFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightGlomerularFluidPermeability.name, renal.axisX, renal.requests.rightGlomerularFluidPermeability.axisY);
         renal.requests.rightGlomerularFluidPermeability.axisY = renal.axisY(renal.requests.rightGlomerularFluidPermeability)
-      } else  if  (renal.series(renal.requests.rightGlomerularFluidPermeability.axisY.label)){
-          renal.removeSeries(renal.requests.rightGlomerularFluidPermeability);
+        renal.requests.rightGlomerularFluidPermeability.axisY.visible = true
+        renal.requests.rightGlomerularFluidPermeability.axisY.titleText = renal.requests.rightGlomerularFluidPermeability.name
+        
+      } else  if  (renal.series(renal.requests.rightGlomerularFluidPermeability.name)){
+        renal.requests.rightGlomerularFluidPermeability.axisY.visible = false
+        renal.removeSeries(renal.requests.rightGlomerularFluidPermeability);
       }
       break;
       case "rightFiltrationFraction":
       if(active){
-        renal.requests.rightFiltrationFraction = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightFiltrationFraction.axisY.label, renal.axisX, renal.requests.rightFiltrationFraction.axisY);
+        renal.requests.rightFiltrationFraction = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightFiltrationFraction.name, renal.axisX, renal.requests.rightFiltrationFraction.axisY);
         renal.requests.rightFiltrationFraction.axisY = renal.axisY(renal.requests.rightFiltrationFraction)
-      } else  if  (renal.series(renal.requests.rightFiltrationFraction.axisY.label)){
-          renal.removeSeries(renal.requests.rightFiltrationFraction);
+        renal.requests.rightFiltrationFraction.axisY.visible = true
+        renal.requests.rightFiltrationFraction.axisY.titleText = renal.requests.rightFiltrationFraction.name
+        
+      } else  if  (renal.series(renal.requests.rightFiltrationFraction.name)){
+        renal.requests.rightFiltrationFraction.axisY.visible = false
+        renal.removeSeries(renal.requests.rightFiltrationFraction);
       }
       break;
       case "rightNetFiltrationPressure":
       if(active){
-        renal.requests.rightNetFiltrationPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightNetFiltrationPressure.axisY.label, renal.axisX, renal.requests.rightNetFiltrationPressure.axisY);
+        renal.requests.rightNetFiltrationPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightNetFiltrationPressure.name, renal.axisX, renal.requests.rightNetFiltrationPressure.axisY);
         renal.requests.rightNetFiltrationPressure.axisY = renal.axisY(renal.requests.rightNetFiltrationPressure)
-      } else  if  (renal.series(renal.requests.rightNetFiltrationPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightNetFiltrationPressure);
+        renal.requests.rightNetFiltrationPressure.axisY.visible = true
+        renal.requests.rightNetFiltrationPressure.axisY.titleText = renal.requests.rightNetFiltrationPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightNetFiltrationPressure.name)){
+        renal.requests.rightNetFiltrationPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightNetFiltrationPressure);
       }
       break;
       case "rightNetReabsorptionPressure":
       if(active){
-        renal.requests.rightNetReabsorptionPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightNetReabsorptionPressure.axisY.label, renal.axisX, renal.requests.rightNetReabsorptionPressure.axisY);
+        renal.requests.rightNetReabsorptionPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightNetReabsorptionPressure.name, renal.axisX, renal.requests.rightNetReabsorptionPressure.axisY);
         renal.requests.rightNetReabsorptionPressure.axisY = renal.axisY(renal.requests.rightNetReabsorptionPressure)
-      } else  if  (renal.series(renal.requests.rightNetReabsorptionPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightNetReabsorptionPressure);
+        renal.requests.rightNetReabsorptionPressure.axisY.visible = true
+        renal.requests.rightNetReabsorptionPressure.axisY.titleText = renal.requests.rightNetReabsorptionPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightNetReabsorptionPressure.name)){
+        renal.requests.rightNetReabsorptionPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightNetReabsorptionPressure);
       }
       break;
       case "rightPeritubularCapillariesHydrostaticPressure":
       if(active){
-        renal.requests.rightPeritubularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY.label, renal.axisX, renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY);
+        renal.requests.rightPeritubularCapillariesHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightPeritubularCapillariesHydrostaticPressure.name, renal.axisX, renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY);
         renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY = renal.axisY(renal.requests.rightPeritubularCapillariesHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightPeritubularCapillariesHydrostaticPressure);
+        renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY.visible = true
+        renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY.titleText = renal.requests.rightPeritubularCapillariesHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightPeritubularCapillariesHydrostaticPressure.name)){
+        renal.requests.rightPeritubularCapillariesHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightPeritubularCapillariesHydrostaticPressure);
       }
       break;
       case "rightPeritubularCapillariesOsmoticPressure":
       if(active){
-        renal.requests.rightPeritubularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY.label, renal.axisX, renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY);
+        renal.requests.rightPeritubularCapillariesOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightPeritubularCapillariesOsmoticPressure.name, renal.axisX, renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY);
         renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY = renal.axisY(renal.requests.rightPeritubularCapillariesOsmoticPressure)
-      } else  if  (renal.series(renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightPeritubularCapillariesOsmoticPressure);
+        renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY.visible = true
+        renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY.titleText = renal.requests.rightPeritubularCapillariesOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightPeritubularCapillariesOsmoticPressure.name)){
+        renal.requests.rightPeritubularCapillariesOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightPeritubularCapillariesOsmoticPressure);
       }
       break;
       case "rightReabsorptionFiltrationCoefficient":
       if(active){
-        renal.requests.rightReabsorptionFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightReabsorptionFiltrationCoefficient.axisY.label, renal.axisX, renal.requests.rightReabsorptionFiltrationCoefficient.axisY);
+        renal.requests.rightReabsorptionFiltrationCoefficient = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightReabsorptionFiltrationCoefficient.name, renal.axisX, renal.requests.rightReabsorptionFiltrationCoefficient.axisY);
         renal.requests.rightReabsorptionFiltrationCoefficient.axisY = renal.axisY(renal.requests.rightReabsorptionFiltrationCoefficient)
-      } else  if  (renal.series(renal.requests.rightReabsorptionFiltrationCoefficient.axisY.label)){
-          renal.removeSeries(renal.requests.rightReabsorptionFiltrationCoefficient);
+        renal.requests.rightReabsorptionFiltrationCoefficient.axisY.visible = true
+        renal.requests.rightReabsorptionFiltrationCoefficient.axisY.titleText = renal.requests.rightReabsorptionFiltrationCoefficient.name
+        
+      } else  if  (renal.series(renal.requests.rightReabsorptionFiltrationCoefficient.name)){
+        renal.requests.rightReabsorptionFiltrationCoefficient.axisY.visible = false
+        renal.removeSeries(renal.requests.rightReabsorptionFiltrationCoefficient);
       }
       break;
       case "rightReabsorptionRate":
       if(active){
-        renal.requests.rightReabsorptionRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightReabsorptionRate.axisY.label, renal.axisX, renal.requests.rightReabsorptionRate.axisY);
+        renal.requests.rightReabsorptionRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightReabsorptionRate.name, renal.axisX, renal.requests.rightReabsorptionRate.axisY);
         renal.requests.rightReabsorptionRate.axisY = renal.axisY(renal.requests.rightReabsorptionRate)
-      } else  if  (renal.series(renal.requests.rightReabsorptionRate.axisY.label)){
-          renal.removeSeries(renal.requests.rightReabsorptionRate);
+        renal.requests.rightReabsorptionRate.axisY.visible = true
+        renal.requests.rightReabsorptionRate.axisY.titleText = renal.requests.rightReabsorptionRate.name
+        
+      } else  if  (renal.series(renal.requests.rightReabsorptionRate.name)){
+        renal.requests.rightReabsorptionRate.axisY.visible = false
+        renal.removeSeries(renal.requests.rightReabsorptionRate);
       }
       break;
       case "rightTubularReabsorptionFiltrationSurfaceArea":
       if(active){
-        renal.requests.rightTubularReabsorptionFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY.label, renal.axisX, renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY);
+        renal.requests.rightTubularReabsorptionFiltrationSurfaceArea = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.name, renal.axisX, renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY);
         renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY = renal.axisY(renal.requests.rightTubularReabsorptionFiltrationSurfaceArea)
-      } else  if  (renal.series(renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY.label)){
-          renal.removeSeries(renal.requests.rightTubularReabsorptionFiltrationSurfaceArea);
+        renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY.visible = true
+        renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY.titleText = renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.name
+        
+      } else  if  (renal.series(renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.name)){
+        renal.requests.rightTubularReabsorptionFiltrationSurfaceArea.axisY.visible = false
+        renal.removeSeries(renal.requests.rightTubularReabsorptionFiltrationSurfaceArea);
       }
       break;
       case "rightTubularReabsorptionFluidPermeability":
       if(active){
-        renal.requests.rightTubularReabsorptionFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularReabsorptionFluidPermeability.axisY.label, renal.axisX, renal.requests.rightTubularReabsorptionFluidPermeability.axisY);
+        renal.requests.rightTubularReabsorptionFluidPermeability = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularReabsorptionFluidPermeability.name, renal.axisX, renal.requests.rightTubularReabsorptionFluidPermeability.axisY);
         renal.requests.rightTubularReabsorptionFluidPermeability.axisY = renal.axisY(renal.requests.rightTubularReabsorptionFluidPermeability)
-      } else  if  (renal.series(renal.requests.rightTubularReabsorptionFluidPermeability.axisY.label)){
-          renal.removeSeries(renal.requests.rightTubularReabsorptionFluidPermeability);
+        renal.requests.rightTubularReabsorptionFluidPermeability.axisY.visible = true
+        renal.requests.rightTubularReabsorptionFluidPermeability.axisY.titleText = renal.requests.rightTubularReabsorptionFluidPermeability.name
+        
+      } else  if  (renal.series(renal.requests.rightTubularReabsorptionFluidPermeability.name)){
+        renal.requests.rightTubularReabsorptionFluidPermeability.axisY.visible = false
+        renal.removeSeries(renal.requests.rightTubularReabsorptionFluidPermeability);
       }
       break;
       case "rightTubularHydrostaticPressure":
       if(active){
-        renal.requests.rightTubularHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularHydrostaticPressure.axisY.label, renal.axisX, renal.requests.rightTubularHydrostaticPressure.axisY);
+        renal.requests.rightTubularHydrostaticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularHydrostaticPressure.name, renal.axisX, renal.requests.rightTubularHydrostaticPressure.axisY);
         renal.requests.rightTubularHydrostaticPressure.axisY = renal.axisY(renal.requests.rightTubularHydrostaticPressure)
-      } else  if  (renal.series(renal.requests.rightTubularHydrostaticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightTubularHydrostaticPressure);
+        renal.requests.rightTubularHydrostaticPressure.axisY.visible = true
+        renal.requests.rightTubularHydrostaticPressure.axisY.titleText = renal.requests.rightTubularHydrostaticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightTubularHydrostaticPressure.name)){
+        renal.requests.rightTubularHydrostaticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightTubularHydrostaticPressure);
       }
       break;
       case "rightTubularOsmoticPressure":
       if(active){
-        renal.requests.rightTubularOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularOsmoticPressure.axisY.label, renal.axisX, renal.requests.rightTubularOsmoticPressure.axisY);
+        renal.requests.rightTubularOsmoticPressure = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.rightTubularOsmoticPressure.name, renal.axisX, renal.requests.rightTubularOsmoticPressure.axisY);
         renal.requests.rightTubularOsmoticPressure.axisY = renal.axisY(renal.requests.rightTubularOsmoticPressure)
-      } else  if  (renal.series(renal.requests.rightTubularOsmoticPressure.axisY.label)){
-          renal.removeSeries(renal.requests.rightTubularOsmoticPressure);
+        renal.requests.rightTubularOsmoticPressure.axisY.visible = true
+        renal.requests.rightTubularOsmoticPressure.axisY.titleText = renal.requests.rightTubularOsmoticPressure.name
+        
+      } else  if  (renal.series(renal.requests.rightTubularOsmoticPressure.name)){
+        renal.requests.rightTubularOsmoticPressure.axisY.visible = false
+        renal.removeSeries(renal.requests.rightTubularOsmoticPressure);
       }
       break;
       case "urinationRate":
       if(active){
-        renal.requests.urinationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urinationRate.axisY.label, renal.axisX, renal.requests.urinationRate.axisY);
+        renal.requests.urinationRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urinationRate.name, renal.axisX, renal.requests.urinationRate.axisY);
         renal.requests.urinationRate.axisY = renal.axisY(renal.requests.urinationRate)
-      } else  if  (renal.series(renal.requests.urinationRate.axisY.label)){
-          renal.removeSeries(renal.requests.urinationRate);
+        renal.requests.urinationRate.axisY.visible = true
+        renal.requests.urinationRate.axisY.titleText = renal.requests.urinationRate.name
+        
+      } else  if  (renal.series(renal.requests.urinationRate.name)){
+        renal.requests.urinationRate.axisY.visible = false
+        renal.removeSeries(renal.requests.urinationRate);
       }
       break;
       case "urineOsmolality":
       if(active){
-        renal.requests.urineOsmolality = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineOsmolality.axisY.label, renal.axisX, renal.requests.urineOsmolality.axisY);
+        renal.requests.urineOsmolality = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineOsmolality.name, renal.axisX, renal.requests.urineOsmolality.axisY);
         renal.requests.urineOsmolality.axisY = renal.axisY(renal.requests.urineOsmolality)
-      } else  if  (renal.series(renal.requests.urineOsmolality.axisY.label)){
-          renal.removeSeries(renal.requests.urineOsmolality);
+        renal.requests.urineOsmolality.axisY.visible = true
+        renal.requests.urineOsmolality.axisY.titleText = renal.requests.urineOsmolality.name
+        
+      } else  if  (renal.series(renal.requests.urineOsmolality.name)){
+        renal.requests.urineOsmolality.axisY.visible = false
+        renal.removeSeries(renal.requests.urineOsmolality);
       }
       break;
       case "urineOsmolarity":
       if(active){
-        renal.requests.urineOsmolarity = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineOsmolarity.axisY.label, renal.axisX, renal.requests.urineOsmolarity.axisY);
+        renal.requests.urineOsmolarity = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineOsmolarity.name, renal.axisX, renal.requests.urineOsmolarity.axisY);
         renal.requests.urineOsmolarity.axisY = renal.axisY(renal.requests.urineOsmolarity)
-      } else  if  (renal.series(renal.requests.urineOsmolarity.axisY.label)){
-          renal.removeSeries(renal.requests.urineOsmolarity);
+        renal.requests.urineOsmolarity.axisY.visible = true
+        renal.requests.urineOsmolarity.axisY.titleText = renal.requests.urineOsmolarity.name
+        
+      } else  if  (renal.series(renal.requests.urineOsmolarity.name)){
+        renal.requests.urineOsmolarity.axisY.visible = false
+        renal.removeSeries(renal.requests.urineOsmolarity);
       }
       break;
       case "urineProductionRate":
       if(active){
-        renal.requests.urineProductionRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineProductionRate.axisY.label, renal.axisX, renal.requests.urineProductionRate.axisY);
+        renal.requests.urineProductionRate = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineProductionRate.name, renal.axisX, renal.requests.urineProductionRate.axisY);
         renal.requests.urineProductionRate.axisY = renal.axisY(renal.requests.urineProductionRate)
-      } else  if  (renal.series(renal.requests.urineProductionRate.axisY.label)){
-          renal.removeSeries(renal.requests.urineProductionRate);
+        renal.requests.urineProductionRate.axisY.visible = true
+        renal.requests.urineProductionRate.axisY.titleText = renal.requests.urineProductionRate.name
+        
+      } else  if  (renal.series(renal.requests.urineProductionRate.name)){
+        renal.requests.urineProductionRate.axisY.visible = false
+        renal.removeSeries(renal.requests.urineProductionRate);
       }
       break;
       case "meanUrineOutput":
       if(active){
-        renal.requests.meanUrineOutput = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.meanUrineOutput.axisY.label, renal.axisX, renal.requests.meanUrineOutput.axisY);
+        renal.requests.meanUrineOutput = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.meanUrineOutput.name, renal.axisX, renal.requests.meanUrineOutput.axisY);
         renal.requests.meanUrineOutput.axisY = renal.axisY(renal.requests.meanUrineOutput)
-      } else  if  (renal.series(renal.requests.meanUrineOutput.axisY.label)){
-          renal.removeSeries(renal.requests.meanUrineOutput);
+        renal.requests.meanUrineOutput.axisY.visible = true
+        renal.requests.meanUrineOutput.axisY.titleText = renal.requests.meanUrineOutput.name
+        
+      } else  if  (renal.series(renal.requests.meanUrineOutput.name)){
+        renal.requests.meanUrineOutput.axisY.visible = false
+        renal.removeSeries(renal.requests.meanUrineOutput);
       }
       break;
       case "urineSpecificGravity":
       if(active){
-        renal.requests.urineSpecificGravity = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineSpecificGravity.axisY.label, renal.axisX, renal.requests.urineSpecificGravity.axisY);
+        renal.requests.urineSpecificGravity = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineSpecificGravity.name, renal.axisX, renal.requests.urineSpecificGravity.axisY);
         renal.requests.urineSpecificGravity.axisY = renal.axisY(renal.requests.urineSpecificGravity)
-      } else  if  (renal.series(renal.requests.urineSpecificGravity.axisY.label)){
-          renal.removeSeries(renal.requests.urineSpecificGravity);
+        renal.requests.urineSpecificGravity.axisY.visible = true
+        renal.requests.urineSpecificGravity.axisY.titleText = renal.requests.urineSpecificGravity.name
+        
+      } else  if  (renal.series(renal.requests.urineSpecificGravity.name)){
+        renal.requests.urineSpecificGravity.axisY.visible = false
+        renal.removeSeries(renal.requests.urineSpecificGravity);
       }
       break;
       case "urineVolume":
       if(active){
-        renal.requests.urineVolume = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineVolume.axisY.label, renal.axisX, renal.requests.urineVolume.axisY);
+        renal.requests.urineVolume = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineVolume.name, renal.axisX, renal.requests.urineVolume.axisY);
         renal.requests.urineVolume.axisY = renal.axisY(renal.requests.urineVolume)
-      } else  if  (renal.series(renal.requests.urineVolume.axisY.label)){
-          renal.removeSeries(renal.requests.urineVolume);
+        renal.requests.urineVolume.axisY.visible = true
+        renal.requests.urineVolume.axisY.titleText = renal.requests.urineVolume.name
+        
+      } else  if  (renal.series(renal.requests.urineVolume.name)){
+        renal.requests.urineVolume.axisY.visible = false
+        renal.removeSeries(renal.requests.urineVolume);
       }
       break;
       case "urineUreaNitrogenConcentration":
       if(active){
-        renal.requests.urineUreaNitrogenConcentration = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineUreaNitrogenConcentration.axisY.label, renal.axisX, renal.requests.urineUreaNitrogenConcentration.axisY);
+        renal.requests.urineUreaNitrogenConcentration = renal.createSeries(ChartView.SeriesTypeLine, renal.requests.urineUreaNitrogenConcentration.name, renal.axisX, renal.requests.urineUreaNitrogenConcentration.axisY);
         renal.requests.urineUreaNitrogenConcentration.axisY = renal.axisY(renal.requests.urineUreaNitrogenConcentration)
-      } else  if  (renal.series(renal.requests.urineUreaNitrogenConcentration.axisY.label)){
-          renal.removeSeries(renal.requests.urineUreaNitrogenConcentration);
+        renal.requests.urineUreaNitrogenConcentration.axisY.visible = true
+        renal.requests.urineUreaNitrogenConcentration.axisY.titleText = renal.requests.urineUreaNitrogenConcentration.name
+        
+      } else  if  (renal.series(renal.requests.urineUreaNitrogenConcentration.name)){
+        renal.requests.urineUreaNitrogenConcentration.axisY.visible = false
+        renal.removeSeries(renal.requests.urineUreaNitrogenConcentration);
       }
       break;
     }
   }
   function toggleRespiratorySeries(request, active){
+    const DEFAULT_UNIT = ""
+    const DEFAULT_LABEL_FORMAT = [Qt.binding( function() { return (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e';} )]
     switch(request){
       case "alveolarArterialGradient":
       if(active){
-        respiratory.requests.alveolarArterialGradient = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.alveolarArterialGradient.axisY.label, respiratory.axisX, respiratory.requests.alveolarArterialGradient.axisY);
+        respiratory.requests.alveolarArterialGradient = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.alveolarArterialGradient.name, respiratory.axisX, respiratory.requests.alveolarArterialGradient.axisY);
         respiratory.requests.alveolarArterialGradient.axisY = respiratory.axisY(respiratory.requests.alveolarArterialGradient)
-      } else  if  (respiratory.series(respiratory.requests.alveolarArterialGradient.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.alveolarArterialGradient);
+        respiratory.requests.alveolarArterialGradient.axisY.visible = true
+        respiratory.requests.alveolarArterialGradient.axisY.titleText = respiratory.requests.alveolarArterialGradient.name
+        
+      } else  if  (respiratory.series(respiratory.requests.alveolarArterialGradient.name)){
+        respiratory.requests.alveolarArterialGradient.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.alveolarArterialGradient);
       }
       break;
       case "carricoIndex":
       if(active){
-        respiratory.requests.carricoIndex = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.carricoIndex.axisY.label, respiratory.axisX, respiratory.requests.carricoIndex.axisY);
+        respiratory.requests.carricoIndex = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.carricoIndex.name, respiratory.axisX, respiratory.requests.carricoIndex.axisY);
         respiratory.requests.carricoIndex.axisY = respiratory.axisY(respiratory.requests.carricoIndex)
-      } else  if  (respiratory.series(respiratory.requests.carricoIndex.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.carricoIndex);
+        respiratory.requests.carricoIndex.axisY.visible = true
+        respiratory.requests.carricoIndex.axisY.titleText = respiratory.requests.carricoIndex.name
+        
+      } else  if  (respiratory.series(respiratory.requests.carricoIndex.name)){
+        respiratory.requests.carricoIndex.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.carricoIndex);
       }
       break;
       case "endTidalCarbonDioxideFraction":
       if(active){
-        respiratory.requests.endTidalCarbonDioxideFraction = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.endTidalCarbonDioxideFraction.axisY.label, respiratory.axisX, respiratory.requests.endTidalCarbonDioxideFraction.axisY);
+        respiratory.requests.endTidalCarbonDioxideFraction = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.endTidalCarbonDioxideFraction.name, respiratory.axisX, respiratory.requests.endTidalCarbonDioxideFraction.axisY);
         respiratory.requests.endTidalCarbonDioxideFraction.axisY = respiratory.axisY(respiratory.requests.endTidalCarbonDioxideFraction)
-      } else  if  (respiratory.series(respiratory.requests.endTidalCarbonDioxideFraction.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.endTidalCarbonDioxideFraction);
+        respiratory.requests.endTidalCarbonDioxideFraction.axisY.visible = true
+        respiratory.requests.endTidalCarbonDioxideFraction.axisY.titleText = respiratory.requests.endTidalCarbonDioxideFraction.name
+        
+      } else  if  (respiratory.series(respiratory.requests.endTidalCarbonDioxideFraction.name)){
+        respiratory.requests.endTidalCarbonDioxideFraction.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.endTidalCarbonDioxideFraction);
       }
       break;
       case "endTidalCarbonDioxidePressure":
       if(active){
-        respiratory.requests.endTidalCarbonDioxidePressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.endTidalCarbonDioxidePressure.axisY.label, respiratory.axisX, respiratory.requests.endTidalCarbonDioxidePressure.axisY);
+        respiratory.requests.endTidalCarbonDioxidePressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.endTidalCarbonDioxidePressure.name, respiratory.axisX, respiratory.requests.endTidalCarbonDioxidePressure.axisY);
         respiratory.requests.endTidalCarbonDioxidePressure.axisY = respiratory.axisY(respiratory.requests.endTidalCarbonDioxidePressure)
-      } else  if  (respiratory.series(respiratory.requests.endTidalCarbonDioxidePressure.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.endTidalCarbonDioxidePressure);
+        respiratory.requests.endTidalCarbonDioxidePressure.axisY.visible = true
+        respiratory.requests.endTidalCarbonDioxidePressure.axisY.titleText = respiratory.requests.endTidalCarbonDioxidePressure.name
+        
+      } else  if  (respiratory.series(respiratory.requests.endTidalCarbonDioxidePressure.name)){
+        respiratory.requests.endTidalCarbonDioxidePressure.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.endTidalCarbonDioxidePressure);
       }
       break;
       case "expiratoryFlow":
       if(active){
-        respiratory.requests.expiratoryFlow = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.expiratoryFlow.axisY.label, respiratory.axisX, respiratory.requests.expiratoryFlow.axisY);
+        respiratory.requests.expiratoryFlow = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.expiratoryFlow.name, respiratory.axisX, respiratory.requests.expiratoryFlow.axisY);
         respiratory.requests.expiratoryFlow.axisY = respiratory.axisY(respiratory.requests.expiratoryFlow)
-      } else  if  (respiratory.series(respiratory.requests.expiratoryFlow.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.expiratoryFlow);
+        respiratory.requests.expiratoryFlow.axisY.visible = true
+        respiratory.requests.expiratoryFlow.axisY.titleText = respiratory.requests.expiratoryFlow.name
+        
+      } else  if  (respiratory.series(respiratory.requests.expiratoryFlow.name)){
+        respiratory.requests.expiratoryFlow.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.expiratoryFlow);
       }
       break;
       case "inspiratoryExpiratoryRatio":
       if(active){
-        respiratory.requests.inspiratoryExpiratoryRatio = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.inspiratoryExpiratoryRatio.axisY.label, respiratory.axisX, respiratory.requests.inspiratoryExpiratoryRatio.axisY);
+        respiratory.requests.inspiratoryExpiratoryRatio = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.inspiratoryExpiratoryRatio.name, respiratory.axisX, respiratory.requests.inspiratoryExpiratoryRatio.axisY);
         respiratory.requests.inspiratoryExpiratoryRatio.axisY = respiratory.axisY(respiratory.requests.inspiratoryExpiratoryRatio)
-      } else  if  (respiratory.series(respiratory.requests.inspiratoryExpiratoryRatio.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.inspiratoryExpiratoryRatio);
+        respiratory.requests.inspiratoryExpiratoryRatio.axisY.visible = true
+        respiratory.requests.inspiratoryExpiratoryRatio.axisY.titleText = respiratory.requests.inspiratoryExpiratoryRatio.name
+        
+      } else  if  (respiratory.series(respiratory.requests.inspiratoryExpiratoryRatio.name)){
+        respiratory.requests.inspiratoryExpiratoryRatio.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.inspiratoryExpiratoryRatio);
       }
       break;
       case "inspiratoryFlow":
       if(active){
-        respiratory.requests.inspiratoryFlow = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.inspiratoryFlow.axisY.label, respiratory.axisX, respiratory.requests.inspiratoryFlow.axisY);
+        respiratory.requests.inspiratoryFlow = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.inspiratoryFlow.name, respiratory.axisX, respiratory.requests.inspiratoryFlow.axisY);
         respiratory.requests.inspiratoryFlow.axisY = respiratory.axisY(respiratory.requests.inspiratoryFlow)
-      } else  if  (respiratory.series(respiratory.requests.inspiratoryFlow.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.inspiratoryFlow);
+        respiratory.requests.inspiratoryFlow.axisY.visible = true
+        respiratory.requests.inspiratoryFlow.axisY.titleText = respiratory.requests.inspiratoryFlow.name
+        
+      } else  if  (respiratory.series(respiratory.requests.inspiratoryFlow.name)){
+        respiratory.requests.inspiratoryFlow.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.inspiratoryFlow);
       }
       break;
       case "pulmonaryCompliance":
       if(active){
-        respiratory.requests.pulmonaryCompliance = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.pulmonaryCompliance.axisY.label, respiratory.axisX, respiratory.requests.pulmonaryCompliance.axisY);
+        respiratory.requests.pulmonaryCompliance = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.pulmonaryCompliance.name, respiratory.axisX, respiratory.requests.pulmonaryCompliance.axisY);
         respiratory.requests.pulmonaryCompliance.axisY = respiratory.axisY(respiratory.requests.pulmonaryCompliance)
-      } else  if  (respiratory.series(respiratory.requests.pulmonaryCompliance.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.pulmonaryCompliance);
+        respiratory.requests.pulmonaryCompliance.axisY.visible = true
+        respiratory.requests.pulmonaryCompliance.axisY.titleText = respiratory.requests.pulmonaryCompliance.name
+        
+      } else  if  (respiratory.series(respiratory.requests.pulmonaryCompliance.name)){
+        respiratory.requests.pulmonaryCompliance.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.pulmonaryCompliance);
       }
       break;
       case "pulmonaryResistance":
       if(active){
-        respiratory.requests.pulmonaryResistance = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.pulmonaryResistance.axisY.label, respiratory.axisX, respiratory.requests.pulmonaryResistance.axisY);
+        respiratory.requests.pulmonaryResistance = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.pulmonaryResistance.name, respiratory.axisX, respiratory.requests.pulmonaryResistance.axisY);
         respiratory.requests.pulmonaryResistance.axisY = respiratory.axisY(respiratory.requests.pulmonaryResistance)
-      } else  if  (respiratory.series(respiratory.requests.pulmonaryResistance.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.pulmonaryResistance);
+        respiratory.requests.pulmonaryResistance.axisY.visible = true
+        respiratory.requests.pulmonaryResistance.axisY.titleText = respiratory.requests.pulmonaryResistance.name
+        
+      } else  if  (respiratory.series(respiratory.requests.pulmonaryResistance.name)){
+        respiratory.requests.pulmonaryResistance.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.pulmonaryResistance);
       }
       break;
       case "respirationDriverPressure":
       if(active){
-        respiratory.requests.respirationDriverPressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.respirationDriverPressure.axisY.label, respiratory.axisX, respiratory.requests.respirationDriverPressure.axisY);
+        respiratory.requests.respirationDriverPressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.respirationDriverPressure.name, respiratory.axisX, respiratory.requests.respirationDriverPressure.axisY);
         respiratory.requests.respirationDriverPressure.axisY = respiratory.axisY(respiratory.requests.respirationDriverPressure)
-      } else  if  (respiratory.series(respiratory.requests.respirationDriverPressure.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.respirationDriverPressure);
+        respiratory.requests.respirationDriverPressure.axisY.visible = true
+        respiratory.requests.respirationDriverPressure.axisY.titleText = respiratory.requests.respirationDriverPressure.name
+        
+      } else  if  (respiratory.series(respiratory.requests.respirationDriverPressure.name)){
+        respiratory.requests.respirationDriverPressure.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.respirationDriverPressure);
       }
       break;
       case "respirationMusclePressure":
       if(active){
-        respiratory.requests.respirationMusclePressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.respirationMusclePressure.axisY.label, respiratory.axisX, respiratory.requests.respirationMusclePressure.axisY);
+        respiratory.requests.respirationMusclePressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.respirationMusclePressure.name, respiratory.axisX, respiratory.requests.respirationMusclePressure.axisY);
         respiratory.requests.respirationMusclePressure.axisY = respiratory.axisY(respiratory.requests.respirationMusclePressure)
-      } else  if  (respiratory.series(respiratory.requests.respirationMusclePressure.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.respirationMusclePressure);
+        respiratory.requests.respirationMusclePressure.axisY.visible = true
+        respiratory.requests.respirationMusclePressure.axisY.titleText = respiratory.requests.respirationMusclePressure.name
+        
+      } else  if  (respiratory.series(respiratory.requests.respirationMusclePressure.name)){
+        respiratory.requests.respirationMusclePressure.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.respirationMusclePressure);
       }
       break;
       case "respirationRate":
       if(active){
-        respiratory.requests.respirationRate = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.respirationRate.axisY.label, respiratory.axisX, respiratory.requests.respirationRate.axisY);
+        respiratory.requests.respirationRate = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.respirationRate.name, respiratory.axisX, respiratory.requests.respirationRate.axisY);
         respiratory.requests.respirationRate.axisY = respiratory.axisY(respiratory.requests.respirationRate)
-      } else  if  (respiratory.series(respiratory.requests.respirationRate.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.respirationRate);
+        respiratory.requests.respirationRate.axisY.visible = true
+        respiratory.requests.respirationRate.axisY.titleText = respiratory.requests.respirationRate.name
+        
+      } else  if  (respiratory.series(respiratory.requests.respirationRate.name)){
+        respiratory.requests.respirationRate.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.respirationRate);
       }
       break;
       case "specificVentilation":
       if(active){
-        respiratory.requests.specificVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.specificVentilation.axisY.label, respiratory.axisX, respiratory.requests.specificVentilation.axisY);
+        respiratory.requests.specificVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.specificVentilation.name, respiratory.axisX, respiratory.requests.specificVentilation.axisY);
         respiratory.requests.specificVentilation.axisY = respiratory.axisY(respiratory.requests.specificVentilation)
-      } else  if  (respiratory.series(respiratory.requests.specificVentilation.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.specificVentilation);
+        respiratory.requests.specificVentilation.axisY.visible = true
+        respiratory.requests.specificVentilation.axisY.titleText = respiratory.requests.specificVentilation.name
+        
+      } else  if  (respiratory.series(respiratory.requests.specificVentilation.name)){
+        respiratory.requests.specificVentilation.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.specificVentilation);
       }
       break;
       case "targetPulmonaryVentilation":
       if(active){
-        respiratory.requests.targetPulmonaryVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.targetPulmonaryVentilation.axisY.label, respiratory.axisX, respiratory.requests.targetPulmonaryVentilation.axisY);
+        respiratory.requests.targetPulmonaryVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.targetPulmonaryVentilation.name, respiratory.axisX, respiratory.requests.targetPulmonaryVentilation.axisY);
         respiratory.requests.targetPulmonaryVentilation.axisY = respiratory.axisY(respiratory.requests.targetPulmonaryVentilation)
-      } else  if  (respiratory.series(respiratory.requests.targetPulmonaryVentilation.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.targetPulmonaryVentilation);
+        respiratory.requests.targetPulmonaryVentilation.axisY.visible = true
+        respiratory.requests.targetPulmonaryVentilation.axisY.titleText = respiratory.requests.targetPulmonaryVentilation.name
+        
+      } else  if  (respiratory.series(respiratory.requests.targetPulmonaryVentilation.name)){
+        respiratory.requests.targetPulmonaryVentilation.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.targetPulmonaryVentilation);
       }
       break;
       case "tidalVolume":
       if(active){
-        respiratory.requests.tidalVolume = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.tidalVolume.axisY.label, respiratory.axisX, respiratory.requests.tidalVolume.axisY);
+        respiratory.requests.tidalVolume = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.tidalVolume.name, respiratory.axisX, respiratory.requests.tidalVolume.axisY);
         respiratory.requests.tidalVolume.axisY = respiratory.axisY(respiratory.requests.tidalVolume)
-      } else  if  (respiratory.series(respiratory.requests.tidalVolume.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.tidalVolume);
+        respiratory.requests.tidalVolume.axisY.visible = true
+        respiratory.requests.tidalVolume.axisY.titleText = respiratory.requests.tidalVolume.name
+        
+      } else  if  (respiratory.series(respiratory.requests.tidalVolume.name)){
+        respiratory.requests.tidalVolume.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.tidalVolume);
       }
       break;
       case "totalAlveolarVentilation":
       if(active){
-        respiratory.requests.totalAlveolarVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalAlveolarVentilation.axisY.label, respiratory.axisX, respiratory.requests.totalAlveolarVentilation.axisY);
+        respiratory.requests.totalAlveolarVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalAlveolarVentilation.name, respiratory.axisX, respiratory.requests.totalAlveolarVentilation.axisY);
         respiratory.requests.totalAlveolarVentilation.axisY = respiratory.axisY(respiratory.requests.totalAlveolarVentilation)
-      } else  if  (respiratory.series(respiratory.requests.totalAlveolarVentilation.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.totalAlveolarVentilation);
+        respiratory.requests.totalAlveolarVentilation.axisY.visible = true
+        respiratory.requests.totalAlveolarVentilation.axisY.titleText = respiratory.requests.totalAlveolarVentilation.name
+        
+      } else  if  (respiratory.series(respiratory.requests.totalAlveolarVentilation.name)){
+        respiratory.requests.totalAlveolarVentilation.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.totalAlveolarVentilation);
       }
       break;
       case "totalDeadSpaceVentilation":
       if(active){
-        respiratory.requests.totalDeadSpaceVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalDeadSpaceVentilation.axisY.label, respiratory.axisX, respiratory.requests.totalDeadSpaceVentilation.axisY);
+        respiratory.requests.totalDeadSpaceVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalDeadSpaceVentilation.name, respiratory.axisX, respiratory.requests.totalDeadSpaceVentilation.axisY);
         respiratory.requests.totalDeadSpaceVentilation.axisY = respiratory.axisY(respiratory.requests.totalDeadSpaceVentilation)
-      } else  if  (respiratory.series(respiratory.requests.totalDeadSpaceVentilation.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.totalDeadSpaceVentilation);
+        respiratory.requests.totalDeadSpaceVentilation.axisY.visible = true
+        respiratory.requests.totalDeadSpaceVentilation.axisY.titleText = respiratory.requests.totalDeadSpaceVentilation.name
+        
+      } else  if  (respiratory.series(respiratory.requests.totalDeadSpaceVentilation.name)){
+        respiratory.requests.totalDeadSpaceVentilation.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.totalDeadSpaceVentilation);
       }
       break;
       case "totalLungVolume":
       if(active){
-        respiratory.requests.totalLungVolume = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalLungVolume.axisY.label, respiratory.axisX, respiratory.requests.totalLungVolume.axisY);
+        respiratory.requests.totalLungVolume = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalLungVolume.name, respiratory.axisX, respiratory.requests.totalLungVolume.axisY);
         respiratory.requests.totalLungVolume.axisY = respiratory.axisY(respiratory.requests.totalLungVolume)
-      } else  if  (respiratory.series(respiratory.requests.totalLungVolume.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.totalLungVolume);
+        respiratory.requests.totalLungVolume.axisY.visible = true
+        respiratory.requests.totalLungVolume.axisY.titleText = respiratory.requests.totalLungVolume.name
+        
+      } else  if  (respiratory.series(respiratory.requests.totalLungVolume.name)){
+        respiratory.requests.totalLungVolume.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.totalLungVolume);
       }
       break;
       case "totalPulmonaryVentilation":
       if(active){
-        respiratory.requests.totalPulmonaryVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalPulmonaryVentilation.axisY.label, respiratory.axisX, respiratory.requests.totalPulmonaryVentilation.axisY);
+        respiratory.requests.totalPulmonaryVentilation = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.totalPulmonaryVentilation.name, respiratory.axisX, respiratory.requests.totalPulmonaryVentilation.axisY);
         respiratory.requests.totalPulmonaryVentilation.axisY = respiratory.axisY(respiratory.requests.totalPulmonaryVentilation)
-      } else  if  (respiratory.series(respiratory.requests.totalPulmonaryVentilation.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.totalPulmonaryVentilation);
+        respiratory.requests.totalPulmonaryVentilation.axisY.visible = true
+        respiratory.requests.totalPulmonaryVentilation.axisY.titleText = respiratory.requests.totalPulmonaryVentilation.name
+        
+      } else  if  (respiratory.series(respiratory.requests.totalPulmonaryVentilation.name)){
+        respiratory.requests.totalPulmonaryVentilation.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.totalPulmonaryVentilation);
       }
       break;
       case "transpulmonaryPressure":
       if(active){
-        respiratory.requests.transpulmonaryPressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.transpulmonaryPressure.axisY.label, respiratory.axisX, respiratory.requests.transpulmonaryPressure.axisY);
+        respiratory.requests.transpulmonaryPressure = respiratory.createSeries(ChartView.SeriesTypeLine, respiratory.requests.transpulmonaryPressure.name, respiratory.axisX, respiratory.requests.transpulmonaryPressure.axisY);
         respiratory.requests.transpulmonaryPressure.axisY = respiratory.axisY(respiratory.requests.transpulmonaryPressure)
-      } else  if  (respiratory.series(respiratory.requests.transpulmonaryPressure.axisY.label)){
-          respiratory.removeSeries(respiratory.requests.transpulmonaryPressure);
+        respiratory.requests.transpulmonaryPressure.axisY.visible = true
+        respiratory.requests.transpulmonaryPressure.axisY.titleText = respiratory.requests.transpulmonaryPressure.name
+        
+      } else  if  (respiratory.series(respiratory.requests.transpulmonaryPressure.name)){
+        respiratory.requests.transpulmonaryPressure.axisY.visible = false
+        respiratory.removeSeries(respiratory.requests.transpulmonaryPressure);
       }
       break;
     }
   }
   function toggleTissueSeries(request, active){
+    const DEFAULT_UNIT = ""
+    
     switch(request){
       case "carbonDioxideProductionRate":
       if(active){
-        tissue.requests.carbonDioxideProductionRate = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.carbonDioxideProductionRate.axisY.label, tissue.axisX, tissue.requests.carbonDioxideProductionRate.axisY);
+        tissue.requests.carbonDioxideProductionRate = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.carbonDioxideProductionRate.name, tissue.axisX, tissue.requests.carbonDioxideProductionRate.axisY);
         tissue.requests.carbonDioxideProductionRate.axisY = tissue.axisY(tissue.requests.carbonDioxideProductionRate)
-      } else  if  (tissue.series(tissue.requests.transpulmonaryPressure.axisY.label)){
-          tissue.removeSeries(tissue.requests.transpulmonaryPressure);
+        tissue.requests.carbonDioxideProductionRate.axisY.visible = true
+        tissue.requests.carbonDioxideProductionRate.axisY.titleText = tissue.requests.carbonDioxideProductionRate.name
+        
+      } else  if  (tissue.series(tissue.requests.transpulmonaryPressure.name)){
+        tissue.requests.transpulmonaryPressure.axisY.visible = false
+        tissue.removeSeries(tissue.requests.transpulmonaryPressure);
       }
       break;
       case "dehydrationFraction":
       if(active){
-        tissue.requests.dehydrationFraction = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.dehydrationFraction.axisY.label, tissue.axisX, tissue.requests.dehydrationFraction.axisY);
+        tissue.requests.dehydrationFraction = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.dehydrationFraction.name, tissue.axisX, tissue.requests.dehydrationFraction.axisY);
         tissue.requests.dehydrationFraction.axisY = tissue.axisY(tissue.requests.dehydrationFraction)
-      } else  if  (tissue.series(tissue.requests.dehydrationFraction.axisY.label)){
-          tissue.removeSeries(tissue.requests.dehydrationFraction);
+        tissue.requests.dehydrationFraction.axisY.visible = true
+        tissue.requests.dehydrationFraction.axisY.titleText = tissue.requests.dehydrationFraction.name
+        
+      } else  if  (tissue.series(tissue.requests.dehydrationFraction.name)){
+        tissue.requests.dehydrationFraction.axisY.visible = false
+        tissue.removeSeries(tissue.requests.dehydrationFraction);
       }
       break;
       case "extracellularFluidVolume":
       if(active){
-        tissue.requests.extracellularFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.extracellularFluidVolume.axisY.label, tissue.axisX, tissue.requests.extracellularFluidVolume.axisY);
+        tissue.requests.extracellularFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.extracellularFluidVolume.name, tissue.axisX, tissue.requests.extracellularFluidVolume.axisY);
         tissue.requests.extracellularFluidVolume.axisY = tissue.axisY(tissue.requests.extracellularFluidVolume)
-      } else  if  (tissue.series(tissue.requests.extracellularFluidVolume.axisY.label)){
-          tissue.removeSeries(tissue.requests.extracellularFluidVolume);
+        tissue.requests.extracellularFluidVolume.axisY.visible = true
+        tissue.requests.extracellularFluidVolume.axisY.titleText = tissue.requests.extracellularFluidVolume.name
+        
+      } else  if  (tissue.series(tissue.requests.extracellularFluidVolume.name)){
+        tissue.requests.extracellularFluidVolume.axisY.visible = false
+        tissue.removeSeries(tissue.requests.extracellularFluidVolume);
       }
       break;
       case "extravascularFluidVolume":
       if(active){
-        tissue.requests.extravascularFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.extravascularFluidVolume.axisY.label, tissue.axisX, tissue.requests.extravascularFluidVolume.axisY);
+        tissue.requests.extravascularFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.extravascularFluidVolume.name, tissue.axisX, tissue.requests.extravascularFluidVolume.axisY);
         tissue.requests.extravascularFluidVolume.axisY = tissue.axisY(tissue.requests.extravascularFluidVolume)
-      } else  if  (tissue.series(tissue.requests.extravascularFluidVolume.axisY.label)){
-          tissue.removeSeries(tissue.requests.extravascularFluidVolume);
+        tissue.requests.extravascularFluidVolume.axisY.visible = true
+        tissue.requests.extravascularFluidVolume.axisY.titleText = tissue.requests.extravascularFluidVolume.name
+        
+      } else  if  (tissue.series(tissue.requests.extravascularFluidVolume.name)){
+        tissue.requests.extravascularFluidVolume.axisY.visible = false
+        tissue.removeSeries(tissue.requests.extravascularFluidVolume);
       }
       break;
       case "intracellularFluidPH":
       if(active){
-        tissue.requests.intracellularFluidPH = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.intracellularFluidPH.axisY.label, tissue.axisX, tissue.requests.intracellularFluidPH.axisY);
+        tissue.requests.intracellularFluidPH = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.intracellularFluidPH.name, tissue.axisX, tissue.requests.intracellularFluidPH.axisY);
         tissue.requests.intracellularFluidPH.axisY = tissue.axisY(tissue.requests.intracellularFluidPH)
-      } else  if  (tissue.series(tissue.requests.intracellularFluidPH.axisY.label)){
-          tissue.removeSeries(tissue.requests.intracellularFluidPH);
+        tissue.requests.intracellularFluidPH.axisY.visible = true
+        tissue.requests.intracellularFluidPH.axisY.titleText = tissue.requests.intracellularFluidPH.name
+        
+      } else  if  (tissue.series(tissue.requests.intracellularFluidPH.name)){
+        tissue.requests.intracellularFluidPH.axisY.visible = false
+        tissue.removeSeries(tissue.requests.intracellularFluidPH);
       }
       break;
       case "intracellularFluidVolume":
       if(active){
-        tissue.requests.intracellularFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.intracellularFluidVolume.axisY.label, tissue.axisX, tissue.requests.intracellularFluidVolume.axisY);
+        tissue.requests.intracellularFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.intracellularFluidVolume.name, tissue.axisX, tissue.requests.intracellularFluidVolume.axisY);
         tissue.requests.intracellularFluidVolume.axisY = tissue.axisY(tissue.requests.intracellularFluidVolume)
-      } else  if  (tissue.series(tissue.requests.intracellularFluidVolume.axisY.label)){
-          tissue.removeSeries(tissue.requests.intracellularFluidVolume);
+        tissue.requests.intracellularFluidVolume.axisY.visible = true
+        tissue.requests.intracellularFluidVolume.axisY.titleText = tissue.requests.intracellularFluidVolume.name
+        
+      } else  if  (tissue.series(tissue.requests.intracellularFluidVolume.name)){
+        tissue.requests.intracellularFluidVolume.axisY.visible = false
+        tissue.removeSeries(tissue.requests.intracellularFluidVolume);
       }
       break;
       case "totalBodyFluidVolume":
       if(active){
-        tissue.requests.totalBodyFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.totalBodyFluidVolume.axisY.label, tissue.axisX, tissue.requests.totalBodyFluidVolume.axisY);
+        tissue.requests.totalBodyFluidVolume = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.totalBodyFluidVolume.name, tissue.axisX, tissue.requests.totalBodyFluidVolume.axisY);
         tissue.requests.totalBodyFluidVolume.axisY = tissue.axisY(tissue.requests.totalBodyFluidVolume)
-      } else  if  (tissue.series(tissue.requests.totalBodyFluidVolume.axisY.label)){
-          tissue.removeSeries(tissue.requests.totalBodyFluidVolume);
+        tissue.requests.totalBodyFluidVolume.axisY.visible = true
+        tissue.requests.totalBodyFluidVolume.axisY.titleText = tissue.requests.totalBodyFluidVolume.name
+        
+      } else  if  (tissue.series(tissue.requests.totalBodyFluidVolume.name)){
+        tissue.requests.totalBodyFluidVolume.axisY.visible = false
+        tissue.removeSeries(tissue.requests.totalBodyFluidVolume);
       }
       break;
       case "oxygenConsumptionRate":
       if(active){
-        tissue.requests.oxygenConsumptionRate = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.oxygenConsumptionRate.axisY.label, tissue.axisX, tissue.requests.oxygenConsumptionRate.axisY);
+        tissue.requests.oxygenConsumptionRate = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.oxygenConsumptionRate.name, tissue.axisX, tissue.requests.oxygenConsumptionRate.axisY);
         tissue.requests.oxygenConsumptionRate.axisY = tissue.axisY(tissue.requests.oxygenConsumptionRate)
-      } else  if  (tissue.series(tissue.requests.oxygenConsumptionRate.axisY.label)){
-          tissue.removeSeries(tissue.requests.oxygenConsumptionRate);
+        tissue.requests.oxygenConsumptionRate.axisY.visible = true
+        tissue.requests.oxygenConsumptionRate.axisY.titleText = tissue.requests.oxygenConsumptionRate.name
+        
+      } else  if  (tissue.series(tissue.requests.oxygenConsumptionRate.name)){
+        tissue.requests.oxygenConsumptionRate.axisY.visible = false
+        tissue.removeSeries(tissue.requests.oxygenConsumptionRate);
       }
       break;
       case "respiratoryExchangeRatio":
       if(active){
-        tissue.requests.respiratoryExchangeRatio = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.respiratoryExchangeRatio.axisY.label, tissue.axisX, tissue.requests.respiratoryExchangeRatio.axisY);
+        tissue.requests.respiratoryExchangeRatio = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.respiratoryExchangeRatio.name, tissue.axisX, tissue.requests.respiratoryExchangeRatio.axisY);
         tissue.requests.respiratoryExchangeRatio.axisY = tissue.axisY(tissue.requests.respiratoryExchangeRatio)
-      } else  if  (tissue.series(tissue.requests.respiratoryExchangeRatio.axisY.label)){
-          tissue.removeSeries(tissue.requests.respiratoryExchangeRatio);
+        tissue.requests.respiratoryExchangeRatio.axisY.visible = true
+        tissue.requests.respiratoryExchangeRatio.axisY.titleText = tissue.requests.respiratoryExchangeRatio.name
+        
+      } else  if  (tissue.series(tissue.requests.respiratoryExchangeRatio.name)){
+        tissue.requests.respiratoryExchangeRatio.axisY.visible = false
+        tissue.removeSeries(tissue.requests.respiratoryExchangeRatio);
       }
       break;
       case "liverInsulinSetPoint":
       if(active){
-        tissue.requests.liverInsulinSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.liverInsulinSetPoint.axisY.label, tissue.axisX, tissue.requests.liverInsulinSetPoint.axisY);
+        tissue.requests.liverInsulinSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.liverInsulinSetPoint.name, tissue.axisX, tissue.requests.liverInsulinSetPoint.axisY);
         tissue.requests.liverInsulinSetPoint.axisY = tissue.axisY(tissue.requests.liverInsulinSetPoint)
-      } else  if  (tissue.series(tissue.requests.liverInsulinSetPoint.axisY.label)){
-          tissue.removeSeries(tissue.requests.liverInsulinSetPoint);
+        tissue.requests.liverInsulinSetPoint.axisY.visible = true
+        tissue.requests.liverInsulinSetPoint.axisY.titleText = tissue.requests.liverInsulinSetPoint.name
+        
+      } else  if  (tissue.series(tissue.requests.liverInsulinSetPoint.name)){
+        tissue.requests.liverInsulinSetPoint.axisY.visible = false
+        tissue.removeSeries(tissue.requests.liverInsulinSetPoint);
       }
       break;
       case "liverGlucagonSetPoint":
       if(active){
-        tissue.requests.liverGlucagonSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.liverGlucagonSetPoint.axisY.label, tissue.axisX, tissue.requests.liverGlucagonSetPoint.axisY);
+        tissue.requests.liverGlucagonSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.liverGlucagonSetPoint.name, tissue.axisX, tissue.requests.liverGlucagonSetPoint.axisY);
         tissue.requests.liverGlucagonSetPoint.axisY = tissue.axisY(tissue.requests.liverGlucagonSetPoint)
-      } else  if  (tissue.series(tissue.requests.liverGlucagonSetPoint.axisY.label)){
-          tissue.removeSeries(tissue.requests.liverGlucagonSetPoint);
+        tissue.requests.liverGlucagonSetPoint.axisY.visible = true
+        tissue.requests.liverGlucagonSetPoint.axisY.titleText = tissue.requests.liverGlucagonSetPoint.name
+        
+      } else  if  (tissue.series(tissue.requests.liverGlucagonSetPoint.name)){
+        tissue.requests.liverGlucagonSetPoint.axisY.visible = false
+        tissue.removeSeries(tissue.requests.liverGlucagonSetPoint);
       }
       break;
       case "muscleInsulinSetPoint":
       if(active){
-        tissue.requests.muscleInsulinSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.muscleInsulinSetPoint.axisY.label, tissue.axisX, tissue.requests.muscleInsulinSetPoint.axisY);
+        tissue.requests.muscleInsulinSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.muscleInsulinSetPoint.name, tissue.axisX, tissue.requests.muscleInsulinSetPoint.axisY);
         tissue.requests.muscleInsulinSetPoint.axisY = tissue.axisY(tissue.requests.muscleInsulinSetPoint)
-      } else  if  (tissue.series(tissue.requests.muscleInsulinSetPoint.axisY.label)){
-          tissue.removeSeries(tissue.requests.muscleInsulinSetPoint);
+        tissue.requests.muscleInsulinSetPoint.axisY.visible = true
+        tissue.requests.muscleInsulinSetPoint.axisY.titleText = tissue.requests.muscleInsulinSetPoint.name
+        
+      } else  if  (tissue.series(tissue.requests.muscleInsulinSetPoint.name)){
+        tissue.requests.muscleInsulinSetPoint.axisY.visible = false
+        tissue.removeSeries(tissue.requests.muscleInsulinSetPoint);
       }
       break;
       case "muscleGlucagonSetPoint":
       if(active){
-        tissue.requests.muscleGlucagonSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.muscleGlucagonSetPoint.axisY.label, tissue.axisX, tissue.requests.muscleGlucagonSetPoint.axisY);
+        tissue.requests.muscleGlucagonSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.muscleGlucagonSetPoint.name, tissue.axisX, tissue.requests.muscleGlucagonSetPoint.axisY);
         tissue.requests.muscleGlucagonSetPoint.axisY = tissue.axisY(tissue.requests.muscleGlucagonSetPoint)
-      } else  if  (tissue.series(tissue.requests.muscleGlucagonSetPoint.axisY.label)){
-          tissue.removeSeries(tissue.requests.muscleGlucagonSetPoint);
+        tissue.requests.muscleGlucagonSetPoint.axisY.visible = true
+        tissue.requests.muscleGlucagonSetPoint.axisY.titleText = tissue.requests.muscleGlucagonSetPoint.name
+        
+      } else  if  (tissue.series(tissue.requests.muscleGlucagonSetPoint.name)){
+        tissue.requests.muscleGlucagonSetPoint.axisY.visible = false
+        tissue.removeSeries(tissue.requests.muscleGlucagonSetPoint);
       }
       break;
       case "fatInsulinSetPoint":
       if(active){
-        tissue.requests.fatInsulinSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.fatInsulinSetPoint.axisY.label, tissue.axisX, tissue.requests.fatInsulinSetPoint.axisY);
+        tissue.requests.fatInsulinSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.fatInsulinSetPoint.name, tissue.axisX, tissue.requests.fatInsulinSetPoint.axisY);
         tissue.requests.fatInsulinSetPoint.axisY = tissue.axisY(tissue.requests.fatInsulinSetPoint)
-      } else  if  (tissue.series(tissue.requests.fatInsulinSetPoint.axisY.label)){
-          tissue.removeSeries(tissue.requests.fatInsulinSetPoint);
+        tissue.requests.fatInsulinSetPoint.axisY.visible = true
+        tissue.requests.fatInsulinSetPoint.axisY.titleText = tissue.requests.fatInsulinSetPoint.name
+        
+      } else  if  (tissue.series(tissue.requests.fatInsulinSetPoint.name)){
+        tissue.requests.fatInsulinSetPoint.axisY.visible = false
+        tissue.removeSeries(tissue.requests.fatInsulinSetPoint);
       }
       break;
       case "fatGlucagonSetPoint":
       if(active){
-        tissue.requests.fatGlucagonSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.fatGlucagonSetPoint.axisY.label, tissue.axisX, tissue.requests.fatGlucagonSetPoint.axisY);
+        tissue.requests.fatGlucagonSetPoint = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.fatGlucagonSetPoint.name, tissue.axisX, tissue.requests.fatGlucagonSetPoint.axisY);
         tissue.requests.fatGlucagonSetPoint.axisY = tissue.axisY(tissue.requests.fatGlucagonSetPoint)
-      } else  if  (tissue.series(tissue.requests.fatGlucagonSetPoint.axisY.label)){
-          tissue.removeSeries(tissue.requests.fatGlucagonSetPoint);
+        tissue.requests.fatGlucagonSetPoint.axisY.visible = true
+        tissue.requests.fatGlucagonSetPoint.axisY.titleText = tissue.requests.fatGlucagonSetPoint.name
+        
+      } else  if  (tissue.series(tissue.requests.fatGlucagonSetPoint.name)){
+        tissue.requests.fatGlucagonSetPoint.axisY.visible = false
+        tissue.removeSeries(tissue.requests.fatGlucagonSetPoint);
       }
       break;
       case "liverGlycogen":
       if(active){
-        tissue.requests.liverGlycogen = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.liverGlycogen.axisY.label, tissue.axisX, tissue.requests.liverGlycogen.axisY);
+        tissue.requests.liverGlycogen = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.liverGlycogen.name, tissue.axisX, tissue.requests.liverGlycogen.axisY);
         tissue.requests.liverGlycogen.axisY = tissue.axisY(tissue.requests.liverGlycogen)
-      } else  if  (tissue.series(tissue.requests.liverGlycogen.axisY.label)){
-          tissue.removeSeries(tissue.requests.liverGlycogen);
+        tissue.requests.liverGlycogen.axisY.visible = true
+        tissue.requests.liverGlycogen.axisY.titleText = tissue.requests.liverGlycogen.name
+        
+      } else  if  (tissue.series(tissue.requests.liverGlycogen.name)){
+        tissue.requests.liverGlycogen.axisY.visible = false
+        tissue.removeSeries(tissue.requests.liverGlycogen);
       }
       break;
       case "muscleGlycogen":
       if(active){
-        tissue.requests.muscleGlycogen = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.muscleGlycogen.axisY.label, tissue.axisX, tissue.requests.muscleGlycogen.axisY);
+        tissue.requests.muscleGlycogen = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.muscleGlycogen.name, tissue.axisX, tissue.requests.muscleGlycogen.axisY);
         tissue.requests.muscleGlycogen.axisY = tissue.axisY(tissue.requests.muscleGlycogen)
-      } else  if  (tissue.series(tissue.requests.muscleGlycogen.axisY.label)){
-          tissue.removeSeries(tissue.requests.muscleGlycogen);
+        tissue.requests.muscleGlycogen.axisY.visible = true
+        tissue.requests.muscleGlycogen.axisY.titleText = tissue.requests.muscleGlycogen.name
+        
+      } else  if  (tissue.series(tissue.requests.muscleGlycogen.name)){
+        tissue.requests.muscleGlycogen.axisY.visible = false
+        tissue.removeSeries(tissue.requests.muscleGlycogen);
       }
       break;
       case "storedProtein":
       if(active){
-        tissue.requests.storedProtein = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.storedProtein.axisY.label, tissue.axisX, tissue.requests.storedProtein.axisY);
+        tissue.requests.storedProtein = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.storedProtein.name, tissue.axisX, tissue.requests.storedProtein.axisY);
         tissue.requests.storedProtein.axisY = tissue.axisY(tissue.requests.storedProtein)
-      } else  if  (tissue.series(tissue.requests.storedProtein.axisY.label)){
-          tissue.removeSeries(tissue.requests.storedProtein);
+        tissue.requests.storedProtein.axisY.visible = true
+        tissue.requests.storedProtein.axisY.titleText = tissue.requests.storedProtein.name
+        
+      } else  if  (tissue.series(tissue.requests.storedProtein.name)){
+        tissue.requests.storedProtein.axisY.visible = false
+        tissue.removeSeries(tissue.requests.storedProtein);
       }
       break;
       case "storedFat":
       if(active){
-        tissue.requests.storedFat = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.storedFat.axisY.label, tissue.axisX, tissue.requests.storedFat.axisY);
+        tissue.requests.storedFat = tissue.createSeries(ChartView.SeriesTypeLine, tissue.requests.storedFat.name, tissue.axisX, tissue.requests.storedFat.axisY);
         tissue.requests.storedFat.axisY = tissue.axisY(tissue.requests.storedFat)
-      } else  if  (tissue.series(tissue.requests.storedFat.axisY.label)){
-          tissue.removeSeries(tissue.requests.storedFat);
+        tissue.requests.storedFat.axisY.visible = true
+        tissue.requests.storedFat.axisY.titleText = tissue.requests.storedFat.name
+        
+      } else  if  (tissue.series(tissue.requests.storedFat.name)){
+        tissue.requests.storedFat.axisY.visible = false
+        tissue.removeSeries(tissue.requests.storedFat);
       }
       break;
     }
   }
   onFilterChange : {
-    console.log("GraphArea Filter Changed %1 %2 = %3".arg(system).arg(request).arg(active))
     switch ( system ) {
       case "BloodChemistry":
         toggleBloodChemistrySeries(request,active);

@@ -5,108 +5,109 @@ import QtCharts 2.3
 Item {
   id: root
   property ValueAxis axisX : ValueAxis {
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     property int tickCount : 0
     titleText : "Simulation Time"
     min: 0
     max : 60
   }
   property LineSeries  baroreceptorHeartRateScale : LineSeries {
+    id: baroreceptorHeartRateScale
     name : "baroreceptorHeartRateScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "baroreceptorHeartRateScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  baroreceptorHeartElastanceScale : LineSeries {
+    id: baroreceptorHeartElastanceScale
     name : "baroreceptorHeartElastanceScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "baroreceptorHeartElastanceScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  baroreceptorResistanceScale : LineSeries {
+    id: baroreceptorResistanceScale
     name : "baroreceptorResistanceScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "baroreceptorResistanceScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  baroreceptorComplianceScale : LineSeries {
+    id: baroreceptorComplianceScale
     name : "baroreceptorComplianceScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "baroreceptorComplianceScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  chemoreceptorHeartRateScale : LineSeries {
+    id: chemoreceptorHeartRateScale
     name : "chemoreceptorHeartRateScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "chemoreceptorHeartRateScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  chemoreceptorHeartElastanceScale : LineSeries {
+    id: chemoreceptorHeartElastanceScale
     name : "chemoreceptorHeartElastanceScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "chemoreceptorHeartElastanceScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  painVisualAnalogueScale : LineSeries {
+    id: painVisualAnalogueScale
     name : "painVisualAnalogueScale"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "painVisualAnalogueScale"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  leftEyePupillaryResponse : LineSeries {
+    id: leftEyePupillaryResponse
     name : "leftEyePupillaryResponse"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "leftEyePupillaryResponse"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  rightEyePupillaryResponse : LineSeries {
+    id: rightEyePupillaryResponse
     name : "rightEyePupillaryResponse"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "rightEyePupillaryResponse"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
 }

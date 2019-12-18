@@ -5,356 +5,329 @@ import QtCharts 2.3
 Item {
   id: root
   property ValueAxis axisX : ValueAxis {
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     property int tickCount : 0
     titleText : "Simulation Time"
     min: 0
     max : 60
   }
   property LineSeries  arterialPressure : LineSeries {
+    id: arterialPressure
     name : "arterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "arterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  bloodVolume : LineSeries {
+    id: bloodVolume
     name : "bloodVolume"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "bloodVolume"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  cardiacIndex : LineSeries {
+    id: cardiacIndex
     name : "cardiacIndex"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "cardiacIndex"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  cardiacOutput : LineSeries {
+    id: cardiacOutput
     name : "cardiacOutput"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "cardiacOutput"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  centralVenousPressure : LineSeries {
+    id: centralVenousPressure
     name : "centralVenousPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "centralVenousPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  cerebralBloodFlow : LineSeries {
+    id: cerebralBloodFlow
     name : "cerebralBloodFlow"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "cerebralBloodFlow"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  cerebralPerfusionPressure : LineSeries {
+    id: cerebralPerfusionPressure
     name : "cerebralPerfusionPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "cerebralPerfusionPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  diastolicArterialPressure : LineSeries {
+    id: diastolicArterialPressure
     name : "diastolicArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "diastolicArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  heartEjectionFraction : LineSeries {
+    id: heartEjectionFraction
     name : "heartEjectionFraction"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "heartEjectionFraction"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  heartRate : LineSeries {
+    id: heartRate
     name : "heartRate"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "heartRate"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  heartStrokeVolume : LineSeries {
+    id: heartStrokeVolume
     name : "heartStrokeVolume"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "heartStrokeVolume"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  intracranialPressure : LineSeries {
+    id: intracranialPressure
     name : "intracranialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "intracranialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  meanArterialPressure : LineSeries {
+    id: meanArterialPressure
     name : "meanArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "meanArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  meanArterialCarbonDioxidePartialPressure : LineSeries {
+    id: meanArterialCarbonDioxidePartialPressure
     name : "meanArterialCarbonDioxidePartialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "meanArterialCarbonDioxidePartialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  meanArterialCarbonDioxidePartialPressureDelta : LineSeries {
+    id: meanArterialCarbonDioxidePartialPressureDelta
     name : "meanArterialCarbonDioxidePartialPressureDelta"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "meanArterialCarbonDioxidePartialPressureDelta"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  meanCentralVenousPressure : LineSeries {
+    id: meanCentralVenousPressure
     name : "meanCentralVenousPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "meanCentralVenousPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  meanSkinFlow : LineSeries {
+    id: meanSkinFlow
     name : "meanSkinFlow"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "meanSkinFlow"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryArterialPressure : LineSeries {
+    id: pulmonaryArterialPressure
     name : "pulmonaryArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryCapillariesWedgePressure : LineSeries {
+    id: pulmonaryCapillariesWedgePressure
     name : "pulmonaryCapillariesWedgePressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryCapillariesWedgePressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryDiastolicArterialPressure : LineSeries {
+    id: pulmonaryDiastolicArterialPressure
     name : "pulmonaryDiastolicArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryDiastolicArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryMeanArterialPressure : LineSeries {
+    id: pulmonaryMeanArterialPressure
     name : "pulmonaryMeanArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryMeanArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryMeanCapillaryFlow : LineSeries {
+    id: pulmonaryMeanCapillaryFlow
     name : "pulmonaryMeanCapillaryFlow"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryMeanCapillaryFlow"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryMeanShuntFlow : LineSeries {
+    id: pulmonaryMeanShuntFlow
     name : "pulmonaryMeanShuntFlow"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryMeanShuntFlow"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonarySystolicArterialPressure : LineSeries {
+    id: pulmonarySystolicArterialPressure
     name : "pulmonarySystolicArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonarySystolicArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryVascularResistance : LineSeries {
+    id: pulmonaryVascularResistance
     name : "pulmonaryVascularResistance"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryVascularResistance"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulmonaryVascularResistanceIndex : LineSeries {
+    id: pulmonaryVascularResistanceIndex
     name : "pulmonaryVascularResistanceIndex"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulmonaryVascularResistanceIndex"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  pulsePressure : LineSeries {
+    id: pulsePressure
     name : "pulsePressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "pulsePressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  systemicVascularResistance : LineSeries {
+    id: systemicVascularResistance
     name : "systemicVascularResistance"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "systemicVascularResistance"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  systolicArterialPressure : LineSeries {
+    id: systolicArterialPressure
     name : "systolicArterialPressure"
+    property int min : 0;
+    property int min_count : 1;
+    property int max: 1;
+    property int max_count : 1;
     axisY: ValueAxis {
-            min : 0.
-            max: 1.
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
-            property string label : "systolicArterialPressure"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
 }

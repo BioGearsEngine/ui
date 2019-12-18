@@ -5,31 +5,24 @@ import QtCharts 2.3
 Item {
   id: root
   property ValueAxis axisX : ValueAxis {
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     property int tickCount : 0
     titleText : "Simulation Time"
     min: 0
     max : 60
   }
   property LineSeries  insulinSynthesisRate : LineSeries {
+    id: insulinSynthesisRate
     name : "insulinSynthesisRate"
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "insulinSynthesisRate"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
   property LineSeries  glucagonSynthesisRate : LineSeries {
+    id: glucagonSynthesisRate
     name : "glucagonSynthesisRate"
     axisY: ValueAxis {
-            min : 0.
-            max : 1.
-            property string label : "glucagonSynthesisRate"
-            property string unit   : ""
-            titleText : "%1 %2".arg(label).arg(unit)
-            labelFormat: (max < 100.) ?  '%0.2d': '%0.2e'
+        labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
     }
   }
 }
