@@ -51,8 +51,10 @@ GraphAreaForm {
   Component.onCompleted: {
     var bloodChemistry = physiologyRequestModel.get(0).requests
     for ( var i = 0; i < bloodChemistry.count ; ++i){
-      if(bloodChemistry.get(i).active)
-       toggleBloodChemistrySeries(bloodChemistry.get(i).request, bloodChemistry.get(i).active)
+      if (bloodChemistry.get(i).active){
+		toggleBloodChemistrySeries(bloodChemistry.get(i).request, bloodChemistry.get(i).active)
+		physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistry.get(i).request})
+		}
     }
     var cardiovascular = physiologyRequestModel.get(1).requests
     for ( var i = 0; i < cardiovascular.count; ++i){
@@ -160,6 +162,19 @@ GraphAreaForm {
       axisX.min = 0
       axisX.max = interval
     }
+  }
+
+  //This function is specific to searching physiology request lists for an element with a "request" field that matches the input
+  //We can look to generalize this to other fields if/when needed
+  function findRequestIndex(list, request){
+	var index = -1;
+	for (var i = 0; i < list.count; ++i){
+		if (list.get(i).request == request){
+			index = i;
+			break;
+		}
+	}
+	return index;
   }
 
   //!

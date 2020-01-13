@@ -53,7 +53,11 @@ Page {
             Layout.preferredWidth : 200
             Layout.preferredHeight : 40
             font.pointSize: 12
-            clip:true 
+            clip:true
+			UITabButtonForm {
+				id: textButton
+				text: qsTr("Test")
+			}
             UITabButtonForm {
                 id: bloodChemistryButton
                 text: qsTr("BloodChemistry")
@@ -143,6 +147,16 @@ Page {
                                     onClicked : {
                                         physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
                                         root.filterChange(physiologyRequestModel.get(plots.currentIndex).system, model.request, checked)
+										if (checked){
+											//bcList.append({"request": model.request})
+											physiologyRequestModel.get(plots.currentIndex).activeRequests.append({"request": model.request})
+											physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "plotVisible", checked)
+										}
+										else {
+											//bcList.remove(findRequestIndex(bcList,model.request), 1)
+											physiologyRequestModel.get(plots.currentIndex).activeRequests.remove(findRequestIndex(physiologyRequestModel.get(plots.currentIndex).activeRequests,model.request), 1)
+											physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "plotVisible", checked)
+										}
                                     }
                                 }
                             }
@@ -181,7 +195,34 @@ Page {
         id: plots
         anchors.fill: parent
         currentIndex:0
-        clip:true 
+        clip:true
+		Item {
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+		/*	ListModel {
+				id: bcList
+			}*/
+			ScrollView {
+				id: scroller
+				anchors.fill: parent
+				clip: true
+				GridView {
+					id: gridView
+					cellWidth: plots.width / 2
+					cellHeight: plots.height / 2
+					model: physiologyRequestModel.get(0).activeRequests
+					delegate: Component {
+						id:bcName
+						Label {
+							color: "blue"
+							text: model.request
+							font.pixelSize: 20
+							}
+					}
+				}
+			}
+		}
+		
         UIPlotSeries {
             id: bloodChemistrySeries
             property Item requests : 
@@ -340,6 +381,7 @@ ListModel {
    id: physiologyRequestModel
    ListElement {
       system : "BloodChemistry"
+	  activeRequests :[ ]
       requests:  [
           ListElement {request:"arterialBloodPH"; active: true}
          ,ListElement {request:"arterialBloodPHBaseline"; active: false}
