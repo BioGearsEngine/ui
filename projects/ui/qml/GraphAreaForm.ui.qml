@@ -3,6 +3,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.3
 import QtCharts 2.3
+import QtQml.Models 2.2
 
 import "./data" as Requests
 
@@ -24,6 +25,7 @@ Page {
 
     signal filterChange(string system, string request, bool active)
     
+
     header:  RowLayout {
         id: headerBar
         Layout.fillWidth : true
@@ -54,10 +56,10 @@ Page {
             Layout.preferredHeight : 40
             font.pointSize: 12
             clip:true
-			UITabButtonForm {
+			/*UITabButtonForm {
 				id: textButton
 				text: qsTr("Test")
-			}
+			}*/
             UITabButtonForm {
                 id: bloodChemistryButton
                 text: qsTr("BloodChemistry")
@@ -146,17 +148,15 @@ Page {
                                     Layout.preferredWidth : 10
                                     onClicked : {
                                         physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
-                                        root.filterChange(physiologyRequestModel.get(plots.currentIndex).system, model.request, checked)
 										if (checked){
-											//bcList.append({"request": model.request})
 											physiologyRequestModel.get(plots.currentIndex).activeRequests.append({"request": model.request})
 											physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "plotVisible", checked)
 										}
 										else {
-											//bcList.remove(findRequestIndex(bcList,model.request), 1)
 											physiologyRequestModel.get(plots.currentIndex).activeRequests.remove(findRequestIndex(physiologyRequestModel.get(plots.currentIndex).activeRequests,model.request), 1)
 											physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "plotVisible", checked)
 										}
+										root.filterChange(physiologyRequestModel.get(plots.currentIndex).system, model.request, checked)
                                     }
                                 }
                             }
@@ -197,33 +197,64 @@ Page {
         currentIndex:0
         clip:true
 		Item {
+			id: bloodChemistrySeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-		/*	ListModel {
-				id: bcList
-			}*/
-			ScrollView {
-				id: scroller
+
+			property Item requests : 
+            Requests.BloodChemistry {
+                id : bloodChemistryRequests
+            }
+
+			Rectangle {
+				id: background
+				anchors.fill: parent
+				color: "steelblue"
+				opacity: 0.2
+			}
+
+			GridView {
+				id: gridView
 				anchors.fill: parent
 				clip: true
-				GridView {
-					id: gridView
-					cellWidth: plots.width / 2
-					cellHeight: plots.height / 2
-					model: physiologyRequestModel.get(0).activeRequests
-					delegate: Component {
-						id:bcName
-						Label {
-							color: "blue"
-							text: model.request
-							font.pixelSize: 20
-							}
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: plotDelegateModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: gridView.parent
+                    anchors.top: gridView.top
+                    anchors.right: gridView.right
+                    anchors.bottom: gridView.bottom
+                }
+			}
+
+			DelegateModel {
+				id: plotDelegateModel
+				model: physiologyRequestModel.get(0).activeRequests
+				delegate: UIPlotSeries {
+					id: plotSeries
+					width: plotSeries.GridView.view.cellWidth
+					height: plotSeries.GridView.view.cellHeight
+					legend.visible: false
+					title: request
+					LineSeries {
+						id: bcLineSeries
+						axisX : ValueAxis {
+							property int tickCount : 0
+							titleText : "Simulation Time (min)"
+							min: 0
+							max : 60
+						}
+						axisY : ValueAxis {
+							titleText: request
+							labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
+						}
 					}
 				}
 			}
 		}
-		
-        UIPlotSeries {
+		/*UIPlotSeries {
             id: bloodChemistrySeries
             property Item requests : 
             Requests.BloodChemistry {
@@ -235,7 +266,7 @@ Page {
                 min: 0
                 max : 60
             }
-        }
+        }*/
         UIPlotSeries {
             id: cardiovascularSeries
             property Item requests : 
@@ -381,9 +412,9 @@ ListModel {
    id: physiologyRequestModel
    ListElement {
       system : "BloodChemistry"
-	  activeRequests :[ ]
+	  activeRequests: [ ]
       requests:  [
-          ListElement {request:"arterialBloodPH"; active: true}
+          ListElement {request:"arterialBloodPH"; active: true;}
          ,ListElement {request:"arterialBloodPHBaseline"; active: false}
          ,ListElement {request:"bloodDensity"; active: false}
          ,ListElement {request:"bloodSpecificHeat"; active: false}

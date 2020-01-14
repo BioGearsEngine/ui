@@ -49,11 +49,11 @@ GraphAreaForm {
   }
 
   Component.onCompleted: {
-    var bloodChemistry = physiologyRequestModel.get(0).requests
-    for ( var i = 0; i < bloodChemistry.count ; ++i){
-      if (bloodChemistry.get(i).active){
-		toggleBloodChemistrySeries(bloodChemistry.get(i).request, bloodChemistry.get(i).active)
-		physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistry.get(i).request})
+    var bloodChemistryReq = physiologyRequestModel.get(0).requests
+    for ( var i = 0; i < bloodChemistryReq.count ; ++i){
+      if (bloodChemistryReq.get(i).active){
+		//toggleBloodChemistrySeries(bloodChemistry.get(i).request, bloodChemistry.get(i).active)
+		physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistryReq.get(i).request})
 		}
     }
     var cardiovascular = physiologyRequestModel.get(1).requests
@@ -185,7 +185,7 @@ GraphAreaForm {
   //!  If anyone finds a better layout for data/*.qml and these signal/slots
   //!  Feel free to refactor it, most clearner ways I tried did not work
   //!  Due to the insane way I have to add plots to a line series
-  Connections {
+ /* Connections {
     target : bloodChemistry.requests.arterialBloodPH
     onPointAdded : newPointHandler(bloodChemistry.requests.arterialBloodPH, index)
   }
@@ -392,7 +392,7 @@ GraphAreaForm {
   Connections {
     target : bloodChemistry.requests.inflammatoryResponseTissueIntegrity
     onPointAdded : newPointHandler(bloodChemistry.requests.inflammatoryResponseTissueIntegrity, index)
-  }
+  }*/
 ////////////////////////
   Connections {
     target : cardiovascular.requests.arterialPressure
@@ -1083,13 +1083,15 @@ GraphAreaForm {
     target : tissue.requests.storedFat
     onPointAdded : newPointHandler(tissue.requests.storedFat, index)
   }
+
+
   //!
   //!  Update Function
   //!  Calls Append for each Blood Chemistry Data Request
   function updateBloodChemistry( metrics ) {
-    updateDomain(bloodChemistry.axisX)
-    var bc_requests = physiologyRequestModel.get(0).requests
-    if(bc_requests.get(0).active){
+    //updateDomain(bloodChemistry.axisX)
+    //var bc_requests = physiologyRequestModel.get(0).activeRequests
+    /*if(bc_requests.get(0).active){
       bloodChemistry.requests.arterialBloodPH.append(metrics.simulationTime,metrics.arterialBloodPH)
     }
     if(bc_requests.get(1).active){
@@ -1244,7 +1246,7 @@ GraphAreaForm {
     }
     if(bc_requests.get(51).active){
       bloodChemistry.requests.inflammatoryResponseTissueIntegrity.append(metrics.simulationTime,metrics.inflammatoryResponseTissueIntegrity)
-    }
+    }*/
   }
   function updateCardiovascular(metrics){
     updateDomain(cardiovascular.axisX)
@@ -4542,7 +4544,7 @@ GraphAreaForm {
   onFilterChange : {
     switch ( system ) {
       case "BloodChemistry":
-        toggleBloodChemistrySeries(request,active);
+        //toggleBloodChemistrySeries(request,active);
         break;
       case "Cardiovascular":
         toggleCardiovascularSeries(request,active);
