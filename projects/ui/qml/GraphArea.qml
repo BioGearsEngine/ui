@@ -54,6 +54,7 @@ GraphAreaForm {
       if (bloodChemistryReq.get(i).active){
 		//toggleBloodChemistrySeries(bloodChemistry.get(i).request, bloodChemistry.get(i).active)
 		physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistryReq.get(i).request})
+		bloodChemistryObjectModel.createPlotView(bloodChemistryReq.get(i).request)
 		}
     }
     var cardiovascular = physiologyRequestModel.get(1).requests
@@ -169,7 +170,7 @@ GraphAreaForm {
   function findRequestIndex(list, request){
 	var index = -1;
 	for (var i = 0; i < list.count; ++i){
-		if (list.get(i).request == request){
+		if (list.get(i).title == request){
 			index = i;
 			break;
 		}
@@ -1090,7 +1091,11 @@ GraphAreaForm {
   //!  Calls Append for each Blood Chemistry Data Request
   function updateBloodChemistry( metrics ) {
     //updateDomain(bloodChemistry.axisX)
-    //var bc_requests = physiologyRequestModel.get(0).activeRequests
+    var bc_requests = physiologyRequestModel.get(0).activeRequests
+	/*for (var i = 0; i < bc_requests.count; ++i) {
+		console.log(bc_requests.get(i).request)
+		console.log(metrics[bc_requests.get(i).request])
+	}*/
     /*if(bc_requests.get(0).active){
       bloodChemistry.requests.arterialBloodPH.append(metrics.simulationTime,metrics.arterialBloodPH)
     }

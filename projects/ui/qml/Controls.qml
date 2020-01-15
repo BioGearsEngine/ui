@@ -61,15 +61,15 @@ ControlsForm {
     } 
     action_1.onPressed:{
         console.log("Hemorrhage Stop") 
-        biogears_scenario.create_hemorrhage_action("Left Arm",0.0);
+        biogears_scenario.create_hemorrhage_action("LeftArm",0.0);
     } 
     action_2.onPressed:{
         console.log("Hemorrhage Mild")
-        biogears_scenario.create_hemorrhage_action("Left Arm",5.0);
+        biogears_scenario.create_hemorrhage_action("LeftArm",5.0);
     } 
     action_3.onPressed:{
         console.log("Hemorrhage Extreme") 
-        biogears_scenario.create_hemorrhage_action("Left Arm",100.0);
+        biogears_scenario.create_hemorrhage_action("LeftArm",100.0);
     } 
     action_4.onPressed:{
         console.log("ASthma Attack") 

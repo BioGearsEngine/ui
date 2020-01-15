@@ -22,6 +22,7 @@ Page {
     property alias tissue: tissue
 
     property alias physiologyRequestModel : physiologyRequestModel
+	property alias bloodChemistryObjectModel : bloodChemistryObjectModel
 
     signal filterChange(string system, string request, bool active)
     
@@ -149,12 +150,15 @@ Page {
                                     onClicked : {
                                         physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
 										if (checked){
+											bloodChemistryObjectModel.createPlotView(model.request)
 											physiologyRequestModel.get(plots.currentIndex).activeRequests.append({"request": model.request})
-											physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "plotVisible", checked)
-										}
-										else {
-											physiologyRequestModel.get(plots.currentIndex).activeRequests.remove(findRequestIndex(physiologyRequestModel.get(plots.currentIndex).activeRequests,model.request), 1)
-											physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "plotVisible", checked)
+										} else {
+											var i = findRequestIndex(bloodChemistryObjectModel, model.request)
+											if (i != -1){
+												bloodChemistryObjectModel.remove(findRequestIndex(bloodChemistryObjectModel, model.request), 1)
+												physiologyRequestModel.get(plots.currentIndex).activeRequests.remove(i, 1)
+											}
+											
 										}
 										root.filterChange(physiologyRequestModel.get(plots.currentIndex).system, model.request, checked)
                                     }
@@ -213,13 +217,32 @@ Page {
 				opacity: 0.2
 			}
 
+			ObjectModel {
+				id: bloodChemistryObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(gridView,{"width" : gridView.cellWidth, "height" : gridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.signalTest)
+						bloodChemistryObjectModel.append(chartObject)
+					}
+				}
+			}
+
 			GridView {
 				id: gridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: plotDelegateModel
+				model: bloodChemistryObjectModel
 
 				ScrollBar.vertical: ScrollBar {
                     parent: gridView.parent
@@ -228,46 +251,9 @@ Page {
                     anchors.bottom: gridView.bottom
                 }
 			}
-
-			DelegateModel {
-				id: plotDelegateModel
-				model: physiologyRequestModel.get(0).activeRequests
-				delegate: UIPlotSeries {
-					id: plotSeries
-					width: plotSeries.GridView.view.cellWidth
-					height: plotSeries.GridView.view.cellHeight
-					legend.visible: false
-					title: request
-					LineSeries {
-						id: bcLineSeries
-						axisX : ValueAxis {
-							property int tickCount : 0
-							titleText : "Simulation Time (min)"
-							min: 0
-							max : 60
-						}
-						axisY : ValueAxis {
-							titleText: request
-							labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
-						}
-					}
-				}
-			}
 		}
-		/*UIPlotSeries {
-            id: bloodChemistrySeries
-            property Item requests : 
-            Requests.BloodChemistry {
-                id : bloodChemistryRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }*/
-        UIPlotSeries {
+
+        ChartView {
             id: cardiovascularSeries
             property Item requests : 
             Requests.Cardiovascular {
@@ -280,7 +266,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: drugs
             property Item requests :
             Requests.Drugs {
@@ -293,7 +279,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: endocrine
             property Item requests :
             Requests.Endocrine {
@@ -306,7 +292,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: energy
             property Item requests :
             Requests.Energy {
@@ -319,7 +305,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: gastrointestinal
             property Item requests :
             Requests.Gastrointestinal {
@@ -332,7 +318,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: hepatic
             property Item requests :
             Requests.Hepatic {
@@ -345,7 +331,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: nervous
             property Item requests :
             Requests.Nervous {
@@ -358,7 +344,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: renal
             property Item requests :
             Requests.Renal {
@@ -371,7 +357,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: respiratory
             property Item requests :
             Requests.Respiratory {
@@ -384,7 +370,7 @@ Page {
                 max : 60
             }
         }
-        UIPlotSeries {
+        ChartView {
             id: tissue
             property Item requests :
             Requests.Tissue {
@@ -407,6 +393,8 @@ Page {
     anchors.bottom: plots.bottom
     anchors.horizontalCenter: plots.horizontalCenter
 }
+
+
 
 ListModel {
    id: physiologyRequestModel
@@ -688,8 +676,9 @@ ListModel {
         ,ListElement{request:"storedFat"; active: false}
       ]
   }
+  	function createRequestSeries(){
+	}
 }
-
 }
 
 /*##^## Designer {
