@@ -812,14 +812,14 @@ void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
 {
   auto action = std::make_unique<biogears::SEHemorrhage>();
   action->SetCompartment(compartment.toStdString());
-  action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
+  action->GetInitialRate().SetValue(ml_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_asthma_action()
 {
   auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLegt");
+  action->SetCompartment("RightLeg");
   action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
@@ -827,7 +827,7 @@ void Scenario::create_asthma_action()
 void Scenario::create_substance_infusion_action()
 {
   auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLegt");
+  action->SetCompartment("RightLeg");
   action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
@@ -835,7 +835,7 @@ void Scenario::create_substance_infusion_action()
 void Scenario::create_burn_action()
 {
   auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLegt");
+  action->SetCompartment("RightLeg");
   action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
@@ -843,7 +843,7 @@ void Scenario::create_burn_action()
 void Scenario::create_infection_action()
 {
   auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLegt");
+  action->SetCompartment("RightLeg");
   action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
