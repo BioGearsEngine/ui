@@ -9,22 +9,22 @@ import "./data" as Requests
 
 Page {
     id: root
-    property alias bloodChemistry: bloodChemistrySeries
-    property alias cardiovascular: cardiovascularSeries
-    property alias drugs: drugs
-    property alias endocrine: endocrine
-    property alias energy: energy
-    property alias gastrointestinal: gastrointestinal
-    property alias hepatic: hepatic
-    property alias nervous: nervous
-    property alias renal: renal
-    property alias respiratory: respiratory
-    property alias tissue: tissue
-
+    
     property alias physiologyRequestModel : physiologyRequestModel
-	property alias bloodChemistryObjectModel : bloodChemistryObjectModel
+	property alias bloodChemistryModel : bloodChemistryObjectModel
+	property alias cardiovascularModel : cardiovascularObjectModel
+	property alias drugModel : drugObjectModel
+	property alias endocrineModel : endocrineObjectModel
+	property alias energyModel : energyObjectModel
+	property alias gastrointestinalModel : gastrointestinalObjectModel
+	property alias hepaticModel : hepaticObjectModel
+	property alias nervousModel : nervousObjectModel
+	property alias renalModel : renalObjectModel
+	property alias respiratoryModel : respiratoryObjectModel
+	property alias tissueModel : tissueObjectModel
 
-    signal filterChange(string system, string request, bool active)
+	//property alias plotObjectModel : plotObjectModel
+
     
 
     header:  RowLayout {
@@ -57,10 +57,6 @@ Page {
             Layout.preferredHeight : 40
             font.pointSize: 12
             clip:true
-			/*UITabButtonForm {
-				id: textButton
-				text: qsTr("Test")
-			}*/
             UITabButtonForm {
                 id: bloodChemistryButton
                 text: qsTr("BloodChemistry")
@@ -150,17 +146,10 @@ Page {
                                     onClicked : {
                                         physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
 										if (checked){
-											bloodChemistryObjectModel.createPlotView(model.request)
-											physiologyRequestModel.get(plots.currentIndex).activeRequests.append({"request": model.request})
+											createPlotView(plots.currentIndex, model.request)
 										} else {
-											var i = findRequestIndex(bloodChemistryObjectModel, model.request)
-											if (i != -1){
-												bloodChemistryObjectModel.remove(findRequestIndex(bloodChemistryObjectModel, model.request), 1)
-												physiologyRequestModel.get(plots.currentIndex).activeRequests.remove(i, 1)
-											}
-											
+											removePlotView(plots.currentIndex, model.request)
 										}
-										root.filterChange(physiologyRequestModel.get(plots.currentIndex).system, model.request, checked)
                                     }
                                 }
                             }
@@ -205,15 +194,10 @@ Page {
 			Layout.fillWidth: true
 			Layout.fillHeight: true
 
-			property Item requests : 
-            Requests.BloodChemistry {
-                id : bloodChemistryRequests
-            }
-
 			Rectangle {
-				id: background
+				id: bloodChemistryBackground
 				anchors.fill: parent
-				color: "steelblue"
+				color: "slategray"
 				opacity: 0.2
 			}
 
@@ -228,16 +212,16 @@ Page {
 						}
 						console.log("Error : Chart component not ready");
 					} else {
-						var chartObject = chartComponent.createObject(gridView,{"width" : gridView.cellWidth, "height" : gridView.cellHeight });
+						var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" : bloodChemistryGridView.cellHeight });
 						chartObject.setChartTitle(request);
-						root.metricUpdates.connect(chartObject.signalTest)
+						root.metricUpdates.connect(chartObject.updateSeries)
 						bloodChemistryObjectModel.append(chartObject)
 					}
 				}
 			}
 
 			GridView {
-				id: gridView
+				id: bloodChemistryGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
@@ -245,144 +229,493 @@ Page {
 				model: bloodChemistryObjectModel
 
 				ScrollBar.vertical: ScrollBar {
-                    parent: gridView.parent
-                    anchors.top: gridView.top
-                    anchors.right: gridView.right
-                    anchors.bottom: gridView.bottom
+                    parent: bloodChemistryGridView.parent
+                    anchors.top: bloodChemistryGridView.top
+                    anchors.right: bloodChemistryGridView.right
+                    anchors.bottom: bloodChemistryGridView.bottom
                 }
 			}
 		}
 
-        ChartView {
-            id: cardiovascularSeries
-            property Item requests : 
-            Requests.Cardiovascular {
-                id : cardiovascularRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: drugs
-            property Item requests :
-            Requests.Drugs {
-                id : drugRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: endocrine
-            property Item requests :
-            Requests.Endocrine {
-                id : endocrineRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: energy
-            property Item requests :
-            Requests.Energy {
-                id : energyRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: gastrointestinal
-            property Item requests :
-            Requests.Gastrointestinal {
-                id : gastrointestinalRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: hepatic
-            property Item requests :
-            Requests.Hepatic {
-                id : hepaticRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: nervous
-            property Item requests :
-            Requests.Nervous {
-                id : nervousRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: renal
-            property Item requests :
-            Requests.Renal {
-                id : renalRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: respiratory
-            property Item requests :
-            Requests.Respiratory {
-                id : respiratoryRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
-        ChartView {
-            id: tissue
-            property Item requests :
-            Requests.Tissue {
-                id : tissueRequests
-            }
-            property ValueAxis axisX : ValueAxis {
-                property int tickCount : 0
-                titleText : "Simulation Time"
-                min: 0
-                max : 60
-            }
-        }
+        Item {
+			id: cardiovascularSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: cardiovascularBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: cardiovascularObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(cardiovascularGridView,{"width" : cardiovascularGridView.cellWidth, "height" : cardiovascularGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						cardiovascularObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: cardiovascularGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: cardiovascularObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: cardiovascularGridView.parent
+                    anchors.top: cardiovascularGridView.top
+                    anchors.right: cardiovascularGridView.right
+                    anchors.bottom: cardiovascularGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: drugSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: drugBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: drugObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(drugGridView,{"width" : drugGridView.cellWidth, "height" : drugGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						drugObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: drugGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: drugObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: drugGridView.parent
+                    anchors.top: drugGridView.top
+                    anchors.right: drugGridView.right
+                    anchors.bottom: drugGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: endocrineSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: endocrineBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: endocrineObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(endocrineGridView,{"width" : endocrineGridView.cellWidth, "height" : endocrineGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						endocrineObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: endocrineGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: endocrineObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: endocrineGridView.parent
+                    anchors.top: endocrineGridView.top
+                    anchors.right: endocrineGridView.right
+                    anchors.bottom: endocrineGridView.bottom
+                }
+			}
+		}
+        
+		Item {
+			id: energySeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: energyBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: energyObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(energyGridView,{"width" : energyGridView.cellWidth, "height" : energyGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						energyObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: energyGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: energyObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: energyGridView.parent
+                    anchors.top: energyGridView.top
+                    anchors.right: energyGridView.right
+                    anchors.bottom: energyGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: gastrointestinalSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: gastrointestinalBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: gastrointestinalObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(gastrointestinalGridView,{"width" : gastrointestinalGridView.cellWidth, "height" : gastrointestinalGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						gastrointestinalObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: gastrointestinalGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: gastrointestinalObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: gastrointestinalGridView.parent
+                    anchors.top: gastrointestinalGridView.top
+                    anchors.right: gastrointestinalGridView.right
+                    anchors.bottom: gastrointestinalGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: hepaticSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: hepaticBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: hepaticObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						hepaticObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: hepaticGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: hepaticObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: hepaticGridView.parent
+                    anchors.top: hepaticGridView.top
+                    anchors.right: hepaticGridView.right
+                    anchors.bottom: hepaticGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: nervousSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: nervousBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: nervousObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						nervousObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: nervousGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: nervousObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: nervousGridView.parent
+                    anchors.top: nervousGridView.top
+                    anchors.right: nervousGridView.right
+                    anchors.bottom: nervousGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: renalSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: renalBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: renalObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						renalObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: renalGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: renalObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: renalGridView.parent
+                    anchors.top: renalGridView.top
+                    anchors.right: renalGridView.right
+                    anchors.bottom: renalGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: respiratorySeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: respiratoryBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: respiratoryObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						respiratoryObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: respiratoryGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: respiratoryObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: respiratoryGridView.parent
+                    anchors.top: respiratoryGridView.top
+                    anchors.right: respiratoryGridView.right
+                    anchors.bottom: respiratoryGridView.bottom
+                }
+			}
+		}
+
+		Item {
+			id: tissueSeries
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+			Rectangle {
+				id: tissueBackground
+				anchors.fill: parent
+				color: "slategray"
+				opacity: 0.2
+			}
+
+			ObjectModel {
+				id: tissueObjectModel
+				function createPlotView (request) {
+					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+					if ( chartComponent.status != Component.Ready){
+						if (chartComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
+						chartObject.setChartTitle(request);
+						root.metricUpdates.connect(chartObject.updateSeries)
+						tissueObjectModel.append(chartObject)
+					}
+				}
+			}
+
+			GridView {
+				id: tissueGridView
+				anchors.fill: parent
+				clip: true
+				cellWidth: plots.width / 2
+				cellHeight: plots.height / 2
+				model: tissueObjectModel
+
+				ScrollBar.vertical: ScrollBar {
+                    parent: tissueGridView.parent
+                    anchors.top: tissueGridView.top
+                    anchors.right: tissueGridView.right
+                    anchors.bottom: tissueGridView.bottom
+                }
+			}
+		}
     }
     PageIndicator {
     id: indicator
@@ -394,6 +727,39 @@ Page {
     anchors.horizontalCenter: plots.horizontalCenter
 }
 
+/*ObjectModel {
+	id: plotObjectModel
+	ObjectModel {
+		id: testBCModel
+	}
+	ObjectModel {
+		id: testCVModel
+	}
+	
+	function createPlotView (request, objectIndex) {
+		var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+		if ( chartComponent.status != Component.Ready){
+			if (chartComponent.status == Component.Error){
+				console.log("Error : " + chartComponent.errorString() );
+				return;
+			}
+			console.log("Error : Chart component not ready");
+		} else {
+			var chartObject = chartComponent.createObject(testBCModel.GridView.currentItem, {"width" : plots.itemAt(objectIndex).grid.cellWidth, "height" : plots.itemAt(objectIndex).grid.cellHeight });
+			chartObject.setChartTitle(request);
+			console.log("----"+request+"--------")
+			console.log(chartObject.parent);
+			console.log(chartObject.width);
+			console.log(chartObject.height);
+
+			root.metricUpdates.connect(chartObject.updateSeries)
+			plotObjectModel.get(objectIndex).append(chartObject)
+			//console.log(plotObjectModel.get(objectIndex).count)
+		}
+
+		
+	}
+}*/
 
 
 ListModel {
@@ -458,6 +824,7 @@ ListModel {
   }
   ListElement {
       system : "Cardiovascular"
+	  activeRequests: []
       requests:  [
         ListElement {request:"arterialPressure"; active: false}
         ,ListElement {request:"bloodVolume"; active: false}
@@ -492,6 +859,7 @@ ListModel {
   }
   ListElement {
       system : "Drugs"
+	  activeRequests: []
       requests:  [
         ListElement {request:"bronchodilationLevel"; active: true}
         ,ListElement {request:"heartRateChange"; active: true}
@@ -508,6 +876,7 @@ ListModel {
   }
   ListElement {
       system : "Endocrine"
+	  activeRequests: []
       requests:  [
          ListElement {request:"insulinSynthesisRate"; active: true}
         ,ListElement {request:"glucagonSynthesisRate"; active: false}
@@ -515,6 +884,7 @@ ListModel {
   }
   ListElement {
       system : "Energy"
+	  activeRequests: []
       requests:  [
         ListElement {request:"achievedExerciseLevel"; active: false}
         ,ListElement {request:"chlorideLostToSweat"; active: false}
@@ -533,6 +903,7 @@ ListModel {
   }
   ListElement {
       system: "Gastrointestinal"
+	  activeRequests: []
       requests: [
         ListElement {request:"chymeAbsorptionRate"; active: false}
         ,ListElement {request:"stomachContents_calcium"; active: true}
@@ -548,6 +919,7 @@ ListModel {
   }
   ListElement {
       system: "Hepatic"
+	  activeRequests: []
       requests: [
         ListElement {request:"ketoneproductionRate"; active : true}
         ,ListElement {request:"hepaticGluconeogenesisRate"; active : false}
@@ -555,6 +927,7 @@ ListModel {
   }
   ListElement {
       system : "Nervous"
+	  activeRequests: []
       requests: [
         ListElement {request: "baroreceptorHeartRateScale"; active: false}
         ,ListElement {request: "baroreceptorHeartElastanceScale"; active: false}
@@ -569,6 +942,7 @@ ListModel {
   }
   ListElement {
       system : "Renal"
+	  activeRequests: []
       requests: [
         ListElement{request:"glomerularFiltrationRate"; active: false}
         ,ListElement{request:"filtrationFraction"; active: false}
@@ -629,6 +1003,7 @@ ListModel {
   }
   ListElement{
       system : "Respiratory"
+	  activeRequests: []
       requests:[
         ListElement{request:"alveolarArterialGradient"; active: false}
         ,ListElement{request:"carricoIndex"; active: false}
@@ -654,6 +1029,7 @@ ListModel {
   }
   ListElement{
       system:"Tissue"
+	  activeRequests: []
       requests:[
          ListElement{request:"carbonDioxideProductionRate"; active: true}
         ,ListElement{request:"dehydrationFraction"; active: true}
@@ -676,8 +1052,6 @@ ListModel {
         ,ListElement{request:"storedFat"; active: false}
       ]
   }
-  	function createRequestSeries(){
-	}
 }
 }
 

@@ -6,11 +6,14 @@ import QtCharts 2.3
 ChartView {
     id: root
 	legend.visible : false
+	theme : ChartView.ChartThemeBlueCerulean
+	
+
 
 	ValueAxis {
 		id: xAxis
 		property int tickCount : 0
-		titleText : "Simulation Time (min)"
+		titleText : "Simulation Time (s)"
 		min: 0
 		max : 60
 	}
@@ -39,22 +42,33 @@ ChartView {
 		yAxis.titleText = name
 	}
 
-	function signalTest(metrics){
-		var time = metrics.simulationTime
-		var prop = metrics[root.title]
-		//console.log(time + "," + prop);
-		lSeries.append(time, prop)
-		//console.log(lSeries.at(0))
-		++xAxis.tickCount
+	function updateSeries(metrics){
+		var time = metrics.simulationTime;
+		var prop = metrics[root.title];
+		lSeries.append(time, prop);
+		updateDomain()
 		updateYScale(prop)
+	}
+
+	function updateDomain(){
+		++xAxis.tickCount;
+		const interval = 60 * 5
+		if(xAxis.tickCount > interval){
+			xAxis.min = xAxis.tickCount - interval;
+			xAxis.max = xAxis.tickCount;
+		} else {
+			xAxis.min = 0
+			xAxis.max=interval
+		}
+
 	}
 
 	function updateYScale(newY){
 		if (newY < lSeries._minY){
-			lSeries._minY = Math.floor(newY)
+			lSeries._minY = Math.floor(0.9 * newY);
 		}
 		if (newY > lSeries._maxY){
-			lSeries._maxY = Math.ceil(newY)
+			lSeries._maxY = Math.ceil(1.1 * newY);
 		}
 	}
 
