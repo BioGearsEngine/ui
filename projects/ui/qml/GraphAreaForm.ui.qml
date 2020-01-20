@@ -854,7 +854,7 @@ ListModel {
         ,ListElement {request:"pulmonaryVascularResistanceIndex"; active: false}
         ,ListElement {request:"pulsePressure"; active: false}
         ,ListElement {request:"systemicVascularResistance"; active: false}
-        ,ListElement {request:"systolicArterialPressure  "; active: true}
+        ,ListElement {request:"systolicArterialPressure"; active: true}
       ]
   }
   ListElement {

@@ -13,9 +13,9 @@ ChartView {
 	ValueAxis {
 		id: xAxis
 		property int tickCount : 0
-		titleText : "Simulation Time (s)"
+		titleText : "Simulation Time (min)"
 		min: 0
-		max : 60
+		max : 10
 	}
 	ValueAxis {
 		id: yAxis
@@ -44,7 +44,7 @@ ChartView {
 	}
 
 	function updateSeries(metrics){
-		var time = metrics.simulationTime;
+		var time = metrics.simulationTime / 60;
 		var prop = metrics[root.title];
 		lSeries.append(time, prop);
 		updateDomain()
@@ -55,11 +55,11 @@ ChartView {
 		++xAxis.tickCount;
 		const interval_s = 60 * root.windowWidth_min
 		if(xAxis.tickCount > interval_s){
-			xAxis.min = xAxis.tickCount - interval_s;
-			xAxis.max = xAxis.tickCount;
+			xAxis.min = (xAxis.tickCount - interval_s) / 60;
+			xAxis.max = xAxis.tickCount / 60
 		} else {
 			xAxis.min = 0
-			xAxis.max=interval_s
+			xAxis.max=interval_s / 60
 		}
 
 	}
