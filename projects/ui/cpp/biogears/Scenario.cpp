@@ -551,7 +551,7 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   current->plasmaVolume = (_plasmaVolume) ? _plasmaVolume->GetValue() : 0.0;
   current->pulseOximetry = (_pulseOximetry) ? _pulseOximetry->GetValue() : 0.0;
   current->redBloodCellAcetylcholinesterase = (_redBloodCellAcetylcholinesterase) ? _redBloodCellAcetylcholinesterase->GetValue() : 0.0;
-  current->redBloodCellCount = (_redBloodCellCount) ? _redBloodCellCount->GetValue() : 0.0;
+  current->redBloodCellCount = (_redBloodCellCount) ? _redBloodCellCount->GetValue(biogears::AmountPerVolumeUnit::ct_Per_uL) : 0.0;
   current->shuntFraction = (_shuntFraction) ? _shuntFraction->GetValue() : 0.0;
   current->strongIonDifference = (_strongIonDifference) ? _strongIonDifference->GetValue() : 0.0;
   current->totalBilirubin = (_totalBilirubin) ? _totalBilirubin->GetValue() : 0.0;
