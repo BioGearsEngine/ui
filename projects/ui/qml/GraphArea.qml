@@ -120,61 +120,6 @@ GraphAreaForm {
     }
   }
 
-  function newPointHandler(series,pointIndex) {
-      const MAX_INTERVAL = 3600
-      var start = ( series.count < MAX_INTERVAL ) ? 0 : series.count - MAX_INTERVAL;
-
-      if ( !series.min || !series.max)  {
-        series.min = series.at(series.count-1).y
-        series.max = series.at(series.count-1).y
-        series.min_count = 0
-        series.max_count = 0
-      }
-
-      //New Poiunts
-      if ( series.at(series.count-1).y < series.min) {
-         series.min = series.at(series.count-1).y
-         series.min_count = 1
-      } else if ( series.at(series.count-1).y ==  series.min) {
-          series.min_count += 1
-      }
-
-      if ( series.at(series.count-1).y > series.max) {
-         series.max = series.at(series.count-1).y
-         series.max_count = 1
-      } else if ( series.at(series.count-1).y ==  series.max) {
-          series.max_count += 1
-      }
-      //Deleting Points
-      if ( series.at(start).y == series.min && series.count > MAX_INTERVAL ) {
-         series.min_count -= 1
-         if ( series.min_count == 0 ) {
-          series.min = series.at(start - 1).y
-         }
-      }
-      if ( series.at(start).y == series.max && series.count > MAX_INTERVAL ) {
-         series.max_count -= 1
-         if (series.max_count == 0 ) {
-           series.max = series.at(series.count - 2 ).y
-         }
-      }
-      
-      series.axisY.min = (series.min == -1.0 || series.min == 0.0 ) ? series.min : series.min * 0.9
-      series.axisY.max = (series.max == 1.0 ) ? series.max :series.max * 1.1
-  }
-
-
-  function updateDomain(axisX) {
-    axisX.tickCount = axisX.tickCount + 1;
-    const interval =  60 * 15
-    if ( axisX.tickCount > interval ){
-      axisX.min = axisX.tickCount - interval
-      axisX.max = axisX.tickCount
-    } else {
-      axisX.min = 0
-      axisX.max = interval
-    }
-  }
 
   //This function is specific to searching physiology request lists for an element with a "request" field that matches the input
   //We can look to generalize this to other fields if/when needed

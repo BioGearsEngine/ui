@@ -218,6 +218,11 @@ Page {
 						bloodChemistryObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < bloodChemistryObjectModel.count; ++i){
+						bloodChemistryObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -227,6 +232,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: bloodChemistryObjectModel
+
+				onCellWidthChanged : {
+					bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: bloodChemistryGridView.parent
@@ -266,6 +278,11 @@ Page {
 						cardiovascularObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < cardiovascularObjectModel.count; ++i){
+						cardiovascularObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -275,6 +292,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: cardiovascularObjectModel
+
+				onCellWidthChanged : {
+					cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: cardiovascularGridView.parent
@@ -314,6 +338,11 @@ Page {
 						drugObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < drugObjectModel.count; ++i){
+						drugObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -323,6 +352,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: drugObjectModel
+
+				onCellWidthChanged : {
+					drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: drugGridView.parent
@@ -362,6 +398,11 @@ Page {
 						endocrineObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < endocrineObjectModel.count; ++i){
+						endocrineObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -371,6 +412,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: endocrineObjectModel
+
+				onCellWidthChanged : {
+					endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: endocrineGridView.parent
@@ -410,6 +458,11 @@ Page {
 						energyObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < energyObjectModel.count; ++i){
+						energyObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -419,6 +472,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: energyObjectModel
+
+				onCellWidthChanged : {
+					energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: energyGridView.parent
@@ -458,6 +518,11 @@ Page {
 						gastrointestinalObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < gastrointestinalObjectModel.count; ++i){
+						gastrointestinalObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -467,6 +532,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: gastrointestinalObjectModel
+
+				onCellWidthChanged : {
+					gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: gastrointestinalGridView.parent
@@ -506,6 +578,11 @@ Page {
 						hepaticObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < hepaticObjectModel.count; ++i){
+						hepaticObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -515,6 +592,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: hepaticObjectModel
+
+				onCellWidthChanged : {
+					hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: hepaticGridView.parent
@@ -554,6 +638,11 @@ Page {
 						nervousObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < nervousObjectModel.count; ++i){
+						nervousObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -563,6 +652,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: nervousObjectModel
+
+				onCellWidthChanged : {
+					nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: nervousGridView.parent
@@ -602,6 +698,11 @@ Page {
 						renalObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < renalObjectModel.count; ++i){
+						renalObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -611,6 +712,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: renalObjectModel
+
+				onCellWidthChanged : {
+					renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: renalGridView.parent
@@ -650,6 +758,11 @@ Page {
 						respiratoryObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < respiratoryObjectModel.count; ++i){
+						respiratoryObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -659,6 +772,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: respiratoryObjectModel
+
+				onCellWidthChanged : {
+					respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: respiratoryGridView.parent
@@ -698,6 +818,11 @@ Page {
 						tissueObjectModel.append(chartObject)
 					}
 				}
+				function resizePlots(newWidth, newHeight){
+					for (var i = 0; i < tissueObjectModel.count; ++i){
+						tissueObjectModel.get(i).resizePlot(newWidth, newHeight);
+					}
+				}
 			}
 
 			GridView {
@@ -707,6 +832,13 @@ Page {
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: tissueObjectModel
+
+				onCellWidthChanged : {
+					tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
+				}
+				onCellHeightChanged : {
+					tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
+				}
 
 				ScrollBar.vertical: ScrollBar {
                     parent: tissueGridView.parent

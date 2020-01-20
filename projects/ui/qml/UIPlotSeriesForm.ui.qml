@@ -7,7 +7,7 @@ ChartView {
     id: root
 	legend.visible : false
 	theme : ChartView.ChartThemeBlueCerulean
-	property int windowWidth_min : 10
+	property int windowWidth_min : 1
 
 
 	ValueAxis {
@@ -47,24 +47,23 @@ ChartView {
 		var time = metrics.simulationTime / 60;
 		var prop = metrics[root.title];
 		lSeries.append(time, prop);
-		updateDomain()
-		updateYScale(prop)
+		updateDomainAndRange(prop)
 	}
 
-	function updateDomain(){
+	function updateDomainAndRange(){
 		++xAxis.tickCount;
 		const interval_s = 60 * root.windowWidth_min
+		//Domain
 		if(xAxis.tickCount > interval_s){
 			xAxis.min = (xAxis.tickCount - interval_s) / 60;
 			xAxis.max = xAxis.tickCount / 60
+			//Remove first point, which will always be just outside (to left) of viewing window after updating domain
+			lSeries.remove(0)
 		} else {
 			xAxis.min = 0
 			xAxis.max=interval_s / 60
 		}
-
-	}
-
-	function updateYScale(newY){
+		//Range
 		if (newY < lSeries._minY){
 			lSeries._minY = Math.floor(0.9 * newY);
 		}
@@ -73,6 +72,10 @@ ChartView {
 		}
 	}
 
+	function resizePlot(newWidth, newHeight){
+		root.width = newWidth
+		root.height = newHeight
+	}
 }
 
 /*##^## Designer {
