@@ -213,7 +213,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" : bloodChemistryGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						bloodChemistryObjectModel.append(chartObject)
 					}
@@ -261,7 +261,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(cardiovascularGridView,{"width" : cardiovascularGridView.cellWidth, "height" : cardiovascularGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						cardiovascularObjectModel.append(chartObject)
 					}
@@ -309,7 +309,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(drugGridView,{"width" : drugGridView.cellWidth, "height" : drugGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						drugObjectModel.append(chartObject)
 					}
@@ -357,7 +357,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(endocrineGridView,{"width" : endocrineGridView.cellWidth, "height" : endocrineGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						endocrineObjectModel.append(chartObject)
 					}
@@ -405,7 +405,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(energyGridView,{"width" : energyGridView.cellWidth, "height" : energyGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						energyObjectModel.append(chartObject)
 					}
@@ -453,7 +453,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(gastrointestinalGridView,{"width" : gastrointestinalGridView.cellWidth, "height" : gastrointestinalGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						gastrointestinalObjectModel.append(chartObject)
 					}
@@ -501,7 +501,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						hepaticObjectModel.append(chartObject)
 					}
@@ -549,7 +549,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						nervousObjectModel.append(chartObject)
 					}
@@ -597,7 +597,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						renalObjectModel.append(chartObject)
 					}
@@ -645,7 +645,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						respiratoryObjectModel.append(chartObject)
 					}
@@ -693,7 +693,7 @@ Page {
 						console.log("Error : Chart component not ready");
 					} else {
 						var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
-						chartObject.setChartTitle(request);
+						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						tissueObjectModel.append(chartObject)
 					}
@@ -746,7 +746,7 @@ Page {
 			console.log("Error : Chart component not ready");
 		} else {
 			var chartObject = chartComponent.createObject(testBCModel.GridView.currentItem, {"width" : plots.itemAt(objectIndex).grid.cellWidth, "height" : plots.itemAt(objectIndex).grid.cellHeight });
-			chartObject.setChartTitle(request);
+			chartObject.initializeChart(request, root.tickCount);
 			console.log("----"+request+"--------")
 			console.log(chartObject.parent);
 			console.log(chartObject.width);

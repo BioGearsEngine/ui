@@ -7,7 +7,7 @@ ChartView {
     id: root
 	legend.visible : false
 	theme : ChartView.ChartThemeBlueCerulean
-	
+	property int windowWidth_min : 10
 
 
 	ValueAxis {
@@ -33,8 +33,9 @@ ChartView {
 		property int _maxY : 1
 	}
 
-	function setChartTitle (title) {
+	function initializeChart (title, tickCount) {
 		root.title = title
+		xAxis.tickCount = tickCount
 		setYAxisName(title)
 	}
 
@@ -52,13 +53,13 @@ ChartView {
 
 	function updateDomain(){
 		++xAxis.tickCount;
-		const interval = 60 * 5
-		if(xAxis.tickCount > interval){
-			xAxis.min = xAxis.tickCount - interval;
+		const interval_s = 60 * root.windowWidth_min
+		if(xAxis.tickCount > interval_s){
+			xAxis.min = xAxis.tickCount - interval_s;
 			xAxis.max = xAxis.tickCount;
 		} else {
 			xAxis.min = 0
-			xAxis.max=interval
+			xAxis.max=interval_s
 		}
 
 	}

@@ -16,6 +16,7 @@ GraphAreaForm {
 
   property double count_1 : 0.0
   property double count_2 : 0.0
+  property int tickCount : -1
 
   onStart : {
     console.log("GraphAreaForm " + "start")
@@ -30,6 +31,7 @@ GraphAreaForm {
   }
 
   onMetricUpdates: {
+	++tickCount;
   }
 
   onStateUpdates: {
