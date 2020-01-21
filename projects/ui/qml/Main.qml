@@ -30,8 +30,8 @@ ApplicationWindow {
         controls.onPauseClicked: {
             graphArea.pause()
         }
-        controls.onStopClicked: {
-            graphArea.stop()
+        controls.onRestartClicked: {
+            graphArea.restart()
         }
     }
 

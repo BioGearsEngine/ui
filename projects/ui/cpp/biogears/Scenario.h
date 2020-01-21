@@ -54,6 +54,9 @@ public:
 
   Q_INVOKABLE double get_simulation_time();
 
+  Q_INVOKABLE void restart();
+  Q_INVOKABLE bool pause_play();
+  Q_INVOKABLE void speed_toggle(int speed);
   Q_INVOKABLE void run() final;
   Q_INVOKABLE void stop() final;
   Q_INVOKABLE void join() final;
@@ -89,6 +92,7 @@ private:
   Channel _action_queue;
 
   std::atomic<bool> _running;
+  std::atomic<bool> _paused;
   std::atomic<bool> _throttle;
 
   std::vector<std::pair<biogears::SEScalar const *, std::string>> _data_requests;

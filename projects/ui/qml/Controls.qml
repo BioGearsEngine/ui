@@ -4,15 +4,18 @@ import com.biogearsengine.ui.scenario 1.0
 
 ControlsForm {
     id: root
+    signal restartClicked()
     signal pauseClicked()
     signal playClicked()
-    signal stopClicked()
+    signal speedToggled(int speed)
 
     signal patientMetricsChanged(PatientMetrics metrics )
     signal patientStateChanged(PatientState patientState )
     signal patientConditionsChanged(PatientConditions conditions )
 
-    property alias running : advanceTimer.running
+    property bool running : false
+    property bool paused : false
+    property int speed  :1
     property Scenario scenario : biogears_scenario
     patientBox.scenario : biogears_scenario
 
@@ -26,7 +29,18 @@ ControlsForm {
                 root.oxygenSaturation.value      = metrics.OxygenSaturation
                 root.systolicBloodPressure.value = metrics.SystolicBloodPressure
                 root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
+                
+
+                var seconds = metrics.SimulationTime % 60
+                var minutes = Math.floor(metrics.SimulationTime / 60) % 60
+                var hours   = Math.floor(metrics.SimulationTime / 3600)
+
+                seconds = (seconds<60) ? "0%1".arg(seconds) : "%1".arg(seconds)
+                minutes = (minutes<60) ? "0%1".arg(minutes) : "%1".arg(minutes)
+
+                playback.simulationTime = "%1:%2:%3".arg(hours).arg(minutes).arg(seconds)
                 root.patientMetricsChanged(metrics)
+                
             }
         }
         onPatientStateChanged: {
@@ -45,19 +59,30 @@ ControlsForm {
             root.patientConditionsChanged(conditions)
         }
     }
+    playback.onRestartClicked: {
+            console.log("Restarting BioGears")
+            biogears_scenario.restart()
+            root.stopClicked()
+        } 
     playback.onPauseClicked: {
-        root.pauseClicked()
         console.log("Pausing BioGears")
-        root.running = false
+        if(root.running)
+        {
+            root.paused = biogears_scenario.pause_play()
+        }
+        root.pauseClicked()
     }
     playback.onPlayClicked: {
-        root.playClicked()
-        root.running = true
         console.log("Starting BioGears")
+        biogears_scenario.run()
+        root.running = true;
+        root.playClicked()
     }
-    playback.onStopClicked: {
-        root.stopClicked()
-        console.log("Stoping BioGears")
+    playback.onRateToggleClicked: {
+        console.log("Setting BioGears run rate to %1".arg(speed))
+        biogears_scenario.speed_toggle(speed)
+        root.speedToggled(speed)
+        root.speed = speed
     } 
     action_1.onPressed:{
         console.log("Hemorrhage Stop") 
@@ -83,69 +108,7 @@ ControlsForm {
     action_7.onPressed:{
         console.log("Mild Infection") 
     }
-    Timer {
-      id: advanceTimer
-      interval: 1000; running: false; repeat: true
-      onTriggered: biogears_scenario.step()
-    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*##^## Designer {
     D{i:0;autoSize:true;height:600;width:300}

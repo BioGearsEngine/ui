@@ -511,8 +511,8 @@ private:
   Q_PROPERTY(QString SystolicBloodPressure MEMBER systolic_blood_pressure_mmHg)
   Q_PROPERTY(QString DiastolicBloodPressure MEMBER diastolic_blood_pressure_mmHg)
 
-  Q_PROPERTY(double simulationTime MEMBER simulationTime)
-  Q_PROPERTY(double timeStep MEMBER timeStep)
+  Q_PROPERTY(double SimulationTime MEMBER simulationTime)
+  Q_PROPERTY(double TimeStep MEMBER timeStep)
 
   Q_PROPERTY(double arterialBloodPH MEMBER arterialBloodPH)
   Q_PROPERTY(double arterialBloodPHBaseline MEMBER arterialBloodPHBaseline)

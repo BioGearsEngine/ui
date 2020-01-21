@@ -6,7 +6,7 @@ import com.biogearsengine.ui.scenario 1.0
 
 GraphAreaForm {
   signal start()
-  signal stop()
+  signal restart()
   signal pause()
 
   signal metricUpdates(PatientMetrics metrics)
@@ -22,8 +22,8 @@ GraphAreaForm {
     console.log("GraphAreaForm " + "start")
   }
 
-  onStop : {
-    console.log("GraphAreaForm " + "stop")
+  onRestart : {
+    console.log("GraphAreaForm " + "restart")
   }
 
   onPause: {

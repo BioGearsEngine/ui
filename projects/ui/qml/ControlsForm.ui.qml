@@ -29,6 +29,7 @@ ColumnLayout {
     property alias oxygenSaturation : physiology.oxygenSaturation
     property alias condition : physiology.condition
 
+
     property alias playback : playback_controls
     property alias action_1 : action_1
     property alias action_2 : action_2

@@ -36,6 +36,7 @@ Scenario::Scenario(QString name, QObject* parent)
   , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
   , _action_queue()
   , _running(false)
+  , _paused(true)
   , _throttle(true)
 {
   _engine->GetPatient().SetName(name.toStdString());
@@ -43,8 +44,38 @@ Scenario::Scenario(QString name, QObject* parent)
 //-------------------------------------------------------------------------------
 Scenario::~Scenario()
 {
+  stop();
   if (_thread.joinable()) {
     _thread.join();
+  }
+}
+//-------------------------------------------------------------------------------
+void Scenario::restart()
+{
+  _running = true;
+  _paused = false;
+  _throttle = true;
+  //TODO: Reload Initial Patient State setting simulation to 0s
+}
+//-------------------------------------------------------------------------------
+bool Scenario::pause_play()
+{
+  //TODO: Reload Initial Patient State setting simulation to 0s
+  _paused = !_paused;
+  return _paused;
+}
+//-------------------------------------------------------------------------------
+void Scenario::speed_toggle(int speed)
+{
+  switch (speed) {
+  case 0:
+  case 1:
+    _throttle = true;
+    break;
+  case 2:
+  default:
+    _throttle = false;
+    break;
   }
 }
 //-------------------------------------------------------------------------------
@@ -52,16 +83,24 @@ void Scenario::run()
 {
   if (!_thread.joinable() && !_running) {
     _running = true;
+    _paused = false;
+    _throttle = true;
     _thread = std::thread(&Scenario::physiology_thread_main, this);
   }
 }
 //-----------------   --------------------------------------------------------------
 void Scenario::stop()
 {
+  _running = false;
+  _paused = true;
+  _throttle = false;
 }
 //-------------------------------------------------------------------------------
 void Scenario::join()
 {
+  if (_thread.joinable()) {
+    _thread.join();
+  }
 }
 //-------------------------------------------------------------------------------
 void Scenario::step()
@@ -452,11 +491,13 @@ void Scenario::physiology_thread_main()
   using namespace std::chrono_literals;
 
   auto current_time = std::chrono::steady_clock::now();
-  auto prev = current_time;
+  std::chrono::time_point<std::chrono::steady_clock> prev;
   while (_running) {
-    step();
+    prev = current_time;
+    physiology_thread_step();
+    current_time = std::chrono::steady_clock::now();
     if (_throttle) {
-      while ((current_time - prev) > 1s) {
+      while ((current_time - prev) < 1s) {
         std::this_thread::sleep_for(16ms);
         current_time = std::chrono::steady_clock::now();
       }
@@ -467,6 +508,7 @@ void Scenario::physiology_thread_main()
 inline void Scenario::physiology_thread_step()
 {
   using namespace std::chrono_literals;
+  if (!_paused) {
   if (_action_queue.size()) {
     dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
   }
@@ -475,6 +517,10 @@ inline void Scenario::physiology_thread_step()
   emit patientStateChanged(get_physiology_state());
   emit patientMetricsChanged(get_physiology_metrics());
   emit patientConditionsChanged(get_physiology_conditions());
+
+  } else {
+    std::this_thread::sleep_for(16ms);
+  }
 }
 //---------------------------------------------------------------------------------
 auto Scenario::get_physiology_state() -> PatientState

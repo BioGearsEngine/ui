@@ -25,6 +25,10 @@
         <file alias="prev.png">img/prev.png</file>
         <file alias="foward.png">img/foward.png</file>
         <file alias="reverse.png">img/reverse.png</file>
+        <file alias="reset.png">img/reset.png</file>
+        <file alias="clock-realtime.png">img/clock-realtime.png</file>
+        <file alias="clock-2x.png">img/clock-2x.png</file>
+        <file alias="clock-max.png">img/clock-max.png</file>
         <file alias="help.svg">img/icon-round-question_mark.svg</file>
         <file alias="help.png">img/question.png</file>
         <file alias="menu.png">img/menu.png</file>
