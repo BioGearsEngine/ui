@@ -7,9 +7,11 @@ ChartView {
     id: root
 	legend.visible : false
 	theme : ChartView.ChartThemeBlueCerulean
+	titleFont.pointSize : 12
+	titleFont.bold : true
+
 	property int windowWidth_min : 1
 	property string requestName : ""
-
 
 	ValueAxis {
 		id: xAxis

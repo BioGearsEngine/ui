@@ -13,15 +13,15 @@ Rectangle {
     Rectangle {
         anchors.fill : parent
         id:backgroundRect
-        color: "steelblue"
-        border.color: "steelblue"
-        opacity: enabled ? 1.0 : 0.3
+        color: "#1A5276"
+        border.color: "#1A5276"
 
         Text {
         id:content
         anchors.centerIn : parent
         text: root.text
-        font: Qt.application.font
+        //font: Qt.application.font
+		font.pointSize : 20
         color: "white"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

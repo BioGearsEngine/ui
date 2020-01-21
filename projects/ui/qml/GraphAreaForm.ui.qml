@@ -59,7 +59,7 @@ Page {
             clip:true
             UITabButtonForm {
                 id: bloodChemistryButton
-                text: qsTr("BloodChemistry")
+                text: qsTr("Blood Chemistry")
             }
             UITabButtonForm {
                 id: cardiovascularButton
@@ -197,8 +197,7 @@ Page {
 			Rectangle {
 				id: bloodChemistryBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -212,7 +211,7 @@ Page {
 						}
 						console.log("Error : Chart component not ready");
 					} else {
-						var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" : bloodChemistryGridView.cellHeight });
+						var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" :  bloodChemistryGridView.cellHeight });
 						chartObject.initializeChart(request, root.tickCount);
 						root.metricUpdates.connect(chartObject.updateSeries)
 						bloodChemistryObjectModel.append(chartObject)
@@ -257,8 +256,7 @@ Page {
 			Rectangle {
 				id: cardiovascularBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -317,8 +315,7 @@ Page {
 			Rectangle {
 				id: drugBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -377,8 +374,7 @@ Page {
 			Rectangle {
 				id: endocrineBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -437,8 +433,7 @@ Page {
 			Rectangle {
 				id: energyBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -497,8 +492,7 @@ Page {
 			Rectangle {
 				id: gastrointestinalBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -557,8 +551,7 @@ Page {
 			Rectangle {
 				id: hepaticBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -617,8 +610,7 @@ Page {
 			Rectangle {
 				id: nervousBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -677,8 +669,7 @@ Page {
 			Rectangle {
 				id: renalBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -737,8 +728,7 @@ Page {
 			Rectangle {
 				id: respiratoryBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -797,8 +787,7 @@ Page {
 			Rectangle {
 				id: tissueBackground
 				anchors.fill: parent
-				color: "slategray"
-				opacity: 0.2
+				color: "#7CB342"
 			}
 
 			ObjectModel {
@@ -858,41 +847,6 @@ Page {
     anchors.bottom: plots.bottom
     anchors.horizontalCenter: plots.horizontalCenter
 }
-
-/*ObjectModel {
-	id: plotObjectModel
-	ObjectModel {
-		id: testBCModel
-	}
-	ObjectModel {
-		id: testCVModel
-	}
-	
-	function createPlotView (request, objectIndex) {
-		var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-		if ( chartComponent.status != Component.Ready){
-			if (chartComponent.status == Component.Error){
-				console.log("Error : " + chartComponent.errorString() );
-				return;
-			}
-			console.log("Error : Chart component not ready");
-		} else {
-			var chartObject = chartComponent.createObject(testBCModel.GridView.currentItem, {"width" : plots.itemAt(objectIndex).grid.cellWidth, "height" : plots.itemAt(objectIndex).grid.cellHeight });
-			chartObject.initializeChart(request, root.tickCount);
-			console.log("----"+request+"--------")
-			console.log(chartObject.parent);
-			console.log(chartObject.width);
-			console.log(chartObject.height);
-
-			root.metricUpdates.connect(chartObject.updateSeries)
-			plotObjectModel.get(objectIndex).append(chartObject)
-			//console.log(plotObjectModel.get(objectIndex).count)
-		}
-
-		
-	}
-}*/
-
 
 ListModel {
    id: physiologyRequestModel
