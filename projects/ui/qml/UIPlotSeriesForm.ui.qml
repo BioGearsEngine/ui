@@ -8,6 +8,7 @@ ChartView {
 	legend.visible : false
 	theme : ChartView.ChartThemeBlueCerulean
 	property int windowWidth_min : 1
+	property string requestName : ""
 
 
 	ValueAxis {
@@ -33,24 +34,31 @@ ChartView {
 		property int _maxY : 1
 	}
 
-	function initializeChart (title, tickCount) {
-		root.title = title
+	function initializeChart (request, tickCount) {
 		xAxis.tickCount = tickCount
-		setYAxisName(title)
+		setPlotTitle(request)
+		root.requestName = request
+		yAxis.titleText = "Unit Placeholder"
 	}
 
-	function setYAxisName(name){
-		yAxis.titleText = name
+	function setPlotTitle(title){
+		//Function assumes that input title is camel case (i.e. arterialBloodPH)
+		//Expression ([a-z])([A-Z]) searches for lower case letter followed by upper case (this way, something like "PH" isn't split into "P H").  
+		//Parenthesis around each range capture the value in string, which we can call using $ syntax.  '$1 $2' means put a space between the first captured value (lower) and second captured value (upper)
+		var plotTitle = title.replace(/([a-z])([A-Z])/g, '$1 $2')
+		//Next, make sure that first character is upper case.  ^[a-z] specifies that we are only looking at leading character.
+		plotTitle = plotTitle.replace(/^[a-z]/, u=>u.toUpperCase());
+		root.title = plotTitle
 	}
 
 	function updateSeries(metrics){
 		var time = metrics.simulationTime / 60;
-		var prop = metrics[root.title];
+		var prop = metrics[root.requestName];
 		lSeries.append(time, prop);
 		updateDomainAndRange(prop)
 	}
 
-	function updateDomainAndRange(){
+	function updateDomainAndRange(newY){
 		++xAxis.tickCount;
 		const interval_s = 60 * root.windowWidth_min
 		//Domain
