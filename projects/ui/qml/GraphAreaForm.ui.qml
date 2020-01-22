@@ -5,8 +5,6 @@ import QtQuick.Layouts 1.3
 import QtCharts 2.3
 import QtQml.Models 2.2
 
-import "./data" as Requests
-
 Page {
     id: root
     

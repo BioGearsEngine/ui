@@ -46,7 +46,7 @@ ColumnLayout {
 
     UIPatientBox {
         id: patientBox
-        label: "Scenario"
+        label: "Patient"
         Layout.alignment: Qt.AlignHCenter
     }
 
@@ -176,6 +176,16 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
+        Button {
+            id : testWinOpen
+            text : 'New Window'
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 100
+            onClicked : {
+                var win = Qt.createQmlObject('import QtQuick.Window 2.12; Window {height : 20; width : 20}', root, "TestWin");
+                win.show()
+            }
+         } 
     }
 }
 
