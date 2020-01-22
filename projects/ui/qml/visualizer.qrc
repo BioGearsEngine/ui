@@ -34,17 +34,4 @@
         <file alias="menu.png">img/menu.png</file>
         <file alias="biogears_logo.png">img/biogears_logo_400_400.png</file>
     </qresource>
-      <qresource prefix="/data">
-        <file alias="BloodChemistry.qml">data/BloodChemistry.qml</file>
-        <file alias="Cardiovascular.qml">data/Cardiovascular.qml</file>
-        <file alias="Drugs.qml">data/Drugs.qml</file>
-        <file alias="Endocrine.qml">data/Endocrine.qml</file>
-        <file alias="Energy.qml">data/Energy.qml</file>
-        <file alias="Gastrointestinal.qml">data/Gastrointestinal.qml</file>
-        <file alias="Hepatic.qml">data/Hepatic.qml</file>
-        <file alias="Nervous.qml">data/Nervous.qml</file>
-        <file alias="Renal.qml">data/Renal.qml</file>
-        <file alias="Respiratory.qml">data/Respiratory.qml</file>
-        <file alias="Tissue.qml">data/Tissue.qml</file>
-    </qresource>
 </RCC>
