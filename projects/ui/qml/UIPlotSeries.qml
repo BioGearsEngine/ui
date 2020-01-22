@@ -27,7 +27,7 @@ UIPlotSeriesForm {
 
 	//Gets simulation time and physiology data request from patient metrics, appending new point to series
 	function updateSeries(metrics){
-		var time = metrics.simulationTime / 60;
+		var time = metrics.SimulationTime / 60;
 		var prop = metrics[root.requestName];
 		lSeries.append(time, prop);
 		updateDomainAndRange(prop)
