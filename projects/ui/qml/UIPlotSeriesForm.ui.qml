@@ -10,8 +10,9 @@ ChartView {
 	titleFont.pointSize : 12
 	titleFont.bold : true
 
-	property int windowWidth_min : 1
-	property string requestName : ""
+	property alias xAxis : xAxis
+	property alias yAxis : yAxis
+	property alias lSeries : lSeries
 
 	ValueAxis {
 		id: xAxis
@@ -36,7 +37,7 @@ ChartView {
 		property int _maxY : 1
 	}
 
-	function initializeChart (request, tickCount) {
+	/*function initializeChart (request, tickCount) {
 		xAxis.tickCount = tickCount
 		setPlotTitle(request)
 		root.requestName = request
@@ -85,7 +86,7 @@ ChartView {
 	function resizePlot(newWidth, newHeight){
 		root.width = newWidth
 		root.height = newHeight
-	}
+	}*/
 }
 
 /*##^## Designer {

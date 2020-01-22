@@ -126,7 +126,7 @@ GraphAreaForm {
   function findRequestIndex(list, request){
 	var index = -1;
 	for (var i = 0; i < list.count; ++i){
-		if (list.get(i).title == request){
+		if (list.get(i).requestName == request){
 			index = i;
 			break;
 		}
