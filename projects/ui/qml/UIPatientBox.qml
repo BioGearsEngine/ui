@@ -8,11 +8,18 @@ UIComboBoxForm {
     property alias label :root.label
     property Scenario scenario
 
+    signal patientFolderReady()
+
     FolderListModel {
         id: folderModel
         nameFilters: ["*.xml"]
         folder: "file:states"
         showDirs : false
+        onStatusChanged : {
+            if (folderModel.status == FolderListModel.Ready){
+                root.patientFolderReady();
+            }
+        }
     }
 
     comboBox.contentItem: Text {
@@ -24,7 +31,7 @@ UIComboBoxForm {
 
     comboBox.model: folderModel
     comboBox.displayText: comboBox.model.status == FolderListModel.Ready ? comboBox.model.get(comboBox.currentIndex,'fileName').split('@')[0] : "Not loaded"
-    comboBox.currentIndex: 0
+    comboBox.currentIndex: 4  //Corresponds to DefaultMale
     comboBox.delegate: ItemDelegate {
         width: comboBox.width
         contentItem: Text {
@@ -45,6 +52,9 @@ UIComboBoxForm {
     }
     onScenarioChanged: {
 
+    }
+    onPatientFolderReady:{
+        scenario.load_patient(comboBox.model.get(comboBox.currentIndex,'fileName'));
     }
 }
 

@@ -23,8 +23,6 @@ Page {
 
 	//property alias plotObjectModel : plotObjectModel
 
-    
-
     header:  RowLayout {
         id: headerBar
         Layout.fillWidth : true
