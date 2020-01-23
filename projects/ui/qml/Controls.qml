@@ -94,7 +94,7 @@ ControlsForm {
     } 
     action_3.onPressed:{
         console.log("Hemorrhage Extreme") 
-        biogears_scenario.create_hemorrhage_action("LeftArm",100.0);
+        biogears_scenario.create_hemorrhage_action("Aorta",250.0);
     } 
     action_4.onPressed:{
         console.log("ASthma Attack") 

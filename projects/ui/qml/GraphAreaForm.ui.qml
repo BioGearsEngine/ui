@@ -850,7 +850,7 @@ ListModel {
       system : "BloodChemistry"
 	  activeRequests: [ ]
       requests:  [
-          ListElement {request:"arterialBloodPH"; active: true;}
+          ListElement {request:"arterialBloodPH"; active: true}
          ,ListElement {request:"arterialBloodPHBaseline"; active: false}
          ,ListElement {request:"bloodDensity"; active: false}
          ,ListElement {request:"bloodSpecificHeat"; active: false}
@@ -915,7 +915,7 @@ ListModel {
         ,ListElement {request:"centralVenousPressure"; active: false}
         ,ListElement {request:"cerebralBloodFlow"; active: false}
         ,ListElement {request:"cerebralPerfusionPressure"; active: false}
-        ,ListElement {request:"diastolicArterialPressure"; active: true}
+        ,ListElement {request:"bloodPressure"; active: true}
         ,ListElement {request:"heartEjectionFraction"; active: false}
         ,ListElement {request:"heartRate"; active: false}
         ,ListElement {request:"heartStrokeVolume"; active: false}
@@ -936,7 +936,7 @@ ListModel {
         ,ListElement {request:"pulmonaryVascularResistanceIndex"; active: false}
         ,ListElement {request:"pulsePressure"; active: false}
         ,ListElement {request:"systemicVascularResistance"; active: false}
-        ,ListElement {request:"systolicArterialPressure"; active: true}
+        //,ListElement {request:"systolicArterialPressure"; active: true}
       ]
   }
   ListElement {

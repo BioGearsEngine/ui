@@ -1,18 +1,19 @@
 import QtQuick 2.12
-
+import QtCharts 2.3
 
 UIPlotSeriesForm {
 	id: root
 
-	property int windowWidth_min : 1
+	property int windowWidth_min : 10
 	property string requestName : ""
 
 	//Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
 	function initializeChart (request, tickCount) {
-		xAxis.tickCount = tickCount
-		setPlotTitle(request)
-		root.requestName = request
-		yAxis.titleText = "Unit Placeholder"
+		var series = root.createSeries(ChartView.SeriesTypeLine, request, xAxis, yAxis);
+		xAxis.tickCount = tickCount;
+		setPlotTitle(request);
+		root.requestName = request;
+		yAxis.titleText = "Unit Placeholder";
 	}
 
 	//Takes request name (in camel case) and converts to normal format, e.g. systolicArterialPressure -> Systolic Arterial Pressure
@@ -29,7 +30,7 @@ UIPlotSeriesForm {
 	function updateSeries(metrics){
 		var time = metrics.SimulationTime / 60;
 		var prop = metrics[root.requestName];
-		lSeries.append(time, prop);
+		root.series(root.requestName).append(time,prop)
 		updateDomainAndRange(prop)
 	}
 
@@ -46,16 +47,16 @@ UIPlotSeriesForm {
 			xAxis.max=interval_s / 60
 		}
 		//Range
-		if (newY < lSeries._minY){
-			lSeries._minY = Math.floor(0.9 * newY);
+		if (newY < yAxis.min){
+			yAxis.min = Math.floor(0.9 * newY);
 		}
-		if (newY > lSeries._maxY){
-			lSeries._maxY = Math.ceil(1.1 * newY);
+		if (newY > yAxis.max){
+			yAxis.max = Math.ceil(1.1 * newY);
 		}
 		//If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always
 		//be the one just outside the viewing area.  Note that we can't use tickCount for this or else we graphs that start later in simulation would have points removed almost immediately
-		if (lSeries.count > interval_s){
-			lSeries.remove(0)
+		if (root.series(0).count > interval_s){
+			root.series(0).remove(0)
 		}
 	}
 
