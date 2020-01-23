@@ -8,17 +8,22 @@ UIComboBoxForm {
     property alias label :root.label
     property Scenario scenario
 
-
-
     FolderListModel {
         id: folderModel
         nameFilters: ["*.xml"]
         folder: "file:states"
         showDirs : false
-        }
+    }
+
+    comboBox.contentItem: Text {
+        text: comboBox.displayText
+        font: comboBox.font
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+    }
 
     comboBox.model: folderModel
-    comboBox.textRole: 'fileName'
+    comboBox.displayText: comboBox.model.status == FolderListModel.Ready ? comboBox.model.get(comboBox.currentIndex,'fileName').split('@')[0] : "Not loaded"
     comboBox.currentIndex: 0
     comboBox.delegate: ItemDelegate {
         width: comboBox.width
@@ -33,10 +38,10 @@ UIComboBoxForm {
         highlighted: comboBox.highlightedIndex === index
     }
     comboBox.onAccepted:  {
-        scenario.load_patient(comboBox.currentText);
+        scenario.load_patient(comboBox.model.get(comboBox.currentIndex,'fileName'));
     }
     comboBox.onActivated:  {
-        scenario.load_patient(comboBox.currentText);
+        scenario.load_patient(comboBox.model.get(comboBox.currentIndex,'fileName'));
     }
     onScenarioChanged: {
 
