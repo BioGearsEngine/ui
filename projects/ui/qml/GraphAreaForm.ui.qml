@@ -142,7 +142,7 @@ Page {
                                     onClicked : {
                                         physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
 										if (checked){
-											createPlotView(plots.currentIndex, model.request)
+											createPlotView(plots.currentIndex, model)
 										} else {
 											removePlotView(plots.currentIndex, model.request)
 										}
@@ -844,6 +844,7 @@ Page {
     anchors.horizontalCenter: plots.horizontalCenter
 }
 
+
 ListModel {
    id: physiologyRequestModel
    ListElement {
@@ -915,7 +916,8 @@ ListModel {
         ,ListElement {request:"centralVenousPressure"; active: false}
         ,ListElement {request:"cerebralBloodFlow"; active: false}
         ,ListElement {request:"cerebralPerfusionPressure"; active: false}
-        ,ListElement {request:"bloodPressure"; active: true}
+        ,ListElement {request:"bloodPressure"; active: true;
+			subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
         ,ListElement {request:"heartEjectionFraction"; active: false}
         ,ListElement {request:"heartRate"; active: false}
         ,ListElement {request:"heartStrokeVolume"; active: false}
@@ -936,7 +938,6 @@ ListModel {
         ,ListElement {request:"pulmonaryVascularResistanceIndex"; active: false}
         ,ListElement {request:"pulsePressure"; active: false}
         ,ListElement {request:"systemicVascularResistance"; active: false}
-        //,ListElement {request:"systolicArterialPressure"; active: true}
       ]
   }
   ListElement {

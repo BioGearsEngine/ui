@@ -45,77 +45,77 @@ GraphAreaForm {
     for ( var i = 0; i < bloodChemistryReq.count ; ++i){
       if (bloodChemistryReq.get(i).active){
 		physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistryReq.get(i).request})
-		bloodChemistryModel.createPlotView(bloodChemistryReq.get(i).request)
+		bloodChemistryModel.createPlotView(bloodChemistryReq.get(i))
 		}
     }
     var cardiovascularReq = physiologyRequestModel.get(1).requests
     for ( var i = 0; i < cardiovascularReq.count; ++i){
       if( cardiovascularReq.get(i).active){
 		physiologyRequestModel.get(1).activeRequests.append({"request": cardiovascularReq.get(i).request})
-		cardiovascularModel.createPlotView(cardiovascularReq.get(i).request)
+		cardiovascularModel.createPlotView(cardiovascularReq.get(i))
 		}
     }
     var drugReq = physiologyRequestModel.get(2).requests
     for ( var i = 0; i < drugReq.count; ++i){
       if( drugReq.get(i).active){
 		physiologyRequestModel.get(2).activeRequests.append({"request": drugReq.get(i).request})
-		drugModel.createPlotView(drugReq.get(i).request)
+		drugModel.createPlotView(drugReq.get(i))
 		}
     }
     var endocrineReq = physiologyRequestModel.get(3).requests
     for ( var i = 0; i < endocrineReq.count ; ++i){
       if(endocrineReq.get(i).active){
 		physiologyRequestModel.get(3).activeRequests.append({"request": endocrineReq.get(i).request})
-		endocrineModel.createPlotView(endocrineReq.get(i).request)
+		endocrineModel.createPlotView(endocrineReq.get(i))
 		}
     }
     var energyReq = physiologyRequestModel.get(4).requests
     for ( var i = 0; i < energyReq.count ; ++i){
       if(energyReq.get(i).active){
 		physiologyRequestModel.get(4).activeRequests.append({"request": energyReq.get(i).request})
-		energyModel.createPlotView(energyReq.get(i).request)
+		energyModel.createPlotView(energyReq.get(i))
 		}  
     }
     var gastrointestinalReq = physiologyRequestModel.get(5).requests
     for ( var i = 0; i < gastrointestinalReq.count ; ++i){
       if( gastrointestinalReq.get(i).active){
 		physiologyRequestModel.get(5).activeRequests.append({"request": gastrointestinalReq.get(i).request})
-		gastrointestinalModel.createPlotView(gastrointestinalReq.get(i).request)
+		gastrointestinalModel.createPlotView(gastrointestinalReq.get(i))
 		}     
     }
     var hepaticReq = physiologyRequestModel.get(6).requests
     for ( var i = 0; i < hepaticReq.count ; ++i){
       if(hepaticReq.get(i).active){
 		physiologyRequestModel.get(6).activeRequests.append({"request": hepaticReq.get(i).request})
-		hepaticModel.createPlotView(hepaticReq.get(i).request)
+		hepaticModel.createPlotView(hepaticReq.get(i))
 		}
     }
     var nervousReq = physiologyRequestModel.get(7).requests
     for ( var i = 0; i < nervousReq.count; ++i){
       if( nervousReq.get(i).active){
 		physiologyRequestModel.get(7).activeRequests.append({"request": nervousReq.get(i).request})
-		nervousModel.createPlotView(nervousReq.get(i).request)
+		nervousModel.createPlotView(nervousReq.get(i))
 		} 
     }
     var renalReq = physiologyRequestModel.get(8).requests
     for ( var i = 0; i < renalReq.count ; ++i){
       if(renalReq.get(i).active){
 		physiologyRequestModel.get(8).activeRequests.append({"request": renalReq.get(i).request})
-		renalModel.createPlotView(renalReq.get(i).request)
+		renalModel.createPlotView(renalReq.get(i))
 		} 
     }
     var respiratoryReq = physiologyRequestModel.get(9).requests
     for ( var i = 0; i < respiratoryReq.count ; ++i){
       if(respiratoryReq.get(i).active){
 		physiologyRequestModel.get(9).activeRequests.append({"request": respiratoryReq.get(i).request})
-		respiratoryModel.createPlotView(respiratoryReq.get(i).request)
+		respiratoryModel.createPlotView(respiratoryReq.get(i))
 		}
     }
     var tissueReq = physiologyRequestModel.get(10).requests
     for ( var i = 0; i < tissueReq.count ; ++i){
       if(tissueReq.get(i).active){
 		physiologyRequestModel.get(10).activeRequests.append({"request": tissueReq.get(i).request})
-		tissueModel.createPlotView(tissueReq.get(i).request)
+		tissueModel.createPlotView(tissueReq.get(i))
 		}
     }
   }
