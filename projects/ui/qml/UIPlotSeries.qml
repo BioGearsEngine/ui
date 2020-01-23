@@ -41,8 +41,6 @@ UIPlotSeriesForm {
 		if(xAxis.tickCount > interval_s){
 			xAxis.min = (xAxis.tickCount - interval_s) / 60;
 			xAxis.max = xAxis.tickCount / 60
-			//Remove first point, which will always be just outside (to left) of viewing window after updating domain
-			lSeries.remove(0)
 		} else {
 			xAxis.min = 0
 			xAxis.max=interval_s / 60
@@ -53,6 +51,11 @@ UIPlotSeriesForm {
 		}
 		if (newY > lSeries._maxY){
 			lSeries._maxY = Math.ceil(1.1 * newY);
+		}
+		//If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always
+		//be the one just outside the viewing area.  Note that we can't use tickCount for this or else we graphs that start later in simulation would have points removed almost immediately
+		if (lSeries.count > interval_s){
+			lSeries.remove(0)
 		}
 	}
 
