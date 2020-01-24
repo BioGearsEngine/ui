@@ -36,7 +36,7 @@ UIPlotSeriesForm {
 		return formatted
 	}
 
-	//Gets simulation time and physiology data request from patient metrics, appending new point to series
+	//Gets simulation time and physiology data request from patient metrics, appending new point to each series
 	function updateSeries(metrics){
 		var time = metrics.SimulationTime / 60;
 		var prop;
@@ -44,7 +44,7 @@ UIPlotSeriesForm {
 			for (var i = 0; i < root.count; ++i){
 				var subRequest = root.requestNames[i]
 				prop = metrics[subRequest]
-				//Need to grab the formatted request since sub-series use it so as to make the legend labels look good.  Could loop through by index number, but this seems safer
+				//Need to grab the formatted request since sub-series use that version to make the legend labels look good.  Could loop through by index number, but this seems safer
 				root.series(formatRequest(subRequest)).append(time,prop)
 			}
 		} else {
@@ -52,11 +52,11 @@ UIPlotSeriesForm {
 			root.series(root.requestNames[0]).append(time,prop)
 		}
 
-		updateDomainAndRange(prop)
+		updateDomainAndRange()
 	}
 
 	//Moves x-axis range if new data point is out of specified windowWidth and removes points no longer in visible range.  Update yAxis range according to min/max y-values
-	function updateDomainAndRange(newY){
+	function updateDomainAndRange(){
 		++xAxis.tickCount;
 		const interval_s = 60 * root.windowWidth_min
 		//Domain
@@ -67,16 +67,13 @@ UIPlotSeriesForm {
 			xAxis.min = 0
 			xAxis.max=interval_s / 60
 		}
-		//Range
-		if (newY < yAxis.min){
-			yAxis.min = Math.floor(0.9 * newY);
-		}
-		if (newY > yAxis.max){
-			yAxis.max = Math.ceil(1.1 * newY);
-		}
-		//If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always
-		//be the one just outside the viewing area.  Note that we can't use tickCount for this or else we graphs that start later in simulation would have points removed almost immediately
+		//Range -- loop over series in the event that there are multiple defined for a chart
 		for (var i = 0; i < root.count; ++i){
+			var newY = root.series(i).at(root.series(i).count-1).y
+			yAxis.min = Math.min(yAxis.min, Math.floor(0.9 * newY))
+			yAxis.max = Math.max(yAxis.max, Math.ceil(1.1 * newY))
+			//If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always
+			//be the one just outside the viewing area.  Note that we can't use tickCount for this or else we graphs that start later in simulation would have points removed almost immediately
 			if (root.series(i).count > interval_s){
 				root.series(i).remove(0)
 			}

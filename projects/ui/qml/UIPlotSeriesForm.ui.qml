@@ -22,6 +22,7 @@ ChartView {
 	}
 	ValueAxis {
 		id: yAxis
+		min: 0
 		labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
 	}
 
