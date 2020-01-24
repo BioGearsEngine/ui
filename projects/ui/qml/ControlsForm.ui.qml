@@ -182,7 +182,21 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
             onClicked : {
-                var win = Qt.createQmlObject('import QtQuick.Window 2.12; Window {height : 20; width : 20}', root, "TestWin");
+                var win = Qt.createQmlObject('import QtQuick.Window 2.12; Window {}', root, "TestWin");
+                win.height = root.parent.height //Makes the window the height of the full app window, not just this column layout
+                win.width = root.width
+                win.title = "BioGears Action Menu"
+                //Unlike most items, a new Window's position is defined relative to Screen, and not its parent
+                //The mapTo functions take the coordinates of "this" and converts them relative to the given item (for mapToItem)
+                //and the Screen (for mapToGlobal).  I think "this" (in this instance) refers to the testWinOpen button, since the 
+                //onClicked signal belongs to it.  In any case, comparing the global coordinates of this item to its coordinates relative
+                //to the root column layout gives us the coordinates of the upper left corner of the column layout.  We then substract 
+                //the window width to move it over left so that its right edge aligns with the main app window.  When (if) we make 
+                //a separate file to implement this window (e.g. UIActionWindow.qml), we'll probably need to revisit this
+                var itemCoor = mapToItem(root, x, y)
+                var globalCoor = mapToGlobal(x, y)
+                win.x = globalCoor.x - itemCoor.x - win.width
+                win.y = globalCoor.y - itemCoor.y
                 win.show()
             }
          } 
