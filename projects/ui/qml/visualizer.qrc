@@ -16,6 +16,8 @@
         <file>UIPlotSeries.qml</file>
         <file>UIPlotSeriesForm.ui.qml</file>
         <file>UITabButtonForm.ui.qml</file>
+        <file>UIActionExplorer.qml</file>
+        <file>UIActionExplorerForm.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
