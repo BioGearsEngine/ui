@@ -111,28 +111,27 @@ ControlsForm {
         console.log("Mild Infection") 
     }
     explorer.onClicked : {
-                //var win = Qt.createQmlObject('import QtQuick.Window 2.12; Window {}', root, "TestWin");
-                //win.height = root.parent.height //Makes the window the height of the full app window, not just this column layout
-                //win.width = root.width
-                //win.title = "BioGears Action Menu"
-                if(!actionMenuVisible){
-                root.actionMenuVisible = true
-                var itemCoor = explorer.mapToItem(root, x, y)
-                var globalCoor = explorer.mapToGlobal(x, y)
-                var windowX = globalCoor.x - itemCoor.x - root.width
-                var windowY = globalCoor.y - itemCoor.y
+        if(!actionMenuVisible){
+            root.actionMenuVisible = true
+            var itemCoor = explorer.mapToItem(root, x, y)
+            var globalCoor = explorer.mapToGlobal(x, y)
+            var windowX = globalCoor.x - itemCoor.x - root.width
+            var windowY = globalCoor.y - itemCoor.y
 
-                var winComponent = Qt.createComponent("UIActionExplorer.qml")
+            var winComponent = Qt.createComponent("UIActionExplorer.qml")
+            if (winComponent.status != Component.Ready){
+				if (winComponent.status == Component.Error){
+					console.log("Error : " + winComponent.errorString() );
+					return;
+				}
+				console.log("Error : Action menu not ready");
+            }
+            else {
                 var explorerWin = winComponent.createObject(root, {"x" : windowX, "y" : windowY, "height" : root.parent.height, "width" : root.width})
-                //Unlike most items, a new Window's position is defined relative to Screen, and not its parent
-                //The mapTo functions take the coordinates of "this" (explorer button) and converts them relative to the given item 
-                //(for mapToItem)and the Screen (for mapToGlobal).  We then substract the window width to move it over left so that
-                //its right edge aligns with the main app window.  When (if) we make a separate file to implement this window 
-                //(e.g. UIActionWindow.qml), we'll probably need to revisit this
                 explorerWin.onClosing.connect(root.actionMenuClosed)
                 explorerWin.show()
-
-                }
+            }
+        }
     }
     onActionMenuClosed : {
         actionMenuVisible = false
