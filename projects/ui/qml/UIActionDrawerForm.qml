@@ -1,12 +1,15 @@
 import QtQuick.Controls 2.12
 import QtQuick 2.12
 import QtQuick.Controls.Material 2.12
-import QtQuick.Window 2.12
 
-Window {
-    //property alias actionMenuModel : actionMenuModel
+Drawer {
+    width : parent.width * 0.2
+    height : parent.height
+    edge : Qt.LeftEdge
+    interactive : true
+    position : 0
 
-   ListView {
+    ListView {
         anchors.fill : parent
         clip : true
         model : actionMenuModel
@@ -39,6 +42,7 @@ Window {
         ListElement { name : "Exercise"; section : "Patient Actions"}
         ListElement { name : "ConsumeMeal"; section : "Patient Actions"}
         ListElement { name : "Hemorrhage"; section : "Insults"}
+        ListElement { name : "PainStimulus"; section : "Insults"}
         ListElement { name : "TensionPneumothorax"; section : "Insults"}
         ListElement { name : "Sepsis"; section : "Insults"}
         ListElement { name : "AsthmaAttack"; section : "Insults"}
@@ -57,7 +61,7 @@ Window {
 
     }
 
-}
+    }
 
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

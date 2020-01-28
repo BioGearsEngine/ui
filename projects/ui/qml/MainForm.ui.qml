@@ -14,7 +14,11 @@ GridLayout {
     property alias controls : controls
     property alias graphArea: graphArea
     property alias consoleArea : consoleArea
+    property alias actionDrawer : actionDrawer
 
+    UIActionDrawer {
+        id: actionDrawer
+    }
     Controls {
         id: controls
         Layout.fillWidth: false

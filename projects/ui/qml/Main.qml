@@ -33,6 +33,9 @@ ApplicationWindow {
         controls.onRestartClicked: {
             graphArea.restart()
         }
+        controls.onDrawerOpenClosed: {
+            actionDrawer.toggleState();
+        }
     }
 
     Info {

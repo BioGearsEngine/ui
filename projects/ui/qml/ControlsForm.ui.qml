@@ -38,7 +38,7 @@ ColumnLayout {
     property alias action_5 : action_5
     property alias action_6 : action_6
     property alias action_7 : action_7
-    property alias explorer : actionExplorer
+    property alias drawerToggle : drawerToggle
 
     Row {
         height: 10
@@ -178,7 +178,7 @@ ColumnLayout {
             Layout.preferredWidth: 100
         }
         Button {
-            id : actionExplorer
+            id : drawerToggle
             text : 'Action Explorer'
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100

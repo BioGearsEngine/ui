@@ -12,11 +12,10 @@ ControlsForm {
     signal patientMetricsChanged(PatientMetrics metrics )
     signal patientStateChanged(PatientState patientState )
     signal patientConditionsChanged(PatientConditions conditions )
-    signal actionMenuClosed()
+    signal drawerOpenClosed()
 
     property bool running : false
     property bool paused : false
-    property bool actionMenuVisible : false
     property int speed  :1
     property Scenario scenario : biogears_scenario
     patientBox.scenario : biogears_scenario
@@ -110,32 +109,10 @@ ControlsForm {
     action_7.onPressed:{
         console.log("Mild Infection") 
     }
-    explorer.onClicked : {
-        if(!actionMenuVisible){
-            root.actionMenuVisible = true
-            var itemCoor = explorer.mapToItem(root, x, y)
-            var globalCoor = explorer.mapToGlobal(x, y)
-            var windowX = globalCoor.x - itemCoor.x - root.width
-            var windowY = globalCoor.y - itemCoor.y
-
-            var winComponent = Qt.createComponent("UIActionExplorer.qml")
-            if (winComponent.status != Component.Ready){
-				if (winComponent.status == Component.Error){
-					console.log("Error : " + winComponent.errorString() );
-					return;
-				}
-				console.log("Error : Action menu not ready");
-            }
-            else {
-                var explorerWin = winComponent.createObject(root, {"x" : windowX, "y" : windowY, "height" : root.parent.height, "width" : root.width})
-                explorerWin.onClosing.connect(root.actionMenuClosed)
-                explorerWin.show()
-            }
-        }
+    drawerToggle.onPressed : {
+        root.drawerOpenClosed();
     }
-    onActionMenuClosed : {
-        actionMenuVisible = false
-    }
+    
 }
 
 /*##^## Designer {
