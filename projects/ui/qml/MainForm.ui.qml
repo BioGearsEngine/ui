@@ -18,12 +18,14 @@ GridLayout {
 
     UIActionDrawer {
         id: actionDrawer
+        scenario : root.scenario
     }
     Controls {
         id: controls
         Layout.fillWidth: false
         Layout.alignment: Qt.AlignTop
         Layout.fillHeight: false
+        Layout.rowSpan : 2
 
         onPatientMetricsChanged : {
             graphArea.metricUpdates(metrics)
@@ -38,16 +40,14 @@ GridLayout {
 
     GraphArea {
         id: graphArea
-
+        Layout.preferredHeight:100
         Layout.fillHeight: true
         Layout.fillWidth: true
     }
     TextArea {
         id:consoleArea
-        Layout.columnSpan: 2
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.preferredHeight: 200
     }
 
 }

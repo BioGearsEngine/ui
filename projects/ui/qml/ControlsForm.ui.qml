@@ -32,12 +32,12 @@ ColumnLayout {
 
     property alias playback : playback_controls
     property alias action_1 : action_1
-    property alias action_2 : action_2
+    //property alias action_2 : action_2
     property alias action_3 : action_3
-    property alias action_4 : action_4
-    property alias action_5 : action_5
-    property alias action_6 : action_6
-    property alias action_7 : action_7
+    //property alias action_4 : action_4
+    //property alias action_5 : action_5
+    //property alias action_6 : action_6
+    //property alias action_7 : action_7
     property alias drawerToggle : drawerToggle
 
     Row {
@@ -135,13 +135,13 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
-        Button {
+        /*Button {
             id : action_2
             text: 'Hemorrhage Mild '
             font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
-        }
+        }*/
         Button {
             id : action_3
             text: 'Hemorrhage Extreme'
@@ -149,7 +149,7 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
-        Button {
+        /*Button {
             id : action_4
             text: 'Asthma Attack'
             font.pixelSize: Qt.application.font.pixelSize * 0.8
@@ -176,7 +176,7 @@ ColumnLayout {
             font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
-        }
+        }*/
         Button {
             id : drawerToggle
             text : 'Action Explorer'

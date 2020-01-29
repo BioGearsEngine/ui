@@ -87,17 +87,17 @@ ControlsForm {
     } 
     action_1.onPressed:{
         console.log("Hemorrhage Stop") 
-        biogears_scenario.create_hemorrhage_action("LeftArm",0.0);
+        biogears_scenario.create_hemorrhage_action("Aorta",0.0);
     } 
-    action_2.onPressed:{
+    /*action_2.onPressed:{
         console.log("Hemorrhage Mild")
         biogears_scenario.create_hemorrhage_action("LeftArm",5.0);
-    } 
+    } */
     action_3.onPressed:{
         console.log("Hemorrhage Extreme") 
         biogears_scenario.create_hemorrhage_action("Aorta",250.0);
     } 
-    action_4.onPressed:{
+    /*action_4.onPressed:{
         console.log("ASthma Attack") 
     } 
     action_5.onPressed:{
@@ -108,7 +108,7 @@ ControlsForm {
     } 
     action_7.onPressed:{
         console.log("Mild Infection") 
-    }
+    }*/
     drawerToggle.onPressed : {
         root.drawerOpenClosed();
     }
