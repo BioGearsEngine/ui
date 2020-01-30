@@ -19,6 +19,7 @@ GridLayout {
     UIActionDrawer {
         id: actionDrawer
         scenario : root.scenario
+        controls : root.controls
     }
     Controls {
         id: controls

@@ -2,6 +2,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick 2.12
 import QtQuick.Controls.Material 2.12
+import QtQml.Models 2.2
 
 import com.biogearsengine.ui.scenario 1.0
 
@@ -31,9 +32,9 @@ ColumnLayout {
 
 
     property alias playback : playback_controls
-    property alias action_1 : action_1
+    //property alias action_1 : action_1
     //property alias action_2 : action_2
-    property alias action_3 : action_3
+   // property alias action_3 : action_3
     //property alias action_4 : action_4
     //property alias action_5 : action_5
     //property alias action_6 : action_6
@@ -124,7 +125,37 @@ ColumnLayout {
         Layout.fillWidth: true
     }
 
-    GridLayout {
+    Button {
+            id : drawerToggle
+            text : 'Action Explorer'
+            Layout.preferredWidth: root.width
+            Layout.alignment: Qt.AlignHCenter
+     }
+
+     /*Item {
+        id : actionButtonWrapper
+        Layout.preferredWidth : root.width
+        Layout.preferredHeight : 0.5 * root.parent.height
+
+        GridView {
+            id : actionButtonView
+            anchors.fill : parent
+            cellWidth : parent.width / 2.5
+            cellHeight : 5
+        }
+        ObjectModel {
+            id : actionButtonModel
+            function addButton() {
+                var actionButton = Qt.createQmlObject('import QtQuick.Controls 2.12; Button {text : "Hemorrhage Test"; width: 15; height:10}', controls, 'ActionButton');
+		        actionButton.clicked.connect(actionMenuModel.get(index).func);
+                actionButtonModel.append(actionButton);
+            }
+        }
+     }*/
+
+
+
+    /*GridLayout {
         Layout.preferredWidth: parent.width
         Layout.fillWidth: true
         columns: 2
@@ -135,13 +166,13 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
-        /*Button {
+        Button {
             id : action_2
             text: 'Hemorrhage Mild '
             font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
-        }*/
+        }
         Button {
             id : action_3
             text: 'Hemorrhage Extreme'
@@ -149,7 +180,7 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
         }
-        /*Button {
+        Button {
             id : action_4
             text: 'Asthma Attack'
             font.pixelSize: Qt.application.font.pixelSize * 0.8
@@ -176,14 +207,9 @@ ColumnLayout {
             font.pixelSize: Qt.application.font.pixelSize * 0.8
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 100
-        }*/
-        Button {
-            id : drawerToggle
-            text : 'Action Explorer'
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-         } 
-    }
+        }
+        
+    }*/
 }
 
 /*##^## Designer {

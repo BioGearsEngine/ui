@@ -7,6 +7,7 @@ import com.biogearsengine.ui.scenario 1.0
 
 Drawer {
     property alias applyButton : applyButton
+    property alias actionMenuModel : actionMenuModel
     width : parent.width * 0.2
     height : parent.height
     edge : Qt.LeftEdge
@@ -65,10 +66,10 @@ Drawer {
                     MouseArea {
                         anchors.fill : parent
                         onClicked : {
-                            console.log(index, name)
-                            actionListView.currentIndex = index
+                            actionListView.currentIndex = index;
                             if (model.inUse == "false"){
                                 model.inUse ="true";
+                                root.makeButton(index)
                             }
                             else {
                                 model.inUse = "false"
@@ -77,7 +78,7 @@ Drawer {
                     }
                     Keys.onReturnPressed : {
                         if (root.opened ){
-                            console.log(index, name)
+                            func(name);
                             if (model.inUse == "false"){
                                 model.inUse ="true";
                             }
@@ -91,25 +92,25 @@ Drawer {
 
             ListModel {
                 id : actionMenuModel
-                ListElement { name : "Exercise"; inUse: "false"; section : "Patient Actions"}
-                ListElement { name : "ConsumeMeal"; inUse: "false"; section : "Patient Actions"}
-                ListElement { name : "Hemorrhage"; inUse: "false"; section : "Insults"}
-                ListElement { name : "PainStimulus"; inUse: "false"; section : "Insults"}
-                ListElement { name : "TensionPneumothorax"; inUse: "false"; section : "Insults"}
-                ListElement { name : "Sepsis"; inUse: "false"; section : "Insults"}
-                ListElement { name : "AsthmaAttack"; inUse: "false"; section : "Insults"}
-                ListElement { name : "AirwayObstruction"; inUse: "false"; section : "Insults"}
-                ListElement { name : "TraumaticBrainInjury"; inUse: "false"; section : "Insults"}
-                ListElement { name : "Bronchoconstriction"; inUse: "false"; section : "Insults" }
-                ListElement { name : "AcuteStress"; inUse: "false"; section : "Insults"}
-                ListElement { name : "DrugAdministration"; inUse: "false"; section : "Interventions"}
-                ListElement { name : "NeedleDecompression"; inUse: "false"; section : "Interventions"}
-                ListElement { name : "Inhaler"; inUse: "false"; section : "Interventions" }
-                ListElement { name : "AnesthesiaMachine"; inUse: "false"; section : "Interventions"}
-                ListElement { name : "Transfusion"; inUse: "false"; section : "Interventions"}
-                ListElement { name : "Diabetes (Type 1)"; inUse: "false"; section : "Conditions"}
-                ListElement { name : "Diabetes (Type 2)"; inUse: "false"; section : "Conditions"}
-                ListElement { name : "Bronchitis"; inUse: "false"; section : "Conditions"}
+                ListElement { name : "Exercise"; inUse: "false"; section : "Patient Actions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "ConsumeMeal"; inUse: "false"; section : "Patient Actions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Hemorrhage"; inUse: "false"; section : "Insults"; property var func : function() {scenario.create_hemorrhage_action("RightArm", 100.0)}}
+                ListElement { name : "PainStimulus"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "TensionPneumothorax"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Sepsis"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "AsthmaAttack"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "AirwayObstruction"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "TraumaticBrainInjury"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Bronchoconstriction"; inUse: "false"; section : "Insults" ; property var func : function(name) {console.log(name)}}
+                ListElement { name : "AcuteStress"; inUse: "false"; section : "Insults"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "DrugAdministration"; inUse: "false"; section : "Interventions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "NeedleDecompression"; inUse: "false"; section : "Interventions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Inhaler"; inUse: "false"; section : "Interventions" ; property var func : function(name) {console.log(name)}}
+                ListElement { name : "AnesthesiaMachine"; inUse: "false"; section : "Interventions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Transfusion"; inUse: "false"; section : "Interventions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Diabetes (Type 1)"; inUse: "false"; section : "Conditions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Diabetes (Type 2)"; inUse: "false"; section : "Conditions"; property var func : function(name) {console.log(name)}}
+                ListElement { name : "Bronchitis"; inUse: "false"; section : "Conditions"; property var func : function(name) {console.log(name)}}
             }
         }
         Button {
