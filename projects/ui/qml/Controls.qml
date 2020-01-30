@@ -18,6 +18,7 @@ ControlsForm {
     property bool paused : false
     property int speed  :1
     property Scenario scenario : biogears_scenario
+    property ObjectModel actionModel : actionButtonModel
     patientBox.scenario : biogears_scenario
 
     Scenario {
@@ -60,6 +61,25 @@ ControlsForm {
             root.patientConditionsChanged(conditions)
         }
     }
+
+    ObjectModel {
+            id : actionButtonModel
+            function addButton(menuElement) {
+                var actionComponent = Qt.createComponent("UIActionButton.qml");
+					if ( actionComponent.status != Component.Ready){
+						if (actionComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
+						actionObject.actionClicked.connect(menuElement.func);
+						actionButtonModel.append(actionObject);
+					}
+            }
+        }
+
     playback.onRestartClicked: {
             console.log("Restarting BioGears")
             biogears_scenario.restart()
@@ -85,30 +105,6 @@ ControlsForm {
         root.speedToggled(speed)
         root.speed = speed
     } 
-    /*action_1.onPressed:{
-        console.log("Hemorrhage Stop") 
-        biogears_scenario.create_hemorrhage_action("Aorta",0.0);
-    } 
-    action_2.onPressed:{
-        console.log("Hemorrhage Mild")
-        biogears_scenario.create_hemorrhage_action("LeftArm",5.0);
-    } 
-    action_3.onPressed:{
-        console.log("Hemorrhage Extreme") 
-        biogears_scenario.create_hemorrhage_action("Aorta",250.0);
-    } 
-    action_4.onPressed:{
-        console.log("Asthma Attack") 
-    } 
-    action_5.onPressed:{
-        console.log("Morphine Drip") 
-    } 
-    action_6.onPressed:{
-        console.log("Burn Patient 25%") 
-    } 
-    action_7.onPressed:{
-        console.log("Mild Infection") 
-    }*/
     drawerToggle.onPressed : {
         root.drawerOpenClosed();
     }

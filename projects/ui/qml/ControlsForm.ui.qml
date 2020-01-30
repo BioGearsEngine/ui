@@ -12,7 +12,6 @@ ColumnLayout {
     Layout.preferredHeight: implicitHeight
     Layout.preferredWidth: implicitWidth
 
-    property ObjectModel actionModel : actionButtonModel
     property alias patientBox: patientBox
     property alias age_yr: age
     property alias gender: gender
@@ -33,6 +32,7 @@ ColumnLayout {
 
     property alias playback : playback_controls
     property alias drawerToggle : drawerToggle
+    property alias actionButtonView : actionButtonView
 
     Row {
         height: 10
@@ -137,25 +137,7 @@ ColumnLayout {
             anchors.fill : parent
             cellWidth : root.width / 2
             cellHeight : 60
-            model : actionButtonModel
-        }
-
-        ObjectModel {
-            id : actionButtonModel
-            function addButton(menuElement) {
-                var actionComponent = Qt.createComponent("UIActionButton.qml");
-					if ( actionComponent.status != Component.Ready){
-						if (actionComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
-						actionObject.actionClicked.connect(menuElement.func);
-						actionButtonModel.append(actionObject);
-					}
-            }
+            model : actionButtonModel  //Defined in Controls.qml
         }
      }
 }
