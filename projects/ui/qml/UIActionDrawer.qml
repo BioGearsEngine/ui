@@ -11,8 +11,23 @@ UIActionDrawerForm {
 	property Controls controls
 	property ObjectModel actionModel
 
-	function makeButton(menuElement){
+	function addButton(menuElement){
 		actionModel.addButton(menuElement)
+	}
+
+	function removeButton(menuElement){
+		var index = -1
+		for (var i = 0; i < actionModel.count; ++i){
+			if (menuElement.name == actionModel.get(i).name){
+				index = i;
+				break;
+			}
+		}
+		if (index!=-1) {
+			actionModel.remove(index, 1);
+		} else {
+			console.log("No active button : " + menuElement.name);
+		}
 	}
 
 	onToggleState:{

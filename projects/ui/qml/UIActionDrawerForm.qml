@@ -69,10 +69,11 @@ Drawer {
                             actionListView.currentIndex = index;
                             if (model.inUse == "false"){
                                 model.inUse ="true";
-                                root.makeButton(actionMenuModel.get(index))
+                                root.addButton(actionMenuModel.get(index))
                             }
                             else {
                                 model.inUse = "false"
+                                root.removeButton(actionMenuModel.get(index))
                             }
                         }
                     }
@@ -92,26 +93,26 @@ Drawer {
 
             ListModel {
                 id : actionMenuModel
-                ListElement { name : "Exercise"; inUse : "false"; section : "Patient Actions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "ConsumeMeal"; inUse : "false"; section : "Patient Actions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults"; property var func : function() {scenario.create_hemorrhage_action("RightArm", 100.0)}}
-                ListElement { name : "Burn"; inUse : "false"; section : "Insults"; property var func : function() {scenario.create_burn_action()}}
-                ListElement { name : "PainStimulus"; inUse : "false"; section : "Insults"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "TensionPneumothorax"; inUse : "false"; section : "Insults"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Sepsis"; inUse : "false"; section : "Insults"; property var func : function() {scenario.create_infection_action()}}
-                ListElement { name : "AsthmaAttack"; inUse : "false"; section : "Insults"; property var func : function() {scenario.create_asthma_action()}}
-                ListElement { name : "AirwayObstruction"; inUse : "false"; section : "Insults"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "TraumaticBrainInjury"; inUse : "false"; section : "Insults"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Bronchoconstriction"; inUse : "false"; section : "Insults" ; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "AcuteStress"; inUse : "false"; section : "Insults"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "DrugAdministration"; inUse : "false"; section : "Interventions"; property var func : function() {scenario.create_substance_infusion_action()}}
-                ListElement { name : "NeedleDecompression"; inUse : "false"; section : "Interventions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Inhaler"; inUse : "false"; section : "Interventions" ; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "AnesthesiaMachine"; inUse : "false"; section : "Interventions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Transfusion"; inUse : "false"; section : "Interventions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Diabetes (Type 1)"; inUse : "false"; section : "Conditions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Diabetes (Type 2)"; inUse : "false"; section : "Conditions"; property var func : function() {console.log("Support coming for: " + name)}}
-                ListElement { name : "Bronchitis"; inUse : "false"; section : "Conditions"; property var func : function() {console.log("Support coming for: " + name)}}
+                ListElement { name : "Exercise"; inUse : "false"; section : "Patient Actions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Consume Meal"; inUse : "false"; section : "Patient Actions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_hemorrhage_action("RightArm", 100.0)}}
+                ListElement { name : "Burn"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_burn_action()}}
+                ListElement { name : "Pain Stimulus"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Tension Pneumothorax"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Sepsis"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_infection_action()}}
+                ListElement { name : "Asthma Attack"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_asthma_action()}}
+                ListElement { name : "Airway Obstruction"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Traumatic Brain Injury"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Bronchoconstriction"; inUse : "false"; section : "Insults" ; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Acute Stress"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Substance Administration"; inUse : "false"; section : "Interventions"; property var func : function(name) {scenario.create_substance_infusion_action()}}
+                ListElement { name : "Needle Decompression"; inUse : "false"; section : "Interventions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Inhaler"; inUse : "false"; section : "Interventions" ; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Anesthesia Machine"; inUse : "false"; section : "Interventions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Transfusion"; inUse : "false"; section : "Interventions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Diabetes (Type 1)"; inUse : "false"; section : "Conditions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Diabetes (Type 2)"; inUse : "false"; section : "Conditions"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Bronchitis"; inUse : "false"; section : "Conditions"; property var func : function(name) {console.log("Support coming for: " + name)}}
             }
         }
         Button {

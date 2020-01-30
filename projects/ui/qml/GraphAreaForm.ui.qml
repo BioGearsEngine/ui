@@ -401,6 +401,7 @@ Page {
 				id: endocrineGridView
 				anchors.fill: parent
 				clip: true
+				width : parent.width
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
 				model: endocrineObjectModel

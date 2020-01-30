@@ -18,6 +18,8 @@
         <file>UITabButtonForm.ui.qml</file>
         <file>UIActionDrawer.qml</file>
         <file>UIActionDrawerForm.qml</file>
+        <file>UIActionButton.qml</file>
+        <file>UIActionButtonForm.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

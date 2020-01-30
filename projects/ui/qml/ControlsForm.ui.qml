@@ -128,22 +128,33 @@ ColumnLayout {
      Item {
         id : actionButtonWrapper
         Layout.preferredWidth : root.width
-        Layout.preferredHeight : implicitHeight
+        Layout.preferredHeight : 200
+        
 
         GridView {
             id : actionButtonView
+            clip: true
             anchors.fill : parent
-            anchors.centerIn : parent
-            cellWidth : parent.width / 2.5
-            cellHeight : 5
+            cellWidth : root.width / 2
+            cellHeight : 60
             model : actionButtonModel
         }
+
         ObjectModel {
             id : actionButtonModel
             function addButton(menuElement) {
-                var actionButton = Qt.createQmlObject('import QtQuick.Controls 2.12; Button {text : "Test Hemorrhage"}', actionButtonView, 'ActionButton');
-                actionButton.clicked.connect(menuElement.func);
-                actionButtonModel.append(actionButton);
+                var actionComponent = Qt.createComponent("UIActionButton.qml");
+					if ( actionComponent.status != Component.Ready){
+						if (actionComponent.status == Component.Error){
+							console.log("Error : " + chartComponent.errorString() );
+							return;
+						}
+						console.log("Error : Chart component not ready");
+					} else {
+						var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
+						actionObject.actionClicked.connect(menuElement.func);
+						actionButtonModel.append(actionObject);
+					}
             }
         }
      }
