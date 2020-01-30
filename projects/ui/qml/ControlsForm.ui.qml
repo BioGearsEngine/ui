@@ -9,10 +9,10 @@ import com.biogearsengine.ui.scenario 1.0
 ColumnLayout {
     id: root
     spacing: 5
-
     Layout.preferredHeight: implicitHeight
     Layout.preferredWidth: implicitWidth
 
+    property ObjectModel actionModel : actionButtonModel
     property alias patientBox: patientBox
     property alias age_yr: age
     property alias gender: gender
@@ -32,13 +32,6 @@ ColumnLayout {
 
 
     property alias playback : playback_controls
-    //property alias action_1 : action_1
-    //property alias action_2 : action_2
-   // property alias action_3 : action_3
-    //property alias action_4 : action_4
-    //property alias action_5 : action_5
-    //property alias action_6 : action_6
-    //property alias action_7 : action_7
     property alias drawerToggle : drawerToggle
 
     Row {
@@ -132,84 +125,28 @@ ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
      }
 
-     /*Item {
+     Item {
         id : actionButtonWrapper
         Layout.preferredWidth : root.width
-        Layout.preferredHeight : 0.5 * root.parent.height
+        Layout.preferredHeight : implicitHeight
 
         GridView {
             id : actionButtonView
             anchors.fill : parent
+            anchors.centerIn : parent
             cellWidth : parent.width / 2.5
             cellHeight : 5
+            model : actionButtonModel
         }
         ObjectModel {
             id : actionButtonModel
-            function addButton() {
-                var actionButton = Qt.createQmlObject('import QtQuick.Controls 2.12; Button {text : "Hemorrhage Test"; width: 15; height:10}', controls, 'ActionButton');
-		        actionButton.clicked.connect(actionMenuModel.get(index).func);
+            function addButton(menuElement) {
+                var actionButton = Qt.createQmlObject('import QtQuick.Controls 2.12; Button {text : "Test Hemorrhage"}', actionButtonView, 'ActionButton');
+                actionButton.clicked.connect(menuElement.func);
                 actionButtonModel.append(actionButton);
             }
         }
-     }*/
-
-
-
-    /*GridLayout {
-        Layout.preferredWidth: parent.width
-        Layout.fillWidth: true
-        columns: 2
-        Button {
-            id : action_1
-            text: 'Hemorrhage Stop'
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        Button {
-            id : action_2
-            text: 'Hemorrhage Mild '
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        Button {
-            id : action_3
-            text: 'Hemorrhage Extreme'
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        Button {
-            id : action_4
-            text: 'Asthma Attack'
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        Button {
-            id : action_5
-            text: 'Morphine Drip'
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        Button {
-            id : action_6
-            text: 'Burn Patient 25%'
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        Button {
-            id : action_7
-            text: 'Mild Infection'
-            font.pixelSize: Qt.application.font.pixelSize * 0.8
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 100
-        }
-        
-    }*/
+     }
 }
 
 /*##^## Designer {

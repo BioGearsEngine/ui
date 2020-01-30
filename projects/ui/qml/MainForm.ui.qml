@@ -12,6 +12,7 @@ GridLayout {
 
     property alias scenario : controls.scenario
     property alias controls : controls
+    property alias actionModel : controls.actionModel
     property alias graphArea: graphArea
     property alias consoleArea : consoleArea
     property alias actionDrawer : actionDrawer
@@ -20,6 +21,7 @@ GridLayout {
         id: actionDrawer
         scenario : root.scenario
         controls : root.controls
+        actionModel : root.actionModel
     }
     Controls {
         id: controls
