@@ -7,7 +7,8 @@ import QtQml.Models 2.2
 
 Page {
     id: root
-    
+    z : 0 //Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
+
     property alias physiologyRequestModel : physiologyRequestModel
 	property alias bloodChemistryModel : bloodChemistryObjectModel
 	property alias cardiovascularModel : cardiovascularObjectModel

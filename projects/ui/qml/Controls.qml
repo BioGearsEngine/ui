@@ -12,6 +12,8 @@ ControlsForm {
     signal patientMetricsChanged(PatientMetrics metrics )
     signal patientStateChanged(PatientState patientState )
     signal patientConditionsChanged(PatientConditions conditions )
+    signal actionMessageUpdate(string name, bool hoverStatus, string status, var coor)
+    signal actionStatusUpdate(string name, string status);
     signal drawerOpenClosed()
 
     property bool running : false
@@ -68,17 +70,19 @@ ControlsForm {
                 var actionComponent = Qt.createComponent("UIActionButton.qml");
 					if ( actionComponent.status != Component.Ready){
 						if (actionComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
+							console.log("Error : " + actionComponent.errorString() );
 							return;
 						}
 						console.log("Error : Chart component not ready");
 					} else {
 						var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
 						actionObject.actionClicked.connect(menuElement.func);
+                        actionObject.actionHoverToggle.connect(actionMessageUpdate);
+                        actionObject.actionActiveToggle.connect(actionStatusUpdate);
 						actionButtonModel.append(actionObject);
 					}
             }
-        }
+     }
 
     playback.onRestartClicked: {
             console.log("Restarting BioGears")
@@ -107,6 +111,19 @@ ControlsForm {
     } 
     drawerToggle.onPressed : {
         root.drawerOpenClosed();
+    }
+
+    onActionMessageUpdate : {
+        actionMessage.actionText = name + "\nStatus : " + status
+        if (hoverStatus){
+            actionMessage.x = coor.x
+            actionMessage.y = coor.y
+        }
+        root.actionMessage.visible = hoverStatus
+    }
+
+    onActionStatusUpdate : {
+        actionMessage.actionText = name + "\nStatus : " + status
     }
     
 }

@@ -11,6 +11,7 @@ ColumnLayout {
     spacing: 5
     Layout.preferredHeight: implicitHeight
     Layout.preferredWidth: implicitWidth
+    z : 1  //Setting to higher than graph area so that action messages will not be hidden behind plots
 
     property alias patientBox: patientBox
     property alias age_yr: age
@@ -33,6 +34,7 @@ ColumnLayout {
     property alias playback : playback_controls
     property alias drawerToggle : drawerToggle
     property alias actionButtonView : actionButtonView
+    property alias actionMessage : actionMessage
 
     Row {
         height: 10
@@ -46,8 +48,6 @@ ColumnLayout {
     }
 
     RowLayout {
-        // columns: 4
-        // rows: 2
         id: configuration_row1
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
@@ -123,13 +123,13 @@ ColumnLayout {
             text : 'Action Explorer'
             Layout.preferredWidth: root.width
             Layout.alignment: Qt.AlignHCenter
-     }
+    }
 
      Item {
         id : actionButtonWrapper
         Layout.preferredWidth : root.width
         Layout.preferredHeight : 200
-        
+        z : 2
 
         GridView {
             id : actionButtonView
@@ -138,6 +138,28 @@ ColumnLayout {
             cellWidth : root.width / 2
             cellHeight : 60
             model : actionButtonModel  //Defined in Controls.qml
+        }
+
+        Rectangle {
+            id : actionMessage
+            color : "#1A5276"
+            height : actionButtonWrapper.width / 5
+            width : actionButtonWrapper.height / 2
+            radius : 10
+            visible : false
+            property string actionText : ""
+            Text {
+                width : parent.width
+                height : parent.height
+                text: parent.actionText
+                color : "white"
+                anchors.fill: parent
+                horizontalAlignment : Text.AlignLeft
+                verticalAlignment : Text.AlignVCenter
+                elide: Text.ElideRight
+                font.pointSize : 8
+                wrapMode : Text.Wrap
+            }
         }
      }
 }

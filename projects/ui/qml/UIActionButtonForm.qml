@@ -9,6 +9,8 @@ Item {
     id : root
     property string name
     property bool active : false
+    property alias actionButton : actionButton
+    property alias delayTimer : delayTimer
     
     //When created by ActionObjectModel, UIActionButton will fill the available cell area
     //Wrapping the active button inside an item like this allows us to add some padding around the button
@@ -19,6 +21,7 @@ Item {
         width : parent.width * 0.9
         height : parent.height * 0.9
         anchors.centerIn : parent
+        hoverEnabled : true
 
         contentItem : Text {
             text : actionButton.text
@@ -36,12 +39,11 @@ Item {
             border.width : 2
             radius : 20
         }
+    }
 
-        onClicked : {
-           root.actionClicked(text)
-           root.active = !root.active
-        }
-
+    Timer {
+        id : delayTimer
+        interval : 2000; running : false; repeat : false
     }
 }
 
