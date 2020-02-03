@@ -79,13 +79,15 @@ Drawer {
                     }
                     Keys.onReturnPressed : {
                         if (root.opened ){
-                            func(name);
+                            actionListView.currentIndex = index;
                             if (model.inUse == "false"){
                                 model.inUse ="true";
+                                root.addButton(actionMenuModel.get(index))
                             }
                             else {
                                 model.inUse = "false"
-                            }
+                                root.removeButton(actionMenuModel.get(index))
+                            }       
                         }
                     }
                 }

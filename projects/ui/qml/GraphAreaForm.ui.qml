@@ -10,17 +10,18 @@ Page {
     z : 0 //Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
 
     property alias physiologyRequestModel : physiologyRequestModel
-	property alias bloodChemistryModel : bloodChemistryObjectModel
-	property alias cardiovascularModel : cardiovascularObjectModel
-	property alias drugModel : drugObjectModel
-	property alias endocrineModel : endocrineObjectModel
-	property alias energyModel : energyObjectModel
-	property alias gastrointestinalModel : gastrointestinalObjectModel
-	property alias hepaticModel : hepaticObjectModel
-	property alias nervousModel : nervousObjectModel
-	property alias renalModel : renalObjectModel
-	property alias respiratoryModel : respiratoryObjectModel
-	property alias tissueModel : tissueObjectModel
+
+	property alias bloodChemistryGridView : bloodChemistryGridView
+	property alias cardiovascularGridView : cardiovascularGridView
+	property alias drugGridView : drugGridView
+	property alias endocrineGridView : endocrineGridView
+	property alias energyGridView : energyGridView
+	property alias gastrointestinalGridView : gastrointestinalGridView
+	property alias hepaticGridView : hepaticGridView
+	property alias nervousGridView : nervousGridView
+	property alias renalGridView : renalGridView
+	property alias respiratoryGridView : respiratoryGridView
+	property alias tissueGridView : tissueGridView
 
 	//property alias plotObjectModel : plotObjectModel
 
@@ -190,52 +191,18 @@ Page {
 			id: bloodChemistrySeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: bloodChemistryBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: bloodChemistryObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" :  bloodChemistryGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						bloodChemistryObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < bloodChemistryObjectModel.count; ++i){
-						bloodChemistryObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: bloodChemistryGridView
 				anchors.fill: parent
 				clip: true
-				cellWidth: plots.width / 2
-				cellHeight: plots.height / 2
-				model: bloodChemistryObjectModel
-
-				onCellWidthChanged : {
-					bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
-				}
-
+				cellWidth: parent.width / 2
+				cellHeight: parent.height / 2
+				model: bloodChemistryModel
 				ScrollBar.vertical: ScrollBar {
                     parent: bloodChemistryGridView.parent
                     anchors.top: bloodChemistryGridView.top
@@ -244,57 +211,22 @@ Page {
                 }
 			}
 		}
-
         Item {
 			id: cardiovascularSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: cardiovascularBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: cardiovascularObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(cardiovascularGridView,{"width" : cardiovascularGridView.cellWidth, "height" : cardiovascularGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						cardiovascularObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < cardiovascularObjectModel.count; ++i){
-						cardiovascularObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: cardiovascularGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: cardiovascularObjectModel
-
-				onCellWidthChanged : {
-					cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
-				}
-
+				model: cardiovascularModel
 				ScrollBar.vertical: ScrollBar {
                     parent: cardiovascularGridView.parent
                     anchors.top: cardiovascularGridView.top
@@ -303,57 +235,22 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: drugSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: drugBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: drugObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(drugGridView,{"width" : drugGridView.cellWidth, "height" : drugGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						drugObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < drugObjectModel.count; ++i){
-						drugObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: drugGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: drugObjectModel
-
-				onCellWidthChanged : {
-					drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
-				}
-
+				model: drugModel
 				ScrollBar.vertical: ScrollBar {
                     parent: drugGridView.parent
                     anchors.top: drugGridView.top
@@ -362,7 +259,6 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: endocrineSeries
 			Layout.fillWidth: true
@@ -373,31 +269,6 @@ Page {
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: endocrineObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(endocrineGridView,{"width" : endocrineGridView.cellWidth, "height" : endocrineGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						endocrineObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < endocrineObjectModel.count; ++i){
-						endocrineObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: endocrineGridView
 				anchors.fill: parent
@@ -405,15 +276,7 @@ Page {
 				width : parent.width
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: endocrineObjectModel
-
-				onCellWidthChanged : {
-					endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
-				}
-
+				model: endocrineModel
 				ScrollBar.vertical: ScrollBar {
                     parent: endocrineGridView.parent
                     anchors.top: endocrineGridView.top
@@ -422,7 +285,6 @@ Page {
                 }
 			}
 		}
-        
 		Item {
 			id: energySeries
 			Layout.fillWidth: true
@@ -433,46 +295,13 @@ Page {
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: energyObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(energyGridView,{"width" : energyGridView.cellWidth, "height" : energyGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						energyObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < energyObjectModel.count; ++i){
-						energyObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: energyGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: energyObjectModel
-
-				onCellWidthChanged : {
-					energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
-				}
-
+				model: energyModel
 				ScrollBar.vertical: ScrollBar {
                     parent: energyGridView.parent
                     anchors.top: energyGridView.top
@@ -481,58 +310,23 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: gastrointestinalSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: gastrointestinalBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: gastrointestinalObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(gastrointestinalGridView,{"width" : gastrointestinalGridView.cellWidth, "height" : gastrointestinalGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						gastrointestinalObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < gastrointestinalObjectModel.count; ++i){
-						gastrointestinalObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: gastrointestinalGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: gastrointestinalObjectModel
-
-				onCellWidthChanged : {
-					gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
-				}
-
-				ScrollBar.vertical: ScrollBar {
+				model: gastrointestinalModel
+                ScrollBar.vertical: ScrollBar {
                     parent: gastrointestinalGridView.parent
                     anchors.top: gastrointestinalGridView.top
                     anchors.right: gastrointestinalGridView.right
@@ -540,57 +334,22 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: hepaticSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: hepaticBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: hepaticObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						hepaticObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < hepaticObjectModel.count; ++i){
-						hepaticObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: hepaticGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: hepaticObjectModel
-
-				onCellWidthChanged : {
-					hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
-				}
-
+				model: hepaticModel
 				ScrollBar.vertical: ScrollBar {
                     parent: hepaticGridView.parent
                     anchors.top: hepaticGridView.top
@@ -599,57 +358,22 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: nervousSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: nervousBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: nervousObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						nervousObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < nervousObjectModel.count; ++i){
-						nervousObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: nervousGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: nervousObjectModel
-
-				onCellWidthChanged : {
-					nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
-				}
-
+				model: nervousModel
 				ScrollBar.vertical: ScrollBar {
                     parent: nervousGridView.parent
                     anchors.top: nervousGridView.top
@@ -658,57 +382,22 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: renalSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: renalBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: renalObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						renalObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < renalObjectModel.count; ++i){
-						renalObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: renalGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: renalObjectModel
-
-				onCellWidthChanged : {
-					renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
-				}
-
+				model: renalModel
 				ScrollBar.vertical: ScrollBar {
                     parent: renalGridView.parent
                     anchors.top: renalGridView.top
@@ -717,57 +406,22 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: respiratorySeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: respiratoryBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: respiratoryObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						respiratoryObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < respiratoryObjectModel.count; ++i){
-						respiratoryObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: respiratoryGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: respiratoryObjectModel
-
-				onCellWidthChanged : {
-					respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
-				}
-
+				model: respiratoryModel
 				ScrollBar.vertical: ScrollBar {
                     parent: respiratoryGridView.parent
                     anchors.top: respiratoryGridView.top
@@ -776,57 +430,22 @@ Page {
                 }
 			}
 		}
-
 		Item {
 			id: tissueSeries
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-
 			Rectangle {
 				id: tissueBackground
 				anchors.fill: parent
 				color: "#7CB342"
 			}
-
-			ObjectModel {
-				id: tissueObjectModel
-				function createPlotView (request) {
-					var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-					if ( chartComponent.status != Component.Ready){
-						if (chartComponent.status == Component.Error){
-							console.log("Error : " + chartComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
-						chartObject.initializeChart(request, root.tickCount);
-						root.metricUpdates.connect(chartObject.updateSeries)
-						tissueObjectModel.append(chartObject)
-					}
-				}
-				function resizePlots(newWidth, newHeight){
-					for (var i = 0; i < tissueObjectModel.count; ++i){
-						tissueObjectModel.get(i).resizePlot(newWidth, newHeight);
-					}
-				}
-			}
-
 			GridView {
 				id: tissueGridView
 				anchors.fill: parent
 				clip: true
 				cellWidth: plots.width / 2
 				cellHeight: plots.height / 2
-				model: tissueObjectModel
-
-				onCellWidthChanged : {
-					tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
-				}
-				onCellHeightChanged : {
-					tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
-				}
-
+				model: tissueModel
 				ScrollBar.vertical: ScrollBar {
                     parent: tissueGridView.parent
                     anchors.top: tissueGridView.top

@@ -6,7 +6,6 @@ import QtQuick.Controls.Material 2.12
 import com.biogearsengine.ui.scenario 1.0
 
 Item {
-    id : root
     property string name
     property bool active : false
     property alias actionButton : actionButton
@@ -43,7 +42,7 @@ Item {
 
     Timer {
         id : delayTimer
-        interval : 2000; running : false; repeat : false
+        interval : 1000; running : false; repeat : false
     }
 }
 
@@ -51,3 +50,4 @@ Item {
     D{i:0;autoSize:true;height:480;width:640}
 }
  ##^##*/
+ 

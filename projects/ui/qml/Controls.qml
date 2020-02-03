@@ -68,19 +68,19 @@ ControlsForm {
             id : actionButtonModel
             function addButton(menuElement) {
                 var actionComponent = Qt.createComponent("UIActionButton.qml");
-					if ( actionComponent.status != Component.Ready){
-						if (actionComponent.status == Component.Error){
-							console.log("Error : " + actionComponent.errorString() );
-							return;
-						}
-						console.log("Error : Chart component not ready");
-					} else {
-						var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
-						actionObject.actionClicked.connect(menuElement.func);
-                        actionObject.actionHoverToggle.connect(actionMessageUpdate);
-                        actionObject.actionActiveToggle.connect(actionStatusUpdate);
-						actionButtonModel.append(actionObject);
+				if ( actionComponent.status != Component.Ready){
+					if (actionComponent.status == Component.Error){
+						console.log("Error : " + actionComponent.errorString() );
+						return;
 					}
+					console.log("Error : Chart component not ready");
+				} else {
+					var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
+					actionObject.actionClicked.connect(menuElement.func);
+                    actionObject.actionHoverToggle.connect(actionMessageUpdate);
+                    actionObject.actionActiveToggle.connect(actionStatusUpdate);
+					actionButtonModel.append(actionObject);
+				}
             }
      }
 
