@@ -542,11 +542,13 @@ inline void Scenario::physiology_thread_step()
   
   if (!_paused) {
     _engine_mutex.lock();//< I ran in to some -O2 issues when using an std::lock_guard in msvc
+
     if (_action_queue.size()) {
       dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
     }
     dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
+
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientConditionsChanged(get_physiology_conditions());
@@ -982,4 +984,10 @@ void Scenario::create_infection_action()
 
   _action_queue.as_source().insert(std::move(action));
 }
+
+//QString Scenario::actionToString(biogears::SEAction action)
+//{
+//
+//}
+
 } //namspace ui

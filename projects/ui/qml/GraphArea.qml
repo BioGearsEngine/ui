@@ -547,11 +547,6 @@ tissueGridView.onCellHeightChanged : {
   tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
 }
 
-
-  
-
-
-
   //This function is specific to searching physiology request lists for an element with a "request" field that matches the input
   //We can look to generalize this to other fields if/when needed
   function findRequestIndex(list, searchRequest){

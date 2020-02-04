@@ -6,13 +6,21 @@ import com.biogearsengine.ui.scenario 1.0
 UIActionButtonForm {
 	id: root
 
+    property var func
+    property Scenario bg_scenario
 	signal actionClicked(string name)
 	signal actionHoverToggle(string name, bool hoverStatus, string actionStatus, var coor)
     signal actionActiveToggle(string name, string status)
 
 	actionButton.onClicked : {
-        root.actionClicked(root.name)
-        root.active = !root.active
+        if (!editWindow.active){
+            var str = bg_scenario.create_hemorrhage_action.toString()
+            console.log(str)
+            func(root.name)
+            root.actionClicked(root.name)
+            root.active = !root.active
+            editWindow.show()
+        }
     }
 
     actionButton.onHoveredChanged : {

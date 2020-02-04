@@ -74,6 +74,7 @@ public:
   Q_INVOKABLE void create_substance_infusion_action();
   Q_INVOKABLE void create_burn_action();
   Q_INVOKABLE void create_infection_action();
+  //Q_INVOKABLE QString actionToString(biogears::SEAction action);
 
 signals:
   void patientStateChanged(PatientState patientState);
