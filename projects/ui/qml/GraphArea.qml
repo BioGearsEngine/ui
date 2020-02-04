@@ -131,7 +131,7 @@ GraphAreaForm {
 		}
     }
   }
-
+  //Blood Chemistry//
   ObjectModel {
 	id: bloodChemistryObjectModel
 	function createPlotView (request) {
@@ -163,7 +163,7 @@ GraphAreaForm {
 	bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
  }
 
-
+ //Cardiovascular//
   ObjectModel {
 	id: cardiovascularObjectModel
 	function createPlotView (request) {
@@ -195,7 +195,7 @@ GraphAreaForm {
 	cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
  }
 
-
+//Drugs//
 ObjectModel {
 	id: drugObjectModel
 	function createPlotView (request) {
@@ -227,6 +227,7 @@ drugGridView.onCellHeightChanged : {
 	drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
 }
 
+//Endocrine//
 ObjectModel {
 	id: endocrineObjectModel
 	function createPlotView (request) {
@@ -258,6 +259,7 @@ endocrineGridView.onCellHeightChanged : {
 	endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
 }
 
+//Energy//
 ObjectModel {
 	id: energyObjectModel
 	function createPlotView (request) {
@@ -289,6 +291,7 @@ energyGridView.onCellHeightChanged : {
 	energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
 }
 
+//Gastrointestinal//
 ObjectModel {
 	id: gastrointestinalObjectModel
 	function createPlotView (request) {
@@ -320,6 +323,7 @@ gastrointestinalGridView.onCellHeightChanged : {
 	gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
 }
 
+//Hepatic//
 ObjectModel {
 	id: hepaticObjectModel
 	function createPlotView (request) {
@@ -351,6 +355,7 @@ hepaticGridView.onCellHeightChanged : {
 	hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
 }
 
+//Nervous//
 ObjectModel {
 	id: nervousObjectModel
 	function createPlotView (request) {
@@ -382,6 +387,7 @@ nervousGridView.onCellHeightChanged : {
 	nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
 }
 
+//Renal//
 ObjectModel {
 	id: renalObjectModel
 	function createPlotView (request) {
@@ -413,6 +419,7 @@ renalGridView.onCellHeightChanged : {
 	renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
 }
 
+//Respiratory//
 ObjectModel {
 	id: respiratoryObjectModel
 	function createPlotView (request) {
@@ -444,6 +451,7 @@ respiratoryGridView.onCellHeightChanged : {
 	respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
 }
 
+//Tissue//
 ObjectModel {
 	id: tissueObjectModel
 	function createPlotView (request) {
