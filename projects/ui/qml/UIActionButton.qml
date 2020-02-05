@@ -1,26 +1,17 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQml.Models 2.2
-import com.biogearsengine.ui.scenario 1.0
 
 UIActionButtonForm {
 	id: root
 
-    property var func
-    property Scenario bg_scenario
 	signal actionClicked(string name)
 	signal actionHoverToggle(string name, bool hoverStatus, string actionStatus, var coor)
     signal actionActiveToggle(string name, string status)
 
 	actionButton.onClicked : {
-        if (!editWindow.active){
-            var str = bg_scenario.create_hemorrhage_action.toString()
-            console.log(str)
-            func(root.name)
-            root.actionClicked(root.name)
-            root.active = !root.active
-            editWindow.show()
-        }
+        root.actionClicked(root.name)
+        root.active = !root.active
     }
 
     actionButton.onHoveredChanged : {

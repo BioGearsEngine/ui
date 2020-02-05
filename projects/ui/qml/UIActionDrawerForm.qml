@@ -97,7 +97,7 @@ Drawer {
                 id : actionMenuModel
                 ListElement { name : "Exercise"; inUse : "false"; section : "Patient Actions"; property var func : function(name) {console.log("Support coming for: " + name)}}
                 ListElement { name : "Consume Meal"; inUse : "false"; section : "Patient Actions"; property var func : function(name) {console.log("Support coming for: " + name)}}
-                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_hemorrhage_action("RightArm", 100.0)}}
+                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults";  func : function() {root.call_hemorrhage()}}
                 ListElement { name : "Burn"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_burn_action()}}
                 ListElement { name : "Pain Stimulus"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
                 ListElement { name : "Tension Pneumothorax"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}

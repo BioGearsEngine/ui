@@ -11,7 +11,6 @@ Item {
     property bool active : false
     property alias actionButton : actionButton
     property alias delayTimer : delayTimer
-    property alias editWindow : actionEditWindow
     
     //When created by ActionObjectModel, UIActionButton will fill the available cell area
     //Wrapping the active button inside an item like this allows us to add some padding around the button
@@ -47,12 +46,6 @@ Item {
         interval : 1000; running : false; repeat : false
     }
 
-    Window {
-        id : actionEditWindow
-        width : 200
-        height : 100
-
-    }
 }
 
 /*##^## Designer {

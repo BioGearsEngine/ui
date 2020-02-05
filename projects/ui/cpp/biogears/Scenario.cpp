@@ -985,9 +985,4 @@ void Scenario::create_infection_action()
   _action_queue.as_source().insert(std::move(action));
 }
 
-//QString Scenario::actionToString(biogears::SEAction action)
-//{
-//
-//}
-
 } //namspace ui
