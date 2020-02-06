@@ -43,7 +43,7 @@ ColumnLayout {
 
     UIPatientBox {
         id: patientBox
-        label: "Patient"
+        label.text: "Patient"
         Layout.alignment: Qt.AlignHCenter
     }
 

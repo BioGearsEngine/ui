@@ -352,18 +352,18 @@ UIActionDrawerForm {
 					if (severitySpinBox.value == 0) {
 						console.log('Invalid entry: Provide a value in range (0, 1.0]' );
 					} else {
-						var bgFunc
+						var bgFunc;
 						switch (action.name){
 							case 'Asthma Attack' :
-								bgFunc = function () { scenario.create_asthma_action(severity) }
+								bgFunc = function () { scenario.create_asthma_action(severity) };
 								root.addButton('Asthma Attack', bgFunc);
 								break;
 							case 'Burn' :
-								bgFunc = function () { scenario.create_burn_action(severity) }
+								bgFunc = function () { scenario.create_burn_action(severity) };
 								root.addButton('Burn', bgFunc);
 								break;
 							default :
-								console.log('Support coming for ' + action.name)
+								console.log('Support coming for ' + action.name);
 							}
 						close();
 					}
@@ -374,7 +374,7 @@ UIActionDrawerForm {
 				onRejected : {
 					close()
 				}
-				Row {
+				contentItem : Row {
 					width : parent.width;
 					height : parent.height
 					spacing : 5;
@@ -402,13 +402,13 @@ UIActionDrawerForm {
 							top : 1.00;
 						}
 						onValueModified : {
-							severityActionDialog.severity = value / 100
+							severityActionDialog.severity = value / 100;
 						}
 						textFromValue : function(value) {
-							return Number(value/100).toLocaleString('f',severitySpinBox.decimals)
+							return Number(value/100).toLocaleString('f',severitySpinBox.decimals);
 						}
 						valueFromText : function(text) {
-							return Number.fromLocaleString(text) * 100
+							return Number.fromLocaleString(text) * 100;
 						}
 					}
 				}
@@ -417,6 +417,119 @@ UIActionDrawerForm {
 		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
 		dialogBox.title = actionItem.name + " Editor"
 		dialogBox.labelText = actionItem.name == "Burn" ? "Fraction Body Surface Area" : "Severity";
+		dialogBox.action = actionItem
+		dialogBox.open()
+	}
+
+	//Substance Administration
+	function setup_SubstanceActions(actionItem){
+		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import Qt.labs.folderlistmodel 2.12;
+			Dialog {
+				id : substanceDialog;
+				width : 500;
+				height : 250;
+				modal : true;
+				closePolicy : Popup.NoAutoClose;
+				property real severity
+				property var action
+				property string labelText
+				footer : DialogButtonBox {
+					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
+				}
+				contentItem : Column {
+					id : columnWrapper;
+					spacing : 5;
+					anchors.centerIn : parent;
+					Row {
+						id: adminRow
+						width : parent.width
+						height : parent.height / 2
+						Label {
+							id : adminLabel
+							width : parent.width / 2
+							height : parent.height
+							text : 'Administration Route'
+							verticalAlignment : Text.AlignVCenter
+							font.pointSize : 10
+						}
+						ComboBox {
+							id : adminCombo
+							width : parent.width / 2
+							height : parent.height
+							contentItem : Text {
+								text : adminCombo.displayText;
+								verticalAlignment : Text.AlignVCenter;
+								horizontalAlignment : Text.AlignHCenter;
+								font.pointSize : 10;
+								height : parent.height
+								width : adminCombo.width
+							} 
+							delegate : ItemDelegate {
+								width : adminCombo.width
+								contentItem : Text {
+									text : model.name;
+									horizontalAlignment : Text.AlignHCenter
+									font.pointSize : 10;
+								}
+								highlighted : adminCombo.highlightedIndex === index;
+							}
+							model : ListModel {
+								id : adminModel
+								ListElement {name : 'Bolus - Intraarterial'}
+								ListElement {name : 'Bolus - Intramuscular'}
+								ListElement {name : 'Bolus - Intravenous'}
+								ListElement {name : 'Infusion - Intravenous'}
+								ListElement {name : 'Oral'}
+								ListElement {name : 'Transmucosal'}
+							}
+						}
+					}
+					Row {
+						id : subRow
+						width : parent.width
+						height : parent.height / 2
+						Label {
+							id : subLabel
+							width : parent.width / 2
+							height : parent.height
+							text : 'Substance'
+							verticalAlignment : Text.AlignVCenter
+							font.pointSize : 10
+						}
+						ComboBox {
+							id : subCombo
+							width : parent.width / 2
+							height : parent.height
+							contentItem : Text {
+								text : subCombo.displayText;
+								verticalAlignment : Text.AlignVCenter;
+								horizontalAlignment : Text.AlignHCenter;
+								font.pointSize : 10;
+								height : parent.height
+								width : subCombo.width
+							} 
+							delegate : ItemDelegate {
+								width : subCombo.width
+								contentItem : Text {
+									text : model.fileName.toString();
+									horizontalAlignment : Text.AlignHCenter
+									font.pointSize : 10;
+								}
+								highlighted : subCombo.highlightedIndex === index;
+							}
+							model : FolderListModel {
+								id : subModel
+								nameFilters : ['*.xml']
+								folder : 'file:substances'
+								showDirs : false
+							}
+						}
+					}
+				}
+			}
+		"
+		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
+		dialogBox.title = "Drug Administration Editor"
 		dialogBox.action = actionItem
 		dialogBox.open()
 	}

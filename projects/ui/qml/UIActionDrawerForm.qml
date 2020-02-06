@@ -108,7 +108,7 @@ Drawer {
                 ListElement { name : "Traumatic Brain Injury"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Bronchoconstriction"; inUse : "false"; section : "Insults" ; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
                 ListElement { name : "Acute Stress"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Substance Administration"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Substance Administration"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_SubstanceActions(actionItem)}}
                 ListElement { name : "Needle Decompression"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Inhaler"; inUse : "false"; section : "Interventions" ; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Anesthesia Machine"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
