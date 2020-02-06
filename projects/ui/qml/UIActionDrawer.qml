@@ -46,7 +46,6 @@ UIActionDrawerForm {
 	//--------------Action-specific wrapper functions-------------------------------//
 	//Hemorrhage
 	function setup_hemorrhage(actionItem){
-		var actionVar = actionItem
 		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12;
 			Dialog {
 				id : hemDialog;
@@ -97,8 +96,8 @@ UIActionDrawerForm {
 							width : parent.width / 2;
 							height : parent.height;
 							font.pointSize : 12;
-							from : 0;
 							value : 0;
+							from : 0;
 							to : 500;
 							editable : true;
 							stepSize: 10;
@@ -164,13 +163,12 @@ UIActionDrawerForm {
 				}	
 			}"
 		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
-		dialogBox.action = actionVar
+		dialogBox.action = actionItem
 		dialogBox.open()
 	}
 
 	//Infection (very similar to hemorrage--1 extra arg--could look into making widget that both can use)
 	function setup_infection(actionItem){
-		var actionVar = actionItem
 		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12;
 			Dialog {
 				id : infectionDialog;
@@ -196,7 +194,8 @@ UIActionDrawerForm {
 					}
 				}
 				onReset : {
-					rateSpinBox.value = 0
+					micSpinBox.value = 0
+					severitySpinBox.value = 0
 					locationComboBox.currentIndex = -1
 				}
 				onRejected : {
@@ -222,8 +221,8 @@ UIActionDrawerForm {
 							width : parent.width / 3;
 							height : parent.height;
 							font.pointSize : 12;
-							from : 0;
 							value : 0;
+							from : 0;
 							to : 300;
 							editable : true;
 							stepSize: 10;
@@ -257,7 +256,7 @@ UIActionDrawerForm {
 							value : 0;
 							from : 0;
 							to : boxText.length;
-							editable : true;
+							editable : false
 							stepSize: 1;
 							validator : IntValidator {
 								bottom : severitySpinBox.from;
@@ -330,8 +329,100 @@ UIActionDrawerForm {
 				}	
 			}"
 		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
-		dialogBox.action = actionVar
+		dialogBox.action = actionItem
 		dialogBox.open()
+	}
+
+	//Generic form for actions that take single severity input (asthma, burn, airway obstruction, etc.)
+	function setup_severityAction(actionItem){
+		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12;
+			Dialog {
+				id : severityActionDialog;
+				width : 500;
+				height : 200;
+				modal : true;
+				closePolicy : Popup.NoAutoClose;
+				property real severity
+				property var action
+				property string labelText
+				footer : DialogButtonBox {
+					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
+				}
+				onApplied : {
+					if (severitySpinBox.value == 0) {
+						console.log('Invalid entry: Provide a value in range (0, 1.0]' );
+					} else {
+						var bgFunc
+						switch (action.name){
+							case 'Asthma Attack' :
+								bgFunc = function () { scenario.create_asthma_action(severity) }
+								root.addButton('Asthma Attack', bgFunc);
+								break;
+							case 'Burn' :
+								bgFunc = function () { scenario.create_burn_action(severity) }
+								root.addButton('Burn', bgFunc);
+								break;
+							default :
+								console.log('Support coming for ' + action.name)
+							}
+						close();
+					}
+				}
+				onReset : {
+					severitySpinBox.value = 0
+				}
+				onRejected : {
+					close()
+				}
+				Row {
+					width : parent.width;
+					height : parent.height
+					spacing : 5;
+					Label {
+						id : severityLabel
+						width : parent.width / 2;
+						text : severityActionDialog.labelText
+						height : parent.height;
+						font.pointSize : 12;
+						verticalAlignment : Text.AlignVCenter;
+					}
+					SpinBox {
+						id : severitySpinBox
+						width : parent.width / 2;
+						height : parent.height;
+						font.pointSize : 12;
+						property int decimals : 3
+						value : 0;
+						from : 0;
+						to : 100;
+						editable : true;
+						stepSize: 5;
+						validator : DoubleValidator {
+							bottom : 0;
+							top : 1.00;
+						}
+						onValueModified : {
+							severityActionDialog.severity = value / 100
+						}
+						textFromValue : function(value) {
+							return Number(value/100).toLocaleString('f',severitySpinBox.decimals)
+						}
+						valueFromText : function(text) {
+							return Number.fromLocaleString(text) * 100
+						}
+					}
+				}
+		}"
+
+		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
+		dialogBox.title = actionItem.name + " Editor"
+		dialogBox.labelText = actionItem.name == "Burn" ? "Fraction Body Surface Area" : "Severity";
+		dialogBox.action = actionItem
+		dialogBox.open()
+	}
+
+	function setup_OtherActions(actionItem){
+		console.log("Support coming for " + actionItem.name);
 	}
 
 }
