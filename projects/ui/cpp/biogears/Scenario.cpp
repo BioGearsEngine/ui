@@ -976,11 +976,13 @@ void Scenario::create_burn_action()
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_infection_action()
+
+void Scenario::create_infection_action(QString location, int severity, double mic_mg_Per_L)
 {
-  auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLeg");
-  action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
+  auto action = std::make_unique<biogears::SEInfection>();
+  action->SetLocation(location.toStdString());
+  action->SetSeverity((CDM::enumInfectionSeverity::value)severity);
+  action->GetMinimumInhibitoryConcentration().SetValue(mic_mg_Per_L, biogears::MassPerVolumeUnit::mg_Per_L);
 
   _action_queue.as_source().insert(std::move(action));
 }

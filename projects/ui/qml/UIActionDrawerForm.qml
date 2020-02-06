@@ -98,11 +98,11 @@ Drawer {
                 id : actionMenuModel
                 ListElement { name : "Exercise"; inUse : "false"; section : "Patient Actions"; property var func : function(name) {console.log("Support coming for: " + name)}}
                 ListElement { name : "Consume Meal"; inUse : "false"; section : "Patient Actions"; property var func : function(name) {console.log("Support coming for: " + name)}}
-                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults";  func : function(actionItem) {root.call_hemorrhage(actionItem)}}
+                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
                 ListElement { name : "Burn"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_burn_action()}}
                 ListElement { name : "Pain Stimulus"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
                 ListElement { name : "Tension Pneumothorax"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
-                ListElement { name : "Sepsis"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_infection_action()}}
+                ListElement { name : "Infection"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
                 ListElement { name : "Asthma Attack"; inUse : "false"; section : "Insults"; property var func : function(name) {scenario.create_asthma_action()}}
                 ListElement { name : "Airway Obstruction"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
                 ListElement { name : "Traumatic Brain Injury"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
