@@ -939,7 +939,15 @@ double Scenario::get_simulation_time()
 }
 }
 
+#include <biogears/cdm/patient/actions/SEAsthmaAttack.h>
+#include <biogears/cdm/patient/actions/SEBurnWound.h>
 #include <biogears/cdm/patient/actions/SEHemorrhage.h>
+#include <biogears/cdm/patient/actions/SEInfection.h>
+#include <biogears/cdm/patient/actions/SESubstanceAdministration.h>
+#include <biogears/cdm/patient/actions/SESubstanceBolus.h>
+#include <biogears/cdm/patient/actions/SESubstanceCompoundInfusion.h>
+#include <biogears/cdm/patient/actions/SESubstanceInfusion.h>
+#include <biogears/cdm/patient/actions/SESubstanceOralDose.h>
 
 namespace bio {
 //---------------------------------------------------------------------------------
@@ -952,27 +960,46 @@ void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_asthma_action()
+void Scenario::create_asthma_action(double severity)
 {
-  auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLeg");
-  action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
+  auto action = std::make_unique<biogears::SEAsthmaAttack>();
+  action->GetSeverity().SetValue(severity);
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_substance_infusion_action()
+
+void Scenario::create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min)
 {
-  auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLeg");
-  action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
+  biogears::SESubstance* sub = _engine->GetSubstances().GetSubstance(substance.toStdString());
+  auto action = std::make_unique<biogears::SESubstanceInfusion>(*sub);
+  action->GetConcentration().SetValue(concentration_ug_Per_mL, biogears::MassPerVolumeUnit::ug_Per_mL);
+  action->GetRate().SetValue(rate_mL_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_burn_action()
+void Scenario::create_substance_bolus_action(QString substance, int route, double dose_mL, double concentration_ug_Per_mL)
 {
-  auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment("RightLeg");
-  action->GetInitialRate().SetValue(2.0, biogears::VolumePerTimeUnit::mL_Per_min);
+  biogears::SESubstance* sub = _engine->GetSubstances().GetSubstance(substance.toStdString());
+  auto action = std::make_unique<biogears::SESubstanceBolus>(*sub);
+  action->SetAdminRoute((CDM::enumBolusAdministration::value)route);
+  action->GetDose().SetValue(dose_mL, biogears::VolumeUnit::mL);
+  action->GetConcentration().SetValue(concentration_ug_Per_mL, biogears::MassPerVolumeUnit::ug_Per_mL);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_substance_oral_action(QString substance, int route, double dose_mg)
+{
+  biogears::SESubstance* sub = _engine->GetSubstances().GetSubstance(substance.toStdString());
+  auto action = std::make_unique<biogears::SESubstanceOralDose>(*sub);
+  action->SetAdminRoute((CDM::enumOralAdministration::value)route);
+  action->GetDose().SetValue(dose_mg, biogears::MassUnit::mg);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_burn_action(double tbsa)
+{
+  auto action = std::make_unique<biogears::SEBurnWound>();
+  action->GetTotalBodySurfaceArea().SetValue(tbsa);
 
   _action_queue.as_source().insert(std::move(action));
 }
@@ -986,10 +1013,5 @@ void Scenario::create_infection_action(QString location, int severity, double mi
 
   _action_queue.as_source().insert(std::move(action));
 }
-
-//QString Scenario::actionToString(biogears::SEAction action)
-//{
-//
-//}
 
 } //namspace ui

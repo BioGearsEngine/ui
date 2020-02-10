@@ -72,7 +72,9 @@ public:
   Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
 
   Q_INVOKABLE void create_asthma_action(double severity);
-  Q_INVOKABLE void create_substance_infusion_action(biogears::SESubstance sub, double concentration_mg_Per_L, double rate_mL_Per_min);
+  Q_INVOKABLE void create_substance_bolus_action(QString substance, int route,  double dose_mL, double concentration_ug_Per_mL);
+  Q_INVOKABLE void create_substance_oral_action(QString substance, int route, double dose_mg);
+  Q_INVOKABLE void create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min);
   Q_INVOKABLE void create_burn_action(double tbsa);
   Q_INVOKABLE void create_infection_action(QString compartment, int severity, double mic_mg_Per_L);
 

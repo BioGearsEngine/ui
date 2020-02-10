@@ -423,39 +423,170 @@ UIActionDrawerForm {
 
 	//Substance Administration
 	function setup_SubstanceActions(actionItem){
-		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import Qt.labs.folderlistmodel 2.12;
+		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import Qt.labs.folderlistmodel 2.12; import QtQuick.XmlListModel 2.12;
 			Dialog {
 				id : substanceDialog;
-				width : 500;
-				height : 250;
+				width : 800;
+				height : 300;
 				modal : true;
 				closePolicy : Popup.NoAutoClose;
-				property real severity
+				property string substance
 				property var action
-				property string labelText
+				property real dose : 0.0
+				property real concentration : 0.0
+				property real rate : 0.0
+				property string adminRoute
+				property string doseLabel : 'Dose (mL)'
+				property int numRows : 4
+				signal adminChange (string route)
 				footer : DialogButtonBox {
 					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
 				}
+
+				onApplied : {
+					if (adminCombo.currentIndex == -1 || subCombo.currentIndex == -1){
+						console.log('Invalid entry : Provide an admin route and a substance');
+					}
+					else {
+						var bgFunc;
+						switch (adminRoute) {
+							case 'Bolus - Intraarterial' :
+							if (dose == 0.0 || concentration == 0.0){
+									console.log('Bolus action requires a dose and concentration')
+								}
+								else {
+									//Intraarterial is CDM::enumBolusAdministration::0
+									bgFunc = function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) }
+									root.addButton(substance + ' Bolus', bgFunc);
+									close();
+								}
+								break;
+							case 'Bolus - Intramuscular' :
+								if (dose == 0.0 || concentration == 0.0){
+									console.log('Bolus action requires a dose and concentration')
+								}
+								else {
+									//Intramuscular is CDM::enumBolusAdministration::1
+									bgFunc = function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) }
+									root.addButton(substance + ' Bolus', bgFunc);
+									close();
+								}
+								break;
+							case 'Bolus - Intravenous' :
+								if (dose == 0.0 || concentration == 0.0){
+									console.log('Bolus action requires a dose and concentration')
+								}
+								else {
+									//Intravenous is CDM::enumBolusAdministration::2
+									bgFunc = function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) }
+									root.addButton(substance + ' Bolus', bgFunc);
+									close();
+								}
+								break;
+							case 'Infusion - Intravenous' :
+								if (concentration == 0.0 || rate == 0.0){
+									console.log('Infusion action requires a concentration and a rate')
+								} else {
+									bgFunc = function () { scenario.create_substance_infusion_action(substance, concentration, rate) }
+									root.addButton(substance + ' Infusion', bgFunc);
+									close();
+								}
+								break;
+							case 'Oral':
+								if (dose == 0.0){
+									console.log('Oral drug action requires a dose')
+								} else {
+									//Oral (GI) is CDM::enumOralAdministration::1
+									bgFunc = function () { scenario.create_substance_oral_action(substance, 1, dose) }
+									root.addButton('Oral ' +  substance, bgFunc);
+									close();
+								}
+								break;
+							case 'Transmucosal':
+								if (dose == 0.0){
+									console.log('Tranmucosal action requires a dose')
+								} else {
+									//Transcmucosal is CDM::enumOralAdministration::0
+									bgFunc = function () { scenario.create_substance_oral_action(substance, 0, dose) }
+									root.addButton('Transmucosal ' + substance, bgFunc);
+									close();
+								}
+								break;
+						}
+					}
+				}
+                
+                onReset : {
+					adminCombo.currentIndex = -1
+					subCombo.currentIndex = -1
+					doseField.clear()
+					concentrationField.clear()
+					rateField.clear()
+					dose = 0.0
+					concentration = 0.0
+					rate = 0.0
+					adminChange('')
+					inputRow.fieldChange('')
+				}
+
+				onRejected : {
+					close()
+				}
+
+				onAdminChange : {
+					switch (route) {
+						case 'Bolus - Intraarterial' :
+						case 'Bolus - Intramuscular' :
+						case 'Bolus - Intravenous' :
+							doseLabel = 'Dose (mL)'
+							doseField.visible = true
+							concentrationField.visible = true
+							rateField.visible = false
+							break;
+						case 'Infusion - Intravenous' :
+							doseField.visible = false
+							concentrationField.visible = true
+							rateField.visible = true
+							break;
+						case 'Oral':
+						case 'Transmucosal':
+							doseLabel = 'Dose (mg)'
+							doseField.visible = true
+							concentrationField.visible = false
+							rateField.visible = false
+							break;	
+						default :
+							doseField.visible = false
+							concentrationField.visible = false
+							rate.Field.visible = false
+					}
+				}
+
 				contentItem : Column {
 					id : columnWrapper;
-					spacing : 5;
-					anchors.centerIn : parent;
+					spacing : 20;
+					anchors.left : parent.left
+					anchors.right : parent.right;
 					Row {
 						id: adminRow
 						width : parent.width
-						height : parent.height / 2
+						height : parent.height / numRows
+						anchors.horizontalCenter : parent.horizontalCenter
+						spacing : 10
 						Label {
-							id : adminLabel
-							width : parent.width / 2
-							height : parent.height
-							text : 'Administration Route'
-							verticalAlignment : Text.AlignVCenter
-							font.pointSize : 10
+								id : adminLabel
+								width : parent.width / 5
+								height : parent.height
+								text : 'Administration Route'
+								verticalAlignment : Text.AlignVCenter
+								horizontalAlignment : Text.AlignRight
+								font.pointSize : 12
 						}
 						ComboBox {
 							id : adminCombo
-							width : parent.width / 2
+							width : parent.width / 4
 							height : parent.height
+							currentIndex : -1
 							contentItem : Text {
 								text : adminCombo.displayText;
 								verticalAlignment : Text.AlignVCenter;
@@ -482,24 +613,26 @@ UIActionDrawerForm {
 								ListElement {name : 'Oral'}
 								ListElement {name : 'Transmucosal'}
 							}
+							onActivated : {
+								substanceDialog.adminRoute = adminModel.get(currentIndex).name
+								substanceDialog.adminChange(adminRoute)
+							}
 						}
-					}
-					Row {
-						id : subRow
-						width : parent.width
-						height : parent.height / 2
 						Label {
 							id : subLabel
-							width : parent.width / 2
+							width : parent.width / 5
 							height : parent.height
 							text : 'Substance'
 							verticalAlignment : Text.AlignVCenter
-							font.pointSize : 10
+							horizontalAlignment : Text.AlignRight
+							font.pointSize : 12
 						}
 						ComboBox {
 							id : subCombo
-							width : parent.width / 2
+							width : parent.width / 4
 							height : parent.height
+							currentIndex : -1
+							displayText : (model.status == FolderListModel.Ready && currentIndex != -1) ? model.get(currentIndex,'fileName').split('.')[0] : ''
 							contentItem : Text {
 								text : subCombo.displayText;
 								verticalAlignment : Text.AlignVCenter;
@@ -511,17 +644,142 @@ UIActionDrawerForm {
 							delegate : ItemDelegate {
 								width : subCombo.width
 								contentItem : Text {
-									text : model.fileName.toString();
+									text : model.fileName.toString().split('.')[0];
 									horizontalAlignment : Text.AlignHCenter
 									font.pointSize : 10;
 								}
 								highlighted : subCombo.highlightedIndex === index;
 							}
-							model : FolderListModel {
+							model : subModel
+							FolderListModel {
 								id : subModel
 								nameFilters : ['*.xml']
 								folder : 'file:substances'
 								showDirs : false
+							}
+							onActivated : {
+								substanceDialog.substance = subModel.get(currentIndex, 'fileBaseName')
+							}
+						}
+					}
+					Row {
+						id : inputRow
+						width : parent.width;
+						height : parent.height / numRows
+						spacing : 0;
+						signal fieldChange (string fieldName)
+						onFieldChange : {
+							switch (fieldName) {
+								case 'Dose' :
+									doseWrapper.editing = true
+									concentrationWrapper.editing = false
+									rateWrapper.editing = false
+									break;
+								case 'Concentration' :
+									doseWrapper.editing = false
+									concentrationWrapper.editing = true
+									rateWrapper.editing = false
+									break;
+								case 'Rate' :
+									doseWrapper.editing = false
+									concentrationWrapper.editing = false
+									rateWrapper.editing = true
+									break;
+								default : 
+									doseWrapper.editing = false
+									concentrationWrapper.editing = false
+									rateWrapper.editing = false
+							}
+						}
+						Item {
+							id : doseWrapper
+							width : parent.width / 3;
+							height : inputRow.height;
+							property bool editing : false
+							TextField {
+								id : doseField
+								anchors.fill : parent
+								placeholderText : substanceDialog.doseLabel
+								verticalAlignment : Text.AlignBottom;
+								horizontalAlignment : Text.AlignHCenter;
+								font.pointSize : 12;
+								visible : false
+								validator : DoubleValidator {
+									bottom : 0.0
+								}
+								background : Rectangle { 
+									anchors.fill : parent; 
+									color : 'transparent'; 
+									border.color : doseWrapper.editing ? 'green' : 'grey'
+									border.width : doseWrapper.editing ? 3 : 1
+								}
+								onPressed : {
+									inputRow.fieldChange('Dose')
+								}
+								onEditingFinished : {
+									substanceDialog.dose = doseField.text
+								}
+							}
+						}
+						Item {
+							id : concentrationWrapper
+							width : parent.width / 3;
+							height : parent.height;
+							property bool editing : false
+							TextField {
+								id : concentrationField
+								anchors.fill : parent
+								placeholderText : 'Concentration (ug/mL)'
+								font.pointSize : 12;
+								visible : false
+								verticalAlignment : Text.AlignBottom;
+								horizontalAlignment : Text.AlignHCenter;
+								validator : DoubleValidator {
+									bottom : 0.0
+								}
+								background : Rectangle { 
+									anchors.fill : parent; 
+									color : 'transparent'; 
+									border.color :  concentrationWrapper.editing ? 'green' : 'grey'
+									border.width : concentrationWrapper.editing ? 3 : 1
+								}
+								onPressed : {
+									inputRow.fieldChange('Concentration')
+								}
+								onEditingFinished : {
+									substanceDialog.concentration = concentrationField.text
+								}
+							}
+							
+						}
+						Item {
+							id : rateWrapper
+							width : parent.width / 3;
+							height : parent.height;
+							property bool editing : false
+							TextField {
+								id : rateField
+								anchors.fill : parent
+								placeholderText : 'Infusion Rate (mL/min)'
+								font.pointSize : 12;
+								visible : false
+								verticalAlignment : Text.AlignVCenter;
+								horizontalAlignment : Text.AlignHCenter;
+								validator : DoubleValidator {
+									bottom : 0.0
+								}
+								background : Rectangle { 
+									anchors.fill : parent; 
+									color : 'transparent'; 
+									border.color : rateWrapper.editing ? 'green' : 'grey'
+									border.width : rateWrapper.editing ? 3 : 1
+								}
+								onPressed : {
+									inputRow.fieldChange('Rate')
+								}
+								onEditingFinished : {
+									substanceDialog.rate = rateField.text
+								}
 							}
 						}
 					}
