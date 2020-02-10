@@ -18,7 +18,7 @@ Item {
     Button {
         id : actionButton
         text : parent.name
-        width : parent.width * 0.9
+        width : parent.width
         height : parent.height * 0.9
         anchors.centerIn : parent
         hoverEnabled : true

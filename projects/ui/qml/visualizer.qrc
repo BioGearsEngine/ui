@@ -16,10 +16,10 @@
         <file>UIPlotSeries.qml</file>
         <file>UIPlotSeriesForm.ui.qml</file>
         <file>UITabButtonForm.ui.qml</file>
-        <file>UIActionDrawer.qml</file>
-        <file>UIActionDrawerForm.qml</file>
-        <file>UIActionButton.qml</file>
-        <file>UIActionButtonForm.qml</file>
+        <file>ActionDrawer.qml</file>
+        <file>ActionDrawerForm.qml</file>
+        <file>UIActionSwitch.qml</file>
+        <file>UIActionSwitchForm.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

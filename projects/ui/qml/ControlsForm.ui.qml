@@ -120,7 +120,20 @@ ColumnLayout {
 
     Button {
             id : drawerToggle
-            text : 'Action Explorer'
+            contentItem : Text {
+                id : drawerText
+                text : 'Add Action'
+                font.pointSize : 12
+                color : 'white'
+                horizontalAlignment : Text.AlignHCenter
+                verticalAlignment : Text.AlignVCenter
+            }
+            background : Rectangle {
+                anchors.fill : parent
+                color : '#1A5276'
+                border.color : '#1A5276'
+                border.width : 2
+            }
             Layout.preferredWidth: root.width
             Layout.alignment: Qt.AlignHCenter
     }
@@ -128,15 +141,14 @@ ColumnLayout {
      Item {
         id : actionButtonWrapper
         Layout.preferredWidth : root.width
-        Layout.preferredHeight : 200
+        Layout.preferredHeight : 400
         z : 2
 
-        GridView {
+        ListView {
             id : actionButtonView
             clip: true
             anchors.fill : parent
-            cellWidth : root.width / 2
-            cellHeight : 60
+            focus : true
             model : actionButtonModel  //Defined in Controls.qml
         }
 

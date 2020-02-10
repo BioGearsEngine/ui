@@ -17,7 +17,7 @@ GridLayout {
     property alias consoleArea : consoleArea
     property alias actionDrawer : actionDrawer
 
-    UIActionDrawer {
+    ActionDrawer {
         id: actionDrawer
         scenario : root.scenario
         controls : root.controls

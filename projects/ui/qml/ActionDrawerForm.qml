@@ -70,7 +70,6 @@ Drawer {
                             if (model.inUse == "false"){
                                 model.inUse ="true";
                                 func(actionMenuModel.get(index))
-                                //root.addButton(actionMenuModel.get(index))
                             }
                             else {
                                 model.inUse = "false"
@@ -122,7 +121,7 @@ Drawer {
             id: applyButton
             Layout.preferredWidth : 0.5 * root
             Layout.alignment : Qt.AlignTop | Qt.AlignHCenter
-            text : "Apply"
+            text : "Close"
         }
     }
 }

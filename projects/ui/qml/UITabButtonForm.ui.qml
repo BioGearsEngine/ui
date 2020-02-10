@@ -27,7 +27,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         opacity: enabled ? 1.0 : 0.3
         elide: Text.ElideRight
-    }
+        }
     }
 }
 
