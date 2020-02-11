@@ -159,7 +159,7 @@ ActionDrawerForm {
 
 	//Infection (very similar to hemorrage--1 extra arg--could look into making widget that both can use)
 	function setup_infection(actionItem){
-		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12;
+		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import QtQuick.Layouts 1.12; import QtQuick.Controls.Material 2.3;
 			Dialog {
 				id : infectionDialog;
 				title : 'Infection Editor'
@@ -198,7 +198,8 @@ ActionDrawerForm {
 				}
 				contentItem : Column {
 					spacing : 5;
-					anchors.centerIn : parent;
+					anchors.left : parent.left;
+					anchors.right : parent.right;
 					Row {
 						width : parent.width;
 						height : parent.height / 3 - parent.spacing / 3;
@@ -273,53 +274,31 @@ ActionDrawerForm {
 							}
 						}
 					}
-					Row {
-						spacing : width - (locationLabel.width + locationComboBox.width);
-						width : parent.width;
-						height : parent.height / 3 - parent.spacing / 3;
-						Label {
-							id : locationLabel
-							width : parent.width / 3;
-							height : parent.height;
-							text : 'Location'
-							font.pointSize : 12;
-							verticalAlignment : Text.AlignVCenter;
+					UIComboBox {
+						id : locationComboBox
+						width : parent.width
+						elementRatio : 0.5
+						height : parent.height / 3 - parent.spacing / 3
+						label.text : 'Location'
+						label.font.pointSize : 12
+						label.font.weight : Font.Normal
+						label.horizontalAlignment : Text.AlignLeft
+						label.verticalAlignment : Text.AlignVCenter
+						comboBox.font.pointSize : 12
+						comboBox.font.weight : Font.Normal
+						comboBox.model : compartmentModel
+						comboBox.currentIndex : -1
+						comboBox.onActivated : {
+							infectionDialog.location = compartmentModel.get(comboBox.currentIndex).name;
 						}
-						ComboBox {
-							id : locationComboBox
-							width : parent.width / 2;
-							height : parent.height;
-							editable : false
-							currentIndex : -1;
-							contentItem : Text {
-								text : locationComboBox.displayText;
-								verticalAlignment : Text.AlignVCenter;
-								horizontalAlignment : Text.AlignHCenter;
-								font.pointSize : 12;
-								height : parent.height;
-							}
-							delegate : ItemDelegate {
-								width : locationComboBox.width;
-								contentItem : Text {
-									text : model.name;
-									verticalAlignment : Text.AlignVCenter;
-									horizontalAlignment : Text.AlignHCenter;
-									font.pointSize : 12;
-								}
-								highlighted : locationComboBox.highlightedIndex === index;
-							}
-							model : ListModel {
-								id : compartmentModel
-								ListElement { name : 'Gut' }
-								ListElement { name : 'LeftArm' }
-								ListElement { name : 'LeftLeg'}
-								ListElement { name : 'RightArm'}
-								ListElement { name : 'RightLeg'}
-							}
-							onActivated : {
-								infectionDialog.location = compartmentModel.get(currentIndex).name;
-							}
-						}
+						ListModel {
+							id : compartmentModel
+							ListElement { name : 'Gut' }
+							ListElement { name : 'LeftArm' }
+							ListElement { name : 'LeftLeg'}
+							ListElement { name : 'RightArm'}
+							ListElement { name : 'RightLeg'}
+						} 
 					}
 				}	
 			}"

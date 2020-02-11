@@ -65,9 +65,9 @@ GraphAreaForm {
     var bloodChemistryReq = physiologyRequestModel.get(0).requests
     for ( var i = 0; i < bloodChemistryReq.count ; ++i){
       if (bloodChemistryReq.get(i).active){
-        physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistryReq.get(i).request})
-        bloodChemistryObjectModel.createPlotView(bloodChemistryReq.get(i))
-      }
+				physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistryReq.get(i).request})
+				bloodChemistryObjectModel.createPlotView(bloodChemistryReq.get(i))
+			}
     }
     var cardiovascularReq = physiologyRequestModel.get(1).requests
     for ( var i = 0; i < cardiovascularReq.count; ++i){

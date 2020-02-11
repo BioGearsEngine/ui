@@ -11,7 +11,6 @@
         <file>UIScalarForm.ui.qml</file>
         <file>UIPlaybackForm.ui.qml</file>
         <file>UIControlPhysiology.ui.qml</file>
-        <file>UIPatientBox.qml</file>
         <file>UIComboBoxForm.ui.qml</file>
         <file>UIPlotSeries.qml</file>
         <file>UIPlotSeriesForm.ui.qml</file>
@@ -20,6 +19,8 @@
         <file>ActionDrawerForm.qml</file>
         <file>UIActionSwitch.qml</file>
         <file>UIActionSwitchForm.qml</file>
+        <file>PatientBox.qml</file>
+        <file>UIComboBox.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
