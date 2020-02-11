@@ -32,6 +32,7 @@ Scenario::Scenario(QObject* parent)
 Scenario::Scenario(QString name, QObject* parent)
   : QObject(parent)
   , _thread()
+  , _engine_mutex()
   , _logger(name.toStdString() + ".log")
   , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
   , _action_queue()
@@ -132,6 +133,7 @@ Scenario& Scenario::environment_name(QString name)
 //-------------------------------------------------------------------------------
 Scenario& Scenario::load_patient(QString file)
 {
+
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
     path = "states/" + path;
@@ -140,6 +142,8 @@ Scenario& Scenario::load_patient(QString file)
     }
   }
 
+  _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
+  _engine = std::make_unique<biogears::BioGearsEngine>(&_logger);
   if (dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->LoadState(path)) {
 
     _data_request_table.clear();
@@ -482,7 +486,7 @@ Scenario& Scenario::load_patient(QString file)
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
   }
-
+  _engine_mutex.unlock();
   return *this;
 }
 //-------------------------------------------------------------------------------
@@ -508,15 +512,17 @@ void Scenario::physiology_thread_main()
 inline void Scenario::physiology_thread_step()
 {
   using namespace std::chrono_literals;
+  
   if (!_paused) {
-  if (_action_queue.size()) {
-    dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
-  }
-  dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
-
-  emit patientStateChanged(get_physiology_state());
-  emit patientMetricsChanged(get_physiology_metrics());
-  emit patientConditionsChanged(get_physiology_conditions());
+    _engine_mutex.lock();//< I ran in to some -O2 issues when using an std::lock_guard in msvc
+    if (_action_queue.size()) {
+      dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
+    }
+    dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
+    _engine_mutex.unlock();
+    emit patientStateChanged(get_physiology_state());
+    emit patientMetricsChanged(get_physiology_metrics());
+    emit patientConditionsChanged(get_physiology_conditions());
 
   } else {
     std::this_thread::sleep_for(16ms);
@@ -698,7 +704,7 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   current->skinTemperature = (_skinTemperature) ? _skinTemperature->GetValue() : 0.0;
   current->sodiumLostToSweat = (_sodiumLostToSweat) ? _sodiumLostToSweat->GetValue() : 0.0;
   current->sweatRate = (_sweatRate) ? _sweatRate->GetValue() : 0.0;
-  current->totalMetabolicRate = (_totalMetabolicRate) ? _totalMetabolicRate->GetValue() : 0.0; 
+  current->totalMetabolicRate = (_totalMetabolicRate) ? _totalMetabolicRate->GetValue() : 0.0;
   current->totalWorkRateLevel = (_totalWorkRateLevel) ? _totalWorkRateLevel->GetValue() : 0.0;
 
   auto& gastrointestinal = _engine->GetGastrointestinal();
@@ -727,66 +733,121 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   current->painVisualAnalogueScale = (_painVisualAnalogueScale) ? _painVisualAnalogueScale->GetValue() : 0.0;
 
   //TODO: Implement Pupillary Response  ReactivityModifier  ShapeModifier  SizeModifier;
-  current->leftEyePupillaryResponse =  0.0;
+  current->leftEyePupillaryResponse = 0.0;
   current->rightEyePupillaryResponse = 0.0;
 
   //Renal
   auto& renal = _engine->GetRenal();
-  current->glomerularFiltrationRate = (_glomerularFiltrationRate) ? _glomerularFiltrationRate->GetValue() : 0.0;;
-  current->filtrationFraction = (_filtrationFraction) ? _filtrationFraction->GetValue() : 0.0;;
-  current->leftAfferentArterioleResistance = (_leftAfferentArterioleResistance) ? _leftAfferentArterioleResistance->GetValue() : 0.0;;
-  current->leftBowmansCapsulesHydrostaticPressure = (_leftBowmansCapsulesHydrostaticPressure) ? _leftBowmansCapsulesHydrostaticPressure->GetValue() : 0.0;;
-  current->leftBowmansCapsulesOsmoticPressure = (_leftBowmansCapsulesOsmoticPressure) ? _leftBowmansCapsulesOsmoticPressure->GetValue() : 0.0;;
-  current->leftEfferentArterioleResistance = (_leftEfferentArterioleResistance) ? _leftEfferentArterioleResistance->GetValue() : 0.0;;
-  current->leftGlomerularCapillariesHydrostaticPressure = (_leftGlomerularCapillariesHydrostaticPressure) ? _leftGlomerularCapillariesHydrostaticPressure->GetValue() : 0.0;;
-  current->leftGlomerularCapillariesOsmoticPressure = (_leftGlomerularCapillariesOsmoticPressure) ? _leftGlomerularCapillariesOsmoticPressure->GetValue() : 0.0;;
-  current->leftGlomerularFiltrationCoefficient = (_leftGlomerularFiltrationCoefficient) ? _leftGlomerularFiltrationCoefficient->GetValue() : 0.0;;
-  current->leftGlomerularFiltrationRate = (_leftGlomerularFiltrationRate) ? _leftGlomerularFiltrationRate->GetValue() : 0.0;;
-  current->leftGlomerularFiltrationSurfaceArea = (_leftGlomerularFiltrationSurfaceArea) ? _leftGlomerularFiltrationSurfaceArea->GetValue() : 0.0;;
-  current->leftGlomerularFluidPermeability = (_leftGlomerularFluidPermeability) ? _leftGlomerularFluidPermeability->GetValue() : 0.0;;
-  current->leftFiltrationFraction = (_leftFiltrationFraction) ? _leftFiltrationFraction->GetValue() : 0.0;;
-  current->leftNetFiltrationPressure = (_leftNetFiltrationPressure) ? _leftNetFiltrationPressure->GetValue() : 0.0;;
-  current->leftNetReabsorptionPressure = (_leftNetReabsorptionPressure) ? _leftNetReabsorptionPressure->GetValue() : 0.0;;
-  current->leftPeritubularCapillariesHydrostaticPressure = (_leftPeritubularCapillariesHydrostaticPressure) ? _leftPeritubularCapillariesHydrostaticPressure->GetValue() : 0.0;;
-  current->leftPeritubularCapillariesOsmoticPressure = (_leftPeritubularCapillariesOsmoticPressure) ? _leftPeritubularCapillariesOsmoticPressure->GetValue() : 0.0;;
-  current->leftReabsorptionFiltrationCoefficient = (_leftReabsorptionFiltrationCoefficient) ? _leftReabsorptionFiltrationCoefficient->GetValue() : 0.0;;
-  current->leftReabsorptionRate = (_leftReabsorptionRate) ? _leftReabsorptionRate->GetValue() : 0.0;;
-  current->leftTubularReabsorptionFiltrationSurfaceArea = (_leftTubularReabsorptionFiltrationSurfaceArea) ? _leftTubularReabsorptionFiltrationSurfaceArea->GetValue() : 0.0;;
-  current->leftTubularReabsorptionFluidPermeability = (_leftTubularReabsorptionFluidPermeability) ? _leftTubularReabsorptionFluidPermeability->GetValue() : 0.0;;
-  current->leftTubularHydrostaticPressure = (_leftTubularHydrostaticPressure) ? _leftTubularHydrostaticPressure->GetValue() : 0.0;;
-  current->leftTubularOsmoticPressure = (_leftTubularOsmoticPressure) ? _leftTubularOsmoticPressure->GetValue() : 0.0;;
-  current->renalBloodFlow = (_renalBloodFlow) ? _renalBloodFlow->GetValue() : 0.0;;
-  current->renalPlasmaFlow = (_renalPlasmaFlow) ? _renalPlasmaFlow->GetValue() : 0.0;;
-  current->renalVascularResistance = (_renalVascularResistance) ? _renalVascularResistance->GetValue() : 0.0;;
-  current->rightAfferentArterioleResistance = (_rightAfferentArterioleResistance) ? _rightAfferentArterioleResistance->GetValue() : 0.0;;
-  current->rightBowmansCapsulesHydrostaticPressure = (_rightBowmansCapsulesHydrostaticPressure) ? _rightBowmansCapsulesHydrostaticPressure->GetValue() : 0.0;;
-  current->rightBowmansCapsulesOsmoticPressure = (_rightBowmansCapsulesOsmoticPressure) ? _rightBowmansCapsulesOsmoticPressure->GetValue() : 0.0;;
-  current->rightEfferentArterioleResistance = (_rightEfferentArterioleResistance) ? _rightEfferentArterioleResistance->GetValue() : 0.0;;
-  current->rightGlomerularCapillariesHydrostaticPressure = (_rightGlomerularCapillariesHydrostaticPressure) ? _rightGlomerularCapillariesHydrostaticPressure->GetValue() : 0.0;;
-  current->rightGlomerularCapillariesOsmoticPressure = (_rightGlomerularCapillariesOsmoticPressure) ? _rightGlomerularCapillariesOsmoticPressure->GetValue() : 0.0;;
-  current->rightGlomerularFiltrationCoefficient = (_rightGlomerularFiltrationCoefficient) ? _rightGlomerularFiltrationCoefficient->GetValue() : 0.0;;
-  current->rightGlomerularFiltrationRate = (_rightGlomerularFiltrationRate) ? _rightGlomerularFiltrationRate->GetValue() : 0.0;;
-  current->rightGlomerularFiltrationSurfaceArea = (_rightGlomerularFiltrationSurfaceArea) ? _rightGlomerularFiltrationSurfaceArea->GetValue() : 0.0;;
-  current->rightGlomerularFluidPermeability = (_rightGlomerularFluidPermeability) ? _rightGlomerularFluidPermeability->GetValue() : 0.0;;
-  current->rightFiltrationFraction = (_rightFiltrationFraction) ? _rightFiltrationFraction->GetValue() : 0.0;;
-  current->rightNetFiltrationPressure = (_rightNetFiltrationPressure) ? _rightNetFiltrationPressure->GetValue() : 0.0;;
-  current->rightNetReabsorptionPressure = (_rightNetReabsorptionPressure) ? _rightNetReabsorptionPressure->GetValue() : 0.0;;
-  current->rightPeritubularCapillariesHydrostaticPressure = (_rightPeritubularCapillariesHydrostaticPressure) ? _rightPeritubularCapillariesHydrostaticPressure->GetValue() : 0.0;;
-  current->rightPeritubularCapillariesOsmoticPressure = (_rightPeritubularCapillariesOsmoticPressure) ? _rightPeritubularCapillariesOsmoticPressure->GetValue() : 0.0;;
-  current->rightReabsorptionFiltrationCoefficient = (_rightReabsorptionFiltrationCoefficient) ? _rightReabsorptionFiltrationCoefficient->GetValue() : 0.0;;
-  current->rightReabsorptionRate = (_rightReabsorptionRate) ? _rightReabsorptionRate->GetValue() : 0.0;;
-  current->rightTubularReabsorptionFiltrationSurfaceArea = (_rightTubularReabsorptionFiltrationSurfaceArea) ? _rightTubularReabsorptionFiltrationSurfaceArea->GetValue() : 0.0;;
-  current->rightTubularReabsorptionFluidPermeability = (_rightTubularReabsorptionFluidPermeability) ? _rightTubularReabsorptionFluidPermeability->GetValue() : 0.0;;
-  current->rightTubularHydrostaticPressure = (_rightTubularHydrostaticPressure) ? _rightTubularHydrostaticPressure->GetValue() : 0.0;;
-  current->rightTubularOsmoticPressure = (_rightTubularOsmoticPressure) ? _rightTubularOsmoticPressure->GetValue() : 0.0;;
-  current->urinationRate = (_urinationRate) ? _urinationRate->GetValue() : 0.0;;
-  current->urineOsmolality = (_urineOsmolality) ? _urineOsmolality->GetValue() : 0.0;;
-  current->urineOsmolarity = (_urineOsmolarity) ? _urineOsmolarity->GetValue() : 0.0;;
-  current->urineProductionRate = (_urineProductionRate) ? _urineProductionRate->GetValue() : 0.0;;
-  current->meanUrineOutput = (_meanUrineOutput) ? _meanUrineOutput->GetValue() : 0.0;;
-  current->urineSpecificGravity = (_urineSpecificGravity) ? _urineSpecificGravity->GetValue() : 0.0;;
-  current->urineVolume = (_urineVolume) ? _urineVolume->GetValue() : 0.0;;
-  current->urineUreaNitrogenConcentration = (_urineUreaNitrogenConcentration) ? _urineUreaNitrogenConcentration->GetValue() : 0.0;;
+  current->glomerularFiltrationRate = (_glomerularFiltrationRate) ? _glomerularFiltrationRate->GetValue() : 0.0;
+  ;
+  current->filtrationFraction = (_filtrationFraction) ? _filtrationFraction->GetValue() : 0.0;
+  ;
+  current->leftAfferentArterioleResistance = (_leftAfferentArterioleResistance) ? _leftAfferentArterioleResistance->GetValue() : 0.0;
+  ;
+  current->leftBowmansCapsulesHydrostaticPressure = (_leftBowmansCapsulesHydrostaticPressure) ? _leftBowmansCapsulesHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->leftBowmansCapsulesOsmoticPressure = (_leftBowmansCapsulesOsmoticPressure) ? _leftBowmansCapsulesOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->leftEfferentArterioleResistance = (_leftEfferentArterioleResistance) ? _leftEfferentArterioleResistance->GetValue() : 0.0;
+  ;
+  current->leftGlomerularCapillariesHydrostaticPressure = (_leftGlomerularCapillariesHydrostaticPressure) ? _leftGlomerularCapillariesHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->leftGlomerularCapillariesOsmoticPressure = (_leftGlomerularCapillariesOsmoticPressure) ? _leftGlomerularCapillariesOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->leftGlomerularFiltrationCoefficient = (_leftGlomerularFiltrationCoefficient) ? _leftGlomerularFiltrationCoefficient->GetValue() : 0.0;
+  ;
+  current->leftGlomerularFiltrationRate = (_leftGlomerularFiltrationRate) ? _leftGlomerularFiltrationRate->GetValue() : 0.0;
+  ;
+  current->leftGlomerularFiltrationSurfaceArea = (_leftGlomerularFiltrationSurfaceArea) ? _leftGlomerularFiltrationSurfaceArea->GetValue() : 0.0;
+  ;
+  current->leftGlomerularFluidPermeability = (_leftGlomerularFluidPermeability) ? _leftGlomerularFluidPermeability->GetValue() : 0.0;
+  ;
+  current->leftFiltrationFraction = (_leftFiltrationFraction) ? _leftFiltrationFraction->GetValue() : 0.0;
+  ;
+  current->leftNetFiltrationPressure = (_leftNetFiltrationPressure) ? _leftNetFiltrationPressure->GetValue() : 0.0;
+  ;
+  current->leftNetReabsorptionPressure = (_leftNetReabsorptionPressure) ? _leftNetReabsorptionPressure->GetValue() : 0.0;
+  ;
+  current->leftPeritubularCapillariesHydrostaticPressure = (_leftPeritubularCapillariesHydrostaticPressure) ? _leftPeritubularCapillariesHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->leftPeritubularCapillariesOsmoticPressure = (_leftPeritubularCapillariesOsmoticPressure) ? _leftPeritubularCapillariesOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->leftReabsorptionFiltrationCoefficient = (_leftReabsorptionFiltrationCoefficient) ? _leftReabsorptionFiltrationCoefficient->GetValue() : 0.0;
+  ;
+  current->leftReabsorptionRate = (_leftReabsorptionRate) ? _leftReabsorptionRate->GetValue() : 0.0;
+  ;
+  current->leftTubularReabsorptionFiltrationSurfaceArea = (_leftTubularReabsorptionFiltrationSurfaceArea) ? _leftTubularReabsorptionFiltrationSurfaceArea->GetValue() : 0.0;
+  ;
+  current->leftTubularReabsorptionFluidPermeability = (_leftTubularReabsorptionFluidPermeability) ? _leftTubularReabsorptionFluidPermeability->GetValue() : 0.0;
+  ;
+  current->leftTubularHydrostaticPressure = (_leftTubularHydrostaticPressure) ? _leftTubularHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->leftTubularOsmoticPressure = (_leftTubularOsmoticPressure) ? _leftTubularOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->renalBloodFlow = (_renalBloodFlow) ? _renalBloodFlow->GetValue() : 0.0;
+  ;
+  current->renalPlasmaFlow = (_renalPlasmaFlow) ? _renalPlasmaFlow->GetValue() : 0.0;
+  ;
+  current->renalVascularResistance = (_renalVascularResistance) ? _renalVascularResistance->GetValue() : 0.0;
+  ;
+  current->rightAfferentArterioleResistance = (_rightAfferentArterioleResistance) ? _rightAfferentArterioleResistance->GetValue() : 0.0;
+  ;
+  current->rightBowmansCapsulesHydrostaticPressure = (_rightBowmansCapsulesHydrostaticPressure) ? _rightBowmansCapsulesHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->rightBowmansCapsulesOsmoticPressure = (_rightBowmansCapsulesOsmoticPressure) ? _rightBowmansCapsulesOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->rightEfferentArterioleResistance = (_rightEfferentArterioleResistance) ? _rightEfferentArterioleResistance->GetValue() : 0.0;
+  ;
+  current->rightGlomerularCapillariesHydrostaticPressure = (_rightGlomerularCapillariesHydrostaticPressure) ? _rightGlomerularCapillariesHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->rightGlomerularCapillariesOsmoticPressure = (_rightGlomerularCapillariesOsmoticPressure) ? _rightGlomerularCapillariesOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->rightGlomerularFiltrationCoefficient = (_rightGlomerularFiltrationCoefficient) ? _rightGlomerularFiltrationCoefficient->GetValue() : 0.0;
+  ;
+  current->rightGlomerularFiltrationRate = (_rightGlomerularFiltrationRate) ? _rightGlomerularFiltrationRate->GetValue() : 0.0;
+  ;
+  current->rightGlomerularFiltrationSurfaceArea = (_rightGlomerularFiltrationSurfaceArea) ? _rightGlomerularFiltrationSurfaceArea->GetValue() : 0.0;
+  ;
+  current->rightGlomerularFluidPermeability = (_rightGlomerularFluidPermeability) ? _rightGlomerularFluidPermeability->GetValue() : 0.0;
+  ;
+  current->rightFiltrationFraction = (_rightFiltrationFraction) ? _rightFiltrationFraction->GetValue() : 0.0;
+  ;
+  current->rightNetFiltrationPressure = (_rightNetFiltrationPressure) ? _rightNetFiltrationPressure->GetValue() : 0.0;
+  ;
+  current->rightNetReabsorptionPressure = (_rightNetReabsorptionPressure) ? _rightNetReabsorptionPressure->GetValue() : 0.0;
+  ;
+  current->rightPeritubularCapillariesHydrostaticPressure = (_rightPeritubularCapillariesHydrostaticPressure) ? _rightPeritubularCapillariesHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->rightPeritubularCapillariesOsmoticPressure = (_rightPeritubularCapillariesOsmoticPressure) ? _rightPeritubularCapillariesOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->rightReabsorptionFiltrationCoefficient = (_rightReabsorptionFiltrationCoefficient) ? _rightReabsorptionFiltrationCoefficient->GetValue() : 0.0;
+  ;
+  current->rightReabsorptionRate = (_rightReabsorptionRate) ? _rightReabsorptionRate->GetValue() : 0.0;
+  ;
+  current->rightTubularReabsorptionFiltrationSurfaceArea = (_rightTubularReabsorptionFiltrationSurfaceArea) ? _rightTubularReabsorptionFiltrationSurfaceArea->GetValue() : 0.0;
+  ;
+  current->rightTubularReabsorptionFluidPermeability = (_rightTubularReabsorptionFluidPermeability) ? _rightTubularReabsorptionFluidPermeability->GetValue() : 0.0;
+  ;
+  current->rightTubularHydrostaticPressure = (_rightTubularHydrostaticPressure) ? _rightTubularHydrostaticPressure->GetValue() : 0.0;
+  ;
+  current->rightTubularOsmoticPressure = (_rightTubularOsmoticPressure) ? _rightTubularOsmoticPressure->GetValue() : 0.0;
+  ;
+  current->urinationRate = (_urinationRate) ? _urinationRate->GetValue() : 0.0;
+  ;
+  current->urineOsmolality = (_urineOsmolality) ? _urineOsmolality->GetValue() : 0.0;
+  ;
+  current->urineOsmolarity = (_urineOsmolarity) ? _urineOsmolarity->GetValue() : 0.0;
+  ;
+  current->urineProductionRate = (_urineProductionRate) ? _urineProductionRate->GetValue() : 0.0;
+  ;
+  current->meanUrineOutput = (_meanUrineOutput) ? _meanUrineOutput->GetValue() : 0.0;
+  ;
+  current->urineSpecificGravity = (_urineSpecificGravity) ? _urineSpecificGravity->GetValue() : 0.0;
+  ;
+  current->urineVolume = (_urineVolume) ? _urineVolume->GetValue() : 0.0;
+  ;
+  current->urineUreaNitrogenConcentration = (_urineUreaNitrogenConcentration) ? _urineUreaNitrogenConcentration->GetValue() : 0.0;
+  ;
 
   //Respiratory
   auto& respiratory = _engine->GetRespiratory();

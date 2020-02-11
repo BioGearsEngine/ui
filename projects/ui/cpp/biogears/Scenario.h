@@ -91,6 +91,7 @@ private:
   std::unique_ptr<biogears::BioGears> _engine;
   Channel _action_queue;
 
+  std::mutex _engine_mutex;
   std::atomic<bool> _running;
   std::atomic<bool> _paused;
   std::atomic<bool> _throttle;
