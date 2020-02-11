@@ -22,6 +22,7 @@ ControlsForm {
     property Scenario scenario : biogears_scenario
     property ObjectModel actionModel : actionButtonModel
     patientBox.scenario : biogears_scenario
+    
 
     Scenario {
         id: biogears_scenario
@@ -94,6 +95,7 @@ ControlsForm {
         if(root.running)
         {
             root.paused = biogears_scenario.pause_play()
+            patientBox.enabled = root.paused
         }
         root.pauseClicked()
     }
@@ -102,6 +104,7 @@ ControlsForm {
         biogears_scenario.run()
         root.running = true;
         root.playClicked()
+         patientBox.enabled = !running
     }
     playback.onRateToggleClicked: {
         console.log("Setting BioGears run rate to %1".arg(speed))
@@ -125,7 +128,6 @@ ControlsForm {
     onActionStatusUpdate : {
         actionMessage.actionText = name + "\nStatus : " + status
     }
-    
 }
 
 /*##^## Designer {
