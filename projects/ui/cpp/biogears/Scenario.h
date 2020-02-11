@@ -48,7 +48,7 @@ public:
   Q_INVOKABLE QString patient_name();
   Q_INVOKABLE QString environment_name();
 
-  Q_INVOKABLE Scenario& patinet_name(QString);
+  Q_INVOKABLE Scenario& patient_name(QString);
   Q_INVOKABLE Scenario& environment_name(QString);
 
   Q_INVOKABLE Scenario& load_patient(QString);

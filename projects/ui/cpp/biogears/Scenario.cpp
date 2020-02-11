@@ -143,7 +143,7 @@ QString Scenario::environment_name()
   return _engine->GetEnvironment().GetName_cStr();
 }
 //-------------------------------------------------------------------------------
-Scenario& Scenario::patinet_name(QString name)
+Scenario& Scenario::patient_name(QString name)
 {
   _engine->GetPatient().SetName(name.toStdString());
   return *this;
