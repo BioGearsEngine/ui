@@ -1,49 +1,53 @@
 import QtQuick.Controls 2.12
 import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Controls.Material 2.12
-import QtQuick.Window 2.12
 
 import com.biogearsengine.ui.scenario 1.0
 
-Item {
+Row {
+    id : actionRow
+    spacing : 5
     property string name
     property bool active : false
-    property alias actionButton : actionButton
-    property alias delayTimer : delayTimer
-    
-    //When created by ActionObjectModel, UIActionButton will fill the available cell area
-    //Wrapping the active button inside an item like this allows us to add some padding around the button
-    //and center it in its cell
-    Button {
-        id : actionButton
-        text : parent.name
-        width : parent.width
+    property alias actionSwitch : actionSwitch
+    property alias scrollTimer : scrollTimer
+    property alias labelHoverArea : labelHoverArea
+    property alias actionLabel : actionLabel
+
+    Label {
+        id : actionLabel
+        width : parent.width * 3/4 - actionRow.spacing / 2
         height : parent.height * 0.9
-        anchors.centerIn : parent
-        hoverEnabled : true
-
-        contentItem : Text {
-            text : actionButton.text
-            horizontalAlignment : Text.AlignHCenter
-            verticalAlignment : Text.AlignVCenter
-            elide: Text.ElideRight
-
-        }
-
+        color : '#1A5276'
+        text : actionRow.name
+        elide : Text.ElideRight
+        font.pointSize : 12
+        font.bold : true
+        horizontalAlignment  : Text.AlignHCenter
+        verticalAlignment : Text.AlignVCenter
         background : Rectangle {
-            width : actionButton.width
-            height : actionButton.height
-            color : root.active ? "#7CB342" : "lightgray"
-            border.color : "black"
-            border.width : 2
-            radius : 20
+            id : labelBackground
+            anchors.fill : parent
+            color : 'transparent'
+            border.color : 'grey'
+            border.width : 0
+        }
+        MouseArea {
+            id : labelHoverArea
+            anchors.fill : parent
+            hoverEnabled : true
         }
     }
+    Switch {
+        id : actionSwitch
+        width : parent.width * 1/4 - actionRow.spacing / 2
+        height : parent.height
+        position : 0
+    }
+
 
     Timer {
-        id : delayTimer
-        interval : 1000; running : false; repeat : false
+        id : scrollTimer
+        interval : 300; running : false; repeat : true
     }
 
 }

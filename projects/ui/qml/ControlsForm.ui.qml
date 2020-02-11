@@ -33,7 +33,7 @@ ColumnLayout {
 
     property alias playback : playback_controls
     property alias drawerToggle : drawerToggle
-    property alias actionButtonView : actionButtonView
+    property alias actionSwitchView : actionSwitchView
     property alias actionMessage : actionMessage
 
     Row {
@@ -145,11 +145,11 @@ ColumnLayout {
         z : 2
 
         ListView {
-            id : actionButtonView
+            id : actionSwitchView
             clip: true
             anchors.fill : parent
             focus : true
-            model : actionButtonModel  //Defined in Controls.qml
+            model : actionSwitchModel  //Defined in Controls.qml
         }
 
         Rectangle {

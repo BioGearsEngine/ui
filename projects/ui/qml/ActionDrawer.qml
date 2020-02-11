@@ -11,23 +11,8 @@ ActionDrawerForm {
 	property Controls controls
 	property ObjectModel actionModel
 
-	function addButton(name, bgFunc){
-		actionModel.addButton(name, bgFunc)
-	}
-
-	function removeButton(menuElement){
-		var index = -1
-		for (var i = 0; i < actionModel.count; ++i){
-			if (menuElement.name == actionModel.get(i).name){
-				index = i;
-				break;
-			}
-		}
-		if (index!=-1) {
-			actionModel.remove(index, 1);
-		} else {
-			console.log("No active button : " + menuElement.name);
-		}
+	function addSwitch(name, onFunc, offFunc){
+		actionModel.addSwitch(name, onFunc, offFunc)
 	}
 
 	onToggleState:{
@@ -57,6 +42,9 @@ ActionDrawerForm {
 				property int rate
 				property string location
 				property var action
+				property var onFunc
+				property var offFunc
+				property string description
 				footer : DialogButtonBox {
 					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
 				}
@@ -64,8 +52,10 @@ ActionDrawerForm {
 					if (locationComboBox.currentIndex == -1 || rateSpinBox.value ==0) {
 						console.log('Invalid entry: Provide a rate > 0 and a location');
 					} else {
-						var bgFunc = function () { scenario.create_hemorrhage_action(location, rate) }
-						root.addButton(action.name, bgFunc)
+					description = action.name + ' : Location  = ' + location + '; Rate = ' + rate + ' mL/min'
+						onFunc = function () { scenario.create_hemorrhage_action(location, rate) }
+						offFunc = function () { scenario.create_hemorrhage_action(location, 0.0) }
+						root.addSwitch(description, onFunc, offFunc)
 						close();
 					}
 				}
@@ -177,10 +167,13 @@ ActionDrawerForm {
 				height : 250;
 				modal : true;
 				closePolicy : Popup.NoAutoClose;
-				property int rate
+				property int mic
 				property int severity
 				property string location
+				property string description
 				property var action
+				property var onFunc
+				property var offFunc
 				footer : DialogButtonBox {
 					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
 				}
@@ -188,8 +181,10 @@ ActionDrawerForm {
 					if (locationComboBox.currentIndex == -1 || severitySpinBox.value == 0 || micSpinBox.value == 0 ) {
 						console.log('Invalid entry: Provide an MIC > 0, a severity, and a location');
 					} else {
-						var bgFunc = function () { scenario.create_infection_action(location, severity, rate) }
-						root.addButton(action.name, bgFunc)
+						description = action.name + ' : Severity = ' + severitySpinBox.textFromValue(severity) + '; Location  = ' + location + '; MIC = ' + mic + ' mg/L'
+						onFunc = function () { scenario.create_infection_action(location, severity, mic) }
+						offFunc = function () { scenario.create_infection_action(location, 0, mic) }
+						root.addSwitch(description, onFunc, offFunc)
 						close();
 					}
 				}
@@ -231,7 +226,7 @@ ActionDrawerForm {
 								top : micSpinBox.to;
 							}
 							onValueModified : {
-								infectionDialog.rate = value
+								infectionDialog.mic = value
 							}
 						}
 					}
@@ -344,7 +339,10 @@ ActionDrawerForm {
 				closePolicy : Popup.NoAutoClose;
 				property real severity
 				property var action
+				property var onFunc
+				property var offFunc
 				property string labelText
+				property string description
 				footer : DialogButtonBox {
 					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
 				}
@@ -352,15 +350,17 @@ ActionDrawerForm {
 					if (severitySpinBox.value == 0) {
 						console.log('Invalid entry: Provide a value in range (0, 1.0]' );
 					} else {
-						var bgFunc;
+						descpription = action.name + ' : ' + actionLabel + ' = ' severity
 						switch (action.name){
 							case 'Asthma Attack' :
-								bgFunc = function () { scenario.create_asthma_action(severity) };
-								root.addButton('Asthma Attack', bgFunc);
+								onFunc = function () { scenario.create_asthma_action(severity) };
+								offFunc = function () { scenario.create_asthma_action(0.0) }
+								root.addSwitch(description, onFunc, offFunc);
 								break;
 							case 'Burn' :
-								bgFunc = function () { scenario.create_burn_action(severity) };
-								root.addButton('Burn', bgFunc);
+								onFunc = function () { scenario.create_burn_action(severity) };
+								offFunc = function () { return 0 };
+								root.addSwitch(description, onFunc, offFunc);
 								break;
 							default :
 								console.log('Support coming for ' + action.name);
@@ -432,10 +432,13 @@ ActionDrawerForm {
 				closePolicy : Popup.NoAutoClose;
 				property string substance
 				property var action
+				property var onFunc
+				property var offFunc
 				property real dose : 0.0
 				property real concentration : 0.0
 				property real rate : 0.0
 				property string adminRoute
+				property string description
 				property string doseLabel : 'Dose (mL)'
 				property int numRows : 4
 				signal adminChange (string route)
@@ -448,67 +451,79 @@ ActionDrawerForm {
 						console.log('Invalid entry : Provide an admin route and a substance');
 					}
 					else {
-						var bgFunc;
+						description = substance + ' ' + adminRoute + ' : '
 						switch (adminRoute) {
 							case 'Bolus - Intraarterial' :
-							if (dose == 0.0 || concentration == 0.0){
+								description += 'Dose = ' + dose + ' mL; Concentration = ' + concentration + ' ug/mL'
+								if (dose == 0.0 || concentration == 0.0){
 									console.log('Bolus action requires a dose and concentration')
 								}
 								else {
 									//Intraarterial is CDM::enumBolusAdministration::0
-									bgFunc = function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) }
-									root.addButton(substance + ' Bolus', bgFunc);
+									onFunc = function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) }
+									offFunc = function () { return 0 }
+									root.addSwitch(description, onFunc, offFunc);
 									close();
 								}
 								break;
 							case 'Bolus - Intramuscular' :
+								description += 'Dose = ' + dose + ' mL; Concentration = ' + concentration + ' ug/mL'
 								if (dose == 0.0 || concentration == 0.0){
 									console.log('Bolus action requires a dose and concentration')
 								}
 								else {
 									//Intramuscular is CDM::enumBolusAdministration::1
-									bgFunc = function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) }
-									root.addButton(substance + ' Bolus', bgFunc);
+									onFunc = function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) }
+									offFunc = function () { return 0 }
+									root.addSwitch(description, onFunc, offFunc);
 									close();
 								}
 								break;
 							case 'Bolus - Intravenous' :
+								description += 'Dose = ' + dose + ' mL; Concentration = ' + concentration + ' ug/mL'
 								if (dose == 0.0 || concentration == 0.0){
 									console.log('Bolus action requires a dose and concentration')
 								}
 								else {
 									//Intravenous is CDM::enumBolusAdministration::2
-									bgFunc = function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) }
-									root.addButton(substance + ' Bolus', bgFunc);
+									onFunc = function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) }
+									offFunc = function () { return 0 }
+									root.addSwitch(description, onFunc, offFunc);
 									close();
 								}
 								break;
 							case 'Infusion - Intravenous' :
+								description += 'Concentration = ' + concentration + ' ug/mL; Rate = ' + rate + ' mL/min'
 								if (concentration == 0.0 || rate == 0.0){
 									console.log('Infusion action requires a concentration and a rate')
 								} else {
-									bgFunc = function () { scenario.create_substance_infusion_action(substance, concentration, rate) }
-									root.addButton(substance + ' Infusion', bgFunc);
+									onFunc = function () { scenario.create_substance_infusion_action(substance, concentration, rate) }
+									offFunc = function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
+									root.addSwitch(description, onFunc, offFunc);
 									close();
 								}
 								break;
 							case 'Oral':
+								description += 'Dose = ' + dose + ' mg'
 								if (dose == 0.0){
 									console.log('Oral drug action requires a dose')
 								} else {
 									//Oral (GI) is CDM::enumOralAdministration::1
-									bgFunc = function () { scenario.create_substance_oral_action(substance, 1, dose) }
-									root.addButton('Oral ' +  substance, bgFunc);
+									onFunc = function () { scenario.create_substance_oral_action(substance, 1, dose) }
+									offFunc = function() { return 0}
+									root.addSwitch(description, onFunc, offFunc);
 									close();
 								}
 								break;
 							case 'Transmucosal':
+								description += 'Dose = ' + dose + ' mg'
 								if (dose == 0.0){
 									console.log('Tranmucosal action requires a dose')
 								} else {
 									//Transcmucosal is CDM::enumOralAdministration::0
-									bgFunc = function () { scenario.create_substance_oral_action(substance, 0, dose) }
-									root.addButton('Transmucosal ' + substance, bgFunc);
+									onFunc = function () { scenario.create_substance_oral_action(substance, 0, dose) }
+									offFunc = function() { return 0 }
+									root.addSwitch(description, onFunc, offFunc);
 									close();
 								}
 								break;
@@ -525,6 +540,7 @@ ActionDrawerForm {
 					dose = 0.0
 					concentration = 0.0
 					rate = 0.0
+					description = ''
 					adminChange('')
 					inputRow.fieldChange('')
 				}

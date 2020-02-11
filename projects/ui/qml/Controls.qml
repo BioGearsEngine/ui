@@ -16,8 +16,11 @@ ControlsForm {
     signal actionStatusUpdate(string name, string status);
     signal drawerOpenClosed()
 
+    property bool running : false
+    property bool paused : false
+    property int speed  :1
     property Scenario scenario : biogears_scenario
-    property ObjectModel actionModel : actionButtonModel
+    property ObjectModel actionModel : actionSwitchModel
     patientBox.scenario : biogears_scenario
     
 
@@ -61,6 +64,7 @@ ControlsForm {
             root.patientConditionsChanged(conditions)
         }
 
+
         onStateChanged : {
             //patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
         }
@@ -90,24 +94,24 @@ ControlsForm {
             }
         }
     }
+    }
 
     ObjectModel {
-            id : actionButtonModel
-            function addButton(menuElement) {
-                var actionComponent = Qt.createComponent("UIActionButton.qml");
-                if ( actionComponent.status != Component.Ready){
-                    if (actionComponent.status == Component.Error){
-                        console.log("Error : " + actionComponent.errorString() );
-                        return;
-                    }
-                    console.log("Error : Chart component not ready");
-                } else {
-                    var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
-                    actionObject.actionClicked.connect(menuElement.func);
-                    actionObject.actionHoverToggle.connect(actionMessageUpdate);
-                    actionObject.actionActiveToggle.connect(actionStatusUpdate);
-                    actionButtonModel.append(actionObject);
-                }
+            id : actionSwitchModel
+            function addSwitch(actionData, onFunc, offFunc) {
+                var actionComponent = Qt.createComponent("UIActionSwitch.qml");
+				if ( actionComponent.status != Component.Ready){
+					if (actionComponent.status == Component.Error){
+						console.log("Error : " + actionComponent.errorString() );
+						return;
+					}
+					console.log("Error : Chart component not ready");
+				} else {
+					var actionSwitch = actionComponent.createObject(actionSwitchView,{ "name" : actionData, "width" : actionSwitchView.width, "height" : 50});
+                    actionSwitch.toggleActionOn.connect(onFunc);
+                    actionSwitch.toggleActionOff.connect(offFunc);
+					actionSwitchModel.append(actionSwitch);
+				}
             }
      }
 

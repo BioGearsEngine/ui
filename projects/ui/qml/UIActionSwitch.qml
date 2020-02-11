@@ -4,37 +4,37 @@ import QtQml.Models 2.2
 
 UIActionSwitchForm {
 	id: root
+    property int scrollCount : 0
+    signal toggleActionOn()
+    signal toggleActionOff()
 
-	signal actionClicked(string name)
-	signal actionHoverToggle(string name, bool hoverStatus, string actionStatus, var coor)
-    signal actionActiveToggle(string name, string status)
 
-	actionButton.onClicked : {
-        root.actionClicked(root.name)
-        root.active = !root.active
-    }
-
-    actionButton.onHoveredChanged : {
-        if (actionButton.hovered) {
-            delayTimer.start()
+    actionSwitch.onPositionChanged : {
+        if(actionSwitch.position == 1){
+            root.toggleActionOn();
         }
         else {
-            root.actionHoverToggle(root.name, actionButton.hovered, "", Qt.point(0,0))
+            root.toggleActionOff();
         }
     }
 
-    delayTimer.onTriggered : {
-        var coor = actionButton.mapToItem(root.parent, root.width / 4, root.height * 0.8)
-        var status = root.active ? "Active" : "Inactive"
-        root.actionHoverToggle(root.name, actionButton.hovered, status, coor)
+    labelHoverArea.onEntered : {
+        scrollTimer.restart()
     }
 
-    //Ideally this functionality would be triggered by the actionClicked signal.  But that signal passes args directly corresponding create_scenario function,
-    //which only takes name arg at this point.  So trying to have actionClicked also emit status causes create_scenario function to err
-    onActiveChanged : {
-        var status = root.active ? "Active" : "Inactive"
-        actionActiveToggle(root.name, status);
+    labelHoverArea.onExited : {
+        scrollTimer.stop()
+        actionLabel.text = root.name
+        scrollCount = 0
     }
 
-    
+    scrollTimer.onTriggered : {
+        if (actionLabel.truncated){
+            scrollCount++;
+            actionLabel.text = root.name.substring(scrollCount, root.name.length)
+        }
+        else {
+            scrollTimer.stop();
+        }
+    }
 }

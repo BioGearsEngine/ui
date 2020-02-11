@@ -52,7 +52,7 @@ Drawer {
                     height : delegateText.height * 1.4
                     width : root.width
                     Layout.alignment : Qt.AlignVCenter
-                    color : inUse == "true" ? "steelblue" : "white"
+                    color : ListView.isCurrentItem ? "steelblue" : "white"
                     border.color: "black"
                     border.width : ListView.isCurrentItem ? 2 : 0
                     Text {
@@ -67,27 +67,13 @@ Drawer {
                         anchors.fill : parent
                         onClicked : {
                             actionListView.currentIndex = index;
-                            if (model.inUse == "false"){
-                                model.inUse ="true";
-                                func(actionMenuModel.get(index))
-                            }
-                            else {
-                                model.inUse = "false"
-                                root.removeButton(actionMenuModel.get(index))
-                            }
+                            func(actionMenuModel.get(index))
                         }
                     }
                     Keys.onReturnPressed : {
                         if (root.opened ){
                             actionListView.currentIndex = index;
-                            if (model.inUse == "false"){
-                                model.inUse ="true";
-                                root.addButton(actionMenuModel.get(index))
-                            }
-                            else {
-                                model.inUse = "false"
-                                root.removeButton(actionMenuModel.get(index))
-                            }       
+                            root.addButton(actionMenuModel.get(index))      
                         }
                     }
                 }
@@ -95,26 +81,26 @@ Drawer {
 
             ListModel {
                 id : actionMenuModel
-                ListElement { name : "Exercise"; inUse : "false"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Consume Meal"; inUse : "false"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Hemorrhage"; inUse : "false"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
-                ListElement { name : "Burn"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Pain Stimulus"; inUse : "false"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
-                ListElement { name : "Tension Pneumothorax"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Infection"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
-                ListElement { name : "Asthma Attack"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Airway Obstruction"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Traumatic Brain Injury"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Bronchoconstriction"; inUse : "false"; section : "Insults" ; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Acute Stress"; inUse : "false"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Substance Administration"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_SubstanceActions(actionItem)}}
-                ListElement { name : "Needle Decompression"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Inhaler"; inUse : "false"; section : "Interventions" ; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Anesthesia Machine"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Transfusion"; inUse : "false"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Diabetes (Type 1)"; inUse : "false"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Diabetes (Type 2)"; inUse : "false"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Bronchitis"; inUse : "false"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Exercise"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Hemorrhage"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
+                ListElement { name : "Burn"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
+                ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Tension Pneumothorax"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Infection";  section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
+                ListElement { name : "Asthma Attack"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
+                ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Traumatic Brain Injury"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Bronchoconstriction"; section : "Insults" ; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
+                ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
+                ListElement { name : "Substance Administration"; section : "Interventions"; property var func : function(actionItem) {root.setup_SubstanceActions(actionItem)}}
+                ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
             }
         }
         Button {
