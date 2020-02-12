@@ -16,9 +16,6 @@ ControlsForm {
     signal actionStatusUpdate(string name, string status);
     signal drawerOpenClosed()
 
-    property bool running : false
-    property bool paused : false
-    property int speed  :1
     property Scenario scenario : biogears_scenario
     property ObjectModel actionModel : actionSwitchModel
     patientBox.scenario : biogears_scenario
@@ -93,7 +90,6 @@ ControlsForm {
                 playback.speedButton.state = "max";
             }
         }
-    }
     }
 
     ObjectModel {

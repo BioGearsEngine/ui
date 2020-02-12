@@ -68,7 +68,8 @@ ActionDrawerForm {
 				}
 				contentItem : Column {
 					spacing : 10;
-					anchors.centerIn : parent;
+					anchors.left : parent.left;
+					anchors.right : parent.right
 					Row {
 						width : parent.width;
 						height : parent.height / 2 - parent.spacing / 2;
@@ -100,54 +101,34 @@ ActionDrawerForm {
 							}
 						}
 					}
-					Row {
-						spacing : width - (locationLabel.width + locationComboBox.width);
-						width : parent.width;
-						height : parent.height / 2 - parent.spacing / 2;
-						Label {
-							id : locationLabel
-							width : parent.width / 3;
-							height : parent.height;
-							text : 'Location'
-							font.pointSize : 12;
-							verticalAlignment : Text.AlignVCenter;
+					UIComboBox {
+						id : locationComboBox
+						width : parent.width
+						height : parent.height / 3 - parent.spacing / 3
+						elementRatio : 0.4
+						label.text : 'Location'
+						label.font.pointSize : 12
+						label.font.weight : Font.Normal
+						label.horizontalAlignment : Text.AlignLeft
+						label.verticalAlignment : Text.AlignVCenter
+						comboBox.font.pointSize : 12
+						comboBox.font.weight : Font.Normal
+						comboBox.model : compartmentModel
+						comboBox.textRole : 'name'		//Tells UIComboBox to use 'name' role of compartmentModel to populate menu
+						comboBox.currentIndex : -1
+						comboBox.onActivated : {
+							hemDialog.location = compartmentModel.get(comboBox.currentIndex).name;
 						}
-						ComboBox {
-							id : locationComboBox
-							width : parent.width / 2;
-							height : parent.height;
-							editable : false
-							currentIndex : -1;
-							contentItem : Text {
-								text : locationComboBox.displayText;
-								verticalAlignment : Text.AlignVCenter;
-								horizontalAlignment : Text.AlignHCenter;
-								font.pointSize : 12;
-								height : parent.height;
-							}
-							delegate : ItemDelegate {
-								width : locationComboBox.width;
-								contentItem : Text {
-									text : model.name;
-									verticalAlignment : Text.AlignVCenter;
-									horizontalAlignment : Text.AlignHCenter;
-									font.pointSize : 12;
-								}
-								highlighted : locationComboBox.highlightedIndex === index;
-							}
-							model : ListModel {
-								id : compartmentModel
-								ListElement { name : 'Aorta'}
-								ListElement { name : 'Brain'}
-								ListElement { name : 'LeftArm'}
-								ListElement { name : 'Gut' }
-								ListElement { name : 'LeftLeg'}
-								ListElement { name : 'RightArm'}
-								ListElement { name : 'RightLeg'}
-							}
-							onActivated : {
-								hemDialog.location = compartmentModel.get(currentIndex).name;
-							}
+						ListModel {
+							//UIComboBox assumes that ListModel has a role called 'name'.  Must define here
+							id : compartmentModel
+							ListElement { name : 'Aorta'}
+							ListElement { name : 'Brain'}
+							ListElement { name : 'LeftArm'}
+							ListElement { name : 'Gut' }
+							ListElement { name : 'LeftLeg'}
+							ListElement { name : 'RightArm'}
+							ListElement { name : 'RightLeg'}
 						}
 					}
 				}	
@@ -287,11 +268,13 @@ ActionDrawerForm {
 						comboBox.font.pointSize : 12
 						comboBox.font.weight : Font.Normal
 						comboBox.model : compartmentModel
+						comboBox.textRole : 'name'		//Tells UIComboBox to use 'name' role of compartmentModel to populate menu
 						comboBox.currentIndex : -1
 						comboBox.onActivated : {
 							infectionDialog.location = compartmentModel.get(comboBox.currentIndex).name;
 						}
 						ListModel {
+							//UIComboBox assumes that a ListModel role called 'name' exists, thus we must set it here
 							id : compartmentModel
 							ListElement { name : 'Gut' }
 							ListElement { name : 'LeftArm' }
@@ -510,7 +493,7 @@ ActionDrawerForm {
 					}
 				}
                 
-                onReset : {
+        onReset : {
 					adminCombo.currentIndex = -1
 					subCombo.currentIndex = -1
 					doseField.clear()
@@ -559,7 +542,7 @@ ActionDrawerForm {
 
 				contentItem : Column {
 					id : columnWrapper;
-					spacing : 20;
+					spacing : 40;
 					anchors.left : parent.left
 					anchors.right : parent.right;
 					Row {
@@ -568,38 +551,23 @@ ActionDrawerForm {
 						height : parent.height / numRows
 						anchors.horizontalCenter : parent.horizontalCenter
 						spacing : 10
-						Label {
-								id : adminLabel
-								width : parent.width / 5
-								height : parent.height
-								text : 'Administration Route'
-								verticalAlignment : Text.AlignVCenter
-								horizontalAlignment : Text.AlignRight
-								font.pointSize : 12
-						}
-						ComboBox {
+						UIComboBox {
 							id : adminCombo
-							width : parent.width / 4
+							width : parent.width / 2.1 - spacing / 2
+							anchors.left : parent.left
+							elementRatio : 0.6
 							height : parent.height
-							currentIndex : -1
-							contentItem : Text {
-								text : adminCombo.displayText;
-								verticalAlignment : Text.AlignVCenter;
-								horizontalAlignment : Text.AlignHCenter;
-								font.pointSize : 10;
-								height : parent.height
-								width : adminCombo.width
-							} 
-							delegate : ItemDelegate {
-								width : adminCombo.width
-								contentItem : Text {
-									text : model.name;
-									horizontalAlignment : Text.AlignHCenter
-									font.pointSize : 10;
-								}
-								highlighted : adminCombo.highlightedIndex === index;
-							}
-							model : ListModel {
+							label.text : 'Administration Route'
+							label.font.pointSize : 12
+							label.font.weight : Font.Normal
+							label.horizontalAlignment : Text.AlignHCenter
+							label.verticalAlignment : Text.AlignVCenter
+							comboBox.font.pointSize : 10
+							comboBox.font.weight : Font.Normal
+							comboBox.currentIndex : -1
+							comboBox.model : adminModel
+							comboBox.textRole : 'name'		//Tells UIComboBox to use 'name' role of adminModel to populate menu
+							ListModel {
 								id : adminModel
 								ListElement {name : 'Bolus - Intraarterial'}
 								ListElement {name : 'Bolus - Intramuscular'}
@@ -608,52 +576,36 @@ ActionDrawerForm {
 								ListElement {name : 'Oral'}
 								ListElement {name : 'Transmucosal'}
 							}
-							onActivated : {
-								substanceDialog.adminRoute = adminModel.get(currentIndex).name
+							comboBox.onActivated : {
+								substanceDialog.adminRoute = adminModel.get(comboBox.currentIndex).name
 								substanceDialog.adminChange(adminRoute)
 							}
 						}
-						Label {
-							id : subLabel
-							width : parent.width / 5
-							height : parent.height
-							text : 'Substance'
-							verticalAlignment : Text.AlignVCenter
-							horizontalAlignment : Text.AlignRight
-							font.pointSize : 12
-						}
-						ComboBox {
+						UIComboBox{
 							id : subCombo
-							width : parent.width / 4
+							width : parent.width / 2.1 - spacing / 2
+							anchors.left : parent.horizontalCenter
+							elementRatio : 0.5
 							height : parent.height
-							currentIndex : -1
-							displayText : (model.status == FolderListModel.Ready && currentIndex != -1) ? model.get(currentIndex,'fileName').split('.')[0] : ''
-							contentItem : Text {
-								text : subCombo.displayText;
-								verticalAlignment : Text.AlignVCenter;
-								horizontalAlignment : Text.AlignHCenter;
-								font.pointSize : 10;
-								height : parent.height
-								width : subCombo.width
-							} 
-							delegate : ItemDelegate {
-								width : subCombo.width
-								contentItem : Text {
-									text : model.fileName.toString().split('.')[0];
-									horizontalAlignment : Text.AlignHCenter
-									font.pointSize : 10;
-								}
-								highlighted : subCombo.highlightedIndex === index;
-							}
-							model : subModel
+							label.text : 'Substance'
+							label.font.pointSize : 12
+							label.font.weight : Font.Normal
+							label.horizontalAlignment : Text.AlignHCenter
+							label.verticalAlignment : Text.AlignVCenter
+							comboBox.font.pointSize : 10
+							comboBox.font.weight : Font.Normal
+							comboBox.currentIndex : -1
+							comboBox.model : subModel
+							comboBox.textRole : 'fileBaseName'  //FolderListModels have many built-in roles (fileName, fileBaseName, filePath, etc).  fileBaseName will remove the '.xml' from substance file name
+
 							FolderListModel {
 								id : subModel
 								nameFilters : ['*.xml']
 								folder : 'file:substances'
 								showDirs : false
 							}
-							onActivated : {
-								substanceDialog.substance = subModel.get(currentIndex, 'fileBaseName')
+							comboBox.onActivated : {
+								substanceDialog.substance = subModel.get(comboBox.currentIndex, 'fileBaseName')
 							}
 						}
 					}
