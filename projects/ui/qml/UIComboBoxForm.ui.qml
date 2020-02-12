@@ -43,21 +43,22 @@ RowLayout {
       font : value.font
       verticalAlignment : Text.AlignVCenter;
       horizontalAlignment : Text.AlignHCenter;
+      width : parent.width
+      height : parent.height
     }
     delegate : ItemDelegate {
       //Controls the look of text in the combo box menu.  The 'textRole' property of ComboBox MUST be set by the instantiating item.  This property tells the menu which role
       //of the combo box model to display.  Ex:  A ListModel might have role called 'name', in which case you must set textRole : 'name' after setting the combo box model.
       //If splitToken is defined, we assume that we want everything up to the token (not after). For example: splitToken = '@' will output StandardMale from StandardMale@0s.  
       //If we ever want something after the token instead, we will need to revisit this code.
-      width : parent.width;
-      text : splitToken ? model[value.textRole].split(splitToken)[0] : model[value.textRole]
       contentItem : Text {
-        text : parent.text
+        text : splitToken ? model[value.textRole].split(splitToken)[0] : model[value.textRole]
         verticalAlignment : Text.AlignVCenter;
         horizontalAlignment : Text.AlignHCenter;
         font: value.font;
       }
       height : value.height
+      width : parent.width
       highlighted : value.highlightedIndex === index;
     }
   }

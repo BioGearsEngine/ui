@@ -21,6 +21,8 @@
         <file>UIActionSwitchForm.qml</file>
         <file>PatientBox.qml</file>
         <file>UIComboBox.qml</file>
+        <file>UISpinBox.qml</file>
+        <file>UISpinBoxForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

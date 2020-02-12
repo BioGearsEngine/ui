@@ -70,46 +70,30 @@ ActionDrawerForm {
 					spacing : 10;
 					anchors.left : parent.left;
 					anchors.right : parent.right
-					Row {
+					UISpinBox {
+						id : rateSpinBox
 						width : parent.width;
 						height : parent.height / 2 - parent.spacing / 2;
-						spacing : 5;
-						Label {
-							id : rateLabel
-							width : parent.width / 2;
-							height : parent.height;
-							text : 'Bleeding Rate (mL/min)';
-							font.pointSize : 12;
-							verticalAlignment : Text.AlignVCenter;
-						}
-						SpinBox {
-							id : rateSpinBox
-							width : parent.width / 2;
-							height : parent.height;
-							font.pointSize : 12;
-							value : 0;
-							from : 0;
-							to : 500;
-							editable : true;
-							stepSize: 10;
-							validator : IntValidator {
-								bottom : rateSpinBox.from;
-								top : rateSpinBox.to;
-							}
-							onValueModified : {
-								hemDialog.rate = value
-							}
+						elementRatio : 0.5
+						label.text : 'Bleeding Rate (mL/min)'
+						label.horizontalAlignment : Text.AlignHCenter
+						label.verticalAlignment : Text.AlignVCenter
+						spinBox.to : 500
+						spinBox.stepSize : 10
+						spinBox.onValueModified : {
+							hemDialog.rate = spinBox.value
 						}
 					}
 					UIComboBox {
 						id : locationComboBox
-						width : parent.width
-						height : parent.height / 3 - parent.spacing / 3
-						elementRatio : 0.4
+						width : parent.width * 0.9
+						anchors.horizontalCenter : parent.horizontalCenter
+						height : parent.height / 2 - parent.spacing / 2
+						elementRatio : 0.6
 						label.text : 'Location'
 						label.font.pointSize : 12
 						label.font.weight : Font.Normal
-						label.horizontalAlignment : Text.AlignLeft
+						label.horizontalAlignment : Text.AlignHCenter
 						label.verticalAlignment : Text.AlignVCenter
 						comboBox.font.pointSize : 12
 						comboBox.font.weight : Font.Normal
@@ -120,7 +104,6 @@ ActionDrawerForm {
 							hemDialog.location = compartmentModel.get(comboBox.currentIndex).name;
 						}
 						ListModel {
-							//UIComboBox assumes that ListModel has a role called 'name'.  Must define here
 							id : compartmentModel
 							ListElement { name : 'Aorta'}
 							ListElement { name : 'Brain'}
@@ -181,84 +164,46 @@ ActionDrawerForm {
 					spacing : 5;
 					anchors.left : parent.left;
 					anchors.right : parent.right;
-					Row {
-						width : parent.width;
+					UISpinBox {
+						id: micSpinBox
+						width : parent.width * 0.9;
 						height : parent.height / 3 - parent.spacing / 3;
-						spacing : 5;
-						Label {
-							id : micLabel
-							width : parent.width / 1.5;
-							height : parent.height;
-							text : 'Minimum Inhibitory Concentration (mg/L)';
-							font.pointSize : 12;
-							verticalAlignment : Text.AlignVCenter;
+						anchors.right : parent.right
+						elementRatio : 0.6
+						label.text : 'Min. Inhibitory Concentration (mg/L)';
+						label.horizontalAlignment : Text.AlignLeft
+						label.verticalAlignment : Text.AlignVCenter
+						spinBox.to : 300
+						spinBox.stepSize : 10
+						
+						spinBox.onValueModified : {
+							infectionDialog.mic = spinBox.value
 						}
-						SpinBox {
-							id : micSpinBox
-							width : parent.width / 3;
-							height : parent.height;
-							font.pointSize : 12;
-							value : 0;
-							from : 0;
-							to : 300;
-							editable : true;
-							stepSize: 10;
-							validator : IntValidator {
-								bottom : micSpinBox.from;
-								top : micSpinBox.to;
-							}
-							onValueModified : {
-								infectionDialog.mic = value
-							}
-						}
+
 					}
-					Row {
-						width : parent.width;
+					UISpinBox {
+						id : severitySpinBox
+						width : parent.width * 0.9;
 						height : parent.height / 3 - parent.spacing / 3;
-						spacing : 5;
-						Label {
-							id : severityLabel
-							width : parent.width / 2;
-							height : parent.height;
-							text : 'Severity';
-							font.pointSize : 12;
-							verticalAlignment : Text.AlignVCenter;
-						}
-						SpinBox {
-							id : severitySpinBox
-							width : parent.width / 2;
-							height : parent.height;
-							font.pointSize : 12;
-							property var boxText: ['','Mild', 'Moderate', 'Severe']
-							value : 0;
-							from : 0;
-							to : boxText.length;
-							editable : false
-							stepSize: 1;
-							validator : IntValidator {
-								bottom : severitySpinBox.from;
-								top : severitySpinBox.to;
-							}
-							textFromValue : function(value) {
-								return boxText[value]
-							}
-							valueFromText : function(text) {
-								for (var i = 0; i < boxText.length; ++i){
-									if (boxText[i] == text){
-										return i
-									}
-								}
-								return value
-							}
-							onValueModified : {
-								infectionDialog.severity = value
-							}
+						anchors.right : parent.right
+						elementRatio : 0.6
+						displayEnum : ['','Mild','Moderate','Severe']
+						label.text : 'Severity';
+						label.horizontalAlignment : Text.AlignLeft
+						label.verticalAlignment : Text.AlignVCenter
+						spinBox.to : 3
+						spinBox.stepSize : 1
+						spinBox.valueFromText : function(text) { return valueFromEnum(spinBox.text)}    //arg to function must be text to match default valueFromText signature
+						spinBox.textFromValue : function(value) { return valueToEnum(spinBox.value)}		//arg to function must be value to match defaul textFromValue signature
+						spinBox.onValueModified : {
+							infectionDialog.severity = spinBox.value
 						}
 					}
 					UIComboBox {
 						id : locationComboBox
-						width : parent.width
-						elementRatio : 0.5
+						width : parent.width * 0.9
+						anchors.right : parent.right
+						elementRatio : 0.6
 						height : parent.height / 3 - parent.spacing / 3
 						label.text : 'Location'
 						label.font.pointSize : 12
@@ -274,7 +219,6 @@ ActionDrawerForm {
 							infectionDialog.location = compartmentModel.get(comboBox.currentIndex).name;
 						}
 						ListModel {
-							//UIComboBox assumes that a ListModel role called 'name' exists, thus we must set it here
 							id : compartmentModel
 							ListElement { name : 'Gut' }
 							ListElement { name : 'LeftArm' }
@@ -312,7 +256,7 @@ ActionDrawerForm {
 					if (severitySpinBox.value == 0) {
 						console.log('Invalid entry: Provide a value in range (0, 1.0]' );
 					} else {
-						descpription = action.name + ' : ' + actionLabel + ' = ' severity
+						description = action.name + ' : ' + actionLabel + ' = ' + severity
 						switch (action.name){
 							case 'Asthma Attack' :
 								onFunc = function () { scenario.create_asthma_action(severity) };
@@ -336,43 +280,24 @@ ActionDrawerForm {
 				onRejected : {
 					close()
 				}
-				contentItem : Row {
-					width : parent.width;
-					height : parent.height
-					spacing : 5;
-					Label {
-						id : severityLabel
-						width : parent.width / 2;
-						text : severityActionDialog.labelText
-						height : parent.height;
-						font.pointSize : 12;
-						verticalAlignment : Text.AlignVCenter;
+				contentItem: UISpinBox {
+					id : severitySpinBox
+					width : parent.width * 0.9;
+					height : parent.height / 2;
+					anchors.horizontalCenter : parent.horizontalCenter
+					elementRatio : 0.5
+					unitScale : true
+					label.text : 'Severity';
+					label.horizontalAlignment : Text.AlignHCenter
+					label.verticalAlignment : Text.AlignVCenter
+					spinBox.to : 100
+					spinBox.stepSize : 5
+					spinBox.valueFromText : function(text) { return valueFromDecimal(spinBox.text)}    //arg to function must be text to match default valueFromText signature
+					spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value)}		//arg to function must be value to match defaul textFromValue signature
+					spinBox.onValueModified : {
+						severityActionDialog.severity = spinBox.value / spinBox.to
 					}
-					SpinBox {
-						id : severitySpinBox
-						width : parent.width / 2;
-						height : parent.height;
-						font.pointSize : 12;
-						property int decimals : 3
-						value : 0;
-						from : 0;
-						to : 100;
-						editable : true;
-						stepSize: 5;
-						validator : DoubleValidator {
-							bottom : 0;
-							top : 1.00;
-						}
-						onValueModified : {
-							severityActionDialog.severity = value / 100;
-						}
-						textFromValue : function(value) {
-							return Number(value/100).toLocaleString('f',severitySpinBox.decimals);
-						}
-						valueFromText : function(text) {
-							return Number.fromLocaleString(text) * 100;
-						}
-					}
+
 				}
 		}"
 
