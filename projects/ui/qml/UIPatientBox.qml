@@ -9,6 +9,9 @@ UIComboBoxForm {
     property Scenario scenario
 
     signal patientFolderReady()
+   
+    function loadState ()
+    {  scenario.restart(comboBox.model.get(comboBox.currentIndex,'fileName'));  }
 
     FolderListModel {
         id: folderModel
@@ -45,16 +48,16 @@ UIComboBoxForm {
         highlighted: comboBox.highlightedIndex === index
     }
     comboBox.onAccepted:  {
-        scenario.load_patient(comboBox.model.get(comboBox.currentIndex,'fileName'));
+        root.loadState();
     }
     comboBox.onActivated:  {
-        scenario.load_patient(comboBox.model.get(comboBox.currentIndex,'fileName'));
+        root.loadState();
     }
     onScenarioChanged: {
 
     }
     onPatientFolderReady:{
-        scenario.load_patient(comboBox.model.get(comboBox.currentIndex,'fileName'));
+        root.loadState();
     }
 }
 

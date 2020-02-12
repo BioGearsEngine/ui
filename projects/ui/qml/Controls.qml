@@ -16,9 +16,6 @@ ControlsForm {
     signal actionStatusUpdate(string name, string status);
     signal drawerOpenClosed()
 
-    property bool running : false
-    property bool paused : false
-    property int speed  :1
     property Scenario scenario : biogears_scenario
     property ObjectModel actionModel : actionButtonModel
     patientBox.scenario : biogears_scenario
@@ -63,6 +60,35 @@ ControlsForm {
         onPatientConditionsChanged:{
             root.patientConditionsChanged(conditions)
         }
+
+        onStateChanged : {
+            //patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
+        }
+        onRunningToggled : {
+            patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
+            if( isRunning){
+                playback.simButton.state = "Simulating";
+            } else {
+                playback.simButton.state = "Stopped";
+            }
+        }
+        onPausedToggled : {
+            patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
+            if( biogears_scenario.isRunning) {
+                if( isPaused ){
+                    playback.simButton.state = "Paused";
+                } else {
+                    playback.simButton.state = "Simulating";
+                }
+            }
+        }
+        onThrottledToggled : {
+            if ( isThrottled ){
+                playback.speedButton.state = "realtime";
+            } else {
+                playback.speedButton.state = "max";
+            }
+        }
     }
 
     ObjectModel {
@@ -78,44 +104,38 @@ ControlsForm {
                 } else {
                     var actionObject = actionComponent.createObject(actionButtonView,{ "name" : menuElement.name, "width" : actionButtonView.cellWidth, "height" : actionButtonView.cellHeight });
                     actionObject.actionClicked.connect(menuElement.func);
-                            actionObject.actionHoverToggle.connect(actionMessageUpdate);
-                            actionObject.actionActiveToggle.connect(actionStatusUpdate);
+                    actionObject.actionHoverToggle.connect(actionMessageUpdate);
+                    actionObject.actionActiveToggle.connect(actionStatusUpdate);
                     actionButtonModel.append(actionObject);
                 }
             }
      }
 
     playback.onRestartClicked: {
-            console.log("Restarting BioGears")
-            biogears_scenario.restart()
-            root.restartClicked()
-        } 
+        playback.simulationTime = "%1:%2:%3".arg("0").arg("00").arg("00")
+        patientBox.loadState();
+        root.restartClicked()
+    } 
     playback.onPauseClicked: {
-        console.log("Pausing BioGears")
-        if(root.running)
-        {
-            root.paused = biogears_scenario.pause_play()
-            patientBox.enabled = root.paused
-        }
+        biogears_scenario.pause_play()
         root.pauseClicked()
     }
     playback.onPlayClicked: {
-        console.log("Starting BioGears")
         biogears_scenario.run()
-        root.running = true;
         root.playClicked()
-         patientBox.enabled = !running
     }
     playback.onRateToggleClicked: {
-        console.log("Setting BioGears run rate to %1".arg(speed))
-        biogears_scenario.speed_toggle(speed)
-        root.speedToggled(speed)
-        root.speed = speed
+        if (biogears_scenario.isThrottled) {
+            biogears_scenario.speed_toggle(2)
+            root.speedToggled(2)
+        } else {
+            biogears_scenario.speed_toggle(1)
+            root.speedToggled(1)
+        }
     } 
     drawerToggle.onPressed : {
         root.drawerOpenClosed();
     }
-
     onActionMessageUpdate : {
         actionMessage.actionText = name + "\nStatus : " + status
         if (hoverStatus){
@@ -124,7 +144,6 @@ ControlsForm {
         }
         root.actionMessage.visible = hoverStatus
     }
-
     onActionStatusUpdate : {
         actionMessage.actionText = name + "\nStatus : " + status
     }

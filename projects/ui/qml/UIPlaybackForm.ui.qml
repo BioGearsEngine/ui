@@ -11,6 +11,13 @@ ColumnLayout {
   signal rateToggleClicked(int speed)
 
   property string simulationTime : "0:00:00"
+  property alias rate : foward.rate
+  property alias playing : pause_play.playing;
+  property alias paused  : pause_play.paused;
+
+  property alias resetButton : reset
+  property alias simButton: pause_play
+  property alias speedButton : foward
   RowLayout {
     spacing: 10
     Label {
@@ -44,7 +51,10 @@ ColumnLayout {
       icon.source: "qrc:/icons/play.png"
       icon.name: "simulate"
       icon.color: "transparent"
+      state : "Stopped"
+
       onClicked: {
+        console.log("UIPlaybackForm %1 %2".arg(playing).arg(paused))
         if(playing) {
           if(paused){
              state = "Simulating"
@@ -53,18 +63,26 @@ ColumnLayout {
           }
           root.pauseClicked()
         } else {
-          playing = true
           state = "Simulating"
           root.playClicked()
-
         }
       }
+
       states: [
-        State {
+       State{
+          name: "Stopped"
+          PropertyChanges { target: pause_play; icon.source: "icons/play.png" }
+          PropertyChanges { target: pause_play; icon.name: "Play" }
+          PropertyChanges { target: pause_play; text: "Play" }
+          PropertyChanges { target: pause_play; playing: false }
+          PropertyChanges { target: pause_play; paused: false }
+       }
+        ,State {
           name: "Simulating"
           PropertyChanges { target: pause_play; icon.source: "icons/pause.png" }
           PropertyChanges { target: pause_play; icon.name: "Pause" }
           PropertyChanges { target: pause_play; text: "Pause" }
+          PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: false }
           }
         ,State {
@@ -72,10 +90,12 @@ ColumnLayout {
           PropertyChanges { target: pause_play; icon.source: "icons/play.png" }
           PropertyChanges { target: pause_play; icon.name: "Resume" }
           PropertyChanges { target: pause_play; text: "Resume" }
+          PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: true }
         }
       ]
     }
+
     Button {
       id: foward
       property int rate : 1
@@ -87,16 +107,16 @@ ColumnLayout {
       icon.color: "transparent"
       Layout.preferredWidth: pause_play.width
       Layout.preferredHeight: pause_play.height
+      state : "realtime"
       onClicked: {
-        if(rate == 1) {
-         state = "max"
-         rate = 2
+        if(rate == 2) {
+          state = "realtime"
         } else {
-         state = "realtime"
-         rate = 1
+          state = "max"
         }
         root.rateToggleClicked(rate)
       }
+      
       states: [
         State {
           name: "realtime"

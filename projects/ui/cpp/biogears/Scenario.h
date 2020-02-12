@@ -33,7 +33,9 @@ class Scenario : public QObject, public biogears::Runnable {
 
   Q_OBJECT
   Q_PROPERTY(double time READ get_simulation_time NOTIFY timeAdvance)
-
+  Q_PROPERTY(double isRunning   READ is_running   NOTIFY runningToggled)
+  Q_PROPERTY(double isPaused    READ is_paused    NOTIFY pausedToggled)
+  Q_PROPERTY(double isThrottled READ is_throttled NOTIFY throttledToggled)
 public:
   Scenario(QObject* parent = Q_NULLPTR);
   Scenario(QString name, QObject* parent = Q_NULLPTR);
@@ -54,7 +56,7 @@ public:
 
   Q_INVOKABLE double get_simulation_time();
 
-  Q_INVOKABLE void restart();
+  Q_INVOKABLE void restart(QString patient_file);
   Q_INVOKABLE bool pause_play();
   Q_INVOKABLE void speed_toggle(int speed);
   Q_INVOKABLE void run() final;
@@ -62,7 +64,11 @@ public:
   Q_INVOKABLE void join() final;
   Q_INVOKABLE void step();
 
-public: //Action Factory Interface;
+  bool is_running() const;
+  bool is_paused() const;
+  bool is_throttled() const;
+
+  public: //Action Factory Interface;
   Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
   Q_INVOKABLE void create_asthma_action();
   Q_INVOKABLE void create_substance_infusion_action();
@@ -74,8 +80,12 @@ signals:
   void patientMetricsChanged(PatientMetrics* metrics);
   void patientConditionsChanged(PatientConditions conditions);
   void timeAdvance();
+  void stateChanged();
+  void runningToggled(bool isRunning);
+  void pausedToggled(bool isPaused);
+  void throttledToggled(bool isThrottled);
 
-protected:
+  protected:
   PatientState get_physiology_state();
   PatientMetrics* get_physiology_metrics();
   PatientConditions get_physiology_conditions();
@@ -92,6 +102,7 @@ private:
   Channel _action_queue;
 
   std::mutex _engine_mutex;
+
   std::atomic<bool> _running;
   std::atomic<bool> _paused;
   std::atomic<bool> _throttle;

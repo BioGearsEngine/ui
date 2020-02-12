@@ -51,18 +51,20 @@ Scenario::~Scenario()
   }
 }
 //-------------------------------------------------------------------------------
-void Scenario::restart()
+void Scenario::restart(QString patient_file)
 {
-  _running = true;
-  _paused = false;
+  _paused = true;
+  emit pausedToggled(_paused);
   _throttle = true;
-  //TODO: Reload Initial Patient State setting simulation to 0s
+  emit throttledToggled(_throttle);
+  load_patient(patient_file);
 }
 //-------------------------------------------------------------------------------
 bool Scenario::pause_play()
 {
-  //TODO: Reload Initial Patient State setting simulation to 0s
+
   _paused = !_paused;
+  emit pausedToggled(_paused);
   return _paused;
 }
 //-------------------------------------------------------------------------------
@@ -78,14 +80,18 @@ void Scenario::speed_toggle(int speed)
     _throttle = false;
     break;
   }
+  emit throttledToggled(_throttle);
 }
 //-------------------------------------------------------------------------------
 void Scenario::run()
 {
   if (!_thread.joinable() && !_running) {
     _running = true;
+    emit runningToggled(_running);
     _paused = false;
+    emit pausedToggled(_paused);
     _throttle = true;
+    emit throttledToggled(_throttle);
     _thread = std::thread(&Scenario::physiology_thread_main, this);
   }
 }
@@ -93,8 +99,11 @@ void Scenario::run()
 void Scenario::stop()
 {
   _running = false;
+  emit runningToggled(_running);
   _paused = true;
+  emit pausedToggled(_paused);
   _throttle = false;
+  emit throttledToggled(_throttle);
 }
 //-------------------------------------------------------------------------------
 void Scenario::join()
@@ -109,11 +118,26 @@ void Scenario::step()
   physiology_thread_step();
 }
 //-------------------------------------------------------------------------------
+bool Scenario::is_running() const
+{
+  return _running;
+}
+//-------------------------------------------------------------------------------
+bool Scenario::is_paused() const
+{
+  return _paused;
+}
+//-------------------------------------------------------------------------------
+bool Scenario::is_throttled() const
+{
+  return _throttle;
+}
+//-------------------------------------------------------------------------------
 QString Scenario::patient_name()
 {
   return _engine->GetPatient().GetName_cStr();
 }
-//--------      -----------------------------------------------------------------------
+//--------      -----------------------------------------------------------------
 QString Scenario::environment_name()
 {
   return _engine->GetEnvironment().GetName_cStr();
@@ -483,10 +507,13 @@ Scenario& Scenario::load_patient(QString file)
 
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
+    emit stateChanged();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
   }
   _engine_mutex.unlock();
+
+
   return *this;
 }
 //-------------------------------------------------------------------------------
