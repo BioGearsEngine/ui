@@ -24,9 +24,10 @@ RowLayout {
     Layout.fillWidth : true
     Layout.fillHeight : true
     text: "Unset"
-    font.pointSize: 10
-    font.weight: Font.DemiBold
-    font.bold: false
+    verticalAlignment : Text.AlignVCenter
+    horizontalAlignment : Text.AlignHCenter
+    font.pointSize: 12
+
   }
 
   ComboBox {
@@ -35,8 +36,9 @@ RowLayout {
     Layout.fillWidth : true
     Layout.fillHeight : true
     font.weight: Font.Medium
-    font.pointSize: 10
+    font.pointSize: 12
     editable: true 
+    currentIndex : -1
     contentItem : Text {
       //Controls the look of text that is currently displayed in the combo box
       text : value.displayText

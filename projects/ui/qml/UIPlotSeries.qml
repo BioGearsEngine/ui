@@ -11,14 +11,14 @@ UIPlotSeriesForm {
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
   function initializeChart (requestElement, tickCount) {
     if(requestElement.subRequests){
-      for (var i = 0; i < requestElement.subRequests.count; ++i){
-        var subRequest = requestElement.subRequests.get(i).subRequest
-        var series = root.createSeries(ChartView.SeriesTypeLine, formatRequest(subRequest), xAxis, yAxis);
+      for (let i = 0; i < requestElement.subRequests.count; ++i){
+        let subRequest = requestElement.subRequests.get(i).subRequest
+        let series = root.createSeries(ChartView.SeriesTypeLine, formatRequest(subRequest), xAxis, yAxis);
         root.requestNames.push(subRequest)
       }
       root.legend.visible = true
     } else {
-      var series = root.createSeries(ChartView.SeriesTypeLine, requestElement.request, xAxis, yAxis);
+      let series = root.createSeries(ChartView.SeriesTypeLine, requestElement.request, xAxis, yAxis);
       root.requestNames.push(requestElement.request);
     }
     xAxis.tickCount = tickCount;
@@ -30,7 +30,7 @@ UIPlotSeriesForm {
   function formatRequest(request){
     //Expression ([a-z])([A-Z]) searches for lower case letter followed by upper case (this way, something like "PH" isn't split into "P H").  
     //Parenthesis around each range capture the value in string, which we can call using $ syntax.  '$1 $2' means put a space between the first captured value (lower) and second captured value (upper)
-    var formatted = request.replace(/([a-z])([A-Z])/g, '$1 $2')
+    let formatted = request.replace(/([a-z])([A-Z])/g, '$1 $2')
     //Next, make sure that first character is upper case.  ^[a-z] specifies that we are only looking at leading character.
     formatted = formatted.replace(/^[a-z]/, u=>u.toUpperCase());
     return formatted
@@ -38,17 +38,16 @@ UIPlotSeriesForm {
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
   function updateSeries(metrics){
-    var time = metrics.SimulationTime / 60;
-    var prop;
+    let time = metrics.SimulationTime / 60;
     if (root.count>1){
-      for (var i = 0; i < root.count; ++i){
-        var subRequest = root.requestNames[i]
-        prop = metrics[subRequest]
+      for (let i = 0; i < root.count; ++i){
+        let subRequest = root.requestNames[i]
+        let prop = metrics[subRequest]
         //Need to grab the formatted request since sub-series use that version to make the legend labels look good.  Could loop through by index number, but this seems safer
         root.series(formatRequest(subRequest)).append(time,prop)
       }
     } else {
-      prop = metrics[root.requestNames[0]];
+      let prop = metrics[root.requestNames[0]];
       root.series(root.requestNames[0]).append(time,prop)
     }
 
@@ -58,12 +57,12 @@ UIPlotSeriesForm {
     //Gets simulation time and physiology data request from patient metrics, appending new point to each series
   function clear(){
     if (root.count>1){
-      for (var i = 0; i < root.count; ++i){
-        var series = root.series(formatRequest(root.requestNames[i]))
+      for (let i = 0; i < root.count; ++i){
+        let series = root.series(formatRequest(root.requestNames[i]))
         series.removePoints(0, series.count)
       }
     } else {
-      var series = root.series(root.requestNames[0])
+      let series = root.series(root.requestNames[0])
       series.removePoints(0, series.count)
     }
 
@@ -83,8 +82,8 @@ UIPlotSeriesForm {
       xAxis.max=interval_s / 60
     }
     //Range -- loop over series in the event that there are multiple defined for a chart
-    for (var i = 0; i < root.count; ++i){
-      var newY = root.series(i).at(root.series(i).count-1).y
+    for (let i = 0; i < root.count; ++i){
+      let newY = root.series(i).at(root.series(i).count-1).y
       yAxis.min = Math.min(yAxis.min, Math.floor(0.9 * newY))
       yAxis.max = Math.max(yAxis.max, Math.ceil(1.1 * newY))
       //If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always

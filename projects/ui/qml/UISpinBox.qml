@@ -5,12 +5,28 @@ import Qt.labs.folderlistmodel 2.12
 UISpinBoxForm {
     id: root
 
+    signal spinUpdate (real value)
+    signal resetSpinBox()
+
+    spinBox.onValueModified : {
+      spinUpdate(spinBox.value);
+    }
+
+    onResetSpinBox : {
+      spinBox.value = 0
+      spinUpdate(spinBox.value)
+    }
+
+    function getDescription(){
+      return label.text + " = " + spinBox.value
+    }
+
     function valueFromEnum (text) {
       if (displayEnum.length == 0){
         console.log('UISpinBoxForm: You must define displayEnum property')
         return -1;
       } else {
-        for (var i = 0; i < displayEnum.length; ++i){
+        for (let i = 0; i < displayEnum.length; ++i){
           if (displayEnum[i] == spinBox.text){
             return i
           }

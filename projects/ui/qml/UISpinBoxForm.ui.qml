@@ -24,6 +24,8 @@ RowLayout {
     Layout.fillWidth : true
     Layout.fillHeight : true
     text: "Unset"
+    horizontalAlignment : Text.AlignHCenter
+    verticalAlignment : Text.AlignVCenter
     font.pointSize: 12
     font.bold: false
   }

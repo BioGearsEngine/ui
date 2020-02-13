@@ -31,94 +31,31 @@ ActionDrawerForm {
 	//--------------Action-specific wrapper functions-------------------------------//
 	//Hemorrhage
 	function setup_hemorrhage(actionItem){
-		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12;
-			Dialog {
-				id : hemDialog;
-				title : 'Hemorrhage Editor'
-				width : 500;
-				height : 250;
-				modal : true;
-				closePolicy : Popup.NoAutoClose;
-				property int rate
-				property string location
-				property var action
-				property var onFunc
-				property var offFunc
-				property string description
-				footer : DialogButtonBox {
-					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+	    if ( dialogComponent.status != Component.Ready){
+		    if (dialogComponent.status == Component.Error){
+			    console.log("Error : " + dialogComponent.errorString() );
+			    return;
+		    }
+	      console.log("Error : Action dialog component not ready");
+	    } else {
+		    var hemDialog = dialogComponent.createObject(root.parent);
+				hemDialog.initializeProperties([{name : 'Hemorrhage'},{location:''}, {rate: 0}]);
+				hemDialog.getProperties();
+				hemDialog.addComponent('UISpinBox', 'Bleeding Rate (mL/min)', 'rate', [])
+				let comboBoxModel = {name : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+				hemDialog.addComponent('UIComboBox', 'Location', 'location', comboBoxModel, [])
+				hemDialog.applyProps.connect( function(props) { actionModel.addSwitch( props.description,
+																																									function () {scenario.create_hemorrhage_action(props.location, props.rate) },
+																																									function () {scenario.create_hemorrhage_action(props.location, 0.0) }
+																																									)
+																													}
+																				)
+				for (let i = 0; i < hemDialog.contentItem.children.length; ++i){
+					console.log(hemDialog.contentItem.children[i].label.text)
 				}
-				onApplied : {
-					if (locationComboBox.currentIndex == -1 || rateSpinBox.value ==0) {
-						console.log('Invalid entry: Provide a rate > 0 and a location');
-					} else {
-					description = action.name + ' : Location  = ' + location + '; Rate = ' + rate + ' mL/min'
-						onFunc = function () { scenario.create_hemorrhage_action(location, rate) }
-						offFunc = function () { scenario.create_hemorrhage_action(location, 0.0) }
-						root.addSwitch(description, onFunc, offFunc)
-						close();
-					}
-				}
-				onReset : {
-					rateSpinBox.value = 0
-					locationComboBox.currentIndex = -1
-				}
-				onRejected : {
-					close()
-				}
-				contentItem : Column {
-					spacing : 10;
-					anchors.left : parent.left;
-					anchors.right : parent.right
-					UISpinBox {
-						id : rateSpinBox
-						width : parent.width;
-						height : parent.height / 2 - parent.spacing / 2;
-						elementRatio : 0.5
-						label.text : 'Bleeding Rate (mL/min)'
-						label.horizontalAlignment : Text.AlignHCenter
-						label.verticalAlignment : Text.AlignVCenter
-						spinBox.to : 500
-						spinBox.stepSize : 10
-						spinBox.onValueModified : {
-							hemDialog.rate = spinBox.value
-						}
-					}
-					UIComboBox {
-						id : locationComboBox
-						width : parent.width * 0.9
-						anchors.horizontalCenter : parent.horizontalCenter
-						height : parent.height / 2 - parent.spacing / 2
-						elementRatio : 0.6
-						label.text : 'Location'
-						label.font.pointSize : 12
-						label.font.weight : Font.Normal
-						label.horizontalAlignment : Text.AlignHCenter
-						label.verticalAlignment : Text.AlignVCenter
-						comboBox.font.pointSize : 12
-						comboBox.font.weight : Font.Normal
-						comboBox.model : compartmentModel
-						comboBox.textRole : 'name'		//Tells UIComboBox to use 'name' role of compartmentModel to populate menu
-						comboBox.currentIndex : -1
-						comboBox.onActivated : {
-							hemDialog.location = compartmentModel.get(comboBox.currentIndex).name;
-						}
-						ListModel {
-							id : compartmentModel
-							ListElement { name : 'Aorta'}
-							ListElement { name : 'Brain'}
-							ListElement { name : 'LeftArm'}
-							ListElement { name : 'Gut' }
-							ListElement { name : 'LeftLeg'}
-							ListElement { name : 'RightArm'}
-							ListElement { name : 'RightLeg'}
-						}
-					}
-				}	
-			}"
-		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
-		dialogBox.action = actionItem
-		dialogBox.open()
+        hemDialog.open()
+	    }
 	}
 
 	//Infection (very similar to hemorrage--1 extra arg--could look into making widget that both can use)

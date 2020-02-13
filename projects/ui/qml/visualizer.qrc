@@ -23,6 +23,8 @@
         <file>UIComboBox.qml</file>
         <file>UISpinBox.qml</file>
         <file>UISpinBoxForm.ui.qml</file>
+        <file>UIActionDialog.qml</file>
+        <file>UIActionDialogForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

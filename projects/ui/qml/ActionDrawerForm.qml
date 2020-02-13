@@ -85,7 +85,7 @@ Drawer {
                 ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Hemorrhage"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
                 ListElement { name : "Burn"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(name) {console.log("Support coming for: " + name)}}
+                ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
                 ListElement { name : "Tension Pneumothorax"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Infection";  section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
                 ListElement { name : "Asthma Attack"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}

@@ -5,6 +5,23 @@ import Qt.labs.folderlistmodel 2.12
 UIComboBoxForm {
     id: root
 
+    property string description
+    signal comboUpdate(string currentSelection)
+    signal resetCombo()
+
+    comboBox.onActivated : {
+      comboUpdate(comboBox.model.get(comboBox.currentIndex).name)
+    }
+
+    onResetCombo : {
+      comboBox.currentIndex = -1
+      comboUpdate("")
+    }
+
+    function getDescription(){
+      return label.text + " = " + comboBox.model.get(comboBox.currentIndex).name
+    }
+
 }
 
 
