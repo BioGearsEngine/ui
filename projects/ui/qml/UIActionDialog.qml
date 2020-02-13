@@ -38,6 +38,7 @@ UIActionDialogForm {
             comboModel.append(element)
           }
           combo.comboBox.model = comboModel
+          combo.comboBox.currentIndex = -1 //By trial and error found that this must be added after model
           combo.comboUpdate.connect(function(value) { root.updateProperty(value, linkedProp) } )
           root.onReset.connect(combo.resetCombo)
         }
@@ -93,7 +94,6 @@ UIActionDialogForm {
       }
     }
     Object.assign(actionProps, {description: description})
-    console.log(actionProps.description)
   }
    
 }
