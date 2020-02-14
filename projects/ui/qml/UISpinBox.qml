@@ -9,7 +9,12 @@ UISpinBoxForm {
     signal resetSpinBox()
 
     spinBox.onValueModified : {
-      spinUpdate(spinBox.value);
+      if (unitScale) {
+        console.log(spinBox.value/spinBox.to)
+        spinUpdate(spinBox.value / spinBox.to);
+      } else {
+        spinUpdate(spinBox.value)
+      }
     }
 
     onResetSpinBox : {
@@ -18,7 +23,14 @@ UISpinBoxForm {
     }
 
     function getDescription(){
-      return label.text + " = " + spinBox.value
+      let dispValue = spinBox.value
+      if (unitScale){
+        dispValue = dispValue / spinBox.to
+      }
+      if (displayEnum.length > 0){
+        dispValue = displayEnum[spinBox.value]
+      }
+      return label.text + " = " + dispValue
     }
 
     function valueFromEnum (text) {
@@ -39,7 +51,6 @@ UISpinBoxForm {
         console.log('UISpinBoxForm: You must define displayEnum property')
         return -1
       } else {
-        console.log('text = ' + displayEnum[value])
         return displayEnum[value]
        }
     }

@@ -66,7 +66,6 @@ ActionDrawerForm {
 		} else {
 			var infectionDialog = dialogComponent.createObject(root.parent);
 			infectionDialog.initializeProperties([{name : 'Infection'}, {location : ''}, {severity : 0}, {mic : 0}])
-			infectionDialog.getProperties()
 			let micSpinProps = [{elementRatio : 0.6}, {spinMax : 500}, {spinStep : 10}]
 			infectionDialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
 			let severitySpinProps = [{elementRatio : 0.6}, {spinMax : 3}, {displayEnum : ['','Mild','Moderate','Severe']}]
@@ -77,84 +76,63 @@ ActionDrawerForm {
 			infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																										function () {scenario.create_infection_action(props.location, props.severity, props.mic) },
 																																							)
-																										}
+																													}
 																	)
 			infectionDialog.open()
 		}
 	}
 
+	function setup_burn(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var burnDialog = dialogComponent.createObject(root.parent);
+			burnDialog.initializeProperties([{name : actionItem.name}, {severity : 0}])
+			let burnArgs = [{elementRatio : 0.6}, {unitScale : true}, {spinMax : 100}, {spinStep : 5}]
+			burnDialog.addSpinBox('Fraction Body Surface Area', 'severity', burnArgs)
+			burnDialog.applyProps.connect( function(props)	{ actionModel.addSwitch	(	props.description, 
+																																				function () { scenario.create_burn_action(props.severity) },
+																																			)
+																							}
+														)
+			burnDialog.open()
+		}
+	}
+
+	function setup_asthma(actionItem){
+		let label = 'Severity'
+		let func = function(sev) { scenario.create_asthma_action(sev) }
+		let customArgs = [{elementRatio : 0.6}, {unitScale : true}, {spinMax : 100}, {spinStep : 5}]
+		setup_severityAction(actionItem.name, label, func, customArgs)
+	}
+
+
 	//Generic form for actions that take single severity input (asthma, burn, airway obstruction, etc.)
-	function setup_severityAction(actionItem){
-		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12;
-			Dialog {
-				id : severityActionDialog;
-				width : 500;
-				height : 200;
-				modal : true;
-				closePolicy : Popup.NoAutoClose;
-				property real severity
-				property var action
-				property var onFunc
-				property var offFunc
-				property string labelText
-				property string description
-				footer : DialogButtonBox {
-					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
-				}
-				onApplied : {
-					if (severitySpinBox.value == 0) {
-						console.log('Invalid entry: Provide a value in range (0, 1.0]' );
-					} else {
-						description = action.name + ' : ' + actionLabel + ' = ' + severity
-						switch (action.name){
-							case 'Asthma Attack' :
-								onFunc = function () { scenario.create_asthma_action(severity) };
-								offFunc = function () { scenario.create_asthma_action(0.0) }
-								root.addSwitch(description, onFunc, offFunc);
-								break;
-							case 'Burn' :
-								onFunc = function () { scenario.create_burn_action(severity) };
-								offFunc = function () { return 0 };
-								root.addSwitch(description, onFunc, offFunc);
-								break;
-							default :
-								console.log('Support coming for ' + action.name);
-							}
-						close();
-					}
-				}
-				onReset : {
-					severitySpinBox.value = 0
-				}
-				onRejected : {
-					close()
-				}
-				contentItem: UISpinBox {
-					id : severitySpinBox
-					width : parent.width * 0.9;
-					height : parent.height / 2;
-					anchors.horizontalCenter : parent.horizontalCenter
-					elementRatio : 0.5
-					unitScale : true
-					label.text : 'Severity';
-					label.horizontalAlignment : Text.AlignHCenter
-					label.verticalAlignment : Text.AlignVCenter
-					spinBox.to : 100
-					spinBox.stepSize : 5
-					spinBox.valueFromText : function(text) { return valueFromDecimal(spinBox.text)}    //arg to function must be text to match default valueFromText signature
-					spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value)}		//arg to function must be value to match defaul textFromValue signature
-					spinBox.onValueModified : {
-						severityActionDialog.severity = spinBox.value / spinBox.to
-					}
-
-				}
-		}"
-
-		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
-		dialogBox.title = actionItem.name + " Editor"
-		dialogBox.labelText = actionItem.name == "Burn" ? "Fraction Body Surface Area" : "Severity";
-		dialogBox.action = actionItem
-		dialogBox.open()
+	function setup_severityAction(name, label, func, customArgs){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var severityDialog = dialogComponent.createObject(root.parent);
+			severityDialog.initializeProperties([{name : name}, {severity : 0}])
+			severityDialog.addSpinBox(label, 'severity', customArgs)
+			severityDialog.applyProps.connect( function (props) {	actionModel.addSwitch(	props.description,
+																																										function () { func (props.severity) },
+																																										function () { func (0.0) }
+																																									)
+																													}
+																				)
+			severityDialog.open()
+		}
 	}
 
 	//Substance Administration

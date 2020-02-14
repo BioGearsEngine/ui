@@ -66,6 +66,10 @@ UIActionDialogForm {
         spin.spinBox.textFromValue(0)
         spin.spinBox.decrease()
       }
+      if (spin.unitScale) {
+        spin.spinBox.valueFromText = function(text) { return spin.valueFromDecimal(spin.spinBox.text) }
+        spin.spinBox.textFromValue = function(text) { return spin.valueToDecimal(spin.spinBox.value) }
+      }
       spin.spinUpdate.connect(function(value) {root.updateProperty(value, linkedProp)})
       root.onReset.connect(spin.resetSpinBox)
 	  }
@@ -92,13 +96,13 @@ UIActionDialogForm {
   function generateDescription(){
     let description = actionProps.name + ": "
     let numChildren = root.contentItem.children.length
-    console.log(numChildren)
     for (let child = 0; child < numChildren; ++child){
       description += root.contentItem.children[child].getDescription()
       if (child != numChildren-1){
         description += "; "
       }
     }
+    console.log(description)
     Object.assign(actionProps, {description: description})
   }
 
