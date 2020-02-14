@@ -39,6 +39,7 @@ UISpinBoxForm {
         console.log('UISpinBoxForm: You must define displayEnum property')
         return -1
       } else {
+        console.log('text = ' + displayEnum[value])
         return displayEnum[value]
        }
     }

@@ -32,143 +32,55 @@ ActionDrawerForm {
 	//Hemorrhage
 	function setup_hemorrhage(actionItem){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-	    if ( dialogComponent.status != Component.Ready){
-		    if (dialogComponent.status == Component.Error){
-			    console.log("Error : " + dialogComponent.errorString() );
-			    return;
-		    }
-	      console.log("Error : Action dialog component not ready");
-	    } else {
-		    var hemDialog = dialogComponent.createObject(root.parent);
-				hemDialog.initializeProperties([{name : 'Hemorrhage'},{location:''}, {rate: 0}]);
-				hemDialog.getProperties();
-				hemDialog.addComponent('UISpinBox', 'Bleeding Rate (mL/min)', 'rate', [])
-				let comboBoxModel = {name : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
-				hemDialog.addComponent('UIComboBox', 'Location', 'location', comboBoxModel, [])
-				hemDialog.applyProps.connect( function(props) { actionModel.addSwitch( props.description,
-																																									function () {scenario.create_hemorrhage_action(props.location, props.rate) },
-																																									function () {scenario.create_hemorrhage_action(props.location, 0.0) }
-																																									)
-																													}
-																				)
-				for (let i = 0; i < hemDialog.contentItem.children.length; ++i){
-					console.log(hemDialog.contentItem.children[i].label.text)
-				}
-        hemDialog.open()
-	    }
+	  if ( dialogComponent.status != Component.Ready){
+		  if (dialogComponent.status == Component.Error){
+			  console.log("Error : " + dialogComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : Action dialog component not ready");
+	  } else {
+		  var hemDialog = dialogComponent.createObject(root.parent);
+			hemDialog.initializeProperties([{name : 'Hemorrhage'},{location:''}, {rate: 0}]);
+			hemDialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', [])
+			let locationListModel = {name : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+			hemDialog.addComboBox('Location', 'location', locationListModel, [])
+			hemDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
+																																							function () {scenario.create_hemorrhage_action(props.location, props.rate) },
+																																							function () {scenario.create_hemorrhage_action(props.location, 0.0) }
+																																							)
+																										}
+																	)
+      hemDialog.open()
+	  }
 	}
 
 	//Infection (very similar to hemorrage--1 extra arg--could look into making widget that both can use)
 	function setup_infection(actionItem){
-		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import QtQuick.Layouts 1.12; import QtQuick.Controls.Material 2.3;
-			Dialog {
-				id : infectionDialog;
-				title : 'Infection Editor'
-				width : 500;
-				height : 250;
-				modal : true;
-				closePolicy : Popup.NoAutoClose;
-				property int mic
-				property int severity
-				property string location
-				property string description
-				property var action
-				property var onFunc
-				property var offFunc
-				footer : DialogButtonBox {
-					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
-				}
-				onApplied : {
-					if (locationComboBox.currentIndex == -1 || severitySpinBox.value == 0 || micSpinBox.value == 0 ) {
-						console.log('Invalid entry: Provide an MIC > 0, a severity, and a location');
-					} else {
-						description = action.name + ' : Severity = ' + severitySpinBox.textFromValue(severity) + '; Location  = ' + location + '; MIC = ' + mic + ' mg/L'
-						onFunc = function () { scenario.create_infection_action(location, severity, mic) }
-						offFunc = function () { scenario.create_infection_action(location, 0, mic) }
-						root.addSwitch(description, onFunc, offFunc)
-						close();
-					}
-				}
-				onReset : {
-					micSpinBox.value = 0
-					severitySpinBox.value = 0
-					locationComboBox.currentIndex = -1
-				}
-				onRejected : {
-					close()
-				}
-				contentItem : Column {
-					spacing : 5;
-					anchors.left : parent.left;
-					anchors.right : parent.right;
-					UISpinBox {
-						id: micSpinBox
-						width : parent.width * 0.9;
-						height : parent.height / 3 - parent.spacing / 3;
-						anchors.right : parent.right
-						elementRatio : 0.6
-						label.text : 'Min. Inhibitory Concentration (mg/L)';
-						label.horizontalAlignment : Text.AlignLeft
-						label.verticalAlignment : Text.AlignVCenter
-						spinBox.to : 300
-						spinBox.stepSize : 10
-						
-						spinBox.onValueModified : {
-							infectionDialog.mic = spinBox.value
-						}
-
-					}
-					UISpinBox {
-						id : severitySpinBox
-						width : parent.width * 0.9;
-						height : parent.height / 3 - parent.spacing / 3;
-						anchors.right : parent.right
-						elementRatio : 0.6
-						displayEnum : ['','Mild','Moderate','Severe']
-						label.text : 'Severity';
-						label.horizontalAlignment : Text.AlignLeft
-						label.verticalAlignment : Text.AlignVCenter
-						spinBox.to : 3
-						spinBox.stepSize : 1
-						spinBox.valueFromText : function(text) { return valueFromEnum(spinBox.text)}    //arg to function must be text to match default valueFromText signature
-						spinBox.textFromValue : function(value) { return valueToEnum(spinBox.value)}		//arg to function must be value to match defaul textFromValue signature
-						spinBox.onValueModified : {
-							infectionDialog.severity = spinBox.value
-						}
-					}
-					UIComboBox {
-						id : locationComboBox
-						width : parent.width * 0.9
-						anchors.right : parent.right
-						elementRatio : 0.6
-						height : parent.height / 3 - parent.spacing / 3
-						label.text : 'Location'
-						label.font.pointSize : 12
-						label.font.weight : Font.Normal
-						label.horizontalAlignment : Text.AlignLeft
-						label.verticalAlignment : Text.AlignVCenter
-						comboBox.font.pointSize : 12
-						comboBox.font.weight : Font.Normal
-						comboBox.model : compartmentModel
-						comboBox.textRole : 'name'		//Tells UIComboBox to use 'name' role of compartmentModel to populate menu
-						comboBox.currentIndex : -1
-						comboBox.onActivated : {
-							infectionDialog.location = compartmentModel.get(comboBox.currentIndex).name;
-						}
-						ListModel {
-							id : compartmentModel
-							ListElement { name : 'Gut' }
-							ListElement { name : 'LeftArm' }
-							ListElement { name : 'LeftLeg'}
-							ListElement { name : 'RightArm'}
-							ListElement { name : 'RightLeg'}
-						} 
-					}
-				}	
-			}"
-		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
-		dialogBox.action = actionItem
-		dialogBox.open()
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var infectionDialog = dialogComponent.createObject(root.parent);
+			infectionDialog.initializeProperties([{name : 'Infection'}, {location : ''}, {severity : 0}, {mic : 0}])
+			infectionDialog.getProperties()
+			let micSpinProps = [{elementRatio : 0.6}, {spinMax : 500}, {spinStep : 10}]
+			infectionDialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
+			let severitySpinProps = [{elementRatio : 0.6}, {spinMax : 3}, {displayEnum : ['','Mild','Moderate','Severe']}]
+			infectionDialog.addSpinBox('Severity', 'severity', severitySpinProps)
+			let locationListModel = { name : ['Gut', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+			let locationProps = [{elementRatio : 0.6}]
+			infectionDialog.addComboBox('Location', 'location', locationListModel, locationProps)
+			infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
+																																										function () {scenario.create_infection_action(props.location, props.severity, props.mic) },
+																																							)
+																										}
+																	)
+			infectionDialog.open()
+		}
 	}
 
 	//Generic form for actions that take single severity input (asthma, burn, airway obstruction, etc.)

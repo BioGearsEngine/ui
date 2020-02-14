@@ -103,7 +103,11 @@ ControlsForm {
 	    } else {
 		    var actionSwitch = actionComponent.createObject(actionSwitchView,{ "name" : actionData, "width" : actionSwitchView.width, "height" : 50});
         actionSwitch.toggleActionOn.connect(onFunc);
-        actionSwitch.toggleActionOff.connect(offFunc);
+        if (offFunc){
+          actionSwitch.toggleActionOff.connect(offFunc);
+        } else {
+          actionSwitch.supportDeactivate = false
+        }
 		    actionSwitchModel.append(actionSwitch);
 	    }
     }
