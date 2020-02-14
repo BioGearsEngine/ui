@@ -10,19 +10,23 @@ Brief:  A label and comboBox (dropdown menu) laid out in a row
 RowLayout {
   id: root
 
-  property alias label: name
-  property alias comboBox: value
   property real elementRatio : 0.5    //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
+  property int colSpan : 1
+  property int rowSpan : 1
   property string splitToken          //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
                                       //we do not want to display (e.g. PatientState@0s vs PatientState).  This splitToken tells which character to split the file name at.  
-  Layout.preferredWidth : parent.width
+
+  property alias label: name
+  property alias comboBox: value
   
+  Layout.preferredWidth : parent.width
+  Layout.columnSpan : colSpan
+  Layout.rowSpan : rowSpan
 
   Label {
     id: name
     Layout.preferredWidth : root.Layout.preferredWidth * elementRatio
     Layout.fillWidth : true
-    Layout.fillHeight : true
     text: "Unset"
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
@@ -34,7 +38,6 @@ RowLayout {
     id: value
     Layout.preferredWidth : root.Layout.preferredWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
-    Layout.fillHeight : true
     font.weight: Font.Medium
     font.pointSize: 12
     editable: true 

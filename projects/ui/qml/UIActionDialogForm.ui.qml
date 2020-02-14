@@ -11,8 +11,8 @@ Dialog {
   id: dialogForm
   
   property var actionProps : ({})
-  property int numComponents : 0
-  property alias contentColumn : contentColumn
+  property var numRows : 1
+  property var numColumns : 1
 
   width : 500
   height : 250
@@ -23,11 +23,14 @@ Dialog {
     standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel
   }
   
-  contentItem : Column {
-    id : contentColumn
-    spacing : 5;
+  contentItem : GridLayout {
+    id : contentGrid
 		anchors.left : parent.left;
 		anchors.right : parent.right;
+    rows : numRows
+    columns : numColumns
+    columnSpacing : 10
+    rowSpacing : 10
   }
 
  

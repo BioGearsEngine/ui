@@ -39,11 +39,12 @@ ActionDrawerForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  var hemDialog = dialogComponent.createObject(root.parent);
-			hemDialog.initializeProperties([{name : 'Hemorrhage'},{location:''}, {rate: 0}]);
-			hemDialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', [])
-			let locationListModel = {name : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
-			hemDialog.addComboBox('Location', 'location', locationListModel, [])
+		  var hemDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 1});
+			hemDialog.initializeProperties({name : 'Hemorrhage', location : '', rate: 0});
+			let rateSpinProps = {elementRatio : 0.6, spinMax : 1000, spinStep : 10}
+			hemDialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', rateSpinProps)
+			let locationModelData = { type : 'ListModel', role : 'name', elements : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+			hemDialog.addComboBox('Location', 'location', locationModelData, {})
 			hemDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																							function () {scenario.create_hemorrhage_action(props.location, props.rate) },
 																																							function () {scenario.create_hemorrhage_action(props.location, 0.0) }
@@ -64,15 +65,15 @@ ActionDrawerForm {
 			}
 			console.log("Error : Action dialog component not ready");
 		} else {
-			var infectionDialog = dialogComponent.createObject(root.parent);
-			infectionDialog.initializeProperties([{name : 'Infection'}, {location : ''}, {severity : 0}, {mic : 0}])
-			let micSpinProps = [{elementRatio : 0.6}, {spinMax : 500}, {spinStep : 10}]
+			var infectionDialog = dialogComponent.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
+			infectionDialog.initializeProperties({name : 'Infection', location : '', severity : 0, mic : 0})
+			let micSpinProps = {elementRatio : 0.6, spinMax : 500, spinStep : 10}
 			infectionDialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
-			let severitySpinProps = [{elementRatio : 0.6}, {spinMax : 3}, {displayEnum : ['','Mild','Moderate','Severe']}]
+			let severitySpinProps = {elementRatio : 0.6, spinMax : 3, displayEnum : ['','Mild','Moderate','Severe']}
 			infectionDialog.addSpinBox('Severity', 'severity', severitySpinProps)
-			let locationListModel = { name : ['Gut', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
-			let locationProps = [{elementRatio : 0.6}]
-			infectionDialog.addComboBox('Location', 'location', locationListModel, locationProps)
+			let locationListData = { type : 'ListModel', role : 'name', elements : ['Gut', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+			let locationProps = {elementRatio : 0.6}
+			infectionDialog.addComboBox('Location', 'location', locationListData, locationProps)
 			infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																										function () {scenario.create_infection_action(props.location, props.severity, props.mic) },
 																																							)
@@ -92,8 +93,8 @@ ActionDrawerForm {
 			console.log("Error : Action dialog component not ready");
 		} else {
 			var burnDialog = dialogComponent.createObject(root.parent);
-			burnDialog.initializeProperties([{name : actionItem.name}, {severity : 0}])
-			let burnArgs = [{elementRatio : 0.6}, {unitScale : true}, {spinMax : 100}, {spinStep : 5}]
+			burnDialog.initializeProperties({name : actionItem.name, severity : 0})
+			let burnArgs = {elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
 			burnDialog.addSpinBox('Fraction Body Surface Area', 'severity', burnArgs)
 			burnDialog.applyProps.connect( function(props)	{ actionModel.addSwitch	(	props.description, 
 																																				function () { scenario.create_burn_action(props.severity) },
@@ -107,7 +108,7 @@ ActionDrawerForm {
 	function setup_asthma(actionItem){
 		let label = 'Severity'
 		let func = function(sev) { scenario.create_asthma_action(sev) }
-		let customArgs = [{elementRatio : 0.6}, {unitScale : true}, {spinMax : 100}, {spinStep : 5}]
+		let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
 		setup_severityAction(actionItem.name, label, func, customArgs)
 	}
 
@@ -123,7 +124,7 @@ ActionDrawerForm {
 			console.log("Error : Action dialog component not ready");
 		} else {
 			var severityDialog = dialogComponent.createObject(root.parent);
-			severityDialog.initializeProperties([{name : name}, {severity : 0}])
+			severityDialog.initializeProperties({name : name, severity : 0})
 			severityDialog.addSpinBox(label, 'severity', customArgs)
 			severityDialog.applyProps.connect( function (props) {	actionModel.addSwitch(	props.description,
 																																										function () { func (props.severity) },
@@ -135,8 +136,36 @@ ActionDrawerForm {
 		}
 	}
 
-	//Substance Administration
 	function setup_SubstanceActions(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var substanceDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 3 } );
+			substanceDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : 0, concentration : 0, rate : 0})
+			let adminListData = { type : 'ListModel', role : 'route', elements : ['Bolus-Intraarterial', 'Bolus-Intramuscular', 'Bolus-Intravenous', 'Infusion-Intravenous','Oral','Transmucosal']}
+			let adminComboProps = {elementRatio : 0.4, 'Layout.columnSpan' : 2}
+			substanceDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
+			let subFolderData = {type : 'FolderModel', role : 'fileBaseName', elements : 'file:substances'}
+			let subComboProps = {elementRatio : 0.4, colSpan : 2}
+			substanceDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
+			substanceDialog.addTextField('Dose (ml)', 'dose', {})
+			substanceDialog.addTextField('Concentration (ug/mL)', 'concentration', {})
+			substanceDialog.addTextField('Rate (mL/min)', 'rate', {})
+			substanceDialog.open();
+		}
+	}
+
+
+
+
+
+	//Substance Administration
+	function setup_SubstanceActions_archive(actionItem){
 		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import Qt.labs.folderlistmodel 2.12; import QtQuick.XmlListModel 2.12;
 			Dialog {
 				id : substanceDialog;

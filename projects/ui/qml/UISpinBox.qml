@@ -10,7 +10,6 @@ UISpinBoxForm {
 
     spinBox.onValueModified : {
       if (unitScale) {
-        console.log(spinBox.value/spinBox.to)
         spinUpdate(spinBox.value / spinBox.to);
       } else {
         spinUpdate(spinBox.value)

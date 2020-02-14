@@ -15,18 +15,21 @@ RowLayout {
   property bool unitScale : false     //SpinBox does not support float step-sizes.  If flagged, this tells SpinBox to divide all values by the maximum spin value so that they are output on 0-1 scale
   property int spinMax : 1
   property int spinStep : 1
+  property int colSpan : 1
+  property int rowSpan : 1
 
   property alias label: name
   property alias spinBox : spinBox
   
 
   Layout.preferredWidth : parent.width
+  Layout.columnSpan : colSpan
+  Layout.rowSpan : rowSpan
 
   Label {
     id: name
     Layout.preferredWidth : root.Layout.preferredWidth * elementRatio
     Layout.fillWidth : true
-    Layout.fillHeight : true
     text: "Unset"
     horizontalAlignment : Text.AlignHCenter
     verticalAlignment : Text.AlignVCenter
@@ -38,7 +41,6 @@ RowLayout {
     id: spinBox
     Layout.preferredWidth : root.Layout.preferredWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
-    Layout.fillHeight : true
     font.pointSize : 12
     editable : true
     value : 0   //Default start at 0 (can override)

@@ -8,16 +8,20 @@ UIActionDialogForm {
   signal applyProps(var props)
 
   onApplied : {
-    generateDescription();
-    root.applyProps(actionProps);
-    close();
+    if (validProps()) {
+      generateDescription();
+      root.applyProps(actionProps);
+      close();
+    } else {
+      console.log('Invalid configuration : Check that all values are defined and non-zero')
+    }
   }
 
   onRejected : {
     close();
   }
 
-  function addComboBox(label, linkedProp, model, customArgs){
+  function addComboBox(label, linkedProp, modelData, customArgs){
     var comboComponent = Qt.createComponent("UIComboBox.qml");
     if ( comboComponent.status != Component.Ready){
       if (comboComponent.status == Component.Error){
@@ -26,18 +30,30 @@ UIActionDialogForm {
       }
       console.log("Error : UIcomboBox component not ready");
     } else {
-      var combo = comboComponent.createObject(contentColumn, {"width" : contentColumn.width});
-      let key = Object.keys(model)[0]
+      var combo = comboComponent.createObject(root.contentItem, {"width" : root.contentItem.width});
       combo.label.text = label
-      combo.comboBox.textRole = key
-      let comboModel = Qt.createQmlObject("import QtQuick.Controls 2.12; import QtQuick 2.12; ListModel {}", combo.comboBox, 'ErrorString')
-      for (let i = 0; i < model[key].length; ++i){
-        let element = {[key] : model[key][i]}
-        comboModel.append(element)
+      combo.comboBox.textRole = modelData.role
+      switch (modelData.type) {
+        case 'ListModel' :
+          let listModel = Qt.createQmlObject("import QtQuick.Controls 2.12; import QtQuick 2.12; ListModel {}", combo.comboBox, 'ListModelErrorString')
+          for (let i = 0; i < modelData.elements.length; ++i){
+            let element = { [modelData.role] : modelData.elements[i] }
+            listModel.append(element)
+          }
+          combo.comboBox.model = listModel
+        break;
+        case 'FolderModel' :
+          let folderModel = Qt.createQmlObject("import Qt.labs.folderlistmodel 2.12; FolderListModel {}", combo.comboBox, 'FolderModelErrorString')
+          folderModel.nameFilters = ['*.xml']
+          folderModel.folder = modelData.elements
+          folderModel.showDirs = false
+          combo.comboBox.model = folderModel
+        break;
+        default :
+          console.log('Bad model definition')
       }
-      combo.comboBox.model = comboModel
       combo.comboBox.currentIndex = -1 //By trial and error found that this must be added after model
-      if (customArgs.length > 0){
+      if (Object.keys(customArgs).length > 0){
         parseCustomArgs(customArgs, combo)
       }
       combo.comboUpdate.connect(function(value) { root.updateProperty(value, linkedProp) } )
@@ -45,40 +61,55 @@ UIActionDialogForm {
     }
   }
 
-  function addSpinBox(label, linkedProp, customArgs){
-    var spinComponent = Qt.createComponent("UISpinBox.qml");
-	  if ( spinComponent.status != Component.Ready){
-		  if (spinComponent.status == Component.Error){
-			  console.log("Error : " + spinComponent.errorString() );
+  function addfieldBox(label, linkedProp, customArgs){
+    var fieldComponent = Qt.createComponent("UIfieldBox.qml");
+	  if ( fieldComponent.status != Component.Ready){
+		  if (fieldComponent.status == Component.Error){
+			  console.log("Error : " + fieldComponent.errorString() );
 			  return;
 		  }
-	    console.log("Error : UISpinBox component not ready");
+	    console.log("Error : UIfieldBox component not ready");
 	  } else {
-		  var spin = spinComponent.createObject(contentColumn, {"width" : contentColumn.width});
-      spin.label.text = label
-      if (customArgs.length > 0){
-        parseCustomArgs(customArgs, spin)
+		  var field = fieldComponent.createObject(root.contentItem, {"width" : root.contentItem.width});
+      field.label.text = label
+      if (Object.keys(customArgs).length > 0){
+        parseCustomArgs(customArgs, field)
       }
-      if (spin.displayEnum.length > 0){
-        spin.spinBox.increase()   //This is terribly hacky, but spin box will not update display text to reflect use of enum unless the value changes.  So increase here, then decrease to force box to refresh text
-        spin.spinBox.valueFromText = function (text) { return spin.valueFromEnum(spin.spinBox.text) }
-        spin.spinBox.textFromValue = function (value) { return spin.valueToEnum(spin.spinBox.value) }
-        spin.spinBox.textFromValue(0)
-        spin.spinBox.decrease()
+      if (field.displayEnum.length > 0){
+        field.fieldBox.increase()   //This is terribly hacky, but field box will not update display text to reflect use of enum unless the value changes.  So increase here, then decrease to force box to refresh text
+        field.fieldBox.valueFromText = function (text) { return field.valueFromEnum(field.fieldBox.text) }
+        field.fieldBox.textFromValue = function (value) { return field.valueToEnum(field.fieldBox.value) }
+        field.fieldBox.textFromValue(0)
+        field.fieldBox.decrease()
       }
-      if (spin.unitScale) {
-        spin.spinBox.valueFromText = function(text) { return spin.valueFromDecimal(spin.spinBox.text) }
-        spin.spinBox.textFromValue = function(text) { return spin.valueToDecimal(spin.spinBox.value) }
+      if (field.unitScale) {
+        field.fieldBox.valueFromText = function(text) { return field.valueFromDecimal(field.fieldBox.text) }
+        field.fieldBox.textFromValue = function(text) { return field.valueToDecimal(field.fieldBox.value) }
       }
-      spin.spinUpdate.connect(function(value) {root.updateProperty(value, linkedProp)})
-      root.onReset.connect(spin.resetSpinBox)
+      field.fieldUpdate.connect(function(value) {root.updateProperty(value, linkedProp)})
+      root.onReset.connect(field.resetfieldBox)
 	  }
   }
 
-  function initializeProperties(newProps){
-    for (let i = 0; i < newProps.length; ++i){
-      Object.assign(actionProps,newProps[i]);
+  function addTextField(label, linkedProp, customArgs){
+    var fieldComponent = Qt.createComponent("UITextField.qml");
+	  if ( fieldComponent.status != Component.Ready){
+		  if (fieldComponent.status == Component.Error){
+			  console.log("Error : " + fieldComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : UIfieldBox component not ready");
+	  } else {
+		  var field = fieldComponent.createObject(root.contentItem, {"width" : root.contentItem.width});
+      field.placeholderText = label
     }
+  }
+
+
+
+
+  function initializeProperties(newProps){
+    actionProps = newProps
     root.title = actionProps.name + " Editor"
   }
 
@@ -90,7 +121,6 @@ UIActionDialogForm {
 
   function updateProperty(value, prop) {
     actionProps[prop] = value
-    console.log(prop, actionProps[prop])
   }
 
   function generateDescription(){
@@ -107,12 +137,26 @@ UIActionDialogForm {
   }
 
   function parseCustomArgs(customArgs, item){
-    for (let i = 0; i < customArgs.length; ++i){
-      let argKey = Object.keys(customArgs[i])[0]
-      if (item.hasOwnProperty(argKey)){
-        item[argKey] = customArgs[i][argKey]
+    for (let key in customArgs){
+      if (item.hasOwnProperty(key)){
+        console.log(key, customArgs[key])
+        item[key] = customArgs[key]
       }
     }
+  }
+
+  function validProps(){
+    for (let key in actionProps){
+      if (key=='name' || key == 'description'){
+        continue;
+      } else {
+        let prop = actionProps[key]
+        if (prop === 0 || prop ===''){
+          return false;
+        }
+      }
+    }
+    return true
   }
    
 }
