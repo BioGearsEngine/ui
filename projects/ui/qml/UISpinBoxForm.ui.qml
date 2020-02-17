@@ -11,6 +11,7 @@ RowLayout {
   id: root
   
   property real elementRatio : 0.5    //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
+  property real maxWidth : parent.width
   property var displayEnum : []     //Text to display insted of values, if desired (e.g. 'Mild', 'Moderate', 'Severe' instead of 0, 1, 2)
   property bool unitScale : false     //SpinBox does not support float step-sizes.  If flagged, this tells SpinBox to divide all values by the maximum spin value so that they are output on 0-1 scale
   property int spinMax : 1
@@ -22,13 +23,14 @@ RowLayout {
   property alias spinBox : spinBox
   
 
-  Layout.preferredWidth : parent.width
+  Layout.maximumWidth : maxWidth
+  Layout.fillWidth : true
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
 
   Label {
     id: name
-    Layout.preferredWidth : root.Layout.preferredWidth * elementRatio
+    Layout.maximumWidth : root.maxWidth * elementRatio
     Layout.fillWidth : true
     text: "Unset"
     horizontalAlignment : Text.AlignHCenter
@@ -39,7 +41,7 @@ RowLayout {
 
   SpinBox {
     id: spinBox
-    Layout.preferredWidth : root.Layout.preferredWidth * (1.0 - elementRatio)
+    Layout.maximumWidth : root.maxWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
     font.pointSize : 12
     editable : true

@@ -6,13 +6,16 @@ import QtQuick.Controls.Material 2.3
 TextField {
   id: root
 
-  property real elementRatio : 0.5    //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
+  property real maxWidth : parent.width
   property int colSpan : 1
   property int rowSpan : 1
   property bool editing : false
 
+  Layout.maximumWidth : maxWidth
   Layout.fillWidth : true
-  font.pointSize : 12
+  Layout.columnSpan : colSpan
+  Layout.rowSpan : rowSpan
+  font.pointSize : 11
   verticalAlignment : Text.AlignBottom
   horizontalAlignment : Text.AlignHCenter
 

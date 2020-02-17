@@ -76,9 +76,9 @@ ActionDrawerForm {
 			infectionDialog.addComboBox('Location', 'location', locationListData, locationProps)
 			infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																										function () {scenario.create_infection_action(props.location, props.severity, props.mic) },
-																																							)
+																																								)
 																													}
-																	)
+																				)
 			infectionDialog.open()
 		}
 	}
@@ -97,10 +97,10 @@ ActionDrawerForm {
 			let burnArgs = {elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
 			burnDialog.addSpinBox('Fraction Body Surface Area', 'severity', burnArgs)
 			burnDialog.applyProps.connect( function(props)	{ actionModel.addSwitch	(	props.description, 
-																																				function () { scenario.create_burn_action(props.severity) },
-																																			)
-																							}
-														)
+																																								function () { scenario.create_burn_action(props.severity) },
+																																							)
+																											}
+																	)
 			burnDialog.open()
 		}
 	}
@@ -145,17 +145,17 @@ ActionDrawerForm {
 			}
 			console.log("Error : Action dialog component not ready");
 		} else {
-			var substanceDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 3 } );
+			var substanceDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 6 } );
 			substanceDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : 0, concentration : 0, rate : 0})
 			let adminListData = { type : 'ListModel', role : 'route', elements : ['Bolus-Intraarterial', 'Bolus-Intramuscular', 'Bolus-Intravenous', 'Infusion-Intravenous','Oral','Transmucosal']}
-			let adminComboProps = {elementRatio : 0.4, 'Layout.columnSpan' : 2}
+			let adminComboProps = {elementRatio : 0.4, maxWidth : (substanceDialog.width / 2 - substanceDialog.colSpace / 2), colSpan : 3}
 			substanceDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
 			let subFolderData = {type : 'FolderModel', role : 'fileBaseName', elements : 'file:substances'}
-			let subComboProps = {elementRatio : 0.4, colSpan : 2}
+			let subComboProps = {elementRatio : 0.4, maxWidth : (substanceDialog.width / 2 - substanceDialog.colSpace / 2), colSpan : 3}
 			substanceDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
-			substanceDialog.addTextField('Dose (ml)', 'dose', {})
-			substanceDialog.addTextField('Concentration (ug/mL)', 'concentration', {})
-			substanceDialog.addTextField('Rate (mL/min)', 'rate', {})
+			substanceDialog.addTextField('Dose (ml)', 'dose', {colSpan : 2, maxWidth : (substanceDialog.width / 3.0 - 2.0 * substanceDialog.colSpace / 3.0)})
+			substanceDialog.addTextField('Concentration (ug/mL)', 'concentration', {colSpan : 2, maxWidth : (substanceDialog.width / 3.0 - 2.0 * substanceDialog.colSpace / 3.0)})
+			substanceDialog.addTextField('Rate (mL/min)', 'rate', {colSpan : 2, maxWidth : (substanceDialog.width / 3.0 - 2.0 * substanceDialog.colSpace / 3.0)})
 			substanceDialog.open();
 		}
 	}

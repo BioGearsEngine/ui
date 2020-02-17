@@ -11,6 +11,7 @@ RowLayout {
   id: root
 
   property real elementRatio : 0.5    //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
+  property real maxWidth : parent.width
   property int colSpan : 1
   property int rowSpan : 1
   property string splitToken          //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
@@ -18,14 +19,14 @@ RowLayout {
 
   property alias label: name
   property alias comboBox: value
-  
-  Layout.preferredWidth : parent.width
+  Layout.fillWidth : true
+  Layout.maximumWidth : maxWidth
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
 
   Label {
     id: name
-    Layout.preferredWidth : root.Layout.preferredWidth * elementRatio
+    Layout.maximumWidth : root.maxWidth * elementRatio
     Layout.fillWidth : true
     text: "Unset"
     verticalAlignment : Text.AlignVCenter
@@ -36,7 +37,7 @@ RowLayout {
 
   ComboBox {
     id: value
-    Layout.preferredWidth : root.Layout.preferredWidth * (1.0 - elementRatio)
+    Layout.maximumWidth : root.maxWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
     font.weight: Font.Medium
     font.pointSize: 12

@@ -11,8 +11,10 @@ Dialog {
   id: dialogForm
   
   property var actionProps : ({})
-  property var numRows : 1
-  property var numColumns : 1
+  property int numRows : 1
+  property int numColumns : 1
+  property int colSpace: 10
+  property int rowSpace : 10
 
   width : 500
   height : 250
@@ -29,8 +31,8 @@ Dialog {
 		anchors.right : parent.right;
     rows : numRows
     columns : numColumns
-    columnSpacing : 10
-    rowSpacing : 10
+    columnSpacing : colSpace
+    rowSpacing : rowSpace
   }
 
  

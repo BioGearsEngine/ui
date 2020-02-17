@@ -30,7 +30,7 @@ UIActionDialogForm {
       }
       console.log("Error : UIcomboBox component not ready");
     } else {
-      var combo = comboComponent.createObject(root.contentItem, {"width" : root.contentItem.width});
+      var combo = comboComponent.createObject(root.contentItem);
       combo.label.text = label
       combo.comboBox.textRole = modelData.role
       switch (modelData.type) {
@@ -61,33 +61,33 @@ UIActionDialogForm {
     }
   }
 
-  function addfieldBox(label, linkedProp, customArgs){
-    var fieldComponent = Qt.createComponent("UIfieldBox.qml");
-	  if ( fieldComponent.status != Component.Ready){
-		  if (fieldComponent.status == Component.Error){
-			  console.log("Error : " + fieldComponent.errorString() );
+  function addSpinBox(label, linkedProp, customArgs){
+    var spinComponent = Qt.createComponent("UISpinBox.qml");
+	  if ( spinComponent.status != Component.Ready){
+		  if (spinComponent.status == Component.Error){
+			  console.log("Error : " + spinComponent.errorString() );
 			  return;
 		  }
-	    console.log("Error : UIfieldBox component not ready");
+	    console.log("Error : UIspinBox component not ready");
 	  } else {
-		  var field = fieldComponent.createObject(root.contentItem, {"width" : root.contentItem.width});
-      field.label.text = label
+		  var spin = spinComponent.createObject(root.contentItem);
+      spin.label.text = label
       if (Object.keys(customArgs).length > 0){
-        parseCustomArgs(customArgs, field)
+        parseCustomArgs(customArgs, spin)
       }
-      if (field.displayEnum.length > 0){
-        field.fieldBox.increase()   //This is terribly hacky, but field box will not update display text to reflect use of enum unless the value changes.  So increase here, then decrease to force box to refresh text
-        field.fieldBox.valueFromText = function (text) { return field.valueFromEnum(field.fieldBox.text) }
-        field.fieldBox.textFromValue = function (value) { return field.valueToEnum(field.fieldBox.value) }
-        field.fieldBox.textFromValue(0)
-        field.fieldBox.decrease()
+      if (spin.displayEnum.length > 0){
+        spin.spinBox.increase()   //This is terribly hacky, but spin box will not update display text to reflect use of enum unless the value changes.  So increase here, then decrease to force box to refresh text
+        spin.spinBox.valueFromText = function (text) { return spin.valueFromEnum(spin.spinBox.text) }
+        spin.spinBox.textFromValue = function (value) { return spin.valueToEnum(spin.spinBox.value) }
+        spin.spinBox.textFromValue(0)
+        spin.spinBox.decrease()
       }
-      if (field.unitScale) {
-        field.fieldBox.valueFromText = function(text) { return field.valueFromDecimal(field.fieldBox.text) }
-        field.fieldBox.textFromValue = function(text) { return field.valueToDecimal(field.fieldBox.value) }
+      if (spin.unitScale) {
+        spin.spinBox.valueFromText = function(text) { return spin.valueFromDecimal(spin.spinBox.text) }
+        spin.spinBox.textFromValue = function(text) { return spin.valueToDecimal(spin.spinBox.value) }
       }
-      field.fieldUpdate.connect(function(value) {root.updateProperty(value, linkedProp)})
-      root.onReset.connect(field.resetfieldBox)
+      spin.spinUpdate.connect(function(value) {root.updateProperty(value, linkedProp)})
+      root.onReset.connect(spin.resetSpinBox)
 	  }
   }
 
@@ -100,8 +100,11 @@ UIActionDialogForm {
 		  }
 	    console.log("Error : UIfieldBox component not ready");
 	  } else {
-		  var field = fieldComponent.createObject(root.contentItem, {"width" : root.contentItem.width});
+		  var field = fieldComponent.createObject(root.contentItem);
       field.placeholderText = label
+      if (Object.keys(customArgs).length > 0){
+        parseCustomArgs(customArgs, field)
+      }
     }
   }
 
