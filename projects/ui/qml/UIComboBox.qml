@@ -10,7 +10,11 @@ UIComboBoxForm {
     signal resetCombo()
 
     comboBox.onActivated : {
-      comboUpdate(comboBox.model.get(comboBox.currentIndex).name)
+      if (comboBox.model instanceof ListModel){
+        comboUpdate(comboBox.model.get(comboBox.currentIndex)[comboBox.textRole])
+      } else if (comboBox.model instanceof FolderListModel) {
+        comboUpdate(comboBox.model.get(comboBox.currentIndex, comboBox.textRole));
+      }
     }
 
     onResetCombo : {
@@ -19,7 +23,13 @@ UIComboBoxForm {
     }
 
     function getDescription(){
-      return label.text + " = " + comboBox.model.get(comboBox.currentIndex).name
+      if (comboBox.model instanceof ListModel){
+        return label.text + " = " + comboBox.model.get(comboBox.currentIndex)[comboBox.textRole]
+      } else if (comboBox.model instanceof FolderListModel){
+        return label.text + " = " + comboBox.model.get(comboBox.currentIndex, comboBox.textRole)
+      } else {
+        return ''
+      }
     }
 
 }

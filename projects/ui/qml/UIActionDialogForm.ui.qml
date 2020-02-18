@@ -13,8 +13,9 @@ Dialog {
   property var actionProps : ({})
   property int numRows : 1
   property int numColumns : 1
-  property int colSpace: 10
-  property int rowSpace : 10
+  property int colSpace: 0
+  property int rowSpace : 0
+
 
   width : 500
   height : 250
@@ -29,12 +30,14 @@ Dialog {
     id : contentGrid
 		anchors.left : parent.left;
 		anchors.right : parent.right;
+    anchors.top : header.bottom
+    anchors.bottom : footer.top
     rows : numRows
     columns : numColumns
     columnSpacing : colSpace
     rowSpacing : rowSpace
-  }
 
+  }
  
 }
 

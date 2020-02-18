@@ -21,6 +21,7 @@ UIActionDialogForm {
     close();
   }
 
+
   function addComboBox(label, linkedProp, modelData, customArgs){
     var comboComponent = Qt.createComponent("UIComboBox.qml");
     if ( comboComponent.status != Component.Ready){
@@ -59,6 +60,7 @@ UIActionDialogForm {
       combo.comboUpdate.connect(function(value) { root.updateProperty(value, linkedProp) } )
       root.onReset.connect(combo.resetCombo)
     }
+    return combo
   }
 
   function addSpinBox(label, linkedProp, customArgs){
@@ -101,10 +103,14 @@ UIActionDialogForm {
 	    console.log("Error : UIfieldBox component not ready");
 	  } else {
 		  var field = fieldComponent.createObject(root.contentItem);
-      field.placeholderText = label
+      field.textField.placeholderText = label
       if (Object.keys(customArgs).length > 0){
         parseCustomArgs(customArgs, field)
       }
+      field.textField.focus = true
+      field.textFieldUpdate.connect(function (value) { root.updateProperty(value, linkedProp)})
+      root.onReset.connect(field.resetTextField)
+      return field
     }
   }
 
@@ -123,6 +129,7 @@ UIActionDialogForm {
   }
 
   function updateProperty(value, prop) {
+    console.log(prop, value)
     actionProps[prop] = value
   }
 
@@ -155,6 +162,7 @@ UIActionDialogForm {
       } else {
         let prop = actionProps[key]
         if (prop === 0 || prop ===''){
+          console.log(key)
           return false;
         }
       }

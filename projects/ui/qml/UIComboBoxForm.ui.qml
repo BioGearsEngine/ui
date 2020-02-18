@@ -11,7 +11,8 @@ RowLayout {
   id: root
 
   property real elementRatio : 0.5    //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
-  property real maxWidth : parent.width
+  property real prefWidth : parent.width
+  property real prefHeight
   property int colSpan : 1
   property int rowSpan : 1
   property string splitToken          //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
@@ -19,26 +20,31 @@ RowLayout {
 
   property alias label: name
   property alias comboBox: value
-  Layout.fillWidth : true
-  Layout.maximumWidth : maxWidth
+  Layout.preferredHeight : prefHeight ? prefHeight : root.implicitHeight
+  Layout.preferredWidth : prefWidth
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
 
   Label {
     id: name
-    Layout.maximumWidth : root.maxWidth * elementRatio
+    Layout.maximumWidth : root.prefWidth * elementRatio
     Layout.fillWidth : true
+    Layout.fillHeight : true
+    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1
     text: "Unset"
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
     font.pointSize: 12
+    background : Rectangle {color : "transparent"; border.color: "black"; border.width : 2; anchors.fill : parent}
 
   }
 
   ComboBox {
     id: value
-    Layout.maximumWidth : root.maxWidth * (1.0 - elementRatio)
+    Layout.maximumWidth : root.prefWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
+    Layout.fillHeight : true
+    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1
     font.weight: Font.Medium
     font.pointSize: 12
     editable: true 
@@ -49,8 +55,7 @@ RowLayout {
       font : value.font
       verticalAlignment : Text.AlignVCenter;
       horizontalAlignment : Text.AlignHCenter;
-      width : parent.width
-      height : parent.height
+      anchors.fill : parent
     }
     delegate : ItemDelegate {
       //Controls the look of text in the combo box menu.  The 'textRole' property of ComboBox MUST be set by the instantiating item.  This property tells the menu which role
@@ -67,6 +72,7 @@ RowLayout {
       width : parent.width
       highlighted : value.highlightedIndex === index;
     }
+    background : Rectangle {color : "transparent"; border.color: "black"; border.width : 2; anchors.fill : parent}
   }
 }
 

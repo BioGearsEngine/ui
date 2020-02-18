@@ -40,11 +40,12 @@ ActionDrawerForm {
 	    console.log("Error : Action dialog component not ready");
 	  } else {
 		  var hemDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 1});
+			let itemHeight = hemDialog.contentItem.height / 3
 			hemDialog.initializeProperties({name : 'Hemorrhage', location : '', rate: 0});
-			let rateSpinProps = {elementRatio : 0.6, spinMax : 1000, spinStep : 10}
+			let rateSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 1000, spinStep : 10}
 			hemDialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', rateSpinProps)
 			let locationModelData = { type : 'ListModel', role : 'name', elements : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
-			hemDialog.addComboBox('Location', 'location', locationModelData, {})
+			hemDialog.addComboBox('Location', 'location', locationModelData, {prefHeight : itemHeight})
 			hemDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																							function () {scenario.create_hemorrhage_action(props.location, props.rate) },
 																																							function () {scenario.create_hemorrhage_action(props.location, 0.0) }
@@ -66,13 +67,18 @@ ActionDrawerForm {
 			console.log("Error : Action dialog component not ready");
 		} else {
 			var infectionDialog = dialogComponent.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
+
+
+
+
+			let itemHeight = infectionDialog.contentItem.height / 4
 			infectionDialog.initializeProperties({name : 'Infection', location : '', severity : 0, mic : 0})
-			let micSpinProps = {elementRatio : 0.6, spinMax : 500, spinStep : 10}
+			let micSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 500, spinStep : 10}
 			infectionDialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
-			let severitySpinProps = {elementRatio : 0.6, spinMax : 3, displayEnum : ['','Mild','Moderate','Severe']}
+			let severitySpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 3, displayEnum : ['','Mild','Moderate','Severe']}
 			infectionDialog.addSpinBox('Severity', 'severity', severitySpinProps)
 			let locationListData = { type : 'ListModel', role : 'name', elements : ['Gut', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
-			let locationProps = {elementRatio : 0.6}
+			let locationProps = {prefHeight : itemHeight, elementRatio : 0.6}
 			infectionDialog.addComboBox('Location', 'location', locationListData, locationProps)
 			infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																										function () {scenario.create_infection_action(props.location, props.severity, props.mic) },
@@ -93,8 +99,9 @@ ActionDrawerForm {
 			console.log("Error : Action dialog component not ready");
 		} else {
 			var burnDialog = dialogComponent.createObject(root.parent);
+			let itemHeight = burnDialog.contentItem.height / 4
 			burnDialog.initializeProperties({name : actionItem.name, severity : 0})
-			let burnArgs = {elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
+			let burnArgs = {prefHeight : itemHeight, elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
 			burnDialog.addSpinBox('Fraction Body Surface Area', 'severity', burnArgs)
 			burnDialog.applyProps.connect( function(props)	{ actionModel.addSwitch	(	props.description, 
 																																								function () { scenario.create_burn_action(props.severity) },
@@ -124,6 +131,8 @@ ActionDrawerForm {
 			console.log("Error : Action dialog component not ready");
 		} else {
 			var severityDialog = dialogComponent.createObject(root.parent);
+			let itemHeight = severityDialog.contentItem.height / 4
+			Object.assign(customArgs, {prefHeight : itemHeight})
 			severityDialog.initializeProperties({name : name, severity : 0})
 			severityDialog.addSpinBox(label, 'severity', customArgs)
 			severityDialog.applyProps.connect( function (props) {	actionModel.addSwitch(	props.description,
@@ -145,379 +154,141 @@ ActionDrawerForm {
 			}
 			console.log("Error : Action dialog component not ready");
 		} else {
-			var substanceDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 6 } );
-			substanceDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : 0, concentration : 0, rate : 0})
+			var substanceDialog = dialogComponent.createObject(root.parent, {'width' : 800, 'numRows' : 2, 'numColumns' : 6 } );
+			let itemHeight = substanceDialog.contentItem.height / 3
+			let itemWidth1 = substanceDialog.contentItem.width / 2
+			let itemWidth2 = substanceDialog.contentItem.width / 3
+			substanceDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : "0", concentration : "0", rate : "0"})
 			let adminListData = { type : 'ListModel', role : 'route', elements : ['Bolus-Intraarterial', 'Bolus-Intramuscular', 'Bolus-Intravenous', 'Infusion-Intravenous','Oral','Transmucosal']}
-			let adminComboProps = {elementRatio : 0.4, maxWidth : (substanceDialog.width / 2 - substanceDialog.colSpace / 2), colSpan : 3}
-			substanceDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
+			let adminComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
+			let adminCombo = substanceDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
 			let subFolderData = {type : 'FolderModel', role : 'fileBaseName', elements : 'file:substances'}
-			let subComboProps = {elementRatio : 0.4, maxWidth : (substanceDialog.width / 2 - substanceDialog.colSpace / 2), colSpan : 3}
-			substanceDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
-			substanceDialog.addTextField('Dose (ml)', 'dose', {colSpan : 2, maxWidth : (substanceDialog.width / 3.0 - 2.0 * substanceDialog.colSpace / 3.0)})
-			substanceDialog.addTextField('Concentration (ug/mL)', 'concentration', {colSpan : 2, maxWidth : (substanceDialog.width / 3.0 - 2.0 * substanceDialog.colSpace / 3.0)})
-			substanceDialog.addTextField('Rate (mL/min)', 'rate', {colSpan : 2, maxWidth : (substanceDialog.width / 3.0 - 2.0 * substanceDialog.colSpace / 3.0)})
+			let subComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
+			let subCombo = substanceDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
+			let doseField = substanceDialog.addTextField('Dose (ml)', 'dose', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+			let concentrationField = substanceDialog.addTextField('Concentration (ug/mL)', 'concentration', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+			let rateField = substanceDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+			substanceDialog.applyProps.connect(root.apply_SubstanceAction)
+			adminCombo.comboUpdate.connect(function (value) { root.manage_substanceOptions(value, doseField, concentrationField, rateField)} )
 			substanceDialog.open();
 		}
 	}
 
+	function manage_substanceOptions(value, doseField, concentrationField, rateField) {
+		switch(value) {
+			case 'Bolus-Intraarterial' :
+			case 'Bolus-Intramuscular' :
+			case 'Bolus-Intravenous' :
+				doseField.textField.placeholderText = 'Dose (mL)'
+				doseField.editable = true
+				concentrationField.editable = true
+				rateField.editable = false
+				break;
+			case 'Infusion-Intravenous' :
+				doseField.editable = false
+				concentrationField.editable = true
+				rateField.editable = true
+				break;
+			case 'Oral':
+			case 'Transmucosal':
+				doseField.textField.placeholderText = 'Dose (mg)'
+				doseField.editable = true
+				concentrationField.editable = false
+				rateField.editable = false
+				break;	
+			default :
+				doseField.editable = false
+				concentrationField.editable = false
+				rateField.editable = false
+		}
+	}
 
-
-
-
-	//Substance Administration
-	function setup_SubstanceActions_archive(actionItem){
-		var dialogStr = "import QtQuick.Controls 2.12; import QtQuick 2.12; import Qt.labs.folderlistmodel 2.12; import QtQuick.XmlListModel 2.12;
-			Dialog {
-				id : substanceDialog;
-				width : 800;
-				height : 300;
-				modal : true;
-				closePolicy : Popup.NoAutoClose;
-				property string substance
-				property var action
-				property var onFunc
-				property var offFunc
-				property real dose : 0.0
-				property real concentration : 0.0
-				property real rate : 0.0
-				property string adminRoute
-				property string description
-				property string doseLabel : 'Dose (mL)'
-				property int numRows : 4
-				signal adminChange (string route)
-				footer : DialogButtonBox {
-					standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel;
+	function apply_SubstanceAction(props){
+		let route = props.adminRoute
+		let substance = props.substance
+		let dose = props.dose
+		let concentration = props.concentration
+		let rate = props.rate
+		let routeDescription = route.split('-')[0] + " (" + route.split('-')[1] + ") : "
+		let description = substance + " " + routeDescription		//Overriding description for substances
+		switch (route) {
+			case 'Bolus-Intraarterial' :
+				if (dose == 0.0 || concentration == 0.0){
+					console.log('Bolus action requires a dose and concentration')
 				}
-
-				onApplied : {
-					if (adminCombo.currentIndex == -1 || subCombo.currentIndex == -1){
-						console.log('Invalid entry : Provide an admin route and a substance');
-					}
-					else {
-						description = substance + ' ' + adminRoute + ' : '
-						switch (adminRoute) {
-							case 'Bolus - Intraarterial' :
-								description += 'Dose = ' + dose + ' mL; Concentration = ' + concentration + ' ug/mL'
-								if (dose == 0.0 || concentration == 0.0){
-									console.log('Bolus action requires a dose and concentration')
-								}
-								else {
-									//Intraarterial is CDM::enumBolusAdministration::0
-									onFunc = function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) }
-									offFunc = function () { return 0 }
-									root.addSwitch(description, onFunc, offFunc);
-									close();
-								}
-								break;
-							case 'Bolus - Intramuscular' :
-								description += 'Dose = ' + dose + ' mL; Concentration = ' + concentration + ' ug/mL'
-								if (dose == 0.0 || concentration == 0.0){
-									console.log('Bolus action requires a dose and concentration')
-								}
-								else {
-									//Intramuscular is CDM::enumBolusAdministration::1
-									onFunc = function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) }
-									offFunc = function () { return 0 }
-									root.addSwitch(description, onFunc, offFunc);
-									close();
-								}
-								break;
-							case 'Bolus - Intravenous' :
-								description += 'Dose = ' + dose + ' mL; Concentration = ' + concentration + ' ug/mL'
-								if (dose == 0.0 || concentration == 0.0){
-									console.log('Bolus action requires a dose and concentration')
-								}
-								else {
-									//Intravenous is CDM::enumBolusAdministration::2
-									onFunc = function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) }
-									offFunc = function () { return 0 }
-									root.addSwitch(description, onFunc, offFunc);
-									close();
-								}
-								break;
-							case 'Infusion - Intravenous' :
-								description += 'Concentration = ' + concentration + ' ug/mL; Rate = ' + rate + ' mL/min'
-								if (concentration == 0.0 || rate == 0.0){
-									console.log('Infusion action requires a concentration and a rate')
-								} else {
-									onFunc = function () { scenario.create_substance_infusion_action(substance, concentration, rate) }
-									offFunc = function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
-									root.addSwitch(description, onFunc, offFunc);
-									close();
-								}
-								break;
-							case 'Oral':
-								description += 'Dose = ' + dose + ' mg'
-								if (dose == 0.0){
-									console.log('Oral drug action requires a dose')
-								} else {
-									//Oral (GI) is CDM::enumOralAdministration::1
-									onFunc = function () { scenario.create_substance_oral_action(substance, 1, dose) }
-									offFunc = function() { return 0}
-									root.addSwitch(description, onFunc, offFunc);
-									close();
-								}
-								break;
-							case 'Transmucosal':
-								description += 'Dose = ' + dose + ' mg'
-								if (dose == 0.0){
-									console.log('Tranmucosal action requires a dose')
-								} else {
-									//Transcmucosal is CDM::enumOralAdministration::0
-									onFunc = function () { scenario.create_substance_oral_action(substance, 0, dose) }
-									offFunc = function() { return 0 }
-									root.addSwitch(description, onFunc, offFunc);
-									close();
-								}
-								break;
-						}
-					}
+				else {
+					//Intraarterial is CDM::enumBolusAdministration::0
+					description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+					console.log('Here')
+					actionModel.addSwitch(description, 
+																function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
+																);
+					close();
 				}
-                
-        onReset : {
-					adminCombo.currentIndex = -1
-					subCombo.currentIndex = -1
-					doseField.clear()
-					concentrationField.clear()
-					rateField.clear()
-					dose = 0.0
-					concentration = 0.0
-					rate = 0.0
-					description = ''
-					adminChange('')
-					inputRow.fieldChange('')
+				break;
+			case 'Bolus-Intramuscular' :
+				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+				if (dose == 0.0 || concentration == 0.0){
+					console.log('Bolus action requires a dose and concentration')
 				}
-
-				onRejected : {
-					close()
+				else {
+					//Intramuscular is CDM::enumBolusAdministration::1
+					actionModel.addSwitch(description, 
+																function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) } 
+																);
+					close();
 				}
-
-				onAdminChange : {
-					switch (route) {
-						case 'Bolus - Intraarterial' :
-						case 'Bolus - Intramuscular' :
-						case 'Bolus - Intravenous' :
-							doseLabel = 'Dose (mL)'
-							doseField.visible = true
-							concentrationField.visible = true
-							rateField.visible = false
-							break;
-						case 'Infusion - Intravenous' :
-							doseField.visible = false
-							concentrationField.visible = true
-							rateField.visible = true
-							break;
-						case 'Oral':
-						case 'Transmucosal':
-							doseLabel = 'Dose (mg)'
-							doseField.visible = true
-							concentrationField.visible = false
-							rateField.visible = false
-							break;	
-						default :
-							doseField.visible = false
-							concentrationField.visible = false
-							rate.Field.visible = false
-					}
+				break;
+			case 'Bolus-Intravenous' :
+				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+				if (dose == 0.0 || concentration == 0.0){
+					console.log('Bolus action requires a dose and concentration')
 				}
-
-				contentItem : Column {
-					id : columnWrapper;
-					spacing : 40;
-					anchors.left : parent.left
-					anchors.right : parent.right;
-					Row {
-						id: adminRow
-						width : parent.width
-						height : parent.height / numRows
-						anchors.horizontalCenter : parent.horizontalCenter
-						spacing : 10
-						UIComboBox {
-							id : adminCombo
-							width : parent.width / 2.1 - spacing / 2
-							anchors.left : parent.left
-							elementRatio : 0.6
-							height : parent.height
-							label.text : 'Administration Route'
-							label.font.pointSize : 12
-							label.font.weight : Font.Normal
-							label.horizontalAlignment : Text.AlignHCenter
-							label.verticalAlignment : Text.AlignVCenter
-							comboBox.font.pointSize : 10
-							comboBox.font.weight : Font.Normal
-							comboBox.currentIndex : -1
-							comboBox.model : adminModel
-							comboBox.textRole : 'name'		//Tells UIComboBox to use 'name' role of adminModel to populate menu
-							ListModel {
-								id : adminModel
-								ListElement {name : 'Bolus - Intraarterial'}
-								ListElement {name : 'Bolus - Intramuscular'}
-								ListElement {name : 'Bolus - Intravenous'}
-								ListElement {name : 'Infusion - Intravenous'}
-								ListElement {name : 'Oral'}
-								ListElement {name : 'Transmucosal'}
-							}
-							comboBox.onActivated : {
-								substanceDialog.adminRoute = adminModel.get(comboBox.currentIndex).name
-								substanceDialog.adminChange(adminRoute)
-							}
-						}
-						UIComboBox{
-							id : subCombo
-							width : parent.width / 2.1 - spacing / 2
-							anchors.left : parent.horizontalCenter
-							elementRatio : 0.5
-							height : parent.height
-							label.text : 'Substance'
-							label.font.pointSize : 12
-							label.font.weight : Font.Normal
-							label.horizontalAlignment : Text.AlignHCenter
-							label.verticalAlignment : Text.AlignVCenter
-							comboBox.font.pointSize : 10
-							comboBox.font.weight : Font.Normal
-							comboBox.currentIndex : -1
-							comboBox.model : subModel
-							comboBox.textRole : 'fileBaseName'  //FolderListModels have many built-in roles (fileName, fileBaseName, filePath, etc).  fileBaseName will remove the '.xml' from substance file name
-
-							FolderListModel {
-								id : subModel
-								nameFilters : ['*.xml']
-								folder : 'file:substances'
-								showDirs : false
-							}
-							comboBox.onActivated : {
-								substanceDialog.substance = subModel.get(comboBox.currentIndex, 'fileBaseName')
-							}
-						}
-					}
-					Row {
-						id : inputRow
-						width : parent.width;
-						height : parent.height / numRows
-						spacing : 0;
-						signal fieldChange (string fieldName)
-						onFieldChange : {
-							switch (fieldName) {
-								case 'Dose' :
-									doseWrapper.editing = true
-									concentrationWrapper.editing = false
-									rateWrapper.editing = false
-									break;
-								case 'Concentration' :
-									doseWrapper.editing = false
-									concentrationWrapper.editing = true
-									rateWrapper.editing = false
-									break;
-								case 'Rate' :
-									doseWrapper.editing = false
-									concentrationWrapper.editing = false
-									rateWrapper.editing = true
-									break;
-								default : 
-									doseWrapper.editing = false
-									concentrationWrapper.editing = false
-									rateWrapper.editing = false
-							}
-						}
-						Item {
-							id : doseWrapper
-							width : parent.width / 3;
-							height : inputRow.height;
-							property bool editing : false
-							TextField {
-								id : doseField
-								anchors.fill : parent
-								placeholderText : substanceDialog.doseLabel
-								verticalAlignment : Text.AlignBottom;
-								horizontalAlignment : Text.AlignHCenter;
-								font.pointSize : 12;
-								visible : false
-								validator : DoubleValidator {
-									bottom : 0.0
-								}
-								background : Rectangle { 
-									anchors.fill : parent; 
-									color : 'transparent'; 
-									border.color : doseWrapper.editing ? 'green' : 'grey'
-									border.width : doseWrapper.editing ? 3 : 1
-								}
-								onPressed : {
-									inputRow.fieldChange('Dose')
-								}
-								onEditingFinished : {
-									substanceDialog.dose = doseField.text
-								}
-							}
-						}
-						Item {
-							id : concentrationWrapper
-							width : parent.width / 3;
-							height : parent.height;
-							property bool editing : false
-							TextField {
-								id : concentrationField
-								anchors.fill : parent
-								placeholderText : 'Concentration (ug/mL)'
-								font.pointSize : 12;
-								visible : false
-								verticalAlignment : Text.AlignBottom;
-								horizontalAlignment : Text.AlignHCenter;
-								validator : DoubleValidator {
-									bottom : 0.0
-								}
-								background : Rectangle { 
-									anchors.fill : parent; 
-									color : 'transparent'; 
-									border.color :  concentrationWrapper.editing ? 'green' : 'grey'
-									border.width : concentrationWrapper.editing ? 3 : 1
-								}
-								onPressed : {
-									inputRow.fieldChange('Concentration')
-								}
-								onEditingFinished : {
-									substanceDialog.concentration = concentrationField.text
-								}
-							}
-							
-						}
-						Item {
-							id : rateWrapper
-							width : parent.width / 3;
-							height : parent.height;
-							property bool editing : false
-							TextField {
-								id : rateField
-								anchors.fill : parent
-								placeholderText : 'Infusion Rate (mL/min)'
-								font.pointSize : 12;
-								visible : false
-								verticalAlignment : Text.AlignVCenter;
-								horizontalAlignment : Text.AlignHCenter;
-								validator : DoubleValidator {
-									bottom : 0.0
-								}
-								background : Rectangle { 
-									anchors.fill : parent; 
-									color : 'transparent'; 
-									border.color : rateWrapper.editing ? 'green' : 'grey'
-									border.width : rateWrapper.editing ? 3 : 1
-								}
-								onPressed : {
-									inputRow.fieldChange('Rate')
-								}
-								onEditingFinished : {
-									substanceDialog.rate = rateField.text
-								}
-							}
-						}
-					}
+				else {
+					//Intravenous is CDM::enumBolusAdministration::2
+					actionModel.addSwitch(description, 
+																function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) } 
+																);
+					close();
 				}
-			}
-		"
-		var dialogBox = Qt.createQmlObject(dialogStr, root.parent, "DialogDebug");
-		dialogBox.title = "Drug Administration Editor"
-		dialogBox.action = actionItem
-		dialogBox.open()
+				break;
+			case 'Infusion-Intravenous' :
+				description += 'Concentration (ug/mL) = ' + concentration + '; Rate (mL/min) = ' + rate
+				if (concentration == 0.0 || rate == 0.0){
+					console.log('Infusion action requires a concentration and a rate')
+				} else {
+					actionModel.addSwitch(description, 
+																function () { scenario.create_substance_infusion_action(substance, concentration, rate)}, 
+																function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
+																);
+					close();
+				}
+				break;
+			case 'Oral':
+				description += 'Dose (mg) = ' + dose
+				if (dose == 0.0){
+					console.log('Oral drug action requires a dose')
+				} else {
+					//Oral (GI) is CDM::enumOralAdministration::1
+					actionModel.addSwitch(description, 
+																function () { scenario.create_substance_oral_action(substance, 0, dose) } 
+																);
+					close();
+				}
+				break;
+			case 'Transmucosal':
+				description += 'Dose (mg) = ' + dose
+				if (dose == 0.0){
+					console.log('Tranmucosal action requires a dose')
+				} else {
+					//Transcmucosal is CDM::enumOralAdministration::0
+					actionModel.addSwitch(description, 
+																function () { scenario.create_substance_oral_action(substance, 1, dose) } 
+																);
+					close();
+				}
+				break;
+		}
 	}
 
 	function setup_OtherActions(actionItem){
