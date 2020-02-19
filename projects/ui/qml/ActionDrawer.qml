@@ -5,21 +5,15 @@ import com.biogearsengine.ui.scenario 1.0
 
 ActionDrawerForm {
 	id: root
-	signal toggleState()
+	signal openActionDrawer()
 	
 	property Scenario scenario
 	property Controls controls
 	property ObjectModel actionModel
 
-	function addSwitch(name, onFunc, offFunc){
-		actionModel.addSwitch(name, onFunc, offFunc)
-	}
-
-	onToggleState:{
+	onOpenActionDrawer:{
 		if (!root.opened){
 			root.open();
-		} else {
-			root.close();
 		}
 	}
 	applyButton.onClicked: {
@@ -28,8 +22,19 @@ ActionDrawerForm {
 		}
 	}
 
-	//--------------Action-specific wrapper functions-------------------------------//
-	//Hemorrhage
+	//--------------Action-specific dialog instantiators--------------------------------------
+	
+	/// setup_*Action* functions are called when *Action* is selected from ActionDrawer (see ActionDrawerForm.ui.qml)
+	/// Each setup function creates a dialog window which can be customized to accept user input.  User input is 
+	/// stored in a "properties" variable, which is passed as args to the appropriate callable BioGears action function 
+	/// (see Scenario.cpp). The BioGears action is connected to an ON/OFF switch (Controls.qml and UIActionSwitch.qml)
+	/// that is displayed in the control panel area.
+
+
+	//----------------------------------------------------------------------------------------
+	/// Creates a hemorrhage dialog window and assign properties for bleeding rate and location
+	/// Sets up a spin box to set rate with upper bound of 1000 mL/min and step size of 10 mL/min
+	/// Sets up a combo box for location and populate list with acceptable comparments
 	function setup_hemorrhage(actionItem){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
 	  if ( dialogComponent.status != Component.Ready){
@@ -56,7 +61,12 @@ ActionDrawerForm {
 	  }
 	}
 
-	//Infection (very similar to hemorrage--1 extra arg--could look into making widget that both can use)
+	
+	//----------------------------------------------------------------------------------------
+	/// Creates an infection dialog window and assign properties for severity, minimum inhibitory concentration, and location
+	/// Sets up a spin box to set mic with upper bound of 500 mg/L and step size of 10 mg/L
+	/// Sets up a spin box to set severity.  Passes an array ['Mild', 'Medium','Severe'] to display enums in spin box
+	/// Sets up a combo box for location and populate list with acceptable comparments
 	function setup_infection(actionItem){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
 		if ( dialogComponent.status != Component.Ready){
@@ -67,10 +77,6 @@ ActionDrawerForm {
 			console.log("Error : Action dialog component not ready");
 		} else {
 			var infectionDialog = dialogComponent.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
-
-
-
-
 			let itemHeight = infectionDialog.contentItem.height / 4
 			infectionDialog.initializeProperties({name : 'Infection', location : '', severity : 0, mic : 0})
 			let micSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 500, spinStep : 10}
@@ -89,6 +95,9 @@ ActionDrawerForm {
 		}
 	}
 
+	//----------------------------------------------------------------------------------------
+	/// Creates burn dialog window and assign fraction body surface area burned property
+	/// Sets up a spin box to set fraction body surface area (scales to output text in floating point)
 	function setup_burn(actionItem){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
 		if ( dialogComponent.status != Component.Ready){
@@ -112,6 +121,10 @@ ActionDrawerForm {
 		}
 	}
 
+	//----------------------------------------------------------------------------------------
+	/// Set up arguments for asthma action, including severity property and spin box arguments
+	/// to track severity value
+	/// Calls to generic setup_severityAction function to complete dialog instantiation
 	function setup_asthma(actionItem){
 		let label = 'Severity'
 		let func = function(sev) { scenario.create_asthma_action(sev) }
@@ -119,8 +132,10 @@ ActionDrawerForm {
 		setup_severityAction(actionItem.name, label, func, customArgs)
 	}
 
-
-	//Generic form for actions that take single severity input (asthma, burn, airway obstruction, etc.)
+	//----------------------------------------------------------------------------------------
+	/// Create dialog window for actions that accepts single severity input (asthma, burn, airway obstruction, etc.)
+	/// Accepts action name, label, biogears function, and args to customize spin box
+	/// Sets up a spin box to track severity
 	function setup_severityAction(name, label, func, customArgs){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
 		if ( dialogComponent.status != Component.Ready){
@@ -145,6 +160,14 @@ ActionDrawerForm {
 		}
 	}
 
+	//----------------------------------------------------------------------------------------
+	/// Create substance dialog window that handles ALL currently available drug actions
+	/// Initializes properties for route, substance, dose, concentration, and rate
+	/// Sets up a combo box with all avaliable admin routes (bolus, infusion, oral)
+	/// Sets up a combo box with all drugs in substance folder
+	/// Sets up text fields for dose, concentration, and rate of infusion
+	/// Calls to manage_substanceOptions and apply_SubstanceActions to customize look and output
+	///		depending on the currently selected admin route
 	function setup_SubstanceActions(actionItem){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
 		if ( dialogComponent.status != Component.Ready){
@@ -174,6 +197,11 @@ ActionDrawerForm {
 		}
 	}
 
+	//----------------------------------------------------------------------------------------
+	/// Helper function for setup_SubstanceActions
+	/// Takes current adminRoute (value) and the three text fields defined in substance dialog
+	/// Updates the visibility of each text field according to the current admin route
+	///		(e.g. bolus only needs dose and concentration, so rate visibility is set to false)
 	function manage_substanceOptions(value, doseField, concentrationField, rateField) {
 		switch(value) {
 			case 'Bolus-Intraarterial' :
@@ -203,6 +231,9 @@ ActionDrawerForm {
 		}
 	}
 
+	//----------------------------------------------------------------------------------------
+	/// Helper function for setup_SubstanceActions
+	/// Takes props set by user and identifies correct Biogears action to call according to admin route
 	function apply_SubstanceAction(props){
 		let route = props.adminRoute
 		let substance = props.substance
@@ -291,6 +322,7 @@ ActionDrawerForm {
 		}
 	}
 
+	//Placeholder function for other actions that have not yet been defined in Scenario.cpp
 	function setup_OtherActions(actionItem){
 		console.log("Support coming for " + actionItem.name);
 	}

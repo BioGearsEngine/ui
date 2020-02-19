@@ -4,28 +4,27 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.3
 
 /*
-Brief:  A label and spinbox (dropdown menu) laid out in a row for use in action editor dialog boxes
+Brief:  Defines a blank dialog window containing a 1 x 1 grid and standard buttons for customization of action editor dialog
 */
 
 Dialog {
   id: dialogForm
-  
+  //Properties -- used to customize the functionality / look of the dialog window
   property var actionProps : ({})
   property int numRows : 1
   property int numColumns : 1
   property int colSpace: 0
   property int rowSpace : 0
-
-
+  //Base properties
   width : 500
   height : 250
   modal : true
   closePolicy : Popup.NoAutoClose
-  
+  //Add standard buttons
   footer : DialogButtonBox {
     standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel
   }
-  
+  //Main content
   contentItem : GridLayout {
     id : contentGrid
 		anchors.left : parent.left;
@@ -36,9 +35,7 @@ Dialog {
     columns : numColumns
     columnSpacing : colSpace
     rowSpacing : rowSpace
-
   }
- 
 }
 
 

@@ -12,7 +12,7 @@ ControlsForm {
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
   signal patientConditionsChanged(PatientConditions conditions )
-  signal drawerOpenClosed()
+  signal openActionDrawer()
 
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
@@ -135,8 +135,8 @@ ControlsForm {
       root.speedToggled(1)
     }
   } 
-  drawerToggle.onPressed : {
-    root.drawerOpenClosed();
+  openDrawerButton.onPressed : {
+    root.openActionDrawer();
   }
 
 }

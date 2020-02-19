@@ -9,18 +9,19 @@ Brief:  A label and comboBox (dropdown menu) laid out in a row
 
 RowLayout {
   id: root
-
-  property real elementRatio : 0.5    //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
+  //Properties -- used to customize look/functionality of component
+  property real elementRatio : 0.5          //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
   property real prefWidth : parent.width
   property real prefHeight
   property int colSpan : 1
   property int rowSpan : 1
-  property string splitToken          //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
-                                      //we do not want to display (e.g. PatientState@0s vs PatientState).  This splitToken tells which character to split the file name at.  
-
+  property string splitToken                //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
+                                            //we do not want to display (e.g. PatientState@0s vs PatientState).  This splitToken tells which character to split the file name at.  
+  //Property aliases -- used to access subcomponents outside form file
   property alias label: name
   property alias comboBox: value
-  Layout.preferredHeight : prefHeight ? prefHeight : root.implicitHeight
+  //Layout options
+  Layout.preferredHeight : prefHeight ? prefHeight : root.implicitHeight   //If no preferred height, use implicit height determined by layout
   Layout.preferredWidth : prefWidth
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
@@ -30,21 +31,18 @@ RowLayout {
     Layout.maximumWidth : root.prefWidth * elementRatio
     Layout.fillWidth : true
     Layout.fillHeight : true
-    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1
+    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1    //If no preferred height, set to -1, which flags Qml Layout to use implicit maximum height
     text: "Unset"
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
     font.pointSize: 12
-    background : Rectangle {color : "transparent"; border.color: "black"; border.width : 2; anchors.fill : parent}
-
   }
-
   ComboBox {
     id: value
     Layout.maximumWidth : root.prefWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
     Layout.fillHeight : true
-    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1
+    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1     //If no preferred height, set to -1, which flags Qml Layout to use implicit maximum height
     font.weight: Font.Medium
     font.pointSize: 12
     editable: true 
@@ -72,7 +70,6 @@ RowLayout {
       width : parent.width
       highlighted : value.highlightedIndex === index;
     }
-    background : Rectangle {color : "transparent"; border.color: "black"; border.width : 2; anchors.fill : parent}
   }
 }
 

@@ -33,8 +33,8 @@ ApplicationWindow {
         controls.onRestartClicked: {
             graphArea.restart()
         }
-        controls.onDrawerOpenClosed: {
-            actionDrawer.toggleState();
+        controls.onOpenActionDrawer: {
+            actionDrawer.openActionDrawer();
         }
     }
 

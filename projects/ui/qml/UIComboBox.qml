@@ -3,34 +3,43 @@ import QtQuick.Controls 2.5
 import Qt.labs.folderlistmodel 2.12
 
 UIComboBoxForm {
-    id: root
+  id: root
+  //----------Signals and Handlers------------------
 
-    property string description
-    signal comboUpdate(string currentSelection)
-    signal resetCombo()
+  // Emit new value to dialog window when new entry selected from menu
+  signal comboUpdate(string currentSelection)
 
-    comboBox.onActivated : {
-      if (comboBox.model instanceof ListModel){
-        comboUpdate(comboBox.model.get(comboBox.currentIndex)[comboBox.textRole])
-      } else if (comboBox.model instanceof FolderListModel) {
-        comboUpdate(comboBox.model.get(comboBox.currentIndex, comboBox.textRole));
-      }
+  //Emit when dialog window Reset is detected
+  signal resetCombo()
+
+  // Handle new entry seleted from menu (according to model type) and emit comboUpdate
+  comboBox.onActivated : {
+    if (comboBox.model instanceof ListModel){
+      comboUpdate(comboBox.model.get(comboBox.currentIndex)[comboBox.textRole])
+    } else if (comboBox.model instanceof FolderListModel) {
+      comboUpdate(comboBox.model.get(comboBox.currentIndex, comboBox.textRole));
     }
+  }
 
-    onResetCombo : {
-      comboBox.currentIndex = -1
-      comboUpdate("")
-    }
+  // Handle reset signal by clearing box
+  onResetCombo : {
+    comboBox.currentIndex = -1
+    comboUpdate("")
+  }
 
-    function getDescription(){
-      if (comboBox.model instanceof ListModel){
-        return label.text + " = " + comboBox.model.get(comboBox.currentIndex)[comboBox.textRole]
-      } else if (comboBox.model instanceof FolderListModel){
-        return label.text + " = " + comboBox.model.get(comboBox.currentIndex, comboBox.textRole)
-      } else {
-        return ''
-      }
+  //---------Functions----------------------------
+
+  //----------------------------------------------
+  //Generates description of property for dialog window description assembly
+  function getDescription(){
+    if (comboBox.model instanceof ListModel){
+      return label.text + " = " + comboBox.model.get(comboBox.currentIndex)[comboBox.textRole]
+    } else if (comboBox.model instanceof FolderListModel){
+      return label.text + " = " + comboBox.model.get(comboBox.currentIndex, comboBox.textRole)
+    } else {
+      return ''
     }
+  }
 
 }
 

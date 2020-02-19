@@ -31,7 +31,7 @@ ColumnLayout {
   property alias condition : physiology.condition
 
   property alias playback : playback_controls
-  property alias drawerToggle : drawerToggle
+  property alias openDrawerButton : openDrawerButton
   property alias actionSwitchView : actionSwitchView
   property alias actionMessage : actionMessage
 
@@ -123,7 +123,7 @@ ColumnLayout {
   }
 
   Button {
-    id : drawerToggle
+    id : openDrawerButton
     contentItem : Text {
       id : drawerText
       text : 'Add Action'
