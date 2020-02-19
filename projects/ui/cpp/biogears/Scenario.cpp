@@ -157,6 +157,10 @@ Scenario& Scenario::environment_name(QString name)
 //-------------------------------------------------------------------------------
 Scenario& Scenario::load_patient(QString file)
 {
+  _drugs_list.clear();
+  _compounds_list.clear();
+  _transfusions_list.clear();
+  parseSubstancesToLists();
 
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
@@ -513,7 +517,6 @@ Scenario& Scenario::load_patient(QString file)
   }
   _engine_mutex.unlock();
 
-
   return *this;
 }
 //-------------------------------------------------------------------------------
@@ -539,9 +542,9 @@ void Scenario::physiology_thread_main()
 inline void Scenario::physiology_thread_step()
 {
   using namespace std::chrono_literals;
-  
+
   if (!_paused) {
-    _engine_mutex.lock();//< I ran in to some -O2 issues when using an std::lock_guard in msvc
+    _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
     if (_action_queue.size()) {
       dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
@@ -937,6 +940,66 @@ double Scenario::get_simulation_time()
 {
   return _engine->GetSimulationTime().GetValue(biogears::TimeUnit::s);
 }
+//---------------------------------------------------------------------------------
+void Scenario::parseSubstancesToLists()
+{
+  QDir subDirectory = QDir("substances");
+  std::unique_ptr<CDM::ObjectData> subXmlData;
+  CDM::SubstanceData* subData;
+  CDM::SubstanceCompoundData* compoundData;
+  std::string test = "test";
+  QString qtest = QString::fromStdString(test);
+
+  if (!subDirectory.exists()) {
+    std::cout << "This is not the substance directory you're looking for";
+  } else {
+    QDirIterator subIt(subDirectory, QDirIterator::NoIteratorFlags);
+    while (subIt.hasNext()) {
+      auto it = subIt.next(); //Only used to advance iterator--don't really need the string that is returned by this function
+      auto subFileInfo = subIt.fileInfo();
+      if (subFileInfo.isFile()) {
+        subData = nullptr;
+        compoundData = nullptr;
+
+        subXmlData = biogears::Serializer::ReadFile(subFileInfo.filePath().toStdString(), _engine->GetLogger());
+        subData = dynamic_cast<CDM::SubstanceData*>(subXmlData.get());
+        if (subData != nullptr) {
+          if (subData->Pharmacodynamics().present() && subData->Pharmacokinetics().present()) {
+            _drugs_list.append(QString::fromStdString(subData->Name()));
+          }
+          continue;
+        }
+        compoundData = dynamic_cast<CDM::SubstanceCompoundData*>(subXmlData.get());
+        if (compoundData != nullptr) {
+          if (compoundData->Classification().present()) {
+            if (compoundData->Classification().get() == CDM::enumSubstanceClass::WholeBlood) {
+              _transfusions_list.append(QString::fromStdString(compoundData->Name()));
+            }
+          } else {
+            _compounds_list.append(QString::fromStdString(compoundData->Name()));
+          }
+          continue;
+        }
+      }
+    }
+  }
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::getDrugsList() 
+{
+  return _drugs_list;
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::getCompoundsList()
+{
+  return _compounds_list;
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::getTransfusionProductsList()
+{
+  return _transfusions_list;
+}
+
 }
 
 #include <biogears/cdm/patient/actions/SEAsthmaAttack.h>

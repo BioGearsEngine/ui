@@ -1,13 +1,14 @@
 #pragma once
 #include <functional>
+#include <map>
 #include <memory>
 #include <vector>
-#include <map>
 
 #include <QString>
-#include <QtQuick>
 #include <QVariant>
+#include <QtQuick>
 
+#include <biogears/cdm/Serializer.h>
 #include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/container/concurrent_queue.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
@@ -16,11 +17,11 @@
 #include <biogears/threading/runnable.h>
 #include <biogears/threading/steppable.h>
 
+#include "DataRequest.h"
+#include "DataRequestModel.h"
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
 #include "PatientState.h"
-#include "DataRequest.h"
-#include "DataRequestModel.h"
 
 namespace biogears {
 class SEScalar;
@@ -33,8 +34,8 @@ class Scenario : public QObject, public biogears::Runnable {
 
   Q_OBJECT
   Q_PROPERTY(double time READ get_simulation_time NOTIFY timeAdvance)
-  Q_PROPERTY(double isRunning   READ is_running   NOTIFY runningToggled)
-  Q_PROPERTY(double isPaused    READ is_paused    NOTIFY pausedToggled)
+  Q_PROPERTY(double isRunning READ is_running NOTIFY runningToggled)
+  Q_PROPERTY(double isPaused READ is_paused NOTIFY pausedToggled)
   Q_PROPERTY(double isThrottled READ is_throttled NOTIFY throttledToggled)
 public:
   Scenario(QObject* parent = Q_NULLPTR);
@@ -53,7 +54,6 @@ public:
 
   Q_INVOKABLE Scenario& load_patient(QString);
 
-
   Q_INVOKABLE double get_simulation_time();
 
   Q_INVOKABLE void restart(QString patient_file);
@@ -64,20 +64,25 @@ public:
   Q_INVOKABLE void join() final;
   Q_INVOKABLE void step();
 
+  Q_INVOKABLE QVector<QString> getDrugsList();
+  Q_INVOKABLE QVector<QString> getCompoundsList();
+  Q_INVOKABLE QVector<QString> getTransfusionProductsList();
+
   bool is_running() const;
   bool is_paused() const;
   bool is_throttled() const;
 
-  public: //Action Factory Interface;
+  void parseSubstancesToLists();
+
+public: //Action Factory Interface;
   Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
 
   Q_INVOKABLE void create_asthma_action(double severity);
-  Q_INVOKABLE void create_substance_bolus_action(QString substance, int route,  double dose_mL, double concentration_ug_Per_mL);
+  Q_INVOKABLE void create_substance_bolus_action(QString substance, int route, double dose_mL, double concentration_ug_Per_mL);
   Q_INVOKABLE void create_substance_oral_action(QString substance, int route, double dose_mg);
   Q_INVOKABLE void create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min);
   Q_INVOKABLE void create_burn_action(double tbsa);
   Q_INVOKABLE void create_infection_action(QString compartment, int severity, double mic_mg_Per_L);
-
 
 signals:
   void patientStateChanged(PatientState patientState);
@@ -89,11 +94,10 @@ signals:
   void pausedToggled(bool isPaused);
   void throttledToggled(bool isThrottled);
 
-  protected:
+protected:
   PatientState get_physiology_state();
   PatientMetrics* get_physiology_metrics();
   PatientConditions get_physiology_conditions();
-
 
 protected:
   void physiology_thread_main();
@@ -111,8 +115,12 @@ private:
   std::atomic<bool> _paused;
   std::atomic<bool> _throttle;
 
-  std::vector<std::pair<biogears::SEScalar const *, std::string>> _data_requests;
+  std::vector<std::pair<biogears::SEScalar const*, std::string>> _data_requests;
   std::unordered_map<std::string, size_t> _data_request_table;
+
+  QVector<QString> _drugs_list;
+  QVector<QString> _compounds_list;
+  QVector<QString> _transfusions_list;
 
   biogears::SEScalar* _arterialBloodPH;
   biogears::SEScalar* _arterialBloodPHBaseline;

@@ -161,14 +161,14 @@ ActionDrawerForm {
 	}
 
 	//----------------------------------------------------------------------------------------
-	/// Create substance dialog window that handles ALL currently available drug actions
+	/// Create drug dialog window that handles ALL currently available drug actions
 	/// Initializes properties for route, substance, dose, concentration, and rate
 	/// Sets up a combo box with all avaliable admin routes (bolus, infusion, oral)
 	/// Sets up a combo box with all drugs in substance folder
 	/// Sets up text fields for dose, concentration, and rate of infusion
 	/// Calls to manage_substanceOptions and apply_SubstanceActions to customize look and output
 	///		depending on the currently selected admin route
-	function setup_SubstanceActions(actionItem){
+	function setup_drugActions(actionItem){
 		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
 		if ( dialogComponent.status != Component.Ready){
 			if (dialogComponent.status == Component.Error){
@@ -177,23 +177,24 @@ ActionDrawerForm {
 			}
 			console.log("Error : Action dialog component not ready");
 		} else {
-			var substanceDialog = dialogComponent.createObject(root.parent, {'width' : 800, 'numRows' : 2, 'numColumns' : 6 } );
-			let itemHeight = substanceDialog.contentItem.height / 3
-			let itemWidth1 = substanceDialog.contentItem.width / 2
-			let itemWidth2 = substanceDialog.contentItem.width / 3
-			substanceDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : "0", concentration : "0", rate : "0"})
+			var drugDialog = dialogComponent.createObject(root.parent, {'width' : 800, 'numRows' : 2, 'numColumns' : 6 } );
+			let itemHeight = drugDialog.contentItem.height / 3
+			let itemWidth1 = drugDialog.contentItem.width / 2
+			let itemWidth2 = drugDialog.contentItem.width / 3
+			drugDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : "0", concentration : "0", rate : "0"})
 			let adminListData = { type : 'ListModel', role : 'route', elements : ['Bolus-Intraarterial', 'Bolus-Intramuscular', 'Bolus-Intravenous', 'Infusion-Intravenous','Oral','Transmucosal']}
 			let adminComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
-			let adminCombo = substanceDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
-			let subFolderData = {type : 'FolderModel', role : 'fileBaseName', elements : 'file:substances'}
+			let adminCombo = drugDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
+			let drugsList = scenario.getDrugsList();
+			let subFolderData = {type : 'ListModel', role : 'drug', elements : drugsList}
 			let subComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
-			let subCombo = substanceDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
-			let doseField = substanceDialog.addTextField('Dose (ml)', 'dose', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-			let concentrationField = substanceDialog.addTextField('Concentration (ug/mL)', 'concentration', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-			let rateField = substanceDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-			substanceDialog.applyProps.connect(root.apply_SubstanceAction)
-			adminCombo.comboUpdate.connect(function (value) { root.manage_substanceOptions(value, doseField, concentrationField, rateField)} )
-			substanceDialog.open();
+			let subCombo = drugDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
+			let doseField = drugDialog.addTextField('Dose (ml)', 'dose', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+			let concentrationField = drugDialog.addTextField('Concentration (ug/mL)', 'concentration', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+			let rateField = drugDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+			drugDialog.applyProps.connect(root.apply_drugAction)
+			adminCombo.comboUpdate.connect(function (value) { root.manage_drugOptions(value, doseField, concentrationField, rateField)} )
+			drugDialog.open();
 		}
 	}
 
@@ -202,7 +203,7 @@ ActionDrawerForm {
 	/// Takes current adminRoute (value) and the three text fields defined in substance dialog
 	/// Updates the visibility of each text field according to the current admin route
 	///		(e.g. bolus only needs dose and concentration, so rate visibility is set to false)
-	function manage_substanceOptions(value, doseField, concentrationField, rateField) {
+	function manage_drugOptions(value, doseField, concentrationField, rateField) {
 		switch(value) {
 			case 'Bolus-Intraarterial' :
 			case 'Bolus-Intramuscular' :
@@ -234,7 +235,7 @@ ActionDrawerForm {
 	//----------------------------------------------------------------------------------------
 	/// Helper function for setup_SubstanceActions
 	/// Takes props set by user and identifies correct Biogears action to call according to admin route
-	function apply_SubstanceAction(props){
+	function apply_drugAction(props){
 		let route = props.adminRoute
 		let substance = props.substance
 		let dose = props.dose
@@ -321,6 +322,35 @@ ActionDrawerForm {
 				break;
 		}
 	}
+
+	//----------------------------------------------------------------------------------------
+	/// Create compound infusion dialog window that handles fluid infusion actions
+	/// Initializes properties for compound, bag volume, and rate
+	/// Sets up a combo box with all avaliable compounds
+	/// Sets up a text field for bag volume
+	/// Sets up a text field for rate
+	function setup_fluidInfusion(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var infusionDialog = dialogComponent.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
+			infusionDialog.initializeProperties({name : actionItem.name, compound : '', bagVolume : 0, rate : 0})
+			let itemHeight = infusionDialog.contentItem.height / 4
+			let compoundList = scenario.getCompoundsList()
+			let compoundListData = {type : 'ListModel', role : 'compound', elements : compoundList}
+			let compoundComboProps = {prefHeight : itemHeight, elementRatio : 0.4}
+			let compoundCombo = infusionDialog.addComboBox('Compound', 'compound', compoundListData, compoundComboProps)
+			let bagVolumeText = infusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : itemHeight, prefWidth : infusionDialog.contentItem.width / 3.0})
+			let rateText = infusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : itemHeight, prefWidth : infusionDialog.contentItem.width / 3.0})																	
+			infusionDialog.open()
+		}
+	}
+
 
 	//Placeholder function for other actions that have not yet been defined in Scenario.cpp
 	function setup_OtherActions(actionItem){
