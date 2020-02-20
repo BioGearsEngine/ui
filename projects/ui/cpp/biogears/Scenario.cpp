@@ -985,7 +985,7 @@ void Scenario::parseSubstancesToLists()
   }
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::getDrugsList() 
+QVector<QString> Scenario::getDrugsList()
 {
   return _drugs_list;
 }
@@ -1002,15 +1002,26 @@ QVector<QString> Scenario::getTransfusionProductsList()
 
 }
 
+#include <biogears/cdm/patient/actions/SEAcuteStress.h>
+#include <biogears/cdm/patient/actions/SEAirwayObstruction.h>
+#include <biogears/cdm/patient/actions/SEApnea.h>
 #include <biogears/cdm/patient/actions/SEAsthmaAttack.h>
+#include <biogears/cdm/patient/actions/SEBrainInjury.h>
+#include <biogears/cdm/patient/actions/SEBronchoconstriction.h>
 #include <biogears/cdm/patient/actions/SEBurnWound.h>
+#include <biogears/cdm/patient/actions/SECardiacArrest.h>
+#include <biogears/cdm/patient/actions/SEExercise.h>
 #include <biogears/cdm/patient/actions/SEHemorrhage.h>
 #include <biogears/cdm/patient/actions/SEInfection.h>
+#include <biogears/cdm/patient/actions/SENeedleDecompression.h>
+#include <biogears/cdm/patient/actions/SEPainStimulus.h>
 #include <biogears/cdm/patient/actions/SESubstanceAdministration.h>
 #include <biogears/cdm/patient/actions/SESubstanceBolus.h>
 #include <biogears/cdm/patient/actions/SESubstanceCompoundInfusion.h>
 #include <biogears/cdm/patient/actions/SESubstanceInfusion.h>
 #include <biogears/cdm/patient/actions/SESubstanceOralDose.h>
+#include <biogears/cdm/patient/actions/SETensionPneumothorax.h>
+#include <biogears/cdm/patient/actions/SETourniquet.h>
 
 namespace bio {
 //---------------------------------------------------------------------------------
@@ -1023,6 +1034,14 @@ void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
 
   _action_queue.as_source().insert(std::move(action));
 }
+void Scenario::create_tourniquet_action(QString compartment, int level)
+{
+  auto action = std::make_unique<biogears::SETourniquet>();
+  action->SetCompartment(compartment.toStdString());
+  action->SetTourniquetLevel((CDM::enumTourniquetApplicationLevel::value)level);
+
+  _action_queue.as_source().insert(std::move(action));
+}
 void Scenario::create_asthma_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAsthmaAttack>();
@@ -1030,7 +1049,6 @@ void Scenario::create_asthma_action(double severity)
 
   _action_queue.as_source().insert(std::move(action));
 }
-
 void Scenario::create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min)
 {
   biogears::SESubstance* sub = _engine->GetSubstances().GetSubstance(substance.toStdString());
@@ -1059,6 +1077,24 @@ void Scenario::create_substance_oral_action(QString substance, int route, double
 
   _action_queue.as_source().insert(std::move(action));
 }
+void Scenario::create_substance_compound_infusion_action(QString compound, double bagVolume_mL, double rate_mL_Per_min)
+{
+  biogears::SESubstanceCompound* subCompound = _engine->GetSubstances().GetCompound(compound.toStdString());
+  auto action = std::make_unique<biogears::SESubstanceCompoundInfusion>(*subCompound);
+  action->GetBagVolume().SetValue(bagVolume_mL, biogears::VolumeUnit::mL);
+  action->GetRate().SetValue(rate_mL_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_blood_transfusion_action(QString compound, double bagVolume_mL, double rate_mL_Per_min)
+{
+  biogears::SESubstanceCompound* bloodProduct = _engine->GetSubstances().GetCompound(compound.toStdString());
+  auto action = std::make_unique<biogears::SESubstanceCompoundInfusion>(*bloodProduct);
+  action->GetBagVolume().SetValue(bagVolume_mL, biogears::VolumeUnit::mL);
+  action->GetRate().SetValue(rate_mL_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
+
+  _action_queue.as_source().insert(std::move(action));
+}
 void Scenario::create_burn_action(double tbsa)
 {
   auto action = std::make_unique<biogears::SEBurnWound>();
@@ -1066,13 +1102,92 @@ void Scenario::create_burn_action(double tbsa)
 
   _action_queue.as_source().insert(std::move(action));
 }
-
 void Scenario::create_infection_action(QString location, int severity, double mic_mg_Per_L)
 {
   auto action = std::make_unique<biogears::SEInfection>();
   action->SetLocation(location.toStdString());
   action->SetSeverity((CDM::enumInfectionSeverity::value)severity);
   action->GetMinimumInhibitoryConcentration().SetValue(mic_mg_Per_L, biogears::MassPerVolumeUnit::mg_Per_L);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W = 0.0)
+{
+  auto action = std::make_unique<biogears::SEExercise>();
+  if (intensity > 0.0) {
+    action->GetIntensity().SetValue(intensity);
+  }
+  if (workRate_W > 0.0) {
+    action->GetDesiredWorkRate().SetValue(workRate_W);
+  }
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_pain_stimulus_action(double severity, QString location)
+{
+  auto action = std::make_unique<biogears::SEPainStimulus>();
+  action->GetSeverity().SetValue(severity);
+  action->SetLocation(location.toStdString());
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_traumatic_brain_injury_action(double severity, int type)
+{
+  auto action = std::make_unique<biogears::SEBrainInjury>();
+  action->GetSeverity().SetValue(severity);
+  action->SetType((CDM::enumBrainInjuryType::value)type);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_tension_pneumothorax_action(double severity, int type, int side)
+{
+  auto action = std::make_unique<biogears::SETensionPneumothorax>();
+  action->GetSeverity().SetValue(severity);
+  action->SetType((CDM::enumPneumothoraxType::value)type);
+  action->SetSide((CDM::enumSide::value)side);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_needle_decompression_action(int state, int side)
+{
+  auto action = std::make_unique<biogears::SENeedleDecompression>();
+  action->SetActive((CDM::enumOnOff::value)state);
+  action->SetSide((CDM::enumSide::value)side);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_cardiac_arrest_action(int state)
+{
+  auto action = std::make_unique<biogears::SECardiacArrest>();
+  action->SetActive((CDM::enumOnOff::value)state);
+
+   _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_airway_obstruction_action(double severity)
+{
+  auto action = std::make_unique<biogears::SEAirwayObstruction>();
+  action->GetSeverity().SetValue(severity);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_bronchoconstriction_action(double severity)
+{
+  auto action = std::make_unique<biogears::SEBronchoconstriction>();
+  action->GetSeverity().SetValue(severity);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_apnea_action(double severity)
+{
+  auto action = std::make_unique<biogears::SEApnea>();
+  action->GetSeverity().SetValue(severity);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_acute_stress_action(double severity)
+{
+  auto action = std::make_unique<biogears::SEAcuteStress>();
+  action->GetSeverity().SetValue(severity);
 
   _action_queue.as_source().insert(std::move(action));
 }

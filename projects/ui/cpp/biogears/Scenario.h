@@ -81,8 +81,26 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_substance_bolus_action(QString substance, int route, double dose_mL, double concentration_ug_Per_mL);
   Q_INVOKABLE void create_substance_oral_action(QString substance, int route, double dose_mg);
   Q_INVOKABLE void create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min);
+  Q_INVOKABLE void create_substance_compound_infusion_action(QString compound, double bagVolume_mL, double rate_mL_Per_min);
+  Q_INVOKABLE void create_blood_transfusion_action(QString compound, double bagVolume_mL, double rate_mL_Per_min);
   Q_INVOKABLE void create_burn_action(double tbsa);
   Q_INVOKABLE void create_infection_action(QString compartment, int severity, double mic_mg_Per_L);
+  Q_INVOKABLE void create_exercise_action(double intensity, double workRate_W);
+  Q_INVOKABLE void create_pain_stimulus_action(double severity, QString location);
+  Q_INVOKABLE void create_tension_pneumothorax_action(double severity, int type, int side);
+  Q_INVOKABLE void create_airway_obstruction_action(double severity);
+  Q_INVOKABLE void create_bronchoconstriction_action(double severity);
+  Q_INVOKABLE void create_traumatic_brain_injury_action(double severity, int type);
+  Q_INVOKABLE void create_acute_stress_action(double severity);
+  Q_INVOKABLE void create_apnea_action(double severity);
+  Q_INVOKABLE void create_cardiac_arrest_action(int state);
+  Q_INVOKABLE void create_needle_decompression_action(int state, int side);
+  Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
+
+
+
+
+  
 
 signals:
   void patientStateChanged(PatientState patientState);
