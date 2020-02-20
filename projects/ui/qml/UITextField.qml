@@ -32,6 +32,16 @@ UITextFieldForm {
     return textField.placeholderText + " = " + textField.text
   }
 
+  //----------------------------------------------
+  //A text field property is valid if text in an *editable* field is not empty (as determined by length of text) 
+  function isValid() {
+    if (root.editable){
+      return !(textField.text.length===0)
+    }
+    return !editable
+  }
+
+
 }
 
 

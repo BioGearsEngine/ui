@@ -141,6 +141,33 @@ UIActionDialogForm {
   }
 
   //-----------------------------------------
+  // Adds a group of radio buttons to the dialog window
+  // Args : label = string to be displayed as place holder text
+  //        linkedProp = dialog property to link field input to 
+  //        buttonEnum = array of names for buttons that should be grouped
+  //        customArgs = Additional properties to customize field (See UITextForm)
+  function addRadioButton(label, linkedProp, buttonEnum, customArgs){
+    var radioComponent = Qt.createComponent("UIRadioButton.qml");
+	  if ( radioComponent.status != Component.Ready){
+		  if (radioComponent.status == Component.Error){
+			  console.log("Error : " + radioComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : UIRadioButton component not ready");
+	  } else {
+		  var radio = radioComponent.createObject(root.contentItem);
+      radio.label.text = label
+      radio.buttonModel = buttonEnum
+      if (Object.keys(customArgs).length > 0){
+        parseCustomArgs(customArgs, radio)
+      }
+      radio.radioGroupUpdate.connect(function (value) { root.updateProperty(value, linkedProp) } )
+      root.onReset.connect(radio.resetRadioGroup)
+      return radio
+    }
+  }
+
+  //-----------------------------------------
   // Populate the ActionDialog actionProps object
   // Must be called on Dialog before adding components (these are the properties that components will link to)
   // Args : newProps = JS object holding property key : value pairs
@@ -194,18 +221,12 @@ UIActionDialogForm {
   }
 
   //-----------------------------------------
-  // Checks if current property configuration is valid
-  // Invalid properties are 0 for reals and '' for strings
+  // Loops over all components added to dialog contentItem and calls their respective isValid methods
+  // Returns false if any property has not been assigned a valid value
   function validProps(){
-    for (let key in actionProps){
-      if (key=='name' || key == 'description'){
-        continue;
-      } else {
-        let prop = actionProps[key]
-        if (prop === 0 || prop ===''){
-          console.log(key)
-          return false;
-        }
+    for (let child in root.contentItem.children){
+     if (!root.contentItem.children[child].isValid()){
+        return false
       }
     }
     return true

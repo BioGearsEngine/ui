@@ -43,6 +43,12 @@ UISpinBoxForm {
   }
 
   //----------------------------------------------
+  //A spin box property needs to return a non-zero value for the action to be valid
+  function isValid(){
+    return spinBox.value != 0
+  }
+
+  //----------------------------------------------
   //Generates value stored by spin box according to enum value (text) displayed in editable area
   //This function is assigned to the SpinBox property valueFromText when the displayEnum property is set
   //Ex : If displayEnum is ['Mild', 'Medium', 'Severe'] and current selection is 'Medium', spin box 

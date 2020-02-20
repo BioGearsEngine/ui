@@ -148,8 +148,43 @@ ActionDrawerForm {
 																																							)
 																											}
 																		)
+			painDialog.open();
 		}
-		painDialog.open();
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Creates a tension pneumothorax dialog and assigns type, severity, and side
+	/// Sets up a radio button group for type
+	/// Sets up a radio button group for side
+	/// Sets up a spinbox for severity
+	function setup_tensionPneumothorax(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var tensionDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
+			tensionDialog.initializeProperties({name : actionItem.name, severity : 0, type : 0, side : 0 })
+			let dialogHeight = tensionDialog.contentItem.height
+			let dialogWidth = tensionDialog.contentItem.width
+			let typeButtons = ['Closed','Open']   //This is the order as defined in CDM::enumOpenClosed
+			let typeOptions = {prefHeight : dialogHeight / 2, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
+			let typeRadioButton = tensionDialog.addRadioButton('Type', 'type', typeButtons, typeOptions)
+			let sideButtons = ['Left','Right']   //This is the order as defined in CDM::enumSide
+			let sideOptions = {prefHeight : dialogHeight / 2, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
+			let sideRadioButton = tensionDialog.addRadioButton('Side','side',sideButtons,sideOptions)
+			let severityOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2, colSpan : 2, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
+			let severitySpinbox = tensionDialog.addSpinBox('Severity', 'severity',severityOptions)
+			tensionDialog.applyProps.connect(	function(props) {	actionModel.addSwitch	(	props.description, 
+																																								function () { scenario.create_tension_pneumothorax_action(props.severity, props.type, props.side) },
+																																							)
+																											}
+																		)
+			tensionDialog.open()
+		}
 	}
 
 	//----------------------------------------------------------------------------------------
@@ -256,7 +291,7 @@ ActionDrawerForm {
 			let itemHeight = drugDialog.contentItem.height / 3
 			let itemWidth1 = drugDialog.contentItem.width / 2
 			let itemWidth2 = drugDialog.contentItem.width / 3
-			drugDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : "0", concentration : "0", rate : "0"})
+			drugDialog.initializeProperties({name : actionItem.name, adminRoute : '', substance : '', dose : 0, concentration : 0, rate : 0})
 			let adminListData = { type : 'ListModel', role : 'route', elements : ['Bolus-Intraarterial', 'Bolus-Intramuscular', 'Bolus-Intravenous', 'Infusion-Intravenous','Oral','Transmucosal']}
 			let adminComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
 			let adminCombo = drugDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
@@ -320,80 +355,53 @@ ActionDrawerForm {
 		let description = substance + " " + routeDescription		//Overriding description for substances
 		switch (route) {
 			case 'Bolus-Intraarterial' :
-				if (dose == 0.0 || concentration == 0.0){
-					console.log('Bolus action requires a dose and concentration')
-				}
-				else {
-					//Intraarterial is CDM::enumBolusAdministration::0
-					description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
-					console.log('Here')
-					actionModel.addSwitch(description, 
-																function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
-																);
-					close();
-				}
+				//Intraarterial is CDM::enumBolusAdministration::0
+				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+				console.log('Here')
+				actionModel.addSwitch(description, 
+															function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
+															);
+				close();
 				break;
 			case 'Bolus-Intramuscular' :
 				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
-				if (dose == 0.0 || concentration == 0.0){
-					console.log('Bolus action requires a dose and concentration')
-				}
-				else {
-					//Intramuscular is CDM::enumBolusAdministration::1
-					actionModel.addSwitch(description, 
-																function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) } 
-																);
-					close();
-				}
+				//Intramuscular is CDM::enumBolusAdministration::1
+				actionModel.addSwitch(description, 
+															function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) } 
+															);
+				close();
 				break;
 			case 'Bolus-Intravenous' :
 				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
-				if (dose == 0.0 || concentration == 0.0){
-					console.log('Bolus action requires a dose and concentration')
-				}
-				else {
-					//Intravenous is CDM::enumBolusAdministration::2
-					actionModel.addSwitch(description, 
-																function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) } 
-																);
-					close();
-				}
+				//Intravenous is CDM::enumBolusAdministration::2
+				actionModel.addSwitch(description, 
+															function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) } 
+															);
+				close();
 				break;
 			case 'Infusion-Intravenous' :
 				description += 'Concentration (ug/mL) = ' + concentration + '; Rate (mL/min) = ' + rate
-				if (concentration == 0.0 || rate == 0.0){
-					console.log('Infusion action requires a concentration and a rate')
-				} else {
-					actionModel.addSwitch(description, 
-																function () { scenario.create_substance_infusion_action(substance, concentration, rate)}, 
-																function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
-																);
-					close();
-				}
+				actionModel.addSwitch(description, 
+															function () { scenario.create_substance_infusion_action(substance, concentration, rate)}, 
+															function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
+															);
+				close();
 				break;
 			case 'Oral':
 				description += 'Dose (mg) = ' + dose
-				if (dose == 0.0){
-					console.log('Oral drug action requires a dose')
-				} else {
-					//Oral (GI) is CDM::enumOralAdministration::1
-					actionModel.addSwitch(description, 
-																function () { scenario.create_substance_oral_action(substance, 0, dose) } 
-																);
-					close();
-				}
+				//Oral (GI) is CDM::enumOralAdministration::1
+				actionModel.addSwitch(description, 
+															function () { scenario.create_substance_oral_action(substance, 0, dose) } 
+															);
+				close();
 				break;
 			case 'Transmucosal':
 				description += 'Dose (mg) = ' + dose
-				if (dose == 0.0){
-					console.log('Tranmucosal action requires a dose')
-				} else {
-					//Transcmucosal is CDM::enumOralAdministration::0
-					actionModel.addSwitch(description, 
-																function () { scenario.create_substance_oral_action(substance, 1, dose) } 
-																);
-					close();
-				}
+				//Transcmucosal is CDM::enumOralAdministration::0
+				actionModel.addSwitch(description, 
+															function () { scenario.create_substance_oral_action(substance, 1, dose) } 
+															);
+				close();
 				break;
 		}
 	}

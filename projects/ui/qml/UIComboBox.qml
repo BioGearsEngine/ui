@@ -40,6 +40,11 @@ UIComboBoxForm {
       return ''
     }
   }
+  //----------------------------------------------
+  //A combo box property is valid if the index is not equal to -1 (meaning nothing displayed in box)
+  function isValid(){
+    return comboBox.currentIndex != -1
+  }
 
 }
 
