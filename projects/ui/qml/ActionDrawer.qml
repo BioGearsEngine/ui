@@ -122,12 +122,87 @@ ActionDrawerForm {
 	}
 
 	//----------------------------------------------------------------------------------------
+	/// Creates pain stimulus dialog window and assign location and severity on visual analog scale
+	/// Sets up a combo box for location
+	/// Sets up a spin box for VAS scale
+	function setup_painStimulus(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var painDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
+			painDialog.initializeProperties({name : actionItem.name, location : '', painScore : 0 })
+			let dialogHeight = painDialog.contentItem.height
+			let locationData = {type : 'ListModel', role : 'location', elements : ['Abdomen', 'Chest','Head', 'LeftArm','LeftLeg','RightArm','RightLeg']}
+			let locationProps = {prefHeight : dialogHeight / 3, elementRatio : 0.5}
+			let locationCombo = painDialog.addComboBox('Location', 'location', locationData, locationProps)
+			let painScoreProps = {prefHeight : dialogHeight / 3, spinMax : 10, spinStep : 1, elementRatio : 0.5}
+			let painSpinBox = painDialog.addSpinBox('Visual Analog Score', 'painScore', painScoreProps)
+			painDialog.applyProps.connect(	function(props) {	actionModel.addSwitch	(	props.description, 
+																																								function () { scenario.create_pain_stimulus_action(props.painScore / 10.0, props.location) },
+																																								function () { scenario.create_pain_stimulus_action(0.0, props.location) }
+																																							)
+																											}
+																		)
+		}
+		painDialog.open();
+	}
+
+	//----------------------------------------------------------------------------------------
 	/// Set up arguments for asthma action, including severity property and spin box arguments
 	/// to track severity value
 	/// Calls to generic setup_severityAction function to complete dialog instantiation
 	function setup_asthma(actionItem){
 		let label = 'Severity'
 		let func = function(sev) { scenario.create_asthma_action(sev) }
+		let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+		setup_severityAction(actionItem.name, label, func, customArgs)
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Set up arguments for apnea action, including severity property and spin box arguments
+	/// to track severity value
+	/// Calls to generic setup_severityAction function to complete dialog instantiation
+	function setup_apnea(actionItem){
+		let label = 'Severity'
+		let func = function(sev) { scenario.create_apnea_action(sev) }
+		let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+		setup_severityAction(actionItem.name, label, func, customArgs)
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Set up arguments for airway obstruction action, including severity property and spin box arguments
+	/// to track severity value
+	/// Calls to generic setup_severityAction function to complete dialog instantiation
+	function setup_airwayObstruction(actionItem){
+		let label = 'Severity'
+		let func = function(sev) { scenario.create_airway_obstruction_action(sev) }
+		let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+		setup_severityAction(actionItem.name, label, func, customArgs)
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Set up arguments for bronchoconstriction action, including severity property and spin box arguments
+	/// to track severity value
+	/// Calls to generic setup_severityAction function to complete dialog instantiation
+	function setup_bronchoconstriction(actionItem){
+		let label = 'Severity'
+		let func = function(sev) { scenario.create_bronchoconstriction_action(sev) }
+		let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+		setup_severityAction(actionItem.name, label, func, customArgs)
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Set up arguments for acute stress, including severity property and spin box arguments
+	/// to track severity value
+	/// Calls to generic setup_severityAction function to complete dialog instantiation
+	function setup_acuteStress(actionItem){
+		let label = 'Severity'
+		let func = function(sev) { scenario.create_acute_stress_action(sev) }
 		let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
 		setup_severityAction(actionItem.name, label, func, customArgs)
 	}
@@ -338,19 +413,58 @@ ActionDrawerForm {
 			}
 			console.log("Error : Action dialog component not ready");
 		} else {
-			var infusionDialog = dialogComponent.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
+			var infusionDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 2});
 			infusionDialog.initializeProperties({name : actionItem.name, compound : '', bagVolume : 0, rate : 0})
-			let itemHeight = infusionDialog.contentItem.height / 4
+			let dialogHeight = infusionDialog.contentItem.height
+			let dialogWidth = infusionDialog.contentItem.width
 			let compoundList = scenario.getCompoundsList()
 			let compoundListData = {type : 'ListModel', role : 'compound', elements : compoundList}
-			let compoundComboProps = {prefHeight : itemHeight, elementRatio : 0.4}
+			let compoundComboProps = {prefHeight : dialogHeight / 4, prefWidth : 0.8 * dialogWidth, elementRatio : 0.4, colSpan : 2}
 			let compoundCombo = infusionDialog.addComboBox('Compound', 'compound', compoundListData, compoundComboProps)
-			let bagVolumeText = infusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : itemHeight, prefWidth : infusionDialog.contentItem.width / 3.0})
-			let rateText = infusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : itemHeight, prefWidth : infusionDialog.contentItem.width / 3.0})																	
+			let bagVolumeText = infusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1, colSpan : 1})
+			let rateText = infusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1, colSpan : 1})			
+			infusionDialog.applyProps.connect( function(props)	{ actionModel.addSwitch	(	props.description, 
+																																								function () { scenario.create_substance_compound_infusion_action(props.compound, props.bagVolume, props.rate) },
+																																							)
+																											}
+																	)
 			infusionDialog.open()
 		}
 	}
 
+	//----------------------------------------------------------------------------------------
+	/// Create transfusion dialog window that handles blood transfusion actions
+	/// Initializes properties for blood type, bag volume, and rate
+	/// Sets up a combo box with all avaliable types
+	/// Sets up a text field for bag volume
+	/// Sets up a text field for rate
+	function setup_transfusion(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var transfusionDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 2});
+			transfusionDialog.initializeProperties({name : actionItem.name, type : '', bagVolume : 0, rate : 0})
+			let dialogHeight = transfusionDialog.contentItem.height
+			let dialogWidth = transfusionDialog.contentItem.width
+			let bloodTypeList = scenario.getTransfusionProductsList()
+			let bloodTypeListData = {type : 'ListModel', role : 'compound', elements : bloodTypeList}
+			let bloodTypeComboProps = {prefHeight : dialogHeight / 4.0, prefWidth : dialogWidth * 0.8, colSpan : 2, elementRatio : 0.4}
+			let compoundCombo = transfusionDialog.addComboBox('Blood Type', 'type', bloodTypeListData, bloodTypeComboProps)
+			let bagVolumeText = transfusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : dialogHeight /4, prefWidth : dialogWidth / 2.1})
+			let rateText = transfusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1})			
+			transfusionDialog.applyProps.connect( function(props)	{ actionModel.addSwitch	(	props.description, 
+																																								function () { scenario.create_blood_transfusion_action(props.type, props.bagVolume, props.rate) },
+																																							)
+																											}
+																	)
+			transfusionDialog.open()
+		}
+	}
 
 	//Placeholder function for other actions that have not yet been defined in Scenario.cpp
 	function setup_OtherActions(actionItem){

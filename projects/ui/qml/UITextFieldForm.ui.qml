@@ -18,6 +18,8 @@ Item {
   Layout.preferredHeight : prefHeight
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
+  Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+  
   //States
   states : [
     State {
@@ -44,7 +46,7 @@ Item {
     id:textField
     anchors.fill : parent
     font.pointSize : 11
-    verticalAlignment : Text.AlignBottom
+    verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
     validator : DoubleValidator {
       bottom : 0.0

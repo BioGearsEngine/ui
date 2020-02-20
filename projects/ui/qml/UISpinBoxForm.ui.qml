@@ -27,6 +27,7 @@ RowLayout {
   Layout.preferredHeight : prefHeight
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
+  Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
 
   Label {
     id: name

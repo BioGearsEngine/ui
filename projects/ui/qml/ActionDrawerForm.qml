@@ -81,24 +81,26 @@ Drawer {
 
             ListModel {
                 id : actionMenuModel
-                ListElement { name : "Exercise"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Exercise"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_exercise(actionItem)}}
                 ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Hemorrhage"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
-                ListElement { name : "Burn"; section : "Insults"; property var func : function(actionItem) {root.setup_burn(actionItem)}}
-                ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
-                ListElement { name : "Tension Pneumothorax"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Infection";  section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
+                ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(actionItem) {root.setup_acuteStress(actionItem)}}
+                ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(actionItem) {root.setup_airwayObstruction(actionItem)}}
+                ListElement { name : "Apnea"; section : "Insults"; property var func : function(actionItem) {root.setup_apnea(actionItem)}}
                 ListElement { name : "Asthma Attack"; section : "Insults"; property var func : function(actionItem) {root.setup_asthma(actionItem)}}
-                ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Traumatic Brain Injury"; section : "Insults"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Bronchoconstriction"; section : "Insults" ; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
-                ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(actionItem) {root.setup_severityAction(actionItem)}}
+                ListElement { name : "Bronchoconstriction"; section : "Insults" ; property var func : function(actionItem) {root.setup_bronchoconstriction(actionItem)}}
+                ListElement { name : "Burn"; section : "Insults"; property var func : function(actionItem) {root.setup_burn(actionItem)}}
+                ListElement { name : "Cardiac Arrest"; section : "Insults"; property var func : function(actionItem) {root.setup_cardiacArrest(actionItem)}}
+                ListElement { name : "Hemorrhage"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
+                ListElement { name : "Infection";  section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
+                ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(actionItem) {root.setup_painStimulus(actionItem)}}
+                ListElement { name : "Tension Pneumothorax"; section : "Insults"; property var func : function(actionItem) {root.setup_tensionPneumothorax(actionItem)}}
+                ListElement { name : "Traumatic Brain Injury"; section : "Insults"; property var func : function(actionItem) {root.setup_traumaticBrainInjury(actionItem)}}
                 ListElement { name : "Administer Drugs"; section : "Interventions"; property var func : function(actionItem) {root.setup_drugActions(actionItem)}}
                 ListElement { name : "Administer Fluids"; section : "Interventions"; property var func : function(actionItem) { root.setup_fluidInfusion(actionItem)}}
-                ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_needleDecompression(actionItem)}}
+                ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_transfusion(actionItem)}}
                 ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}

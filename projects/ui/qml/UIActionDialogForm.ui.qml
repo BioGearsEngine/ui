@@ -20,7 +20,25 @@ Dialog {
   height : 250
   modal : true
   closePolicy : Popup.NoAutoClose
-  //Add standard buttons
+  //Header
+  header : Rectangle {
+    id : headerBackground
+    width : parent.width
+    height : parent.height * 0.2
+    color: "#1A5276"
+    border.color: "#1A5276"
+    Text {
+      id:content
+      anchors.fill : parent
+      text: dialogForm.title
+		  font.pointSize : 12
+      leftPadding : 10
+      color: "white"
+      horizontalAlignment: Text.AlignLeft
+      verticalAlignment: Text.AlignVCenter
+    }
+  }
+  //Add standard buttons to footer
   footer : DialogButtonBox {
     standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel
   }

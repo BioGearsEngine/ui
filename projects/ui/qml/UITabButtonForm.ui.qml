@@ -21,7 +21,7 @@ Rectangle {
         anchors.centerIn : parent
         text: root.text
         //font: Qt.application.font
-		font.pointSize : 20
+		    font.pointSize : 20
         color: "white"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
