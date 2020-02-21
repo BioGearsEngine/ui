@@ -29,6 +29,7 @@ Drawer {
                 clip : true
                 model : actionMenuModel
                 delegate : actionMenuDelegate
+                currentIndex : -1
                 focus : true
                 section {
                     property : "section"
@@ -98,6 +99,7 @@ Drawer {
                 ListElement { name : "Administer Drugs"; section : "Interventions"; property var func : function(actionItem) {root.setup_drugActions(actionItem)}}
                 ListElement { name : "Administer Fluids"; section : "Interventions"; property var func : function(actionItem) { root.setup_fluidInfusion(actionItem)}}
                 ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_needleDecompression(actionItem)}}
+                ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(actionItem) { root.setup_tourniquet(actionItem)}}
                 ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_transfusion(actionItem)}}
                 ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
                 ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}

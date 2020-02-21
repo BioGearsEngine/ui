@@ -27,7 +27,7 @@ UIRadioButtonForm {
  //----------------------------------------------
  //Generates description of property for dialog window description assembly
   function getDescription(){
-    return label.text + " = " + buttonModel[buttonView.currentIndex]
+    return label.text + " = " + buttonModel[radioGroup.checkedButton.buttonIndex]
   }
 
  //----------------------------------------------

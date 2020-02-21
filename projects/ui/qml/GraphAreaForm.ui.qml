@@ -142,12 +142,12 @@ Page {
                                     Layout.fillWidth : true
                                     Layout.preferredWidth : 10
                                     onClicked : {
-                                        physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
-										if (checked){
-											createPlotView(plots.currentIndex, model)
-										} else {
-											removePlotView(plots.currentIndex, model.request)
-										}
+                                      physiologyRequestModel.get(plots.currentIndex).requests.setProperty(index, "active", checked)
+										                  if (checked){
+											                  createPlotView(plots.currentIndex, model)
+										                  } else {
+											                  removePlotView(plots.currentIndex, model.request)
+										                  }
                                     }
                                 }
                             }

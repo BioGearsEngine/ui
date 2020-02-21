@@ -11,6 +11,7 @@ Item {
   property int colSpan : 1
   property int rowSpan : 1
   property bool editable : true
+  property real maxValue : Infinity
   //Property aliases -- used to access text field sub-properties outside of form file
   property alias textField : textField
   //Layout options
@@ -50,6 +51,7 @@ Item {
     horizontalAlignment : Text.AlignHCenter
     validator : DoubleValidator {
       bottom : 0.0
+      top : root.maxValue
     }
     background : Rectangle {
       id : backgroundRect

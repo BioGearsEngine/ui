@@ -49,7 +49,7 @@ ActionDrawerForm {
 			hemDialog.initializeProperties({name : 'Hemorrhage', location : '', rate: 0});
 			let rateSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 1000, spinStep : 10}
 			hemDialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', rateSpinProps)
-			let locationModelData = { type : 'ListModel', role : 'name', elements : ['Aorta', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+			let locationModelData = { type : 'ListModel', role : 'name', elements : ['Aorta', 'Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']}
 			hemDialog.addComboBox('Location', 'location', locationModelData, {prefHeight : itemHeight})
 			hemDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
 																																							function () {scenario.create_hemorrhage_action(props.location, props.rate) },
@@ -61,6 +61,38 @@ ActionDrawerForm {
 	  }
 	}
 
+	/// Creates a tourniquet dialog window and assign properties for location and application level
+	/// Sets up a combo box for location and populate list with acceptable comparments
+	/// Sets up a radio button group for application level (i.e. how well was the tourniquet applied)
+	function setup_tourniquet(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+	  if ( dialogComponent.status != Component.Ready){
+		  if (dialogComponent.status == Component.Error){
+			  console.log("Error : " + dialogComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : Action dialog component not ready");
+	  } else {
+		  var tourniquetDialog = dialogComponent.createObject(root.parent, {'numRows' : 1, 'numColumns' : 2});
+			tourniquetDialog.initializeProperties({name : actionItem.name, location : '', level : 0})
+			let dialogWidth = tourniquetDialog.contentItem.width
+			let dialogHeight = tourniquetDialog.contentItem.height
+			let locationComboData = {type : 'ListModel', role : 'compartment', elements : ['Left Arm', 'Left Leg', 'Right Arm','Right Leg']}
+			let locationProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, elementRatio : 0.3}
+			let locationComboBox = tourniquetDialog.addComboBox('Location','location',locationComboData, locationProps)
+			let levelButtonGroup = ["Correct", "Misapplied"]
+			let levelProps = {prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 2, elementRatio : 0.6}
+			let levelRadioButton = tourniquetDialog.addRadioButton('Application Status','level',levelButtonGroup,levelProps)
+			tourniquetDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
+																																							function () {scenario.create_tourniquet_action(props.location, props.level) },
+																																							function () {scenario.create_tourniquet_action(props.location, 2) }
+																																							)
+																										}
+																	)
+			//Note that "2" option for level in "Off Function" corresponds to "No tourniquet" in CDM::TourniquetApplicationLevel
+      tourniquetDialog.open()
+		}
+	}
 	
 	//----------------------------------------------------------------------------------------
 	/// Creates an infection dialog window and assign properties for severity, minimum inhibitory concentration, and location
@@ -83,7 +115,7 @@ ActionDrawerForm {
 			infectionDialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
 			let severitySpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 3, displayEnum : ['','Mild','Moderate','Severe']}
 			infectionDialog.addSpinBox('Severity', 'severity', severitySpinProps)
-			let locationListData = { type : 'ListModel', role : 'name', elements : ['Gut', 'LeftArm', 'LeftLeg', 'RightArm', 'RightLeg']}
+			let locationListData = { type : 'ListModel', role : 'name', elements : ['Gut', 'Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']}
 			let locationProps = {prefHeight : itemHeight, elementRatio : 0.6}
 			infectionDialog.addComboBox('Location', 'location', locationListData, locationProps)
 			infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
@@ -171,10 +203,10 @@ ActionDrawerForm {
 			let dialogHeight = tensionDialog.contentItem.height
 			let dialogWidth = tensionDialog.contentItem.width
 			let typeButtons = ['Closed','Open']   //This is the order as defined in CDM::enumOpenClosed
-			let typeOptions = {prefHeight : dialogHeight / 2, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
+			let typeOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
 			let typeRadioButton = tensionDialog.addRadioButton('Type', 'type', typeButtons, typeOptions)
 			let sideButtons = ['Left','Right']   //This is the order as defined in CDM::enumSide
-			let sideOptions = {prefHeight : dialogHeight / 2, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
+			let sideOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
 			let sideRadioButton = tensionDialog.addRadioButton('Side','side',sideButtons,sideOptions)
 			let severityOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2, colSpan : 2, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
 			let severitySpinbox = tensionDialog.addSpinBox('Severity', 'severity',severityOptions)
@@ -185,6 +217,119 @@ ActionDrawerForm {
 																		)
 			tensionDialog.open()
 		}
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Creates a needle decompression dialog and assigns side (left/right)
+	/// Sets up a radio button for side
+	/// Assumes that state = on when function switch is on and state= off when function switch is off
+	function setup_needleDecompression(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var needleDialog = dialogComponent.createObject(root.parent, { numRows : 1, numColumns : 1});
+			needleDialog.initializeProperties({name : actionItem.name, side : ''})
+			let needleRadioGroup = ['Left', 'Right']
+			let needleProps = {prefHeight : needleDialog.contentItem.height / 3, prefWidth : needleDialog.contentItem.width / 2}
+			let needleRadioButton = needleDialog.addRadioButton('Side', 'side', needleRadioGroup, needleProps)
+			//In "On" function, 1 --> CDM::enumOnOff = On.  In "Off" function, 0 --> CDM::enumOnOff = Off
+			needleDialog.applyProps.connect(	function(props) {	actionModel.addSwitch	(	props.description, 
+																																								function () { scenario.create_needle_decompression_action(1, props.side) },
+																																								function () { scenario.create_needle_decompression_action(0, props.side) }
+																																							)
+																											}
+																		)
+			needleDialog.open()
+		}
+	}
+
+
+	//----------------------------------------------------------------------------------------
+	/// Creates a traumatic brain injurty dialog and assigns type and severity
+	/// Sets up a radio button group for type (left focal, right focal, or diffuse)
+	/// Sets up a spinbox for severity
+	function setup_traumaticBrainInjury(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var tbiDialog = dialogComponent.createObject(root.parent, { numRows : 1, numColumns : 2});
+			tbiDialog.initializeProperties({name : actionItem.name, severity : 0, type : 0})
+			let dialogWidth = tbiDialog.contentItem.width
+			let dialogHeight = tbiDialog.contentItem.height
+			let typeButtons = ['Diffuse','Left Focal', 'Right Focal']
+			let typeOptions = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 2, elementRatio : 0.3}
+			let typeRadioButton = tbiDialog.addRadioButton('Type','type',typeButtons, typeOptions);
+			let severityOptions = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 4, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
+			let severitySpinBox = tbiDialog.addSpinBox('Severity','severity', severityOptions)
+			tbiDialog.applyProps.connect(	function(props) {	actionModel.addSwitch	(	props.description, 
+																																								function () { scenario.create_traumatic_brain_injury_action(props.severity, props.type) },
+																																								function () { scenario.create_traumatic_brain_injury_action(0.0, props.type) }
+																																							)
+																											}
+																		)
+			tbiDialog.open();
+		}	
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Create exercise dialog window with options to supply arg as intensity scale or work rate
+	/// Sets input method ratio button : User can input intensity (0-1) or work rate (in W)
+	/// Sets up two text fields (one per option):  Visibility controlled by which input method is currently selected
+	function setup_exercise(actionItem){
+		var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+		if ( dialogComponent.status != Component.Ready){
+			if (dialogComponent.status == Component.Error){
+				console.log("Error : " + dialogComponent.errorString() );
+				return;
+			}
+			console.log("Error : Action dialog component not ready");
+		} else {
+			var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
+			exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
+			let dialogHeight = exerciseDialog.contentItem.height
+			let dialogWidth = exerciseDialog.contentItem.width
+			let inputOptionGroup = ['Intensity Level', 'Power Demand']
+			let inputOptionProps = {rowSpan: 2, prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 3, elementRatio : 0.5}
+			let optionsRadioButton = exerciseDialog.addRadioButton('Input Method', 'inputType',inputOptionGroup, inputOptionProps)
+			let intensityProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, maxValue : 1.0, editable : false}
+			let intensityTextField = exerciseDialog.addTextField('Intensity Level (0-1)', 'intensity', intensityProps)
+			let powerProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, editable : false}
+			let powerTextField = exerciseDialog.addTextField('Power (W)', 'workRate', powerProps)
+			let radioToIntensityState = ["unfocused","nonEditable"]			//Intensity is index = 0 in button group--so set states such that 0 = unfocused (visible but not currently being edited) and 1 = non-editable
+			let radioToPowerState = ["nonEditable", "unfocused"]				//Power is index = 1 in button group -- so set states such that 1 = unfocused (visible but not currently being edited) and 0 = non-editable
+			optionsRadioButton.radioGroupUpdate.connect( function (state) { intensityTextField.changeState(radioToIntensityState[state])});
+			optionsRadioButton.radioGroupUpdate.connect( function (state) { powerTextField.changeState(radioToPowerState[state])});
+			exerciseDialog.applyProps.connect(function (props) { actionModel.addSwitch(	props.description, 
+																																									function () { scenario.create_exercise_action(props.intensity, props.workRate) },
+																																									function () { scenario.create_exercise_action(0.0, 0.0) }
+																																								)
+																												}
+																			)
+
+			exerciseDialog.open()
+		}
+	}
+
+	//----------------------------------------------------------------------------------------
+	/// Set up function for cardiac arrest.  No dialog window is created because cardiac arrest 
+	/// is either on or off.  The action switch is thus all we need
+	function setup_cardiacArrest(actionItem){
+		//In "On" function, 1 --> CDM::enumOnOff = On.  In "Off" function, 0 --> CDM::enumOnOff = Off
+		actionModel.addSwitch(actionItem.name, 
+													function () { scenario.create_cardiac_arrest_action(1) },
+													function () {	scenario.create_cardiac_arrest_action(0) }
+													)
+		
 	}
 
 	//----------------------------------------------------------------------------------------

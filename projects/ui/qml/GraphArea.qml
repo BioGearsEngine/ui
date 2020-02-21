@@ -602,6 +602,7 @@ tissueGridView.onCellHeightChanged : {
   function removePlotView(index, request){
   //We can search through list of active requests (rather than lists of chart objects and their titles) because we always append/remove an active request and chart at the same time
   var i = findRequestIndex(physiologyRequestModel.get(index).activeRequests, request)
+  console.log(physiologyRequestModel.get(index).activeRequests.count)
   physiologyRequestModel.get(index).activeRequests.remove(i,1)
   if (i != -1){ 
   switch(index) {
@@ -613,39 +614,30 @@ tissueGridView.onCellHeightChanged : {
     break;
     case 2:
     drugModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 3:
     endocrineModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 4:
     energyModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 5:
     gastrointestinalModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 6:
     hepaticModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 7:
     nervousModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 8:
     renalModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 9:
     respiratoryModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     case 10:
     tissueModel.remove(i,1)
-    physiologyRequestModel.get(index).activeRequests.remove(i,1)
     break;
     }
   } else {

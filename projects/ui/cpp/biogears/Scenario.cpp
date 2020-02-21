@@ -1029,7 +1029,8 @@ namespace bio {
 void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
 {
   auto action = std::make_unique<biogears::SEHemorrhage>();
-  action->SetCompartment(compartment.toStdString());
+  QRegExp space("\\s"); //Hemorrhage compartments names need white space removed to process correctly ("Left Leg" --> "LeftLeg").  This assumes there is only one white space character
+  action->SetCompartment(compartment.remove(space).toStdString());
   action->GetInitialRate().SetValue(ml_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
   _action_queue.as_source().insert(std::move(action));
@@ -1037,7 +1038,8 @@ void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
 void Scenario::create_tourniquet_action(QString compartment, int level)
 {
   auto action = std::make_unique<biogears::SETourniquet>();
-  action->SetCompartment(compartment.toStdString());
+  QRegExp space("\\s"); //Tourniquet compartments names need white space removed to process correctly ("Left Leg" --> "LeftLeg").  This assumes there is only one white space character
+  action->SetCompartment(compartment.remove(space).toStdString());
   action->SetTourniquetLevel((CDM::enumTourniquetApplicationLevel::value)level);
 
   _action_queue.as_source().insert(std::move(action));
@@ -1116,9 +1118,11 @@ void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W 
   auto action = std::make_unique<biogears::SEExercise>();
   if (intensity > 0.0) {
     action->GetIntensity().SetValue(intensity);
-  }
-  if (workRate_W > 0.0) {
+  } else if (workRate_W > 0.0) {
     action->GetDesiredWorkRate().SetValue(workRate_W);
+  } else {
+    //Reach this block if both inputs are 0, meaning we turn off action)
+    action->GetIntensity().SetValue(0.0);
   }
 
   _action_queue.as_source().insert(std::move(action));
@@ -1161,7 +1165,7 @@ void Scenario::create_cardiac_arrest_action(int state)
   auto action = std::make_unique<biogears::SECardiacArrest>();
   action->SetActive((CDM::enumOnOff::value)state);
 
-   _action_queue.as_source().insert(std::move(action));
+  _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_airway_obstruction_action(double severity)
 {

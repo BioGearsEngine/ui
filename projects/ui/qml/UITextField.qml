@@ -20,11 +20,27 @@ UITextFieldForm {
   }
 
   // Handle newly edited text by calling update signal and passing new value
+  // By default, this signal is only called if the input is acceptable to validator
   textField.onEditingFinished : {
     root.textFieldUpdate(textField.text)
   }
 
+  // Handle text that has been edited but not valid (outside of range set by validator)
+  // By constantly clearing invalid text, the user will not be able to enter "bad" data
+  textField.onTextEdited : {
+    if (!textField.acceptableInput){
+      textField.clear()
+    }
+  }
+
   //---------Functions----------------------------
+
+  function changeState(newState){
+    root.state = newState
+    if (newState == "nonEditable"){
+      textField.clear()
+    }
+  }
 
   //----------------------------------------------
   //Generates description of property for dialog window description assembly
