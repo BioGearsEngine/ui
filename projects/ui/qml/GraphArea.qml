@@ -602,7 +602,6 @@ tissueGridView.onCellHeightChanged : {
   function removePlotView(index, request){
   //We can search through list of active requests (rather than lists of chart objects and their titles) because we always append/remove an active request and chart at the same time
   var i = findRequestIndex(physiologyRequestModel.get(index).activeRequests, request)
-  console.log(physiologyRequestModel.get(index).activeRequests.count)
   physiologyRequestModel.get(index).activeRequests.remove(i,1)
   if (i != -1){ 
   switch(index) {

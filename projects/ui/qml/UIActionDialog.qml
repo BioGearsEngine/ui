@@ -189,7 +189,6 @@ UIActionDialogForm {
   // args : value = the new value (passed from component update signal)
   //        prop = the property in actionProps to update
   function updateProperty(value, prop) {
-    console.log(prop, value)
     actionProps[prop] = value
   }
 
