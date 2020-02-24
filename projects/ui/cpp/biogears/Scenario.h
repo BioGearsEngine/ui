@@ -72,7 +72,7 @@ public:
   bool is_paused() const;
   bool is_throttled() const;
 
-  void parseSubstancesToLists();
+  void substances_to_lists();
 
 public: //Action Factory Interface;
   Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
@@ -376,6 +376,8 @@ private:
   biogears::SEUnitScalar* _muscleGlycogen;
   biogears::SEUnitScalar* _storedProtein;
   biogears::SEUnitScalar* _storedFat;
+
+
 };
 
 }

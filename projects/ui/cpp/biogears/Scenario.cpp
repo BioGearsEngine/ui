@@ -157,10 +157,7 @@ Scenario& Scenario::environment_name(QString name)
 //-------------------------------------------------------------------------------
 Scenario& Scenario::load_patient(QString file)
 {
-  _drugs_list.clear();
-  _compounds_list.clear();
-  _transfusions_list.clear();
-  parseSubstancesToLists();
+  substances_to_lists();
 
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
@@ -941,8 +938,12 @@ double Scenario::get_simulation_time()
   return _engine->GetSimulationTime().GetValue(biogears::TimeUnit::s);
 }
 //---------------------------------------------------------------------------------
-void Scenario::parseSubstancesToLists()
+void Scenario::substances_to_lists()
 {
+  _drugs_list.clear();
+  _compounds_list.clear();
+  _transfusions_list.clear();
+
   QDir subDirectory = QDir("substances");
   std::unique_ptr<CDM::ObjectData> subXmlData;
   CDM::SubstanceData* subData;
