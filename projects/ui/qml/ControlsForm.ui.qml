@@ -26,7 +26,7 @@ ColumnLayout {
   property alias heartRate : physiology.heartRate
   property alias systolicBloodPressure : physiology.systolicBloodPressure
   property alias dystolicBloodPressure : physiology.dystolicBloodPressure
-  property alias respritoryRate : physiology.respritoryRate
+  property alias respiratoryRate : physiology.respiratoryRate
   property alias oxygenSaturation : physiology.oxygenSaturation
   property alias condition : physiology.condition
 

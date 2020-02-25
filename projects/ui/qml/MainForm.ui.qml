@@ -39,6 +39,9 @@ GridLayout {
         onPatientStateChanged : {
             graphArea.stateUpdates(state)
         }
+        onSubstanceDataChanged : {
+    
+        }
     }
 
     GraphArea {

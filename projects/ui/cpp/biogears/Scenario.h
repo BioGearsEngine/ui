@@ -22,10 +22,12 @@
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
 #include "PatientState.h"
+#include "Substance.h"
 
 namespace biogears {
 class SEScalar;
 class SEUnitScalar;
+class SESubstance;
 }
 
 namespace bio {
@@ -97,14 +99,10 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
 
-
-
-
-  
-
 signals:
   void patientStateChanged(PatientState patientState);
   void patientMetricsChanged(PatientMetrics* metrics);
+  void substanceDataChanged(QVariantMap subData);
   void patientConditionsChanged(PatientConditions conditions);
   void timeAdvance();
   void stateChanged();
@@ -116,6 +114,7 @@ protected:
   PatientState get_physiology_state();
   PatientMetrics* get_physiology_metrics();
   PatientConditions get_physiology_conditions();
+  QVariantMap get_physiology_substances();
 
 protected:
   void physiology_thread_main();
@@ -139,6 +138,9 @@ private:
   QVector<QString> _drugs_list;
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
+
+  std::vector<biogears::SESubstance*> _activeSubstances;
+  SubstanceData substanceMap;
 
   biogears::SEScalar* _arterialBloodPH;
   biogears::SEScalar* _arterialBloodPHBaseline;

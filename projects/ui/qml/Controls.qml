@@ -12,6 +12,8 @@ ControlsForm {
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
   signal patientConditionsChanged(PatientConditions conditions )
+  signal substanceDataChanged(var subData)
+
   signal openActionDrawer()
 
   property Scenario scenario : biogears_scenario
@@ -23,7 +25,7 @@ ControlsForm {
     id: biogears_scenario
     onPatientMetricsChanged: {
       if(metrics){
-        root.respritoryRate.value        = metrics.RespritoryRate
+        root.respiratoryRate.value        = metrics.RespiratoryRate
         root.heartRate.value             = metrics.HeartRate 
         root.core_temp_c.value           = metrics.CoreTemp + "c"
         root.oxygenSaturation.value      = metrics.OxygenSaturation
@@ -59,6 +61,11 @@ ControlsForm {
       root.patientConditionsChanged(conditions)
     }
 
+    onSubstanceDataChanged : {
+      for (let key in subData){
+        console.log(subData[key].Name)
+      }
+    }
 
     onStateChanged : {
       //patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused

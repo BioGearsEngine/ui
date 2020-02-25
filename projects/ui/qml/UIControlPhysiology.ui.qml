@@ -17,7 +17,7 @@ GridLayout {
     property alias heartRate : heartRate
     property alias systolicBloodPressure : systolicBloodPressure
     property alias dystolicBloodPressure : dystolicBloodPressure
-    property alias respritoryRate : respritoryRate
+    property alias respiratoryRate : respiratoryRate
     property alias oxygenSaturation : oxygenSaturation
     property alias condition : condition
 
@@ -36,7 +36,7 @@ GridLayout {
         value: "110"
     }
     UIScalarForm {
-        id:respritoryRate
+        id:respiratoryRate
         Layout.alignment: Qt.AlignHCenter
         name: "RR"
         value: "12"

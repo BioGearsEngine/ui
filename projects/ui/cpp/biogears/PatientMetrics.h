@@ -504,7 +504,7 @@ struct PatientMetrics : QObject {
 
 private:
   Q_OBJECT
-  Q_PROPERTY(QString RespirtoryRate MEMBER respiratory_rate_bpm)
+  Q_PROPERTY(QString RespiratoryRate MEMBER respiratory_rate_bpm)
   Q_PROPERTY(QString HeartRate MEMBER heart_rate_bpm)
   Q_PROPERTY(QString CoreTemp MEMBER core_temperature_c)
   Q_PROPERTY(QString OxygenSaturation MEMBER oxygen_saturation_pct)

@@ -8,6 +8,8 @@
 #include "PatientState.h"
 
 //#include <biogears/version.h>
+#include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
+#include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/properties/SEScalar.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
@@ -255,6 +257,8 @@ Scenario& Scenario::load_patient(QString file)
     //    qDebug() << QString("(%1, %2) = NaN N/A\n").arg(request.first.c_str()).arg(request.second);
     //  }
     //}
+
+    _activeSubstances = _engine->GetSubstances().GetActiveSubstances();
 
     auto& bloodChemistry = _engine->GetBloodChemistry();
     _arterialBloodPH = (bloodChemistry.HasArterialBloodPH()) ? &bloodChemistry.GetArterialBloodPH() : nullptr;
@@ -508,6 +512,7 @@ Scenario& Scenario::load_patient(QString file)
 
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
+    emit substanceDataChanged(get_physiology_substances());
     emit stateChanged();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
@@ -552,6 +557,7 @@ inline void Scenario::physiology_thread_step()
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientConditionsChanged(get_physiology_conditions());
+    emit substanceDataChanged(get_physiology_substances());
 
   } else {
     std::this_thread::sleep_for(16ms);
@@ -574,7 +580,7 @@ auto Scenario::get_physiology_state() -> PatientState
                                                                                         : "Female";
   current.weight_kg = (patient.HasWeight()) ? QString::number(patient.GetWeight(biogears::MassUnit::kg), 'f', 2)
                                             : "N/A";
-  if (patient.HasWeight() && patient.HasWeight()) {
+  if (patient.HasWeight()) {
     auto BSA = std::sqrt(patient.GetHeight(biogears::LengthUnit::cm) * patient.GetWeight(biogears::MassUnit::kg) / 3600.0);
     current.body_surface_area_m_sq = QString::number(BSA, 'f', 2);
     auto BMI = patient.GetWeight(biogears::MassUnit::kg) / std::pow(patient.GetHeight(biogears::LengthUnit::m), 2);
@@ -931,6 +937,44 @@ auto Scenario::get_physiology_conditions() -> PatientConditions
   PatientConditions current;
   current.diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
   return current;
+}
+//---------------------------------------------------------------------------------
+QVariantMap Scenario::get_physiology_substances()
+{
+  substanceMap.getSubstanceMap().clear();
+  biogears::SETissueCompartment* lKidney = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::LeftKidney);
+  biogears::SETissueCompartment* rKidney = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::RightKidney);
+  biogears::SETissueCompartment* liver = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::Liver);
+
+  biogears::SELiquidCompartment& lKidneyIntracellular = _engine->GetCompartments().GetIntracellularFluid(*lKidney);
+  biogears::SELiquidCompartment& rKidneyIntracellular = _engine->GetCompartments().GetIntracellularFluid(*rKidney);
+  biogears::SELiquidCompartment& liverIntracellular = _engine->GetCompartments().GetIntracellularFluid(*liver);
+
+  for (auto _activeSub : _activeSubstances) {
+    if ((_activeSub->GetState() != CDM::enumSubstanceState::Liquid) && (_activeSub->GetState() != CDM::enumSubstanceState::Gas)) {
+      //This prevents us from tracking molecular (hemoglobin species) and whole blood components (cellular)--not of interest for PK or nutrition purposes
+      continue;
+    }
+    Substance* sub = new Substance();
+    sub->name = QString::fromStdString(_activeSub->GetName());
+    sub->alveolar_transfer = _activeSub->HasAlveolarTransfer() ? _activeSub->GetAlveolarTransfer(biogears::VolumePerTimeUnit::mL_Per_s) : 0;
+    sub->blood_concentration = _activeSub->HasBloodConcentration() ? _activeSub->GetBloodConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
+    sub->effect_site_concentration = _activeSub->HasEffectSiteConcentration() ? _activeSub->GetEffectSiteConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
+    sub->mass_in_body = _activeSub->HasMassInBody() ? _activeSub->GetMassInBody(biogears::MassUnit::ug) : 0;
+    sub->mass_in_blood = _activeSub->HasMassInBlood() ? _activeSub->GetMassInBlood(biogears::MassUnit::ug) : 0;
+    sub->mass_in_tissue = _activeSub->HasMassInTissue() ? _activeSub->GetMassInTissue(biogears::MassUnit::ug) : 0;
+    sub->plasma_concentration = _activeSub->HasPlasmaConcentration() ? _activeSub->GetPlasmaConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
+    sub->systemic_mass_cleared = _activeSub->HasSystemicMassCleared() ? _activeSub->GetSystemicMassCleared(biogears::MassUnit::ug) : 0;
+    sub->tissue_concentration = _activeSub->HasTissueConcentration() ? _activeSub->GetTissueConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
+    sub->area_under_curve = _activeSub->HasAreaUnderCurve() ? _activeSub->GetAreaUnderCurve(biogears::TimeMassPerVolumeUnit::hr_ug_Per_mL) : 0;
+    sub->end_tidal_fraction = _activeSub->HasEndTidalFraction() ? _activeSub->GetEndTidalFraction().GetValue() : 0;
+    sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
+    sub->hepatic_mass_cleared = liverIntracellular.HasSubstanceQuantity(*_activeSub) ? liverIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
+    substanceMap.insertSubstance(sub->name, sub);
+    
+  }
+  
+  return substanceMap.getSubstanceData();
 }
 //---------------------------------------------------------------------------------
 double Scenario::get_simulation_time()
