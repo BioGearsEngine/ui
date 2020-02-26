@@ -12,6 +12,7 @@ ControlsForm {
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
   signal patientConditionsChanged(PatientConditions conditions )
+  signal substancePropertiesChanged(var subProperties)
   signal substanceDataChanged(var subData)
 
   signal openActionDrawer()
@@ -62,9 +63,11 @@ ControlsForm {
     }
 
     onSubstanceDataChanged : {
-      for (let key in subData){
-        console.log(subData[key].Name)
-      }
+      root.substanceDataChanged(subData);
+    }
+
+    onSubstancePropertiesChanged : {
+      root.substancePropertiesChanged(subProperties)
     }
 
     onStateChanged : {

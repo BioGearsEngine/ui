@@ -69,6 +69,8 @@ public:
   Q_INVOKABLE QVector<QString> getDrugsList();
   Q_INVOKABLE QVector<QString> getCompoundsList();
   Q_INVOKABLE QVector<QString> getTransfusionProductsList();
+  Q_INVOKABLE QVector<QString> getSubstancePropertyList();
+
 
   bool is_running() const;
   bool is_paused() const;
@@ -103,6 +105,7 @@ signals:
   void patientStateChanged(PatientState patientState);
   void patientMetricsChanged(PatientMetrics* metrics);
   void substanceDataChanged(QVariantMap subData);
+  void substancePropertiesChanged(QVector<QString> subProperties);
   void patientConditionsChanged(PatientConditions conditions);
   void timeAdvance();
   void stateChanged();
@@ -138,9 +141,9 @@ private:
   QVector<QString> _drugs_list;
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
+  QVector<QString> _substance_property_list;
 
-  std::vector<biogears::SESubstance*> _activeSubstances;
-  SubstanceData substanceMap;
+  QVariantMap substanceData;
 
   biogears::SEScalar* _arterialBloodPH;
   biogears::SEScalar* _arterialBloodPHBaseline;

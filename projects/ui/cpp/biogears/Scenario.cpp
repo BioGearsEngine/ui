@@ -258,8 +258,6 @@ Scenario& Scenario::load_patient(QString file)
     //  }
     //}
 
-    _activeSubstances = _engine->GetSubstances().GetActiveSubstances();
-
     auto& bloodChemistry = _engine->GetBloodChemistry();
     _arterialBloodPH = (bloodChemistry.HasArterialBloodPH()) ? &bloodChemistry.GetArterialBloodPH() : nullptr;
     _arterialBloodPHBaseline = (bloodChemistry.HasArterialBloodPHBaseline()) ? &bloodChemistry.GetArterialBloodPHBaseline() : nullptr;
@@ -941,7 +939,7 @@ auto Scenario::get_physiology_conditions() -> PatientConditions
 //---------------------------------------------------------------------------------
 QVariantMap Scenario::get_physiology_substances()
 {
-  substanceMap.getSubstanceMap().clear();
+  //substanceMap.getSubstanceMap().clear();
   biogears::SETissueCompartment* lKidney = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::LeftKidney);
   biogears::SETissueCompartment* rKidney = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::RightKidney);
   biogears::SETissueCompartment* liver = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::Liver);
@@ -950,13 +948,26 @@ QVariantMap Scenario::get_physiology_substances()
   biogears::SELiquidCompartment& rKidneyIntracellular = _engine->GetCompartments().GetIntracellularFluid(*rKidney);
   biogears::SELiquidCompartment& liverIntracellular = _engine->GetCompartments().GetIntracellularFluid(*liver);
 
-  for (auto _activeSub : _activeSubstances) {
+  QVariant subVariant;
+  Substance* sub;
+
+  for (auto _activeSub : _engine->GetSubstances().GetActiveSubstances()) {
     if ((_activeSub->GetState() != CDM::enumSubstanceState::Liquid) && (_activeSub->GetState() != CDM::enumSubstanceState::Gas)) {
       //This prevents us from tracking molecular (hemoglobin species) and whole blood components (cellular)--not of interest for PK or nutrition purposes
       continue;
     }
-    Substance* sub = new Substance();
-    sub->name = QString::fromStdString(_activeSub->GetName());
+    //The substance data map is type QVariantMap<QString, QVarint>, which automatically converts to javascript object in QML (and automatically converts back to QVariantMap in C++)
+    subVariant = substanceData[QString::fromStdString(_activeSub->GetName())];
+    if (!subVariant.isValid()) {
+      //QVariantMap returns an invalid object if key is not found.  If the substance does not exist yet, make a new entry for it and add it to map.
+      sub = new Substance();
+      sub->name = QString::fromStdString(_activeSub->GetName());
+      substanceData[QString::fromStdString(_activeSub->GetName())] = QVariant::fromValue<QObject*>(sub);
+    } else {
+      //If the substance does exist, we jsut need to update its values.  Firt we need to convert it back to Substance type.
+      //QVariant.value function requires custom type to be defined as metatype and also requires copy constructor to be defined
+      sub = subVariant.value<Substance*>();
+    }
     sub->alveolar_transfer = _activeSub->HasAlveolarTransfer() ? _activeSub->GetAlveolarTransfer(biogears::VolumePerTimeUnit::mL_Per_s) : 0;
     sub->blood_concentration = _activeSub->HasBloodConcentration() ? _activeSub->GetBloodConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
     sub->effect_site_concentration = _activeSub->HasEffectSiteConcentration() ? _activeSub->GetEffectSiteConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
@@ -970,11 +981,9 @@ QVariantMap Scenario::get_physiology_substances()
     sub->end_tidal_fraction = _activeSub->HasEndTidalFraction() ? _activeSub->GetEndTidalFraction().GetValue() : 0;
     sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
     sub->hepatic_mass_cleared = liverIntracellular.HasSubstanceQuantity(*_activeSub) ? liverIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
-    substanceMap.insertSubstance(sub->name, sub);
-    
   }
-  
-  return substanceMap.getSubstanceData();
+
+  return substanceData;
 }
 //---------------------------------------------------------------------------------
 double Scenario::get_simulation_time()
@@ -987,6 +996,16 @@ void Scenario::substances_to_lists()
   _drugs_list.clear();
   _compounds_list.clear();
   _transfusions_list.clear();
+  _substance_property_list.clear();
+
+  Substance* dummy = new Substance();
+  for (int i = 0; i < dummy->metaObject()->propertyCount(); ++i) {
+    std::string name = dummy->metaObject()->property(i).name();
+    if ((name != "objectName") && (name != "Name")) {
+      _substance_property_list.append(QString::fromStdString(name));
+    }
+  }
+  emit substancePropertiesChanged(_substance_property_list);
 
   QDir subDirectory = QDir("substances");
   std::unique_ptr<CDM::ObjectData> subXmlData;
@@ -1043,6 +1062,11 @@ QVector<QString> Scenario::getCompoundsList()
 QVector<QString> Scenario::getTransfusionProductsList()
 {
   return _transfusions_list;
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::getSubstancePropertyList()
+{
+  return _substance_property_list;
 }
 
 }

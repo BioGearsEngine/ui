@@ -9,6 +9,25 @@ struct Substance : QObject {
     : QObject(parent)
   {
   }
+  //Copy constructor
+  Substance(const Substance& rhs)
+  {
+    name = rhs.name;
+    area_under_curve = rhs.area_under_curve;
+    blood_concentration = rhs.blood_concentration;
+    effect_site_concentration = rhs.effect_site_concentration;
+    mass_in_body = rhs.mass_in_body;
+    mass_in_blood = rhs.mass_in_blood;
+    mass_in_tissue = rhs.mass_in_tissue;
+    plasma_concentration = rhs.plasma_concentration;
+    systemic_mass_cleared = rhs.systemic_mass_cleared;
+    tissue_concentration = rhs.tissue_concentration;
+    alveolar_transfer = rhs.alveolar_transfer;
+    end_tidal_fraction = rhs.end_tidal_fraction;
+    renal_mass_cleared = rhs.renal_mass_cleared;
+    hepatic_mass_cleared = rhs.hepatic_mass_cleared;
+  }
+
   QString name;
   double area_under_curve;
   double blood_concentration;
@@ -24,7 +43,7 @@ struct Substance : QObject {
   double renal_mass_cleared;
   double hepatic_mass_cleared;
 
-  bool operator==(const Substance& rhs) const { return name == rhs.name;}
+  bool operator==(const Substance& rhs) const { return name == rhs.name; }
   bool operator!=(const Substance& rhs) const { return !(*this == rhs); }
   bool operator<(const Substance& rhs) const { return name < rhs.name; }
   bool operator>(const Substance& rhs) const { return name > rhs.name; }
@@ -45,34 +64,5 @@ private:
   Q_PROPERTY(double RenalMassCleared MEMBER renal_mass_cleared)
   Q_PROPERTY(double HepaticMassCleared MEMBER hepatic_mass_cleared)
 };
-
-class SubstanceData : QObject {
-  Q_OBJECT
-public:
-  SubstanceData(QObject* parent = nullptr)
-  {
-  }
-  Q_INVOKABLE QVariantMap getSubstanceData()
-  {
-    QVariantMap subData;
-    foreach (QString key, _substanceMap.keys()) {
-      subData[key] = QVariant::fromValue<QObject*>(_substanceMap[key]);
-    }
-    return subData;
-  }
-
-  void insertSubstance(QString key, Substance* sub) 
-  {
-    _substanceMap.insert(key, sub);
-  }
-
-  QMap<QString, Substance*> getSubstanceMap()
-  {
-    return _substanceMap;
-  }
-
-private:
-  QMap<QString, Substance*> _substanceMap;
-};
-
+Q_DECLARE_METATYPE(Substance)
 }

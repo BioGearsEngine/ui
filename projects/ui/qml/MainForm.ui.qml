@@ -31,16 +31,19 @@ GridLayout {
         Layout.rowSpan : 2
 
         onPatientMetricsChanged : {
-            graphArea.metricUpdates(metrics)
+          graphArea.metricUpdates(metrics)
         }
         onPatientConditionsChanged : {
-            graphArea.conditionUpdates(conditions)
+          graphArea.conditionUpdates(conditions)
         }
         onPatientStateChanged : {
-            graphArea.stateUpdates(state)
+          graphArea.stateUpdates(state)
         }
         onSubstanceDataChanged : {
-    
+          graphArea.substanceDataUpdates(subData)
+        }
+        onSubstancePropertiesChanged : {
+          graphArea.substancePropertyUpdates(subProperties)
         }
     }
 
