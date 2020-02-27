@@ -19,6 +19,7 @@ UIPlotSeriesForm {
       root.legend.visible = true
     } else {
       let series = root.createSeries(ChartView.SeriesTypeLine, requestElement.request, xAxis, yAxis);
+      yAxis.visible = false
       root.requestNames.push(requestElement.request);
     }
     xAxis.tickCount = tickCount;
@@ -37,7 +38,7 @@ UIPlotSeriesForm {
   }
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
-  function updateSeries(metrics){
+  function updatePatientSeries(metrics){
     let time = metrics.SimulationTime / 60;
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
@@ -50,11 +51,31 @@ UIPlotSeriesForm {
       let prop = metrics[root.requestNames[0]];
       root.series(root.requestNames[0]).append(time,prop)
     }
-
     updateDomainAndRange()
+    if (!yAxis.visible){
+      yAxis.visible = true
+    }
   }
 
-    //Gets simulation time and physiology data request from patient metrics, appending new point to each series
+  //Gets simulation time and substance data request from substance metrics, appending new point to each series
+  function updateSubstanceSeries(time, subData){
+    //Substance request names stored as (e.g.) Sodium-BloodConcentration.  Split at '-' to get substance (key) and property (object)
+    let requestComponents = root.requestNames[0].split('-')
+    let substance = requestComponents[0]
+    let propName = requestComponents[1]
+    let prop = subData[substance][propName]
+    //console.log("Substance : " + substance)
+    //console.log("Property : " + propName)
+    //console.log(time, prop)
+    root.series(root.requestNames[0]).append(time/60.0, prop)
+    updateDomainAndRange();
+    if (!yAxis.visible){
+      yAxis.visible = true
+    }
+  }
+
+
+  //Gets simulation time and physiology data request from patient metrics, appending new point to each series
   function clear(){
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){

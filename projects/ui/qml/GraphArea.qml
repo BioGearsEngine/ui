@@ -6,15 +6,16 @@ import QtQml.Models 2.2
 import com.biogearsengine.ui.scenario 1.0
 
 GraphAreaForm {
+  id : root
   signal start()
   signal restart()
   signal pause()
 
   signal metricUpdates(PatientMetrics metrics)
-  signal substanceDataUpdates(var subData)
+  signal substanceDataUpdates(real time, var subData)
   signal stateUpdates(PatientState state)
   signal conditionUpdates(PatientConditions conditions)
-  signal substancePropertyUpdates(var subProperties)
+  signal newActiveSubstance(Substance sub)
 
   property double count_1 : 0.0
   property double count_2 : 0.0
@@ -31,9 +32,9 @@ GraphAreaForm {
   property ObjectModel renalModel : renalObjectModel
   property ObjectModel respiratoryModel : respiratoryObjectModel
   property ObjectModel tissueModel : tissueObjectModel
+  property ObjectModel substanceModel : substanceObjectModel
+  property ListModel substanceMenuListModel : substanceMenuListModel
   property var substanceData : ({})
-  property var substanceMenuModel : []
-  property var substancePropertyList : ({})
 
   onStart : {
   }
@@ -68,32 +69,20 @@ GraphAreaForm {
 
   onSubstanceDataUpdates : {
     substanceData = subData
-    //Only update menu when there is a change in the number of substances (the keys in the subData object)
-    //Technically if you added/removed 1 substance simultaneously this would not get flagged as a change
-    //However I do not think that has a strong possiblity of happening since most substances stay active once they are added
-    //and there are very few instances (if any) where we manually remove an active substance
-    if (substanceMenuModel.length != Object.keys(subData).length){
-      substanceMenuModel = Object.keys(subData)
-    }
-    for (let key in subData){
-      let propArray = []
-      for (let p in subData[key]){
-        if (subData[key][p] == 0.0 || p === "Name" || p === "objectNameChanged"){
-          continue;
-        } else {
-          propArray.push(p)
-        }  
-      }
-      let subProps = {[key] : propArray}
-      Object.assign(substancePropertyList, subProps)
-    }
   }
 
-  //onSubstancePropertyUpdates : {
-    //for (let i = 0; i < subProperties.length; ++i){
-     // substancePropertyList.push(subProperties[i])
-   // }
- // }
+  onNewActiveSubstance : {
+    //First extract the properties that are valid to plot for the new substance -- invalid properties will = -1 (see Substance.h)
+    //We also ignore unplottable properties ("Name", "objectName", "objectNameChanged", the latter two of which are auto assigned by qml)
+    let validProps = []
+    for (let prop in sub){
+      if (sub[prop] == -1.0 || prop == "Name" || prop == "objectNameChanged" || prop == "objectName"){
+        continue;
+      }
+      validProps.push({"propName" : prop})
+    }
+    substanceMenuListModel.append({"subName" : sub.Name, "props" : validProps})    
+  }
 
 
   Component.onCompleted: {
@@ -189,7 +178,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" :  bloodChemistryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         bloodChemistryObjectModel.append(chartObject)
       }
     }
@@ -226,7 +215,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(cardiovascularGridView,{"width" : cardiovascularGridView.cellWidth, "height" : cardiovascularGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         cardiovascularObjectModel.append(chartObject)
       }
     }
@@ -263,7 +252,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(drugGridView,{"width" : drugGridView.cellWidth, "height" : drugGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         drugObjectModel.append(chartObject)
       }
     }
@@ -300,7 +289,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(endocrineGridView,{"width" : endocrineGridView.cellWidth, "height" : endocrineGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         endocrineObjectModel.append(chartObject)
       }
     }
@@ -337,7 +326,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(energyGridView,{"width" : energyGridView.cellWidth, "height" : energyGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         energyObjectModel.append(chartObject)
       }
     }
@@ -374,7 +363,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(gastrointestinalGridView,{"width" : gastrointestinalGridView.cellWidth, "height" : gastrointestinalGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         gastrointestinalObjectModel.append(chartObject)
       }
     }
@@ -411,7 +400,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         hepaticObjectModel.append(chartObject)
       }
     }
@@ -448,7 +437,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         nervousObjectModel.append(chartObject)
       }
     }
@@ -485,7 +474,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         renalObjectModel.append(chartObject)
       }
     }
@@ -522,7 +511,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         respiratoryObjectModel.append(chartObject)
       }
     }
@@ -559,7 +548,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updateSeries)
+        metricUpdates.connect(chartObject.updatePatientSeries)
         tissueObjectModel.append(chartObject)
       }
     }
@@ -581,6 +570,48 @@ GraphAreaForm {
   tissueGridView.onCellHeightChanged : {
     tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
   }
+  
+  //Substances
+  ListModel {
+    //List model for menu of currently active substances and valid properties--blank at initialization (dynamically updated by onNewActiveSubstance)
+    id : substanceMenuListModel
+  }
+  ObjectModel {
+    id: substanceObjectModel
+    function createPlotView (request) {
+      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+      if ( chartComponent.status != Component.Ready){
+        if (chartComponent.status == Component.Error){
+        console.log("Error : " + chartComponent.errorString() );
+        return;
+        }
+        console.log("Error : Chart component not ready");
+      } else {
+        var chartObject = chartComponent.createObject(substanceGridView,{"width" : substanceGridView.cellWidth, "height" : substanceGridView.cellHeight });
+        chartObject.initializeChart(request, tickCount);
+        substanceDataUpdates.connect(chartObject.updateSubstanceSeries)
+        substanceObjectModel.append(chartObject)
+      }
+    }
+    function resizePlots(newWidth, newHeight){
+      for (var i = 0; i < substanceObjectModel.count; ++i){
+        substanceObjectModel.get(i).resizePlot(newWidth, newHeight);
+      }
+    }
+    function clearPlots() {
+      for (var i = 0; i < count; ++i){
+        substanceObjectModel.get(i).clear();
+      }
+    }
+  }
+
+  substanceGridView.onCellWidthChanged : {
+    substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
+  }
+  substanceGridView.onCellHeightChanged : {
+    substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
+  }
+  
 
 
 
@@ -633,6 +664,9 @@ GraphAreaForm {
         break;
       case 10:
         tissueModel.createPlotView(modelElement);
+        break;
+      case 11:
+        substanceModel.createPlotView(modelElement);
         break;
     }
   }

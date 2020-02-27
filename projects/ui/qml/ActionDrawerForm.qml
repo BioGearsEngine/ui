@@ -12,6 +12,7 @@ Drawer {
     height : parent.height
     edge : Qt.LeftEdge
     interactive : true
+    closePolicy : Popup.NoAutoClose
     position : 0
 
     ColumnLayout {

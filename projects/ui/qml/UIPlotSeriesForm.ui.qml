@@ -4,7 +4,7 @@ import QtQuick.Controls.Material 2.12
 import QtCharts 2.3
 
 ChartView {
-    id: root
+  id: root
 	legend.visible : false
 	theme : ChartView.ChartThemeBlueCerulean
 	titleFont.pointSize : 12
@@ -18,11 +18,10 @@ ChartView {
 		property int tickCount : 0
 		titleText : "Simulation Time (min)"
 		min: 0
-		max : 10
+		max : windowWidth_min
 	}
 	ValueAxis {
 		id: yAxis
-		min: 0
 		labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
 	}
 

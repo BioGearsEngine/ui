@@ -6,7 +6,7 @@ import QtCharts 2.3
 import QtQml.Models 2.2
 
 Page {
-  id: root
+  //id: root
   z : 0 //Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
 
   property alias physiologyRequestModel : physiologyRequestModel
@@ -22,9 +22,8 @@ Page {
 	property alias renalGridView : renalGridView
 	property alias respiratoryGridView : respiratoryGridView
 	property alias tissueGridView : tissueGridView
-
+  property alias substanceGridView : substanceGridView
   
-
 	//property alias plotObjectModel : plotObjectModel
 
   header:  RowLayout {
@@ -123,11 +122,8 @@ Page {
       icon.name: "terminate"
       icon.color: "transparent"
       onClicked: {
-        console.log("Clicked Burger Menu")
-        console.log(systemSwipeView.currentItem.text)
         if (systemSwipeView.currentItem.text === "Substances"){
           if (substanceMenu.visible){
-            console.log('About to close')
             substanceMenu.close()
           } else {
             substanceMenu.open()
@@ -190,36 +186,38 @@ Page {
         id : substanceMenu
         x : -200
         y : 50
-        closePolicy : Popup.NoAutoClose
+        closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
         Instantiator {
           id : menuItemInstance
-          model : substanceMenuModel
+          model : substanceMenuListModel
           delegate : Menu {
             id : substanceSubMenu
-            title : modelData
-            Instantiator {
+            title : subName
+            property int delegateIndex : index
+            property string sub : subName
+            Repeater {
               id : subMenuInstance
-              model : substancePropertyList[substanceSubMenu.modelData]
+              model : substanceMenuListModel.get(substanceSubMenu.delegateIndex).props
               delegate : MenuItem {
                 CheckBox { 
                   checkable : true
-                  text : modelData
+                  checked : false
+                  text : propName
                   onClicked : {
-                    console.log(substancePropertyList[substanceSubMenu.title])
+                    console.log(sub + " : " + text)
+                    if (checked){
+											createPlotView(plots.currentIndex, {"request" : sub + "-" + text})    //createPlotView expects an object with "request" role
+										} else {
+											removePlotView(plots.currentIndex, sub + "-" + text)
+										}
                   }
                 }
-              }
-              onObjectAdded : {
-                substanceSubMenu.addItem(object)
-              }
-              onObjectRemoved : {
-                substanceSubMenu.addItem(object)
               }
             }
           }
           onObjectAdded : {
-            substanceMenu.addMenu(object)
-            console.log(substanceData[object.title])
+            substanceMenu.addMenu(object)  
+            
           }
           onObjectRemoved : {
             substanceMenu.removeMenu(object)
@@ -540,6 +538,20 @@ Page {
 		    anchors.fill: parent
 		    color: "#7CB342"
 	    }
+      GridView {
+		    id: substanceGridView
+		    anchors.fill: parent
+		    clip: true
+		    cellWidth: plots.width / 2
+		    cellHeight: plots.height / 2
+		    model: substanceModel
+		    ScrollBar.vertical: ScrollBar {
+          parent: substanceGridView.parent
+          anchors.top: substanceGridView.top
+          anchors.right: substanceGridView.right
+          anchors.bottom: substanceGridView.bottom
+        }
+	    }
     }
   }
   PageIndicator {
@@ -842,6 +854,11 @@ ListModel {
       ,ListElement{request:"storedProtein"; active: false}
       ,ListElement{request:"storedFat"; active: false}
     ]
+  }
+  ListElement {
+    system : "Substances"
+    activeRequests : []
+    requests : []    //Requests are managed by substanceMenuListModel--going to try to merge all these lists soon
   }
 }
 }

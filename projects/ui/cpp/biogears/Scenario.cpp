@@ -510,7 +510,7 @@ Scenario& Scenario::load_patient(QString file)
 
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
-    emit substanceDataChanged(get_physiology_substances());
+    emit substanceDataChanged(_engine->GetSimulationTime().GetValue(biogears::TimeUnit::s), get_physiology_substances());
     emit stateChanged();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
@@ -555,7 +555,7 @@ inline void Scenario::physiology_thread_step()
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientConditionsChanged(get_physiology_conditions());
-    emit substanceDataChanged(get_physiology_substances());
+    emit substanceDataChanged(_engine->GetSimulationTime().GetValue(biogears::TimeUnit::s), get_physiology_substances());
 
   } else {
     std::this_thread::sleep_for(16ms);
@@ -950,6 +950,7 @@ QVariantMap Scenario::get_physiology_substances()
 
   QVariant subVariant;
   Substance* sub;
+  bool newActiveSub = false;
 
   for (auto _activeSub : _engine->GetSubstances().GetActiveSubstances()) {
     if ((_activeSub->GetState() != CDM::enumSubstanceState::Liquid) && (_activeSub->GetState() != CDM::enumSubstanceState::Gas)) {
@@ -958,29 +959,52 @@ QVariantMap Scenario::get_physiology_substances()
     }
     //The substance data map is type QVariantMap<QString, QVarint>, which automatically converts to javascript object in QML (and automatically converts back to QVariantMap in C++)
     subVariant = substanceData[QString::fromStdString(_activeSub->GetName())];
+    newActiveSub = false;
     if (!subVariant.isValid()) {
       //QVariantMap returns an invalid object if key is not found.  If the substance does not exist yet, make a new entry for it and add it to map.
       sub = new Substance();
       sub->name = QString::fromStdString(_activeSub->GetName());
       substanceData[QString::fromStdString(_activeSub->GetName())] = QVariant::fromValue<QObject*>(sub);
+      newActiveSub = true;
     } else {
       //If the substance does exist, we jsut need to update its values.  Firt we need to convert it back to Substance type.
       //QVariant.value function requires custom type to be defined as metatype and also requires copy constructor to be defined
       sub = subVariant.value<Substance*>();
     }
-    sub->alveolar_transfer = _activeSub->HasAlveolarTransfer() ? _activeSub->GetAlveolarTransfer(biogears::VolumePerTimeUnit::mL_Per_s) : 0;
-    sub->blood_concentration = _activeSub->HasBloodConcentration() ? _activeSub->GetBloodConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
-    sub->effect_site_concentration = _activeSub->HasEffectSiteConcentration() ? _activeSub->GetEffectSiteConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
+    //Let's be smart about what we define for each substance -- only assign props that apply (e.g. oxygen does not need an AUC)
+
+    //Every substance should have blood concentration, mass in body, mass in blood, mass in tissue
+    sub->blood_concentration = _activeSub->HasBloodConcentration() ? _activeSub->GetBloodConcentration(biogears::MassPerVolumeUnit::ug_Per_L) : 0;
     sub->mass_in_body = _activeSub->HasMassInBody() ? _activeSub->GetMassInBody(biogears::MassUnit::ug) : 0;
     sub->mass_in_blood = _activeSub->HasMassInBlood() ? _activeSub->GetMassInBlood(biogears::MassUnit::ug) : 0;
     sub->mass_in_tissue = _activeSub->HasMassInTissue() ? _activeSub->GetMassInTissue(biogears::MassUnit::ug) : 0;
-    sub->plasma_concentration = _activeSub->HasPlasmaConcentration() ? _activeSub->GetPlasmaConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
-    sub->systemic_mass_cleared = _activeSub->HasSystemicMassCleared() ? _activeSub->GetSystemicMassCleared(biogears::MassUnit::ug) : 0;
-    sub->tissue_concentration = _activeSub->HasTissueConcentration() ? _activeSub->GetTissueConcentration(biogears::MassPerVolumeUnit::ug_Per_mL) : 0;
-    sub->area_under_curve = _activeSub->HasAreaUnderCurve() ? _activeSub->GetAreaUnderCurve(biogears::TimeMassPerVolumeUnit::hr_ug_Per_mL) : 0;
-    sub->end_tidal_fraction = _activeSub->HasEndTidalFraction() ? _activeSub->GetEndTidalFraction().GetValue() : 0;
-    sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
-    sub->hepatic_mass_cleared = liverIntracellular.HasSubstanceQuantity(*_activeSub) ? liverIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
+    //Only subs that are dissolved gases need alveolar transfer and end tidal.  Use relative diffusion coefficient to filter
+    if (_activeSub->HasRelativeDiffusionCoefficient()) {
+      sub->alveolar_transfer = _activeSub->HasAlveolarTransfer() ? _activeSub->GetAlveolarTransfer(biogears::VolumePerTimeUnit::mL_Per_s) : 0;
+      sub->end_tidal_fraction = _activeSub->HasEndTidalFraction() ? _activeSub->GetEndTidalFraction().GetValue() : 0;
+    }
+    //Only subs that have PK need effect site, plasma, AUC
+    if (_activeSub->HasPK()) {
+      sub->effect_site_concentration = _activeSub->HasEffectSiteConcentration() ? _activeSub->GetEffectSiteConcentration(biogears::MassPerVolumeUnit::ug_Per_L) : 0;
+      sub->plasma_concentration = _activeSub->HasPlasmaConcentration() ? _activeSub->GetPlasmaConcentration(biogears::MassPerVolumeUnit::ug_Per_L) : 0;
+      sub->area_under_curve = _activeSub->HasAreaUnderCurve() ? _activeSub->GetAreaUnderCurve(biogears::TimeMassPerVolumeUnit::hr_ug_Per_mL) : 0;
+    }
+    //Assign clearances, if applicable
+    if (_activeSub->HasClearance()) {
+      if (_activeSub->GetClearance().HasRenalClearance()) {
+        sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
+      }
+      if (_activeSub->GetClearance().HasIntrinsicClearance()) {
+        sub->hepatic_mass_cleared = liverIntracellular.HasSubstanceQuantity(*_activeSub) ? liverIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::g) : 0;
+      }
+      if (_activeSub->GetClearance().HasSystemicClearance()) {
+        sub->systemic_mass_cleared = _activeSub->HasSystemicMassCleared() ? _activeSub->GetSystemicMassCleared(biogears::MassUnit::ug) : 0;
+      }
+    }
+    if (newActiveSub) {
+      //Wait to emit until we have initialized substances properties
+      emit activeSubstanceAdded(sub);
+    }
   }
 
   return substanceData;
@@ -996,16 +1020,6 @@ void Scenario::substances_to_lists()
   _drugs_list.clear();
   _compounds_list.clear();
   _transfusions_list.clear();
-  _substance_property_list.clear();
-
-  Substance* dummy = new Substance();
-  for (int i = 0; i < dummy->metaObject()->propertyCount(); ++i) {
-    std::string name = dummy->metaObject()->property(i).name();
-    if ((name != "objectName") && (name != "Name")) {
-      _substance_property_list.append(QString::fromStdString(name));
-    }
-  }
-  emit substancePropertiesChanged(_substance_property_list);
 
   QDir subDirectory = QDir("substances");
   std::unique_ptr<CDM::ObjectData> subXmlData;
@@ -1062,11 +1076,6 @@ QVector<QString> Scenario::getCompoundsList()
 QVector<QString> Scenario::getTransfusionProductsList()
 {
   return _transfusions_list;
-}
-//---------------------------------------------------------------------------------
-QVector<QString> Scenario::getSubstancePropertyList()
-{
-  return _substance_property_list;
 }
 
 }

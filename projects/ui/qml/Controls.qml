@@ -12,8 +12,8 @@ ControlsForm {
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
   signal patientConditionsChanged(PatientConditions conditions )
-  signal substancePropertiesChanged(var subProperties)
-  signal substanceDataChanged(var subData)
+  signal activeSubstanceAdded(Substance sub)
+  signal substanceDataChanged(real time, var subData)
 
   signal openActionDrawer()
 
@@ -63,11 +63,11 @@ ControlsForm {
     }
 
     onSubstanceDataChanged : {
-      root.substanceDataChanged(subData);
+      root.substanceDataChanged(time, subData);
     }
 
-    onSubstancePropertiesChanged : {
-      root.substancePropertiesChanged(subProperties)
+    onActiveSubstanceAdded : {
+      root.activeSubstanceAdded(sub);
     }
 
     onStateChanged : {

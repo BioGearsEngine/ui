@@ -40,10 +40,10 @@ GridLayout {
           graphArea.stateUpdates(state)
         }
         onSubstanceDataChanged : {
-          graphArea.substanceDataUpdates(subData)
+          graphArea.substanceDataUpdates(time, subData)
         }
-        onSubstancePropertiesChanged : {
-          graphArea.substancePropertyUpdates(subProperties)
+        onActiveSubstanceAdded : {
+          graphArea.newActiveSubstance(sub)
         }
     }
 
