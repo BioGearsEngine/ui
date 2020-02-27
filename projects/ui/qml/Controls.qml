@@ -111,7 +111,7 @@ ControlsForm {
 		    }
 	      console.log("Error : Action switch component not ready");
 	    } else {
-		    var actionSwitch = actionComponent.createObject(actionSwitchView,{ "name" : actionData, "width" : actionSwitchView.width, "height" : 50});
+		    var actionSwitch = actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0], "width" : actionSwitchView.width, "height" : 50});
         actionSwitch.toggleActionOn.connect(onFunc);
         if (offFunc){
           actionSwitch.toggleActionOff.connect(offFunc);

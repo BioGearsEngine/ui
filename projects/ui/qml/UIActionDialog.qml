@@ -196,12 +196,12 @@ UIActionDialogForm {
   // Assembles a string describing the action and the input provided by user
   // Displayed next to action switch
   function generateDescription(){
-    let description = actionProps.name + ": "
+    let description = actionProps.name + ": \n    "
     let numChildren = root.contentItem.children.length
     for (let child = 0; child < numChildren; ++child){
       description += root.contentItem.children[child].getDescription()
       if (child != numChildren-1){
-        description += "; "
+        description += "\n    "
       }
     }
     Object.assign(actionProps, {description: description})

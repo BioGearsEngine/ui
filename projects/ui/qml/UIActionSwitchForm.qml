@@ -6,11 +6,11 @@ import com.biogearsengine.ui.scenario 1.0
 Row {
     id : actionRow
     spacing : 5
-    property string name
+    property string nameLong
+    property string namePretty
     property bool active : false
     property alias actionSwitch : actionSwitch
-    property alias scrollTimer : scrollTimer
-    property alias labelHoverArea : labelHoverArea
+    property alias labelMouseArea : labelMouseArea
     property alias actionLabel : actionLabel
 
     Label {
@@ -18,7 +18,7 @@ Row {
         width : parent.width * 3/4 - actionRow.spacing / 2
         height : parent.height * 0.9
         color : '#1A5276'
-        text : actionRow.name
+        text : actionRow.namePretty
         elide : Text.ElideRight
         font.pointSize : 12
         font.bold : true
@@ -32,10 +32,28 @@ Row {
             border.width : 0
         }
         MouseArea {
-            id : labelHoverArea
+            id : labelMouseArea
             anchors.fill : parent
-            hoverEnabled : true
+            acceptedButtons : Qt.RightButton
         }
+        ToolTip {
+          id : actionTip
+          parent : actionLabel
+          x : 0
+          y : parent.height + 5
+          visible : labelMouseArea.pressed
+          text : actionRow.nameLong
+          contentItem : Text {
+            text : actionTip.text
+            color : '#1A5276'
+            font.pointSize : 10
+          }
+          background : Rectangle {
+            color : "white"
+            border.color : "black"
+          }
+        }
+        
     }
     Switch {
         id : actionSwitch
@@ -43,13 +61,6 @@ Row {
         height : parent.height
         position : 0
     }
-
-
-    Timer {
-        id : scrollTimer
-        interval : 300; running : false; repeat : true
-    }
-
 }
 
 /*##^## Designer {
