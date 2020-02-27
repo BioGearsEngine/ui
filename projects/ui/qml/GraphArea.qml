@@ -34,7 +34,6 @@ GraphAreaForm {
   property ObjectModel tissueModel : tissueObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ListModel substanceMenuListModel : substanceMenuListModel
-  property var substanceData : ({})
 
   onStart : {
   }
@@ -52,6 +51,7 @@ GraphAreaForm {
     renalObjectModel.clearPlots()
     respiratoryObjectModel.clearPlots()
     tissueObjectModel.clearPlots()
+    substanceObjectModel.clearPlots()
   }
 
   onPause: {
@@ -67,9 +67,6 @@ GraphAreaForm {
   onConditionUpdates: {
   }
 
-  onSubstanceDataUpdates : {
-    substanceData = subData
-  }
 
   onNewActiveSubstance : {
     //First extract the properties that are valid to plot for the new substance -- invalid properties will = -1 (see Substance.h)
@@ -600,6 +597,7 @@ GraphAreaForm {
     }
     function clearPlots() {
       for (var i = 0; i < count; ++i){
+        console.log(i)
         substanceObjectModel.get(i).clear();
       }
     }
@@ -674,6 +672,7 @@ GraphAreaForm {
   function removePlotView(index, request){
     //We can search through list of active requests (rather than lists of chart objects and their titles) because we always append/remove an active request and chart at the same time
     var i = findRequestIndex(physiologyRequestModel.get(index).activeRequests, request)
+    console.log(i)
     physiologyRequestModel.get(index).activeRequests.remove(i,1)
     if (i != -1){ 
       switch(index) {
@@ -710,6 +709,8 @@ GraphAreaForm {
         case 10:
           tissueModel.remove(i,1)
           break;
+        case 11:
+          substanceModel.remove(i,1)
       }
     } else {
       console.log("No active plot : " + request)

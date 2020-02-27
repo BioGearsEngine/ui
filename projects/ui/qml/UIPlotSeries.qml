@@ -64,9 +64,6 @@ UIPlotSeriesForm {
     let substance = requestComponents[0]
     let propName = requestComponents[1]
     let prop = subData[substance][propName]
-    //console.log("Substance : " + substance)
-    //console.log("Property : " + propName)
-    //console.log(time, prop)
     root.series(root.requestNames[0]).append(time/60.0, prop)
     updateDomainAndRange();
     if (!yAxis.visible){
@@ -84,6 +81,7 @@ UIPlotSeriesForm {
       }
     } else {
       let series = root.series(root.requestNames[0])
+      console.log(series)
       series.removePoints(0, series.count)
     }
 
