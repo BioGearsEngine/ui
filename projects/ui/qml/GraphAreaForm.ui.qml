@@ -113,6 +113,12 @@ Page {
         text : qsTr("Substances")
       }
       currentIndex: plots.currentIndex
+
+      onCurrentIndexChanged : {
+          if( plots.currentIndex != currentIndex){
+              plots.currentIndex = currentIndex;
+          }
+      }
     }
     Button {
       id: filterMenuButton
