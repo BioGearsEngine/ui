@@ -23,6 +23,7 @@
 #include "PatientMetrics.h"
 #include "PatientState.h"
 #include "Substance.h"
+#include "Logger.h"
 
 namespace biogears {
 class SEScalar;
@@ -39,6 +40,8 @@ class Scenario : public QObject, public biogears::Runnable {
   Q_PROPERTY(double isRunning READ is_running NOTIFY runningToggled)
   Q_PROPERTY(double isPaused READ is_paused NOTIFY pausedToggled)
   Q_PROPERTY(double isThrottled READ is_throttled NOTIFY throttledToggled)
+
+  Q_PROPERTY(QtLogForward* feeds READ getLogFoward NOTIFY loggerChanged)
 public:
   Scenario(QObject* parent = Q_NULLPTR);
   Scenario(QString name, QObject* parent = Q_NULLPTR);
@@ -70,6 +73,7 @@ public:
   Q_INVOKABLE QVector<QString> getCompoundsList();
   Q_INVOKABLE QVector<QString> getTransfusionProductsList();
 
+  Q_INVOKABLE QtLogForward* getLogFoward();
 
   bool is_running() const;
   bool is_paused() const;
@@ -111,6 +115,7 @@ signals:
   void runningToggled(bool isRunning);
   void pausedToggled(bool isPaused);
   void throttledToggled(bool isThrottled);
+  void loggerChanged();
 
 protected:
   PatientState get_physiology_state();
@@ -380,7 +385,7 @@ private:
   biogears::SEUnitScalar* _storedProtein;
   biogears::SEUnitScalar* _storedFat;
 
-
+  QtLogForward* _consoleLog;
 };
 
 }

@@ -23,6 +23,7 @@
 #include <biogears/container/concurrent_queue.tci.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
+#include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 
 #include <biogears/cdm/scenario/SEAction.h>
 #include <chrono>
@@ -42,6 +43,9 @@ Scenario::Scenario(QString name, QObject* parent)
   , _paused(true)
   , _throttle(true)
 {
+  _consoleLog = new QtLogForward(this);
+  _logger.SetForward(_consoleLog);
+
   _engine->GetPatient().SetName(name.toStdString());
 }
 //-------------------------------------------------------------------------------
@@ -60,6 +64,7 @@ void Scenario::restart(QString patient_file)
   _throttle = true;
   emit throttledToggled(_throttle);
   load_patient(patient_file);
+  _logger.SetForward(_consoleLog);
 }
 //-------------------------------------------------------------------------------
 bool Scenario::pause_play()
@@ -171,6 +176,7 @@ Scenario& Scenario::load_patient(QString file)
 
   _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
   _engine = std::make_unique<biogears::BioGearsEngine>(&_logger);
+  _logger.SetForward(_consoleLog);
   if (dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->LoadState(path)) {
 
     _data_request_table.clear();
@@ -1077,9 +1083,12 @@ QVector<QString> Scenario::getTransfusionProductsList()
 {
   return _transfusions_list;
 }
-
+//---------------------------------------------------------------------------------
+QtLogForward* Scenario::getLogFoward()
+{
+  return _consoleLog;
 }
-
+}
 #include <biogears/cdm/patient/actions/SEAcuteStress.h>
 #include <biogears/cdm/patient/actions/SEAirwayObstruction.h>
 #include <biogears/cdm/patient/actions/SEApnea.h>

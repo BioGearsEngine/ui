@@ -10,6 +10,9 @@ GridLayout {
     columns: 2
     rows: 2
 
+    rowSpacing:0
+    columnSpacing:5
+    
     property alias scenario : controls.scenario
     property alias controls : controls
     property alias actionModel : controls.actionModel
@@ -49,14 +52,21 @@ GridLayout {
 
     GraphArea {
         id: graphArea
-        Layout.preferredHeight:100
-        Layout.fillHeight: true
+        
+        Layout.preferredHeight:root.height * (3./4.);
         Layout.fillWidth: true
+        Layout.fillHeight: false
+        Layout.margins:0
     }
-    TextArea {
+    LuaConsole {
         id:consoleArea
         Layout.fillWidth: true
         Layout.fillHeight: true
+        Layout.preferredHeight : root.height * (1./4.) - 10;
+        Layout.margins:0
+        Layout.alignment : Qt.AlignTop
+        feeds : root.scenario.feeds
+
     }
 
 }

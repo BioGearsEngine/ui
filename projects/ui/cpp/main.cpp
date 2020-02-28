@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QtQuickControls2/QQuickStyle>
 
+#include "biogears/Logger.h"
 #include "biogears/PatientConditions.h"
 #include "biogears/PatientMetrics.h"
 #include "biogears/PatientState.h"
@@ -23,6 +24,7 @@ int main(int argc, char* argv[])
   qmlRegisterType<bio::SystemInformation>("com.biogearsengine.ui.scenario", 1, 0, "Info");
   qmlRegisterType<bio::Substance>("com.biogearsengine.ui.scenario", 1, 0, "Substance");
   //qmlRegisterType<bio::SubstanceData>("com.biogearsengine.ui.scenario", 1, 0, "SubstanceData");
+  qmlRegisterType<QtLogForward>("com.biogearsengine.ui.scenario", 1, 0, "LogForward");
 
   qRegisterMetaType<PatientState>();
   QMetaType::registerEqualsComparator<PatientState>();

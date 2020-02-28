@@ -15,8 +15,7 @@ struct PatientState {
   QString body_fat_pct;
   QString exercise_state;
 
-    bool
-    operator==(const PatientState& rhs) const
+  bool operator==(const PatientState& rhs) const
   {
     return alive == rhs.alive
       && tacycardia == rhs.tacycardia
@@ -27,15 +26,13 @@ struct PatientState {
       && body_surface_area_m_sq == rhs.body_surface_area_m_sq
       && body_mass_index_kg_per_m_sq == rhs.body_mass_index_kg_per_m_sq
       && body_fat_pct == rhs.body_fat_pct
-      && exercise_state == rhs.exercise_state
-      ;
+      && exercise_state == rhs.exercise_state;
   }
   bool operator!=(const PatientState& rhs) const { return !(*this == rhs); }
 
 private:
   Q_GADGET
   Q_PROPERTY(QString Alive MEMBER alive)
-
 
   Q_PROPERTY(QString Age MEMBER age)
   Q_PROPERTY(QString Height MEMBER height_cm)

@@ -6,7 +6,12 @@ import QtQml.Models 2.2
 import com.biogearsengine.ui.scenario 1.0
 
 GraphAreaForm {
-  id : root
+
+  id: root
+  Rectangle {
+    anchors.fill : parent
+    border.color: "black"; color: "transparent"
+  }
   signal start()
   signal restart()
   signal pause()

@@ -637,7 +637,7 @@ ListModel {
       ,ListElement {request:"cerebralBloodFlow"; active: false}
       ,ListElement {request:"cerebralPerfusionPressure"; active: false}
       ,ListElement {request:"bloodPressure"; active: true;
-	      subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
+                    subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
       ,ListElement {request:"heartEjectionFraction"; active: false}
       ,ListElement {request:"heartRate"; active: false}
       ,ListElement {request:"heartStrokeVolume"; active: false}

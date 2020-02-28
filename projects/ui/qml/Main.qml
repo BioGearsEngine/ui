@@ -68,9 +68,7 @@ ApplicationWindow {
                 sourceSize.width : 100
                 sourceSize.height: 100
                 anchors.verticalCenter: parent.verticalCenter
-
             }
-
             Text {
                 id: infoBox_text
                 anchors.left: infoBox_image.right

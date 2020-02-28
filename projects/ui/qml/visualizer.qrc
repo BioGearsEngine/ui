@@ -1,34 +1,36 @@
 <RCC>
     <qresource prefix="/">
-        <file>Main.qml</file>
-        <file>MainForm.ui.qml</file>
+        <file>ActionDrawer.qml</file>
+        <file>ActionDrawerForm.ui.qml</file>
         <file>Controls.qml</file>
         <file>ControlsForm.ui.qml</file>
         <file>GraphArea.qml</file>
         <file>GraphAreaForm.ui.qml</file>
-        <file>UITextInputForm.ui.qml</file>
+        <file>LuaConsole.qml</file>
+        <file>LuaConsoleForm.ui.qml</file>
+        <file>Main.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>PatientBox.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>UIScalarForm.ui.qml</file>
-        <file>UIPlaybackForm.ui.qml</file>
-        <file>UIControlPhysiology.ui.qml</file>
-        <file>UIComboBoxForm.ui.qml</file>
-        <file>UIPlotSeries.qml</file>
-        <file>UIPlotSeriesForm.ui.qml</file>
-        <file>UITabButtonForm.ui.qml</file>
-        <file>ActionDrawer.qml</file>
-        <file>ActionDrawerForm.qml</file>
         <file>UIActionSwitch.qml</file>
         <file>UIActionSwitchForm.qml</file>
-        <file>PatientBox.qml</file>
+        <file>UIActionDialogForm.ui.qml</file>
         <file>UIComboBox.qml</file>
+        <file>UIComboBoxForm.ui.qml</file>
+        <file>UIControlPhysiology.ui.qml</file>
+        <file>UIPlaybackForm.ui.qml</file>
+        <file>UIPlotSeries.qml</file>
+        <file>UIPlotSeriesForm.ui.qml</file>
+        <file>UIRadioButton.qml</file>
+        <file>UIRadioButtonForm.ui.qml</file>
+        <file>UIScalarForm.ui.qml</file>
         <file>UISpinBox.qml</file>
         <file>UISpinBoxForm.ui.qml</file>
         <file>UIActionDialog.qml</file>
-        <file>UIActionDialogForm.ui.qml</file>
+        <file>UITabButtonForm.ui.qml</file>
         <file>UITextField.qml</file>
         <file>UITextFieldForm.ui.qml</file>
-        <file>UIRadioButton.qml</file>
-        <file>UIRadioButtonForm.ui.qml</file>
+        <file>UITextInputForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
