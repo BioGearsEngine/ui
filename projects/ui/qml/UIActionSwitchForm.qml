@@ -22,7 +22,8 @@ Row {
         elide : Text.ElideRight
         font.pointSize : 12
         font.bold : true
-        horizontalAlignment  : Text.AlignHCenter
+        horizontalAlignment  : Text.AlignLeft
+        leftPadding : 5
         verticalAlignment : Text.AlignVCenter
         background : Rectangle {
             id : labelBackground

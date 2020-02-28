@@ -496,52 +496,48 @@ ActionDrawerForm {
 		let dose = props.dose
 		let concentration = props.concentration
 		let rate = props.rate
-		let routeDescription = route.split('-')[0] + " (" + route.split('-')[1] + ") : "
-		let description = substance + " " + routeDescription		//Overriding description for substances
+		let routeDisplay = route.split('-')[0] + ":"									//Shows "Bolus" in "Bolus-Intravenous"
+		let routeDetail = route.split('-')[1]													//Shows "Intravenous" in "Bolus-Intravenous"
+		let description = substance + " " + routeDisplay		//Overriding description for substances
 		switch (route) {
 			case 'Bolus-Intraarterial' :
 				//Intraarterial is CDM::enumBolusAdministration::0
-				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+				description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
 				console.log('Here')
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
 															);
-				close();
 				break;
 			case 'Bolus-Intramuscular' :
-				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+				description += "\n    Route = " + routeDetail  + "Dose (mL) = " + dose + "\n   Concentration (ug/mL) = " + concentration
 				//Intramuscular is CDM::enumBolusAdministration::1
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) } 
 															);
-				close();
 				break;
 			case 'Bolus-Intravenous' :
-				description += "Dose (mL) = " + dose + "; Concentration (ug/mL) = " + concentration
+				description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
 				//Intravenous is CDM::enumBolusAdministration::2
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) } 
 															);
-				close();
 				break;
 			case 'Infusion-Intravenous' :
-				description += 'Concentration (ug/mL) = ' + concentration + '; Rate (mL/min) = ' + rate
+				description += "\n    Route = " + routeDetail  + "\n    Concentration (ug/mL) = " + concentration + "\n    Rate (mL/min) = " + rate
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_infusion_action(substance, concentration, rate)}, 
 															function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
 															);
-				close();
 				break;
 			case 'Oral':
-				description += 'Dose (mg) = ' + dose
+				description += "\n    Dose (mg) = " + dose
 				//Oral (GI) is CDM::enumOralAdministration::1
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_oral_action(substance, 0, dose) } 
 															);
-				close();
 				break;
 			case 'Transmucosal':
-				description += 'Dose (mg) = ' + dose
+				description += "\n    Dose (mg) = " + dose
 				//Transcmucosal is CDM::enumOralAdministration::0
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_oral_action(substance, 1, dose) } 
