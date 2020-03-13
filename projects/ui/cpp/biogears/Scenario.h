@@ -350,6 +350,7 @@ private:
   biogears::SEUnitScalar* _expiratoryFlow;
   biogears::SEScalar* _inspiratoryExpiratoryRatio;
   biogears::SEUnitScalar* _inspiratoryFlow;
+  bool _newBreathingCycle;
   biogears::SEUnitScalar* _pulmonaryCompliance;
   biogears::SEUnitScalar* _pulmonaryResistance;
   biogears::SEUnitScalar* _respirationDriverPressure;

@@ -228,6 +228,7 @@ struct PatientMetrics : QObject {
   double expiratoryFlow;
   double inspiratoryExpiratoryRatio;
   double inspiratoryFlow;
+  bool newBreathingCycle;
   double pulmonaryCompliance;
   double pulmonaryResistance;
   double respirationDriverPressure;
@@ -464,6 +465,7 @@ struct PatientMetrics : QObject {
       && expiratoryFlow == rhs.expiratoryFlow
       && inspiratoryExpiratoryRatio == rhs.inspiratoryExpiratoryRatio
       && inspiratoryFlow == rhs.inspiratoryFlow
+      && newBreathingCycle == rhs.newBreathingCycle
       && pulmonaryCompliance == rhs.pulmonaryCompliance
       && pulmonaryResistance == rhs.pulmonaryResistance
       && respirationDriverPressure == rhs.respirationDriverPressure
@@ -704,6 +706,7 @@ private:
   Q_PROPERTY(double expiratoryFlow MEMBER expiratoryFlow)
   Q_PROPERTY(double inspiratoryExpiratoryRatio MEMBER inspiratoryExpiratoryRatio)
   Q_PROPERTY(double inspiratoryFlow MEMBER inspiratoryFlow)
+  Q_PROPERTY(bool newBreathingCycle MEMBER newBreathingCycle)
   Q_PROPERTY(double pulmonaryCompliance MEMBER pulmonaryCompliance)
   Q_PROPERTY(double pulmonaryResistance MEMBER pulmonaryResistance)
   Q_PROPERTY(double respirationDriverPressure MEMBER respirationDriverPressure)

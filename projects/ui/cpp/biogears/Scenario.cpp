@@ -478,6 +478,7 @@ Scenario& Scenario::load_patient(QString file)
     _expiratoryFlow = (respiratory.HasExpiratoryFlow()) ? &respiratory.GetExpiratoryFlow() : nullptr;
     _inspiratoryExpiratoryRatio = (respiratory.HasInspiratoryExpiratoryRatio()) ? &respiratory.GetInspiratoryExpiratoryRatio() : nullptr;
     _inspiratoryFlow = (respiratory.HasInspiratoryFlow()) ? &respiratory.GetInspiratoryFlow() : nullptr;
+    _newBreathingCycle = _engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale);
     _pulmonaryCompliance = (respiratory.HasPulmonaryCompliance()) ? &respiratory.GetPulmonaryCompliance() : nullptr;
     _pulmonaryResistance = (respiratory.HasPulmonaryResistance()) ? &respiratory.GetPulmonaryResistance() : nullptr;
     _respirationDriverPressure = (respiratory.HasRespirationDriverPressure()) ? &respiratory.GetRespirationDriverPressure() : nullptr;
@@ -897,6 +898,7 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   current->expiratoryFlow = (_expiratoryFlow) ? _expiratoryFlow->GetValue() : 0.0;
   current->inspiratoryExpiratoryRatio = (_inspiratoryExpiratoryRatio) ? _inspiratoryExpiratoryRatio->GetValue() : 0.0;
   current->inspiratoryFlow = (_inspiratoryFlow) ? _inspiratoryFlow->GetValue() : 0.0;
+  current->newBreathingCycle = _engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale);
   current->pulmonaryCompliance = (_pulmonaryCompliance) ? _pulmonaryCompliance->GetValue() : 0.0;
   current->pulmonaryResistance = (_pulmonaryResistance) ? _pulmonaryResistance->GetValue() : 0.0;
   current->respirationDriverPressure = (_respirationDriverPressure) ? _respirationDriverPressure->GetValue() : 0.0;
@@ -910,7 +912,7 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   current->totalLungVolume = (_totalLungVolume) ? _totalLungVolume->GetValue() : 0.0;
   current->totalPulmonaryVentilation = (_totalPulmonaryVentilation) ? _totalPulmonaryVentilation->GetValue() : 0.0;
   current->transpulmonaryPressure = (_transpulmonaryPressure) ? _transpulmonaryPressure->GetValue() : 0.0;
-
+  
   //Tissue
   auto& tissue = _engine->GetTissue();
   current->carbonDioxideProductionRate = (_carbonDioxideProductionRate) ? _carbonDioxideProductionRate->GetValue() : 0.0;

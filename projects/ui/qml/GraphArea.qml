@@ -33,7 +33,7 @@ GraphAreaForm {
   property ObjectModel renalFluidBalanceModel : renalFluidBalanceObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ListModel substanceMenuListModel : substanceMenuListModel
-  //property ObjectModel gastrointestinalModel : gastrointestinalObjectModel
+  property ObjectModel customModel : customObjectModel
   //property ObjectModel hepaticModel : hepaticObjectModel
   //property ObjectModel nervousModel : nervousObjectModel
   //property ObjectModel renalModel : renalObjectModel
@@ -52,7 +52,7 @@ GraphAreaForm {
     energyMetabolismObjectModel.clearPlots()
     renalFluidBalanceObjectModel.clearPlots()
     substanceObjectModel.clearPlots()
-    //gastrointestinalObjectModel.clearPlots()
+    customObjectModel.clearPlots()
     //hepaticObjectModel.clearPlots()
     //nervousObjectModel.clearPlots()
     //renalObjectModel.clearPlots()
@@ -125,14 +125,14 @@ GraphAreaForm {
         renalFluidBalanceModel.createPlotView(renalFluidBalanceReq.get(i))
       }  
     }
- /*   var gastrointestinalReq = physiologyRequestModel.get(5).requests
-    for ( var i = 0; i < gastrointestinalReq.count ; ++i){
-      if( gastrointestinalReq.get(i).active){
-        physiologyRequestModel.get(5).activeRequests.append({"request": gastrointestinalReq.get(i).request})
-        gastrointestinalModel.createPlotView(gastrointestinalReq.get(i))
+    var customReq = physiologyRequestModel.get(5).requests
+    for ( var i = 0; i < customReq.count ; ++i){
+      if( customReq.get(i).active){
+        physiologyRequestModel.get(5).activeRequests.append({"request": customReq.get(i).request})
+        customModel.createPlotView(customReq.get(i))
       }
     }
-    var hepaticReq = physiologyRequestModel.get(6).requests
+    /*var hepaticReq = physiologyRequestModel.get(6).requests
     for ( var i = 0; i < hepaticReq.count ; ++i){
       if(hepaticReq.get(i).active){
         physiologyRequestModel.get(6).activeRequests.append({"request": hepaticReq.get(i).request})
@@ -395,12 +395,11 @@ GraphAreaForm {
     substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
   }
 
-/*
-  //Gastrointestinal//
+  //Custom Views//
   ObjectModel {
-    id: gastrointestinalObjectModel
+    id: customObjectModel
     function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+      var chartComponent = Qt.createComponent("CustomPlots.qml");
       if ( chartComponent.status != Component.Ready){
         if (chartComponent.status == Component.Error){
         console.log("Error : " + chartComponent.errorString() );
@@ -408,31 +407,38 @@ GraphAreaForm {
         }
         console.log("Error : Chart component not ready");
       } else {
-        var chartObject = chartComponent.createObject(gastrointestinalGridView,{"width" : gastrointestinalGridView.cellWidth, "height" : gastrointestinalGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
-        gastrointestinalObjectModel.append(chartObject)
+        switch (request.request) {
+          case "respiratoryPVCycle" :
+            var chartObject = chartComponent.createObject(customGridView,{"width" : customGridView.cellWidth, "height" : customGridView.cellHeight });
+            chartObject.initializeRespiratoryPVSeries();
+            metricUpdates.connect(chartObject.updateRespiratoryPVSeries)
+            customObjectModel.append(chartObject);
+            break;
+          default :
+            console.log(request + " not found");
+        } 
       }
     }
     function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < gastrointestinalObjectModel.count; ++i){
-        gastrointestinalObjectModel.get(i).resizePlot(newWidth, newHeight);
+      for (var i = 0; i < customObjectModel.count; ++i){
+        customObjectModel.get(i).resizePlot(newWidth, newHeight);
       }
     }
     function clearPlots() {
       for (var i = 0; i < count; ++i){
-        gastrointestinalObjectModel.get(i).clear();
+        customObjectModel.get(i).clear();
       }
     }
   }
 
-  gastrointestinalGridView.onCellWidthChanged : {
-    gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
+  customGridView.onCellWidthChanged : {
+    customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
-  gastrointestinalGridView.onCellHeightChanged : {
-    gastrointestinalObjectModel.resizePlots(gastrointestinalGridView.cellWidth, gastrointestinalGridView.cellHeight)
+  customGridView.onCellHeightChanged : {
+    customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
 
+  /*
   //Hepatic//
   ObjectModel {
     id: hepaticObjectModel
@@ -653,10 +659,10 @@ GraphAreaForm {
       case 5:
         substanceModel.createPlotView(modelElement);
         break;
-      /*case 6:
-        gastrointestinalModel.createPlotView(modelElement);
+      case 6:
+        customModel.createPlotView(modelElement);
         break;
-      case 7:
+      /*case 7:
         hepaticModel.createPlotView(modelElement);
         break;
       case 8:
@@ -711,10 +717,10 @@ GraphAreaForm {
           chart = substanceModel.get(i)
           metricUpdates.disconnect(chart.updateSubstanceSeries)
           substanceModel.remove(i,1)
-      /*  case 6:
-          gastrointestinalModel.remove(i,1)
+        case 6:
+          customModel.remove(i,1)
           break;
-        case 7:
+        /*case 7:
           hepaticModel.remove(i,1)
           break;
         case 8:

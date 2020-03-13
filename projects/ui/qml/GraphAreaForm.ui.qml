@@ -17,7 +17,7 @@ Page {
 	property alias energyMetabolismGridView : energyMetabolismGridView
 	property alias renalFluidBalanceGridView : renalFluidBalanceGridView
   property alias substanceGridView : substanceGridView
-	//property alias gastrointestinalGridView : gastrointestinalGridView
+	property alias customGridView : customGridView
 	//property alias hepaticGridView : hepaticGridView
 	//property alias nervousGridView : nervousGridView
 	//property alias renalGridView : renalGridView
@@ -95,6 +95,10 @@ Page {
       UITabButtonForm {
         id : substanceButton
         text : qsTr("Substances")
+      }
+      UITabButtonForm {
+        id : customPlotsButton
+        text : qsTr("Custom Plots")
       }
       currentIndex: plots.currentIndex
 
@@ -384,32 +388,31 @@ Page {
         }
 	    }
     }
-/*
     Item {
-	    id: gastrointestinalSeries
+	    id: customSeries
 	    Layout.fillWidth: true
 	    Layout.fillHeight: true
 	    Rectangle {
-		    id: gastrointestinalBackground
+		    id: customBackground
 		    anchors.fill: parent
 		    color: "#7CB342"
 	    }
 	    GridView {
-		    id: gastrointestinalGridView
+		    id: customGridView
 		    anchors.fill: parent
 		    clip: true
 		    cellWidth: plots.width / 2
 		    cellHeight: plots.height / 2
-		    model: gastrointestinalModel
+		    model: customModel
         ScrollBar.vertical: ScrollBar {
-          parent: gastrointestinalGridView.parent
-          anchors.top: gastrointestinalGridView.top
-          anchors.right: gastrointestinalGridView.right
-          anchors.bottom: gastrointestinalGridView.bottom
+          parent: customGridView.parent
+          anchors.top: customGridView.top
+          anchors.right: customGridView.right
+          anchors.bottom: customGridView.bottom
         }
 	    }
     }
-    Item {
+  /*  Item {
 	    id: hepaticSeries
 	    Layout.fillWidth: true
 	    Layout.fillHeight: true
@@ -550,13 +553,13 @@ ListModel {
     requests:  [
       ListElement {request:"bloodPressure"; active: false;
                     subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
-      ,ListElement {request:"respirationRate"; active: true}
+      ,ListElement {request:"respirationRate"; active: false}
       ,ListElement {request:"heartRate"; active: false}
       ,ListElement {request:"oxygenSaturation"; active: false}
       ,ListElement {request:"cardiacOutput"; active: false}
       ,ListElement {request:"bloodVolume"; active: false}
       ,ListElement {request:"heartStrokeVolume"; active: false}
-      ,ListElement {request:"tidalVolume"; active: false}
+      ,ListElement {request:"tidalVolume"; active: true}
       ,ListElement {request:"centralVenousPressure"; active: false}
     ]
 }
@@ -625,6 +628,14 @@ ListModel {
     system : "Substances"
     activeRequests : []
     requests : []    //Requests are managed by substanceMenuListModel--going to try to merge all these lists soon
+  }
+
+  ListElement {
+    system : "CustomViews"
+    activeRequests : []
+    requests : [
+      ListElement {request: "respiratoryPVCycle"; active :false} 
+    ]
   }
 }
 }
