@@ -81,7 +81,6 @@ UIPlotSeriesForm {
       }
     } else {
       let series = root.series(root.requestNames[0])
-      console.log(series)
       series.removePoints(0, series.count)
     }
 

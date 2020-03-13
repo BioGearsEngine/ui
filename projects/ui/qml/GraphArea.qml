@@ -26,37 +26,39 @@ GraphAreaForm {
   property double count_2 : 0.0
   property int tickCount : -1
 
+  property ObjectModel vitalsModel : vitalsObjectModel
+  property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
   property ObjectModel bloodChemistryModel : bloodChemistryObjectModel
-  property ObjectModel cardiovascularModel : cardiovascularObjectModel
-  property ObjectModel drugModel : drugObjectModel
-  property ObjectModel endocrineModel : endocrineObjectModel
-  property ObjectModel energyModel : energyObjectModel
-  property ObjectModel gastrointestinalModel : gastrointestinalObjectModel
-  property ObjectModel hepaticModel : hepaticObjectModel
-  property ObjectModel nervousModel : nervousObjectModel
-  property ObjectModel renalModel : renalObjectModel
-  property ObjectModel respiratoryModel : respiratoryObjectModel
-  property ObjectModel tissueModel : tissueObjectModel
+  property ObjectModel energyMetabolismModel : energyMetabolismObjectModel
+  property ObjectModel renalFluidBalanceModel : renalFluidBalanceObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ListModel substanceMenuListModel : substanceMenuListModel
+  //property ObjectModel gastrointestinalModel : gastrointestinalObjectModel
+  //property ObjectModel hepaticModel : hepaticObjectModel
+  //property ObjectModel nervousModel : nervousObjectModel
+  //property ObjectModel renalModel : renalObjectModel
+  //property ObjectModel respiratoryModel : respiratoryObjectModel
+  //property ObjectModel tissueModel : tissueObjectModel
+
 
   onStart : {
   }
 
   onRestart : {
     console.log("Resetting GraphArea Plots")
+    vitalsObjectModel.clearPlots()
+    cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
-    cardiovascularObjectModel.clearPlots()
-    drugObjectModel.clearPlots()
-    endocrineObjectModel.clearPlots()
-    energyObjectModel.clearPlots()
-    gastrointestinalObjectModel.clearPlots()
-    hepaticObjectModel.clearPlots()
-    nervousObjectModel.clearPlots()
-    renalObjectModel.clearPlots()
-    respiratoryObjectModel.clearPlots()
-    tissueObjectModel.clearPlots()
+    energyMetabolismObjectModel.clearPlots()
+    renalFluidBalanceObjectModel.clearPlots()
     substanceObjectModel.clearPlots()
+    //gastrointestinalObjectModel.clearPlots()
+    //hepaticObjectModel.clearPlots()
+    //nervousObjectModel.clearPlots()
+    //renalObjectModel.clearPlots()
+    //respiratoryObjectModel.clearPlots()
+    //tissueObjectModel.clearPlots()
+    
   }
 
   onPause: {
@@ -88,42 +90,42 @@ GraphAreaForm {
 
 
   Component.onCompleted: {
-    var bloodChemistryReq = physiologyRequestModel.get(0).requests
-    for ( var i = 0; i < bloodChemistryReq.count ; ++i){
-      if (bloodChemistryReq.get(i).active){
-				physiologyRequestModel.get(0).activeRequests.append({"request": bloodChemistryReq.get(i).request})
-				bloodChemistryObjectModel.createPlotView(bloodChemistryReq.get(i))
+    var vitalsReq = physiologyRequestModel.get(0).requests
+    for ( var i = 0; i < vitalsReq.count ; ++i){
+      if (vitalsReq.get(i).active){
+				physiologyRequestModel.get(0).activeRequests.append({"request": vitalsReq.get(i).request})
+				vitalsModel.createPlotView(vitalsReq.get(i))
 			}
     }
-    var cardiovascularReq = physiologyRequestModel.get(1).requests
-    for ( var i = 0; i < cardiovascularReq.count; ++i){
-      if( cardiovascularReq.get(i).active){
-        physiologyRequestModel.get(1).activeRequests.append({"request": cardiovascularReq.get(i).request})
-        cardiovascularModel.createPlotView(cardiovascularReq.get(i))
+    var cardiopulmonaryReq = physiologyRequestModel.get(1).requests
+    for ( var i = 0; i < cardiopulmonaryReq.count; ++i){
+      if( cardiopulmonaryReq.get(i).active){
+        physiologyRequestModel.get(1).activeRequests.append({"request": cardiopulmonaryReq.get(i).request})
+        cardiopulmonaryModel.createPlotView(cardiopulmonaryReq.get(i))
       }
     }
-    var drugReq = physiologyRequestModel.get(2).requests
-    for ( var i = 0; i < drugReq.count; ++i){
-      if( drugReq.get(i).active){
-        physiologyRequestModel.get(2).activeRequests.append({"request": drugReq.get(i).request})
-        drugModel.createPlotView(drugReq.get(i))
+    var bloodChemistryReq = physiologyRequestModel.get(2).requests
+    for ( var i = 0; i < bloodChemistryReq.count; ++i){
+      if( bloodChemistryReq.get(i).active){
+        physiologyRequestModel.get(2).activeRequests.append({"request": bloodChemistryReq.get(i).request})
+        bloodChemistryModel.createPlotView(bloodChemistryReq.get(i))
       }
     }
-    var endocrineReq = physiologyRequestModel.get(3).requests
-    for ( var i = 0; i < endocrineReq.count ; ++i){
-      if(endocrineReq.get(i).active){
-        physiologyRequestModel.get(3).activeRequests.append({"request": endocrineReq.get(i).request})
-        endocrineModel.createPlotView(endocrineReq.get(i))
+    var energyMetabolismReq = physiologyRequestModel.get(3).requests
+    for ( var i = 0; i < energyMetabolismReq.count ; ++i){
+      if(energyMetabolismReq.get(i).active){
+        physiologyRequestModel.get(3).activeRequests.append({"request": energyMetabolismReq.get(i).request})
+        energyMetabolismModel.createPlotView(energyMetabolismReq.get(i))
       }
     }
-    var energyReq = physiologyRequestModel.get(4).requests
-    for ( var i = 0; i < energyReq.count ; ++i){
-      if(energyReq.get(i).active){
-        physiologyRequestModel.get(4).activeRequests.append({"request": energyReq.get(i).request})
-        energyModel.createPlotView(energyReq.get(i))
+    var renalFluidBalanceReq = physiologyRequestModel.get(4).requests
+    for ( var i = 0; i < renalFluidBalanceReq.count ; ++i){
+      if(renalFluidBalanceReq.get(i).active){
+        physiologyRequestModel.get(4).activeRequests.append({"request": renalFluidBalanceReq.get(i).request})
+        renalFluidBalanceModel.createPlotView(renalFluidBalanceReq.get(i))
       }  
     }
-    var gastrointestinalReq = physiologyRequestModel.get(5).requests
+ /*   var gastrointestinalReq = physiologyRequestModel.get(5).requests
     for ( var i = 0; i < gastrointestinalReq.count ; ++i){
       if( gastrointestinalReq.get(i).active){
         physiologyRequestModel.get(5).activeRequests.append({"request": gastrointestinalReq.get(i).request})
@@ -164,11 +166,11 @@ GraphAreaForm {
         physiologyRequestModel.get(10).activeRequests.append({"request": tissueReq.get(i).request})
         tissueModel.createPlotView(tissueReq.get(i))
       }
-    }
+    }*/
   }
-  //Blood Chemistry//
+  //Vitals//
   ObjectModel {
-    id: bloodChemistryObjectModel
+    id: vitalsObjectModel
     function createPlotView (request) {
       var chartComponent = Qt.createComponent("UIPlotSeries.qml");
       if ( chartComponent.status != Component.Ready){
@@ -178,7 +180,81 @@ GraphAreaForm {
       }
       console.log("Error : Chart component not ready");
       } else {
-        var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" :  bloodChemistryGridView.cellHeight });
+        var chartObject = chartComponent.createObject(vitalsGridView,{"width" : vitalsGridView.cellWidth, "height" :  vitalsGridView.cellHeight });
+        chartObject.initializeChart(request, tickCount);
+        metricUpdates.connect(chartObject.updatePatientSeries)
+        vitalsObjectModel.append(chartObject)
+      }
+    }
+    function resizePlots(newWidth, newHeight){
+      for (var i = 0; i < vitalsObjectModel.count; ++i){
+        vitalsObjectModel.get(i).resizePlot(newWidth, newHeight);
+      }
+    }
+    function clearPlots() {
+      for (var i = 0; i < vitalsObjectModel.count; ++i){
+        vitalsObjectModel.get(i).clear();
+      }
+    }
+  }
+
+  vitalsGridView.onCellWidthChanged : {
+    vitalsObjectModel.resizePlots(vitalsGridView.cellWidth, vitalsGridView.cellHeight)
+  }
+  vitalsGridView.onCellHeightChanged : {
+    vitalsObjectModel.resizePlots(vitalsGridView.cellWidth, vitalsGridView.cellHeight)
+  }
+
+ //Cardiopulmonary//
+  ObjectModel {
+    id: cardiopulmonaryObjectModel
+    function createPlotView (request) {
+      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+      if ( chartComponent.status != Component.Ready){
+        if (chartComponent.status == Component.Error){
+        console.log("Error : " + chartComponent.errorString() );
+        return;
+        }
+        console.log("Error : Chart component not ready");
+      } else {
+        var chartObject = chartComponent.createObject(cardiopulmonaryGridView,{"width" : cardiopulmonaryGridView.cellWidth, "height" : cardiopulmonaryGridView.cellHeight });
+        chartObject.initializeChart(request, tickCount);
+        metricUpdates.connect(chartObject.updatePatientSeries)
+        cardiopulmonaryObjectModel.append(chartObject)
+      }
+    }
+    function resizePlots(newWidth, newHeight){
+      for (var i = 0; i < cardiopulmonaryObjectModel.count; ++i){
+        cardiopulmonaryObjectModel.get(i).resizePlot(newWidth, newHeight);
+      }
+    }
+    function clearPlots() {
+      for (var i = 0; i < count; ++i){
+        cardiopulmonaryObjectModel.get(i).clear();
+      }
+    }
+  }
+
+  cardiopulmonaryGridView.onCellWidthChanged : {
+    cardiopulmonaryObjectModel.resizePlots(cardiopulmonaryGridView.cellWidth, cardiopulmonaryGridView.cellHeight)
+  }
+  cardiopulmonaryGridView.onCellHeightChanged : {
+    cardiopulmonaryObjectModel.resizePlots(cardiopulmonaryGridView.cellWidth, cardiopulmonaryGridView.cellHeight)
+  }
+
+  //Blood Chemistry//
+  ObjectModel {
+    id: bloodChemistryObjectModel
+    function createPlotView (request) {
+      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
+      if ( chartComponent.status != Component.Ready){
+        if (chartComponent.status == Component.Error){
+        console.log("Error : " + chartComponent.errorString() );
+        return;
+        }
+        console.log("Error : Chart component not ready");
+      } else {
+        var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" : bloodChemistryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
         metricUpdates.connect(chartObject.updatePatientSeries)
         bloodChemistryObjectModel.append(chartObject)
@@ -190,7 +266,7 @@ GraphAreaForm {
       }
     }
     function clearPlots() {
-      for (var i = 0; i < bloodChemistryObjectModel.count; ++i){
+      for (var i = 0; i < count; ++i){
         bloodChemistryObjectModel.get(i).clear();
       }
     }
@@ -203,9 +279,9 @@ GraphAreaForm {
     bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
   }
 
- //Cardiovascular//
+  //Energy - Metabolism//
   ObjectModel {
-    id: cardiovascularObjectModel
+    id: energyMetabolismObjectModel
     function createPlotView (request) {
       var chartComponent = Qt.createComponent("UIPlotSeries.qml");
       if ( chartComponent.status != Component.Ready){
@@ -215,34 +291,34 @@ GraphAreaForm {
         }
         console.log("Error : Chart component not ready");
       } else {
-        var chartObject = chartComponent.createObject(cardiovascularGridView,{"width" : cardiovascularGridView.cellWidth, "height" : cardiovascularGridView.cellHeight });
+        var chartObject = chartComponent.createObject(energyMetabolismGridView,{"width" : energyMetabolismGridView.cellWidth, "height" : energyMetabolismGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
         metricUpdates.connect(chartObject.updatePatientSeries)
-        cardiovascularObjectModel.append(chartObject)
+        energyMetabolismObjectModel.append(chartObject)
       }
     }
     function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < cardiovascularObjectModel.count; ++i){
-        cardiovascularObjectModel.get(i).resizePlot(newWidth, newHeight);
+      for (var i = 0; i < energyMetabolismObjectModel.count; ++i){
+        energyMetabolismObjectModel.get(i).resizePlot(newWidth, newHeight);
       }
     }
     function clearPlots() {
       for (var i = 0; i < count; ++i){
-        cardiovascularObjectModel.get(i).clear();
+        energyMetabolismObjectModel.get(i).clear();
       }
     }
   }
 
-  cardiovascularGridView.onCellWidthChanged : {
-    cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
+  energyMetabolismGridView.onCellWidthChanged : {
+    energyMetabolismObjectModel.resizePlots(energyMetabolismGridView.cellWidth, energyMetabolismGridView.cellHeight)
   }
-  cardiovascularGridView.onCellHeightChanged : {
-    cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
+  energyMetabolismGridView.onCellHeightChanged : {
+    energyMetabolismObjectModel.resizePlots(energyMetabolismGridView.cellWidth, energyMetabolismGridView.cellHeight)
   }
 
-  //Drugs//
+  //Renal - Fluid Balance//
   ObjectModel {
-    id: drugObjectModel
+    id: renalFluidBalanceObjectModel
     function createPlotView (request) {
       var chartComponent = Qt.createComponent("UIPlotSeries.qml");
       if ( chartComponent.status != Component.Ready){
@@ -252,34 +328,38 @@ GraphAreaForm {
         }
         console.log("Error : Chart component not ready");
       } else {
-        var chartObject = chartComponent.createObject(drugGridView,{"width" : drugGridView.cellWidth, "height" : drugGridView.cellHeight });
+        var chartObject = chartComponent.createObject(renalFluidBalanceGridView,{"width" : renalFluidBalanceGridView.cellWidth, "height" : renalFluidBalanceGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
         metricUpdates.connect(chartObject.updatePatientSeries)
-        drugObjectModel.append(chartObject)
+        renalFluidBalanceObjectModel.append(chartObject)
       }
     }
     function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < drugObjectModel.count; ++i){
-        drugObjectModel.get(i).resizePlot(newWidth, newHeight);
+      for (var i = 0; i < renalFluidBalanceObjectModel.count; ++i){
+        renalFluidBalanceObjectModel.get(i).resizePlot(newWidth, newHeight);
       }
     }
     function clearPlots() {
       for (var i = 0; i < count; ++i){
-        drugObjectModel.get(i).clear();
+        renalFluidBalanceObjectModel.get(i).clear();
       }
     }
   }
 
-  drugGridView.onCellWidthChanged : {
-    drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
+  renalFluidBalanceGridView.onCellWidthChanged : {
+    renalFluidBalanceObjectModel.resizePlots(renalFluidBalanceGridView.cellWidth, renalFluidBalanceGridView.cellHeight)
   }
-  drugGridView.onCellHeightChanged : {
-    drugObjectModel.resizePlots(drugGridView.cellWidth, drugGridView.cellHeight)
+  renalFluidBalanceGridView.onCellHeightChanged : {
+    renalFluidBalanceObjectModel.resizePlots(renalFluidBalanceGridView.cellWidth, renalFluidBalanceGridView.cellHeight)
   }
 
-  //Endocrine//
+  //Substances
+  ListModel {
+    //List model for menu of currently active substances and valid properties--blank at initialization (dynamically updated by onNewActiveSubstance)
+    id : substanceMenuListModel
+  }
   ObjectModel {
-    id: endocrineObjectModel
+    id: substanceObjectModel
     function createPlotView (request) {
       var chartComponent = Qt.createComponent("UIPlotSeries.qml");
       if ( chartComponent.status != Component.Ready){
@@ -289,68 +369,33 @@ GraphAreaForm {
         }
         console.log("Error : Chart component not ready");
       } else {
-        var chartObject = chartComponent.createObject(endocrineGridView,{"width" : endocrineGridView.cellWidth, "height" : endocrineGridView.cellHeight });
+        var chartObject = chartComponent.createObject(substanceGridView,{"width" : substanceGridView.cellWidth, "height" : substanceGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
-        endocrineObjectModel.append(chartObject)
+        substanceDataUpdates.connect(chartObject.updateSubstanceSeries)
+        substanceObjectModel.append(chartObject)
       }
     }
     function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < endocrineObjectModel.count; ++i){
-        endocrineObjectModel.get(i).resizePlot(newWidth, newHeight);
+      for (var i = 0; i < substanceObjectModel.count; ++i){
+        substanceObjectModel.get(i).resizePlot(newWidth, newHeight);
       }
     }
     function clearPlots() {
       for (var i = 0; i < count; ++i){
-        endocrineObjectModel.get(i).clear();
+        console.log(i)
+        substanceObjectModel.get(i).clear();
       }
     }
   }
 
-  endocrineGridView.onCellWidthChanged : {
-    endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
+  substanceGridView.onCellWidthChanged : {
+    substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
   }
-  endocrineGridView.onCellHeightChanged : {
-    endocrineObjectModel.resizePlots(endocrineGridView.cellWidth, endocrineGridView.cellHeight)
-  }
-
-  //Energy//
-  ObjectModel {
-    id: energyObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(energyGridView,{"width" : energyGridView.cellWidth, "height" : energyGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
-        energyObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < energyObjectModel.count; ++i){
-        energyObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        energyObjectModel.get(i).clear();
-      }
-    }
+  substanceGridView.onCellHeightChanged : {
+    substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
   }
 
-  energyGridView.onCellWidthChanged : {
-    energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
-  }
-  energyGridView.onCellHeightChanged : {
-    energyObjectModel.resizePlots(energyGridView.cellWidth, energyGridView.cellHeight)
-  }
-
+/*
   //Gastrointestinal//
   ObjectModel {
     id: gastrointestinalObjectModel
@@ -572,52 +617,7 @@ GraphAreaForm {
   tissueGridView.onCellHeightChanged : {
     tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
   }
-  
-  //Substances
-  ListModel {
-    //List model for menu of currently active substances and valid properties--blank at initialization (dynamically updated by onNewActiveSubstance)
-    id : substanceMenuListModel
-  }
-  ObjectModel {
-    id: substanceObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(substanceGridView,{"width" : substanceGridView.cellWidth, "height" : substanceGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        substanceDataUpdates.connect(chartObject.updateSubstanceSeries)
-        substanceObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < substanceObjectModel.count; ++i){
-        substanceObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        console.log(i)
-        substanceObjectModel.get(i).clear();
-      }
-    }
-  }
-
-  substanceGridView.onCellWidthChanged : {
-    substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
-  }
-  substanceGridView.onCellHeightChanged : {
-    substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
-  }
-  
-
-
-
+  */
 
   //This function is specific to searching physiology request lists for an element with a "request" field that matches the input
   //We can look to generalize this to other fields if/when needed
@@ -636,41 +636,41 @@ GraphAreaForm {
     physiologyRequestModel.get(index).activeRequests.append({"request":modelElement.request})
     switch(index) {
       case 0:
-        bloodChemistryObjectModel.createPlotView(modelElement);
+        vitalsModel.createPlotView(modelElement);
         break;
       case 1:
-        cardiovascularModel.createPlotView(modelElement);
+        cardiopulmonaryModel.createPlotView(modelElement);
         break;
       case 2:
-        drugModel.createPlotView(modelElement);
+        bloodChemistryModel.createPlotView(modelElement);
         break;
       case 3:
-        endocrineModel.createPlotView(modelElement);
+        energyMetabolismModel.createPlotView(modelElement);
         break;
       case 4:
-        energyModel.createPlotView(modelElement);
+        renalFluidBalanceModel.createPlotView(modelElement);
         break;
       case 5:
-        gastrointestinalModel.createPlotView(modelElement);
-        break;
-      case 6:
-        hepaticModel.createPlotView(modelElement);
-        break;
-      case 7:
-        nervousModel.createPlotView(modelElement);
-        break;
-      case 8:
-        renalModel.createPlotView(modelElement);
-        break;
-      case 9:
-        respiratoryModel.createPlotView(modelElement);
-        break;
-      case 10:
-        tissueModel.createPlotView(modelElement);
-        break;
-      case 11:
         substanceModel.createPlotView(modelElement);
         break;
+      /*case 6:
+        gastrointestinalModel.createPlotView(modelElement);
+        break;
+      case 7:
+        hepaticModel.createPlotView(modelElement);
+        break;
+      case 8:
+        nervousModel.createPlotView(modelElement);
+        break;
+      case 9:
+        renalModel.createPlotView(modelElement);
+        break;
+      case 10:
+        respiratoryModel.createPlotView(modelElement);
+        break;
+      case 11:
+        tissueModel.createPlotView(modelElement);
+        break;*/
     }
   }
 
@@ -679,47 +679,71 @@ GraphAreaForm {
     var i = findRequestIndex(physiologyRequestModel.get(index).activeRequests, request)
     console.log(i)
     physiologyRequestModel.get(index).activeRequests.remove(i,1)
-    if (i != -1){ 
+    if (i != -1){
+      let chart;
       switch(index) {
         case 0:
-          bloodChemistryObjectModel.remove(i,1)
+          chart = vitalsModel.get(i)
+          metricUpdates.disconnect(chart.updatePatientSeries)
+          vitalsModel.remove(i,1)
           break;
         case 1:
-          cardiovascularModel.remove(i,1)
+          chart = cardiopulmonaryModel.get(i)
+          metricUpdates.disconnect(chart.updatePatientSeries)
+          cardiopulmonaryModel.remove(i,1)
           break;
         case 2:
-          drugModel.remove(i,1)
+          chart = bloodChemistryModel.get(i)
+          metricUpdates.disconnect(chart.updatePatientSeries)
+          bloodChemistryModel.remove(i,1)
           break;
         case 3:
-          endocrineModel.remove(i,1)
+          chart = energyMetabolismModel.get(i)
+          metricUpdates.disconnect(chart.updatePatientSeries)
+          energyMetabolismModel.remove(i,1)
           break;
         case 4:
-          energyModel.remove(i,1)
+          chart = renalFluidBalanceModel.get(i)
+          metricUpdates.disconnect(chart.updatePatientSeries)
+          renalFluidBalanceModel.remove(i,1)
           break;
         case 5:
+          chart = substanceModel.get(i)
+          metricUpdates.disconnect(chart.updateSubstanceSeries)
+          substanceModel.remove(i,1)
+      /*  case 6:
           gastrointestinalModel.remove(i,1)
           break;
-        case 6:
+        case 7:
           hepaticModel.remove(i,1)
           break;
-        case 7:
+        case 8:
           nervousModel.remove(i,1)
           break;
-        case 8:
+        case 9:
           renalModel.remove(i,1)
           break;
-        case 9:
+        case 10:
           respiratoryModel.remove(i,1)
           break;
-        case 10:
+        case 11:
           tissueModel.remove(i,1)
           break;
-        case 11:
-          substanceModel.remove(i,1)
+        */
       }
     } else {
       console.log("No active plot : " + request)
     }
+  }
+
+  //Takes request (or subrequest) name (in camel case) and converts to normal format, e.g. systolicArterialPressure -> Systolic Arterial Pressure, for clear plot title and lengend labels
+  function formatRequest(request){
+    //Expression ([a-z])([A-Z]) searches for lower case letter followed by upper case (this way, something like "PH" isn't split into "P H").  
+    //Parenthesis around each range capture the value in string, which we can call using $ syntax.  '$1 $2' means put a space between the first captured value (lower) and second captured value (upper)
+    let formatted = request.replace(/([a-z])([A-Z])/g, '$1 $2')
+    //Next, make sure that first character is upper case.  ^[a-z] specifies that we are only looking at leading character.
+    formatted = formatted.replace(/^[a-z]/, u=>u.toUpperCase());
+    return formatted
   }
 
 }
