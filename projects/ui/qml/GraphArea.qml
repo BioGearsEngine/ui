@@ -15,9 +15,10 @@ GraphAreaForm {
   signal start()
   signal restart()
   signal pause(bool paused)
+  signal speedToggled(int speed)
 
-  signal highFrequencyRefresh(PatientMetrics metrics)
-  signal lowFrequencyRefresh(PatientMetrics metrics)
+  signal tenHzPlotRefresh(PatientMetrics metrics)
+  signal oneHzPlotRefresh(PatientMetrics metrics)
 
   signal metricUpdates(PatientMetrics metrics)
   signal substanceDataUpdates(real time, var subData)
@@ -46,14 +47,14 @@ GraphAreaForm {
 
 
   onStart : {
-    slowTimer.start()
-    fastTimer.start()
+    oneHzPlotTimer.start()
+    tenHzPlotTimer.start()
     console.log("start")
   }
 
   onRestart : {
-    slowTimer.stop()
-    fastTimer.stop()
+    oneHzPlotTimer.stop()
+    tenHzPlotTimer.stop()
     console.log("Resetting GraphArea Plots")
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
@@ -71,18 +72,29 @@ GraphAreaForm {
 
   onPause: {
     if (paused){
-      slowTimer.stop();
-      fastTimer.stop();
+      oneHzPlotTimer.stop();
+      tenHzPlotTimer.stop();
     } else {
-      slowTimer.start();
-      fastTimer.start();
+      oneHzPlotTimer.start();
+      tenHzPlotTimer.start();
     }
   }
 
-  onMetricUpdates: {
+  onSpeedToggled :{
+    console.log("Speed = " + speed)
+    if (speed == 1){
+      root.state = "realTime"
+    } else {
+      root.state = "max"
+    }
+  }
+
+  onOneHzPlotRefresh : {
     ++tickCount;
+  }
+
+  onMetricUpdates: {
     plotMetrics = metrics
-    //console.log("Sim Time : " + plotMetrics.SimulationTime);
   }
 
   onStateUpdates: {
@@ -199,7 +211,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(vitalsGridView,{"width" : vitalsGridView.cellWidth, "height" :  vitalsGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         vitalsObjectModel.append(chartObject)
       }
     }
@@ -236,7 +248,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(cardiopulmonaryGridView,{"width" : cardiopulmonaryGridView.cellWidth, "height" : cardiopulmonaryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         cardiopulmonaryObjectModel.append(chartObject)
       }
     }
@@ -273,7 +285,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" : bloodChemistryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         bloodChemistryObjectModel.append(chartObject)
       }
     }
@@ -310,7 +322,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(energyMetabolismGridView,{"width" : energyMetabolismGridView.cellWidth, "height" : energyMetabolismGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         energyMetabolismObjectModel.append(chartObject)
       }
     }
@@ -347,7 +359,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(renalFluidBalanceGridView,{"width" : renalFluidBalanceGridView.cellWidth, "height" : renalFluidBalanceGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         renalFluidBalanceObjectModel.append(chartObject)
       }
     }
@@ -428,7 +440,7 @@ GraphAreaForm {
           case "respiratoryPVCycle" :
             var chartObject = chartComponent.createObject(customGridView,{"width" : customGridView.cellWidth, "height" : customGridView.cellHeight });
             chartObject.initializeRespiratoryPVSeries();
-            highFrequencyRefresh.connect(chartObject.updateRespiratoryPVSeries)
+            tenHzPlotRefresh.connect(chartObject.updateRespiratoryPVSeries)
             customObjectModel.append(chartObject);
             break;
           default :
@@ -470,7 +482,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         hepaticObjectModel.append(chartObject)
       }
     }
@@ -507,7 +519,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         nervousObjectModel.append(chartObject)
       }
     }
@@ -544,7 +556,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         renalObjectModel.append(chartObject)
       }
     }
@@ -581,7 +593,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         respiratoryObjectModel.append(chartObject)
       }
     }
@@ -618,7 +630,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
+        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
         tissueObjectModel.append(chartObject)
       }
     }
@@ -707,32 +719,32 @@ GraphAreaForm {
       switch(index) {
         case 0:
           chart = vitalsModel.get(i)
-          metricUpdates.disconnect(chart.updatePatientSeries)
+          oneHzPlotRefresh.disconnect(chart.updatePatientSeries)
           vitalsModel.remove(i,1)
           break;
         case 1:
           chart = cardiopulmonaryModel.get(i)
-          metricUpdates.disconnect(chart.updatePatientSeries)
+          oneHzPlotRefresh.disconnect(chart.updatePatientSeries)
           cardiopulmonaryModel.remove(i,1)
           break;
         case 2:
           chart = bloodChemistryModel.get(i)
-          metricUpdates.disconnect(chart.updatePatientSeries)
+          oneHzPlotRefresh.disconnect(chart.updatePatientSeries)
           bloodChemistryModel.remove(i,1)
           break;
         case 3:
           chart = energyMetabolismModel.get(i)
-          metricUpdates.disconnect(chart.updatePatientSeries)
+          oneHzPlotRefresh.disconnect(chart.updatePatientSeries)
           energyMetabolismModel.remove(i,1)
           break;
         case 4:
           chart = renalFluidBalanceModel.get(i)
-          metricUpdates.disconnect(chart.updatePatientSeries)
+          oneHzPlotRefresh.disconnect(chart.updatePatientSeries)
           renalFluidBalanceModel.remove(i,1)
           break;
         case 5:
           chart = substanceModel.get(i)
-          metricUpdates.disconnect(chart.updateSubstanceSeries)
+          oneHzPlotRefresh.disconnect(chart.updateSubstanceSeries)
           substanceModel.remove(i,1)
         case 6:
           customModel.remove(i,1)

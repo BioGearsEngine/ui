@@ -19,8 +19,8 @@ Page {
   property alias substanceGridView : substanceGridView
 	property alias customGridView : customGridView
 
-  property alias fastTimer : highFrequencyTimer
-  property alias slowTimer : lowFrequencyTimer
+  property alias tenHzPlotTimer : tenHzPlotTimer
+  property alias oneHzPlotTimer : oneHzPlotTimer
 	//property alias hepaticGridView : hepaticGridView
 	//property alias nervousGridView : nervousGridView
 	//property alias renalGridView : renalGridView
@@ -29,6 +29,25 @@ Page {
   
   
 	//property alias plotObjectModel : plotObjectModel
+
+  state : "realTime"
+
+  //The states defined for GraphArea relate to the timers that trigger plot updates During "RealTime", the slower timer triggers plot updates every 1 s (1 Hz), 
+    // while faster timer triggers every 0.1 s (10 Hz).  At maximum run rate, these refresh rates are multipled by factor of 5 (5 Hz for slow timer, 50 Hz for
+    // fast timer) to keep up with BioGears metrics update rate.  By default, all plots are assigned to slower timer (see GraphArea.qml).  Only plots that
+    // absolutely require a faster sampling rate for resolution (like pressure-volume curve) should connect plot to faster timer.
+  states : [ 
+      State {
+        name : "realTime"
+        PropertyChanges {target : tenHzPlotTimer; interval : 100}
+        PropertyChanges {target : oneHzPlotTimer; interval : 1000}
+      }
+      ,State {
+        name : "max"
+        PropertyChanges {target : tenHzPlotTimer; interval : 20}
+        PropertyChanges {target : oneHzPlotTimer; interval : 200}
+      }
+    ]
 
   header:  RowLayout {
     id: headerBar
@@ -565,7 +584,7 @@ ListModel {
       ,ListElement {request:"tidalVolume"; active: true}
       ,ListElement {request:"centralVenousPressure"; active: false}
     ]
-}
+  }
   ListElement {
     system : "Cardiopulmonary"
 	  activeRequests: []
@@ -578,7 +597,7 @@ ListModel {
       ,ListElement {request:"cerebralBloodFlow"; active: false}
       ,ListElement {request:"totalPulmonaryVentilation"; active: false}
       ,ListElement {request:"totalLungVolume"; active: false}
-      ,ListElement {request:"alveolarVentilation"; active: false}
+      ,ListElement {request:"totalAlveolarVentilation"; active: false}
       ,ListElement {request:"deadSpaceVentilation"; active: false}
       ,ListElement {request:"transpulmonaryPressure"; active: false}
       ,ListElement {request:"meanArterialPressure"; active: false}
@@ -602,9 +621,9 @@ ListModel {
       ,ListElement {request:"skinTemperature"; active: false}
       ,ListElement {request:"totalMetabolicRate"; active: false}
       ,ListElement {request:"sweatRate"; active: false}
-      ,ListElement{request:"carbonDioxideProductionRate"; active: false}
-      ,ListElement{request:"oxygenConsumptionRate"; active: false}
-      ,ListElement{request:"stomachContents"; active: false;
+      ,ListElement {request:"carbonDioxideProductionRate"; active: false}
+      ,ListElement {request:"oxygenConsumptionRate"; active: false}
+      ,ListElement {request:"stomachContents"; active: false;
         subRequests: [ListElement {subRequest: "stomachContents_carbohydrates"}, ListElement{subRequest: "stomachContents_fat"}, ListElement{subRequest:"stomachContents_protein"}, ListElement{subRequest:"stomachContents_water"}]}
     ]
   }
@@ -642,32 +661,27 @@ ListModel {
   }
 }
 
-  Timer {
-    id : highFrequencyTimer
-    interval : 100
-    running : false
-    repeat : true
-    triggeredOnStart : true
-    onTriggered : {
-      let date = new Date;
-      root.highFrequencyRefresh(plotMetrics)
-      //console.log("Fast Timer: " + date.getUTCMilliseconds());
-    }
+Timer {
+  id : tenHzPlotTimer
+  interval : 100
+  running : false
+  repeat : true
+  triggeredOnStart : true
+  onTriggered : {
+    root.tenHzPlotRefresh(plotMetrics)
   }
+}
 
-  Timer {
-    id : lowFrequencyTimer
-    interval : 1000
-    running : false
-    repeat : true
-    triggeredOnStart : true
-    onTriggered : {
-      let date = new Date
-      root.lowFrequencyRefresh(plotMetrics)
-      //console.log("Slow Timer : " + date.getUTCSeconds())
-    }
+Timer {
+  id : oneHzPlotTimer
+  interval : 1000
+  running : false
+  repeat : true
+  triggeredOnStart : true
+  onTriggered : {
+    root.oneHzPlotRefresh(plotMetrics)
   }
-
+}
 }
 
 /*##^## Designer {

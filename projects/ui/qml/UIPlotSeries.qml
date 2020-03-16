@@ -91,6 +91,8 @@ UIPlotSeriesForm {
   function updateDomainAndRange(){
     ++xAxis.tickCount;
     const interval_s = 60 * root.windowWidth_min
+    console.log("Tick Count = " + xAxis.tickCount)
+    console.log("Interval = " + interval_s)
     //Domain
     if(xAxis.tickCount > interval_s){
       xAxis.min = (xAxis.tickCount - interval_s) / 60;

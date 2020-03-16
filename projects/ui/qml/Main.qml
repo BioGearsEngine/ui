@@ -25,18 +25,21 @@ ApplicationWindow {
         Component.onCompleted : {
         }
         controls.onPlayClicked:  {
-            graphArea.start()
+          graphArea.start()
         }
         controls.onPauseClicked: {
-            console.log("Pause clicked")
-            console.log(paused)
-            graphArea.pause(paused)
+          console.log("Pause clicked")
+          console.log(paused)
+          graphArea.pause(paused)
         }
         controls.onRestartClicked: {
-            graphArea.restart()
+          graphArea.restart()
+        }
+        controls.onSpeedToggled: {
+          graphArea.speedToggled(speed)
         }
         controls.onOpenActionDrawer: {
-            actionDrawer.openActionDrawer();
+          actionDrawer.openActionDrawer();
         }
     }
 
