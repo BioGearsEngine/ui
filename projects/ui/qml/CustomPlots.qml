@@ -34,18 +34,18 @@ CustomPlotsForm {
     let newPoint = root.series(root.plotName).at(index)
 
     if(newPoint.x >=0){
-      xAxis.min = xAxis.min == 0 ? 0.9 * newPoint.x : Math.min(xAxis.min, Math.floor(0.9 * newPoint.x))
-      xAxis.max = xAxis.max == 1 ? 1.1 * newPoint.x : Math.max(xAxis.max, Math.ceil(1.1 * newPoint.x))
+      xAxis.min = xAxis.min == 0 ? 0.975 * newPoint.x : Math.min(xAxis.min, Math.floor(0.975 * newPoint.x))
+      xAxis.max = xAxis.max == 1 ? 1.025 * newPoint.x : Math.max(xAxis.max, Math.ceil(1.025 * newPoint.x))
     } else {
-      xAxis.min = xAxis.min == 0 ? 1.1 * newPoint.x : Math.min(xAxis.min, Math.floor(1.1 * newPoint.x))
-      xAxis.max = xAxis.max == 1 ? 0.9 * newPoint.x : Math.max(xAxis.max, Math.ceil(0.9 * newPoint.x))
+      xAxis.min = xAxis.min == 0 ? 1.025 * newPoint.x : Math.min(xAxis.min, Math.floor(1.025 * newPoint.x))
+      xAxis.max = xAxis.max == 1 ? 0.975 * newPoint.x : Math.max(xAxis.max, Math.ceil(0.975 * newPoint.x))
     }
     if(newPoint.y >=0){
-      yAxis.min = yAxis.min == 0 ? 0.9 * newPoint.y : Math.min(yAxis.min, Math.floor(0.9 * newPoint.y))
-      yAxis.max = yAxis.max == 1 ? 1.1 * newPoint.y : Math.max(yAxis.max, Math.ceil(1.1 * newPoint.y))
+      yAxis.min = yAxis.min == 0 ? 0.975 * newPoint.y : Math.min(yAxis.min, Math.floor(0.975 * newPoint.y))
+      yAxis.max = yAxis.max == 1 ? 1.025 * newPoint.y : Math.max(yAxis.max, Math.ceil(1.025 * newPoint.y))
     } else {
-      yAxis.min = yAxis.min == 0 ? 1.1 * newPoint.y : Math.min(yAxis.min, Math.floor(1.1 * newPoint.y))
-      yAxis.max = yAxis.max == 1 ? 0.9 * newPoint.y : Math.max(yAxis.max, Math.ceil(0.9 * newPoint.y))
+      yAxis.min = yAxis.min == 0 ? 1.025 * newPoint.y : Math.min(yAxis.min, Math.floor(1.025 * newPoint.y))
+      yAxis.max = yAxis.max == 1 ? 0.975 * newPoint.y : Math.max(yAxis.max, Math.ceil(0.975 * newPoint.y))
     }
   }
 

@@ -5,7 +5,7 @@ import com.biogearsengine.ui.scenario 1.0
 ControlsForm {
   id: root
   signal restartClicked()
-  signal pauseClicked()
+  signal pauseClicked(bool paused)
   signal playClicked()
   signal speedToggled(int speed)
 
@@ -84,11 +84,12 @@ ControlsForm {
     onPausedToggled : {
       patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
       if( biogears_scenario.isRunning) {
-          if( isPaused ){
-              playback.simButton.state = "Paused";
-          } else {
-              playback.simButton.state = "Simulating";
-          }
+        root.pauseClicked(isPaused)
+        if( isPaused ){
+            playback.simButton.state = "Paused";
+        } else {
+            playback.simButton.state = "Simulating";
+        }
       }
     }
     onThrottledToggled : {
@@ -130,7 +131,6 @@ ControlsForm {
   } 
   playback.onPauseClicked: {
     biogears_scenario.pause_play()
-    root.pauseClicked()
   }
   playback.onPlayClicked: {
     biogears_scenario.run()

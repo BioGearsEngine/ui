@@ -538,7 +538,7 @@ void Scenario::physiology_thread_main()
     physiology_thread_step();
     current_time = std::chrono::steady_clock::now();
     if (_throttle) {
-      while ((current_time - prev) < 1s) {
+      while ((current_time - prev) < 100ms) {
         std::this_thread::sleep_for(16ms);
         current_time = std::chrono::steady_clock::now();
       }
@@ -556,7 +556,7 @@ inline void Scenario::physiology_thread_step()
     if (_action_queue.size()) {
       dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
     }
-    dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(1, biogears::TimeUnit::s);
+    dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
 
     emit patientStateChanged(get_physiology_state());

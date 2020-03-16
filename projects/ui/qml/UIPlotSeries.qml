@@ -109,7 +109,6 @@ UIPlotSeriesForm {
         yAxis.min = yAxis.min == 0 ? 1.1 * newY : Math.min(yAxis.min, 1.1 * newY)
         yAxis.max = yAxis.max == 1 ? 0.9 * newY : Math.max(yAxis.max, 0.9 * newY)
       }
-      console.log(newY, yAxis.min, yAxis.max)
       //If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always
       //be the one just outside the viewing area.  Note that we can't use tickCount for this or else we graphs that start later in simulation would have points removed almost immediately
       if (root.series(i).count > interval_s){

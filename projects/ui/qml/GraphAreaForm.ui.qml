@@ -18,6 +18,9 @@ Page {
 	property alias renalFluidBalanceGridView : renalFluidBalanceGridView
   property alias substanceGridView : substanceGridView
 	property alias customGridView : customGridView
+
+  property alias fastTimer : highFrequencyTimer
+  property alias slowTimer : lowFrequencyTimer
 	//property alias hepaticGridView : hepaticGridView
 	//property alias nervousGridView : nervousGridView
 	//property alias renalGridView : renalGridView
@@ -638,6 +641,33 @@ ListModel {
     ]
   }
 }
+
+  Timer {
+    id : highFrequencyTimer
+    interval : 100
+    running : false
+    repeat : true
+    triggeredOnStart : true
+    onTriggered : {
+      let date = new Date;
+      root.highFrequencyRefresh(plotMetrics)
+      //console.log("Fast Timer: " + date.getUTCMilliseconds());
+    }
+  }
+
+  Timer {
+    id : lowFrequencyTimer
+    interval : 1000
+    running : false
+    repeat : true
+    triggeredOnStart : true
+    onTriggered : {
+      let date = new Date
+      root.lowFrequencyRefresh(plotMetrics)
+      //console.log("Slow Timer : " + date.getUTCSeconds())
+    }
+  }
+
 }
 
 /*##^## Designer {

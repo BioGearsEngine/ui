@@ -14,7 +14,10 @@ GraphAreaForm {
   }
   signal start()
   signal restart()
-  signal pause()
+  signal pause(bool paused)
+
+  signal highFrequencyRefresh(PatientMetrics metrics)
+  signal lowFrequencyRefresh(PatientMetrics metrics)
 
   signal metricUpdates(PatientMetrics metrics)
   signal substanceDataUpdates(real time, var subData)
@@ -26,6 +29,7 @@ GraphAreaForm {
   property double count_2 : 0.0
   property int tickCount : -1
 
+  property PatientMetrics plotMetrics
   property ObjectModel vitalsModel : vitalsObjectModel
   property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
   property ObjectModel bloodChemistryModel : bloodChemistryObjectModel
@@ -42,9 +46,14 @@ GraphAreaForm {
 
 
   onStart : {
+    slowTimer.start()
+    fastTimer.start()
+    console.log("start")
   }
 
   onRestart : {
+    slowTimer.stop()
+    fastTimer.stop()
     console.log("Resetting GraphArea Plots")
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
@@ -58,14 +67,22 @@ GraphAreaForm {
     //renalObjectModel.clearPlots()
     //respiratoryObjectModel.clearPlots()
     //tissueObjectModel.clearPlots()
-    
   }
 
   onPause: {
+    if (paused){
+      slowTimer.stop();
+      fastTimer.stop();
+    } else {
+      slowTimer.start();
+      fastTimer.start();
+    }
   }
 
   onMetricUpdates: {
     ++tickCount;
+    plotMetrics = metrics
+    //console.log("Sim Time : " + plotMetrics.SimulationTime);
   }
 
   onStateUpdates: {
@@ -182,7 +199,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(vitalsGridView,{"width" : vitalsGridView.cellWidth, "height" :  vitalsGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         vitalsObjectModel.append(chartObject)
       }
     }
@@ -219,7 +236,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(cardiopulmonaryGridView,{"width" : cardiopulmonaryGridView.cellWidth, "height" : cardiopulmonaryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         cardiopulmonaryObjectModel.append(chartObject)
       }
     }
@@ -256,7 +273,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(bloodChemistryGridView,{"width" : bloodChemistryGridView.cellWidth, "height" : bloodChemistryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         bloodChemistryObjectModel.append(chartObject)
       }
     }
@@ -293,7 +310,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(energyMetabolismGridView,{"width" : energyMetabolismGridView.cellWidth, "height" : energyMetabolismGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         energyMetabolismObjectModel.append(chartObject)
       }
     }
@@ -330,7 +347,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(renalFluidBalanceGridView,{"width" : renalFluidBalanceGridView.cellWidth, "height" : renalFluidBalanceGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         renalFluidBalanceObjectModel.append(chartObject)
       }
     }
@@ -411,7 +428,7 @@ GraphAreaForm {
           case "respiratoryPVCycle" :
             var chartObject = chartComponent.createObject(customGridView,{"width" : customGridView.cellWidth, "height" : customGridView.cellHeight });
             chartObject.initializeRespiratoryPVSeries();
-            metricUpdates.connect(chartObject.updateRespiratoryPVSeries)
+            highFrequencyRefresh.connect(chartObject.updateRespiratoryPVSeries)
             customObjectModel.append(chartObject);
             break;
           default :
@@ -453,7 +470,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         hepaticObjectModel.append(chartObject)
       }
     }
@@ -490,7 +507,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         nervousObjectModel.append(chartObject)
       }
     }
@@ -527,7 +544,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         renalObjectModel.append(chartObject)
       }
     }
@@ -564,7 +581,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         respiratoryObjectModel.append(chartObject)
       }
     }
@@ -601,7 +618,7 @@ GraphAreaForm {
       } else {
         var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
         chartObject.initializeChart(request, tickCount);
-        metricUpdates.connect(chartObject.updatePatientSeries)
+        lowFrequencyRefresh.connect(chartObject.updatePatientSeries)
         tissueObjectModel.append(chartObject)
       }
     }
