@@ -49,4 +49,19 @@ CustomPlotsForm {
     }
   }
 
+  function clear(){
+    let series = root.series(root.plotName)
+    let count = series.count
+    series.removePoints(0,series.count)
+    xAxis.min = 0
+    xAxis.max = 1
+    yAxis.min = 0
+    yAxis.max = 1
+  }
+
+  function resizePlot(newWidth, newHeight){
+    root.width = newWidth
+    root.height = newHeight
+  }
+
 }

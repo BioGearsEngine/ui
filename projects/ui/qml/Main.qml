@@ -28,8 +28,6 @@ ApplicationWindow {
           graphArea.start()
         }
         controls.onPauseClicked: {
-          console.log("Pause clicked")
-          console.log(paused)
           graphArea.pause(paused)
         }
         controls.onRestartClicked: {

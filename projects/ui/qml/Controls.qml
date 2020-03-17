@@ -71,7 +71,7 @@ ControlsForm {
     }
 
     onStateChanged : {
-      //patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
+      root.restartClicked();
     }
     onRunningToggled : {
       patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
