@@ -33,6 +33,8 @@
         <file>UITextInputForm.ui.qml</file>
         <file>CustomPlots.qml</file>
         <file>CustomPlotsForm.ui.qml</file>
+        <file>MenuArea.qml</file>
+        <file>MenuAreaForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

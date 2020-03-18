@@ -33,7 +33,6 @@ ColumnLayout {
   property alias playback : playback_controls
   property alias openDrawerButton : openDrawerButton
   property alias actionSwitchView : actionSwitchView
-  property alias actionMessage : actionMessage
 
   Row {
     height: 10
@@ -154,28 +153,6 @@ ColumnLayout {
       anchors.fill : parent
       focus : true
       model : actionSwitchModel  //Defined in Controls.qml
-    }
-
-    Rectangle {
-      id : actionMessage
-      color : "#1A5276"
-      height : actionButtonWrapper.width / 5
-      width : actionButtonWrapper.height / 2
-      radius : 10
-      visible : false
-      property string actionText : ""
-      Text {
-        width : parent.width
-        height : parent.height
-        text: parent.actionText
-        color : "white"
-        anchors.fill: parent
-        horizontalAlignment : Text.AlignLeft
-        verticalAlignment : Text.AlignVCenter
-        elide: Text.ElideRight
-        font.pointSize : 8
-        wrapMode : Text.Wrap
-      }
     }
   }
   }

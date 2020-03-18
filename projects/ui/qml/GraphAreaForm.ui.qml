@@ -32,7 +32,7 @@ Page {
 
   state : "realTime"
 
-  //The states defined for GraphArea relate to the timers that trigger plot updates During "RealTime", the slower timer triggers plot updates every 1 s (1 Hz), 
+  //The states defined for GraphArea relate to the timers that trigger plot updates. During "RealTime", the slower timer triggers plot updates every 1 s (1 Hz), 
     // while faster timer triggers every 0.1 s (10 Hz).  At maximum run rate, these refresh rates are multipled by factor of 5 (5 Hz for slow timer, 50 Hz for
     // fast timer) to keep up with BioGears metrics update rate.  By default, all plots are assigned to slower timer (see GraphArea.qml).  Only plots that
     // absolutely require a faster sampling rate for resolution (like pressure-volume curve) should connect plot to faster timer.
@@ -169,6 +169,7 @@ Page {
               checked : active
               text : root.formatRequest(request)
               onClicked : {
+                active = checked
                 if (checked){
 							    createPlotView(plots.currentIndex, model)
 								} else {
@@ -199,7 +200,7 @@ Page {
                 CheckBox { 
                   checkable : true
                   checked : false
-                  text : propName
+                  text : root.formatRequest(propName)
                   onClicked : {
                     console.log(sub + " : " + text)
                     if (checked){
