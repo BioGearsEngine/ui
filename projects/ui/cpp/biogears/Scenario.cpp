@@ -13,8 +13,10 @@
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/properties/SEScalar.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
+#include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/properties/SEUnitScalar.h>
+#include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/system/SESystem.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
@@ -23,7 +25,6 @@
 #include <biogears/container/concurrent_queue.tci.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
-#include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 
 #include <biogears/cdm/scenario/SEAction.h>
 #include <chrono>
@@ -912,7 +913,7 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   current->totalLungVolume = (_totalLungVolume) ? _totalLungVolume->GetValue() : 0.0;
   current->totalPulmonaryVentilation = (_totalPulmonaryVentilation) ? _totalPulmonaryVentilation->GetValue() : 0.0;
   current->transpulmonaryPressure = (_transpulmonaryPressure) ? _transpulmonaryPressure->GetValue() : 0.0;
-  
+
   //Tissue
   auto& tissue = _engine->GetTissue();
   current->carbonDioxideProductionRate = (_carbonDioxideProductionRate) ? _carbonDioxideProductionRate->GetValue() : 0.0;
@@ -1033,8 +1034,6 @@ void Scenario::substances_to_lists()
   std::unique_ptr<CDM::ObjectData> subXmlData;
   CDM::SubstanceData* subData;
   CDM::SubstanceCompoundData* compoundData;
-  std::string test = "test";
-  QString qtest = QString::fromStdString(test);
 
   if (!subDirectory.exists()) {
     std::cout << "This is not the substance directory you're looking for";
@@ -1071,17 +1070,17 @@ void Scenario::substances_to_lists()
   }
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::getDrugsList()
+QVector<QString> Scenario::get_drugs()
 {
   return _drugs_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::getCompoundsList()
+QVector<QString> Scenario::get_compounds()
 {
   return _compounds_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::getTransfusionProductsList()
+QVector<QString> Scenario::get_transfusion_products()
 {
   return _transfusions_list;
 }
@@ -1090,6 +1089,70 @@ QtLogForward* Scenario::getLogFoward()
 {
   return _consoleLog;
 }
+
+void Scenario::save_patient(QString patientFileName)
+{
+  return;
+}
+
+void Scenario::save_state(QString stateFileName)
+{
+  std::string fileLoc = "./states/SavedStates/" + stateFileName.toStdString();
+  std::string fullPath = biogears::ResolvePath(fileLoc);
+  biogears::CreateFilePath(fullPath);
+  std::ofstream stream(fullPath);
+  xml_schema::namespace_infomap info;
+  info[""].name = "uri:/mil/tatrc/physiology/datamodel";
+
+  std::unique_ptr<CDM::BioGearsStateData> state(new CDM::BioGearsStateData);
+
+  state->contentVersion(BGE::Version);
+
+  state.get()->AirwayMode(_engine->GetAirwayMode());
+  state.get()->Intubation(_engine->GetIntubation());
+  // Patient
+  state->Patient(std::unique_ptr<CDM::PatientData>(_engine->GetPatient().Unload()));
+  // Conditions
+  std::vector<CDM::ConditionData*> conditions;
+  _engine->GetConditions().Unload(conditions);
+  for (CDM::ConditionData* cData : conditions)
+    state->Condition().push_back(std::unique_ptr<CDM::ConditionData>(cData));
+  // Actions
+  std::vector<CDM::ActionData*> activeActions;
+  _engine->GetActions().Unload(activeActions);
+  for (CDM::ActionData* aData : activeActions)
+    state->ActiveAction().push_back(std::unique_ptr<CDM::ActionData>(aData));
+  // Active Substances/Compounds
+  for (biogears::SESubstance* s : _engine->GetSubstances().GetActiveSubstances())
+    state->ActiveSubstance().push_back(std::unique_ptr<CDM::SubstanceData>(s->Unload()));
+  for (biogears::SESubstanceCompound* c : _engine->GetSubstances().GetActiveCompounds())
+    state->ActiveSubstanceCompound().push_back(std::unique_ptr<CDM::SubstanceCompoundData>(c->Unload()));
+  // Systems
+  state->System().push_back(*(_engine->GetBloodChemistry().Unload()));
+  state->System().push_back(*(_engine->GetCardiovascular().Unload()));
+  state->System().push_back(*(_engine->GetDrugs().Unload()));
+  state->System().push_back(*(_engine->GetEndocrine().Unload()));
+  state->System().push_back(*(_engine->GetEnergy().Unload()));
+  state->System().push_back(*(_engine->GetGastrointestinal().Unload()));
+  state->System().push_back(*(_engine->GetHepatic().Unload()));
+  state->System().push_back(*(_engine->GetNervous().Unload()));
+  state->System().push_back(*(_engine->GetRenal().Unload()));
+  state->System().push_back(*(_engine->GetRespiratory().Unload()));
+  state->System().push_back(*(_engine->GetTissue().Unload()));
+  //state->System().push_back(std::unique_ptr<CDM::BioGearsEnvironmentData>(m_Environment->Unload()));
+  state->System().push_back(*(_engine->GetAnesthesiaMachine().Unload()));
+  state->System().push_back(*(_engine->GetECG().Unload()));
+  state->System().push_back(*(_engine->GetInhaler().Unload()));
+  // Compartments
+  state->CompartmentManager(*(_engine->GetCompartments().Unload()));
+  // Configuration
+  state->Configuration(*(_engine->GetConfiguration().Unload()));
+  // Circuitsk
+  state->CircuitManager(*(_engine->GetCircuits().Unload()));
+  BioGearsState(stream, *state, info);
+  stream.close();
+}
+
 }
 #include <biogears/cdm/patient/actions/SEAcuteStress.h>
 #include <biogears/cdm/patient/actions/SEAirwayObstruction.h>

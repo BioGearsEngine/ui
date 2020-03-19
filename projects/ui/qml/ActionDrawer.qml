@@ -440,7 +440,7 @@ ActionDrawerForm {
 			let adminListData = { type : 'ListModel', role : 'route', elements : ['Bolus-Intraarterial', 'Bolus-Intramuscular', 'Bolus-Intravenous', 'Infusion-Intravenous','Oral','Transmucosal']}
 			let adminComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
 			let adminCombo = drugDialog.addComboBox('Admin. Route', 'adminRoute', adminListData, adminComboProps)
-			let drugsList = scenario.getDrugsList();
+			let drugsList = scenario.get_drugs();
 			let subFolderData = {type : 'ListModel', role : 'drug', elements : drugsList}
 			let subComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
 			let subCombo = drugDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
@@ -566,7 +566,7 @@ ActionDrawerForm {
 			infusionDialog.initializeProperties({name : actionItem.name, compound : '', bagVolume : 0, rate : 0})
 			let dialogHeight = infusionDialog.contentItem.height
 			let dialogWidth = infusionDialog.contentItem.width
-			let compoundList = scenario.getCompoundsList()
+			let compoundList = scenario.get_compounds()
 			let compoundListData = {type : 'ListModel', role : 'compound', elements : compoundList}
 			let compoundComboProps = {prefHeight : dialogHeight / 4, prefWidth : 0.8 * dialogWidth, elementRatio : 0.4, colSpan : 2}
 			let compoundCombo = infusionDialog.addComboBox('Compound', 'compound', compoundListData, compoundComboProps)
@@ -600,7 +600,7 @@ ActionDrawerForm {
 			transfusionDialog.initializeProperties({name : actionItem.name, type : '', bagVolume : 0, rate : 0})
 			let dialogHeight = transfusionDialog.contentItem.height
 			let dialogWidth = transfusionDialog.contentItem.width
-			let bloodTypeList = scenario.getTransfusionProductsList()
+			let bloodTypeList = scenario.get_transfusion_products()
 			let bloodTypeListData = {type : 'ListModel', role : 'compound', elements : bloodTypeList}
 			let bloodTypeComboProps = {prefHeight : dialogHeight / 4.0, prefWidth : dialogWidth * 0.8, colSpan : 2, elementRatio : 0.4}
 			let compoundCombo = transfusionDialog.addComboBox('Blood Type', 'type', bloodTypeListData, bloodTypeComboProps)

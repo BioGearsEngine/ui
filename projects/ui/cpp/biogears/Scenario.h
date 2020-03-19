@@ -29,6 +29,7 @@ namespace biogears {
 class SEScalar;
 class SEUnitScalar;
 class SESubstance;
+class SESubstanceCompound;
 }
 
 namespace bio {
@@ -58,6 +59,8 @@ public:
   Q_INVOKABLE Scenario& environment_name(QString);
 
   Q_INVOKABLE Scenario& load_patient(QString);
+  Q_INVOKABLE void save_patient(QString patientFileName);
+  Q_INVOKABLE void save_state(QString stateFileName);
 
   Q_INVOKABLE double get_simulation_time();
 
@@ -69,9 +72,9 @@ public:
   Q_INVOKABLE void join() final;
   Q_INVOKABLE void step();
 
-  Q_INVOKABLE QVector<QString> getDrugsList();
-  Q_INVOKABLE QVector<QString> getCompoundsList();
-  Q_INVOKABLE QVector<QString> getTransfusionProductsList();
+  Q_INVOKABLE QVector<QString> get_drugs();
+  Q_INVOKABLE QVector<QString> get_compounds();
+  Q_INVOKABLE QVector<QString> get_transfusion_products();
 
   Q_INVOKABLE QtLogForward* getLogFoward();
 
