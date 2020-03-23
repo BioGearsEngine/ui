@@ -60,6 +60,8 @@ constexpr const char* _COMPILER_VERSION_ =
     "16.2"
 #  elif _MSC_VER == 1923
     "16.3"
+#  elif _MSC_VER == 1924
+    "16.4"
 #  endif
   ;
 #elif defined(__clang__)
