@@ -16,7 +16,7 @@ class PhysiologyModel : public QAbstractItemModel {
 
 public:
   explicit PhysiologyModel(QString name = "Unknown Patient", QObject* parent = nullptr);
-  ~PhysiologyModel();
+  virtual ~PhysiologyModel();
 
   enum  PhysiologyRequestRoles {
     PrefixRole = Qt::UserRole + 1,

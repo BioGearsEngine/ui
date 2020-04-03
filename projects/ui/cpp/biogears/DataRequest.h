@@ -39,9 +39,22 @@ public:
 
   PhysiologyRequest* child(int row);
   PhysiologyRequest const * child(int row) const;
+
   int childCount() const;
   int columnCount() const;
 
+  void scalar(biogears::SEScalar const* given)
+  {
+    _value = given;
+    _unit = nullptr;
+  };
+
+  void unit_scalar(biogears::SEUnitScalar const* given)
+  {
+    _unit = given;
+    _value = nullptr;
+  };
+   
   QVariant data(int column) const;
 
   int row() const;

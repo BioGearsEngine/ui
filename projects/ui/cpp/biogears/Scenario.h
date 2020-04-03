@@ -58,7 +58,7 @@ class Scenario : public QObject, public biogears::Runnable {
 public:
   Scenario(QObject* parent = Q_NULLPTR);
   Scenario(QString name, QObject* parent = Q_NULLPTR);
-  ~Scenario();
+  virtual ~Scenario();
 
   using ActionQueue = biogears::ConcurrentQueue<std::unique_ptr<biogears::SEAction>>;
   using Channel = biogears::scmp::Channel<ActionQueue>;
@@ -124,6 +124,7 @@ public: //Action Factory Interface;
 signals:
   void patientStateChanged(PatientState patientState);
   void patientMetricsChanged(PatientMetrics* metrics);
+  void physiologyChanged(PhysiologyModel* physiology);
   void substanceDataChanged(double time, QVariantMap subData);
   void activeSubstanceAdded(Substance* sub);
   void patientConditionsChanged(PatientConditions conditions);
@@ -147,7 +148,7 @@ protected:
 private:
   std::thread _thread;
   biogears::Logger _logger;
-  std::unique_ptr<biogears::BioGears> _engine;
+  std::unique_ptr<biogears::BioGearsEngine> _engine;
   Channel _action_queue;
 
   std::mutex _engine_mutex;
@@ -163,7 +164,7 @@ private:
   QVector<QString> _drugs_list;
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
-  PhysiologyModel* _patient_request_model;
+  PhysiologyModel* _physiology_model;
 
   QVariantMap substanceData;
 

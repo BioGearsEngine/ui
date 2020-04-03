@@ -43,12 +43,110 @@ Scenario::Scenario(QString name, QObject* parent)
   , _running(false)
   , _paused(true)
   , _throttle(true)
-  , _patient_request_model(nullptr)
+  , _physiology_model(nullptr)
 {
   _consoleLog = new QtLogForward(this);
   _logger.SetForward(_consoleLog);
 
-  _engine->GetPatient().SetName(name.toStdString());
+  biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
+  engine->GetPatient().SetName(name.toStdString());
+
+  _physiology_model = std::make_unique<PhysiologyModel>(QString(_engine->GetPatient().GetName_cStr()), this).release();
+  _physiology_model->add_category("Vitals").add_category("Cardiopulmonary").add_category("Blood Chemistry");
+  _physiology_model->add_category("Renal").add_category("Energy and Metabolism").add_category("Fluid Balance");
+  _physiology_model->add_category("Dugs").add_category("Substances").add_category("Panels");
+  {
+    auto vitals = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::VITALS, 0, QModelIndex()).internalPointer());
+    {
+      vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("SystolicArterialPressure"), vitals));
+      vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("DiastolicArterialPressure"), vitals));
+      vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("RespirationRate"), vitals));
+      vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("OxygenSaturation"), vitals));
+      vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("BloodVolume"), vitals));
+      vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("CentralVenousPressure"), vitals));
+    }
+
+    auto cardiopulmonary = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());
+    {
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Cerebral Perfusion Pressure"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Intracranial Pressure"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Systemic Vascular Resistance"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Pulse Pressure"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("IE Ratio"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Total Pulmonary Ventilation"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Lung Volume"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Tidal Volume"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Alveolar Ventilation"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Dead Space Ventlation"), cardiopulmonary));
+      cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Transpulmonary Pressure"), cardiopulmonary));
+    }
+
+    auto blood_chemistry = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::BLOOD_CHEMISTRY, 0, QModelIndex()).internalPointer());
+    {
+
+      blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Carbon Dioxide Saturation"), cardiopulmonary));
+      blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Carbon Monoxide Saturation"), cardiopulmonary));
+      blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Oxygen Saturation"), cardiopulmonary));
+      blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Blood PH"), cardiopulmonary));
+      blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Hematocrit"), cardiopulmonary));
+      blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Strong Ion Difference"), cardiopulmonary));
+    }
+    auto renal = static_cast<PhysiologyRequest*>(_physiology_model->index(0, Categories::RENAL, QModelIndex()).internalPointer());
+    {
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Mean Urine Output"), cardiopulmonary));
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine ProductionRate"), cardiopulmonary));
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine Volume"), cardiopulmonary));
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine Osmolality"), cardiopulmonary));
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine Osmolarity"), cardiopulmonary));
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Glomerular Filtration Rate"), cardiopulmonary));
+      renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Renal Blood Flow"), cardiopulmonary));
+    }
+
+    auto energy_and_metabolism = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::ENERGY_AND_METABOLISM, 0, QModelIndex()).internalPointer());
+    {
+      energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Core Temperature"), cardiopulmonary));
+      energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Sweat Rate"), cardiopulmonary));
+      energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Skin Temperature"), cardiopulmonary));
+      energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Total Metabolic Rate"), cardiopulmonary));
+      energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Stomach Contents"), cardiopulmonary));
+      auto stomach_contents = energy_and_metabolism->child(4);
+      {
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Calcium"), stomach_contents));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Carbohydrates"), stomach_contents));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Fat"), stomach_contents));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Protein"), stomach_contents));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Sodium"), stomach_contents));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Water"), stomach_contents));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Oxygen Consumption Rate"), cardiopulmonary));
+        stomach_contents->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("CO2 Production Rate"), cardiopulmonary));
+      }
+    }
+
+    auto fluid_balance = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::FLUID_BALANCE, 0, QModelIndex()).internalPointer());
+    {
+      fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("Total Body Fluid"), fluid_balance));
+      fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("ExtracellularFluidVolume"), fluid_balance));
+      fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("IntracellularFluidVolume"), fluid_balance));
+      fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("ExtravascularFluidVolume"), fluid_balance));
+    }
+
+    auto drugs = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::DRUGS, 0, QModelIndex()).internalPointer());
+    {
+      drugs->appendChild(std::make_unique<PhysiologyRequest>(QString("Drugs"), QString("Cerebral Perfusion Pressure"), cardiopulmonary));
+    }
+
+    auto substances = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::SUBSTANCES, 0, QModelIndex()).internalPointer());
+    {
+      substances->appendChild(std::make_unique<PhysiologyRequest>(QString("Substances"), QString("Cerebral Perfusion Pressure"), cardiopulmonary));
+    }
+
+    auto panels = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::PANELS, 0, QModelIndex()).internalPointer());
+    {
+      panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Renal"), cardiopulmonary));
+      panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Metabolic"), cardiopulmonary));
+      panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Pulmonary Function Test"), cardiopulmonary));
+    }
+  }
 }
 //-------------------------------------------------------------------------------
 Scenario::~Scenario()
@@ -152,24 +250,27 @@ QString Scenario::patient_name()
 //--------      -----------------------------------------------------------------
 QString Scenario::environment_name()
 {
-  return _engine->GetEnvironment().GetName_cStr();
+
+  return _engine->GetEnvironment()->GetName_cStr();
 }
 //-------------------------------------------------------------------------------
 Scenario& Scenario::patient_name(QString name)
 {
-  _engine->GetPatient().SetName(name.toStdString());
+  biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
+  engine->GetPatient().SetName(name.toStdString());
   return *this;
 }
 //-------------------------------------------------------------------------------
 Scenario& Scenario::environment_name(QString name)
 {
-  _engine->GetEnvironment().SetName(name.toStdString());
+  biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
+  engine->GetEnvironment().SetName(name.toStdString());
   return *this;
 }
 //-------------------------------------------------------------------------------
 Scenario& Scenario::load_patient(QString file)
 {
-  substances_to_lists();
+  //substances_to_lists();
 
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
@@ -180,118 +281,106 @@ Scenario& Scenario::load_patient(QString file)
   }
 
   _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
+
   _engine = std::make_unique<biogears::BioGearsEngine>(&_logger);
   _logger.SetForward(_consoleLog);
-  if (dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->LoadState(path)) {
-    auto engine = dynamic_cast<biogears::BioGearsEngine*>(_engine.get());
 
-    if (_patient_request_model) {
-      _patient_request_model->deleteLater();
-        }
-
-    _patient_request_model = std::make_unique<PhysiologyModel>(QString(_engine->GetPatient().GetName_cStr()), this).release();
-    _patient_request_model->add_category("Vitals").add_category("Cardiopulmonary").add_category("Blood Chemistry");
-    _patient_request_model->add_category("Renal").add_category("Energy and Metabolism").add_category("Fluid Balance");
-    _patient_request_model->add_category("Dugs").add_category("Substances").add_category("Panels");
-    {
-      auto vitals = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::VITALS, 0, QModelIndex()).internalPointer());
+  if (_engine->LoadState(path)) {
+    auto vitals = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::VITALS, 0, QModelIndex()).internalPointer());
       {
-        vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("SystolicArterialPressure"), &_engine->GetCardiovascular().GetSystolicArterialPressure(), vitals));
-        vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("DiastolicArterialPressure"), &_engine->GetCardiovascular().GetDiastolicArterialPressure(), vitals));
-        vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("RespirationRate"), &_engine->GetRespiratory().GetRespirationRate(), vitals));
-        vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("OxygenSaturation"), &_engine->GetBloodChemistry().GetOxygenSaturation(), vitals));
-        vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("BloodVolume"), &_engine->GetCardiovascular().GetBloodVolume(), vitals));
-        vitals->appendChild(std::make_unique<PhysiologyRequest>(QString("Vitals"), QString("CentralVenousPressure"), &_engine->GetCardiovascular().GetCentralVenousPressure(), vitals));
+      vitals->child(0)->unit_scalar(&_engine->GetCardiovascular().GetSystolicArterialPressure());
+      vitals->child(1)->unit_scalar(&_engine->GetCardiovascular().GetDiastolicArterialPressure());
+      vitals->child(2)->unit_scalar(&_engine->GetRespiratory().GetRespirationRate());
+      vitals->child(3)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
+      vitals->child(4)->unit_scalar(&_engine->GetCardiovascular().GetBloodVolume());
+      vitals->child(5)->unit_scalar(&_engine->GetCardiovascular().GetCentralVenousPressure());
           }
 
-      auto cardiopulmonary = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());
+    auto cardiopulmonary = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());
       {
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Cerebral Perfusion Pressure"), &_engine->GetCardiovascular().GetCerebralPerfusionPressure(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Intracranial Pressure"), &_engine->GetCardiovascular().GetIntracranialPressure(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Systemic Vascular Resistance"), &_engine->GetCardiovascular().GetSystemicVascularResistance(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Pulse Pressure"), &_engine->GetCardiovascular().GetPulsePressure(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("IE Ratio"), &_engine->GetRespiratory().GetInspiratoryExpiratoryRatio(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Total Pulmonary Ventilation"), &_engine->GetRespiratory().GetTotalPulmonaryVentilation(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Lung Volume"), &_engine->GetRespiratory().GetTotalLungVolume(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Tidal Volume"), &_engine->GetRespiratory().GetTidalVolume(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Alveolar Ventilation"), &_engine->GetRespiratory().GetTotalAlveolarVentilation(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Dead Space Ventlation"), &_engine->GetRespiratory().GetTotalDeadSpaceVentilation(), cardiopulmonary));
-        cardiopulmonary->appendChild(std::make_unique<PhysiologyRequest>(QString("Cardiopulmonary"), QString("Transpulmonary Pressure"), &_engine->GetRespiratory().GetTranspulmonaryPressure(), cardiopulmonary));
-        }
+      cardiopulmonary->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      cardiopulmonary->child(1)->unit_scalar(&_engine->GetCardiovascular().GetIntracranialPressure());
+      cardiopulmonary->child(2)->unit_scalar(&_engine->GetCardiovascular().GetSystemicVascularResistance());
+      cardiopulmonary->child(3)->unit_scalar(&_engine->GetCardiovascular().GetPulsePressure());
+      cardiopulmonary->child(4)->scalar(&_engine->GetRespiratory().GetInspiratoryExpiratoryRatio());
+      cardiopulmonary->child(5)->unit_scalar(&_engine->GetRespiratory().GetTotalPulmonaryVentilation());
+      cardiopulmonary->child(6)->unit_scalar(&_engine->GetRespiratory().GetTotalLungVolume());
+      cardiopulmonary->child(7)->unit_scalar(&_engine->GetRespiratory().GetTidalVolume());
+      cardiopulmonary->child(8)->unit_scalar(&_engine->GetRespiratory().GetTotalAlveolarVentilation());
+      cardiopulmonary->child(9)->unit_scalar(&_engine->GetRespiratory().GetTotalDeadSpaceVentilation());
+      cardiopulmonary->child(0)->unit_scalar(&_engine->GetRespiratory().GetTranspulmonaryPressure());
+    }
 
-      auto blood_chemistry = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::BLOOD_CHEMISTRY, 0, QModelIndex()).internalPointer());
+    auto blood_chemistry = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::BLOOD_CHEMISTRY, 0, QModelIndex()).internalPointer());
       {
 
-        blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Carbon Dioxide Saturation"), &_engine->GetBloodChemistry().GetCarbonDioxideSaturation(), cardiopulmonary));
-        blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Carbon Monoxide Saturation"), &_engine->GetBloodChemistry().GetCarbonMonoxideSaturation(), cardiopulmonary));
-        blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Oxygen Saturation"), &_engine->GetBloodChemistry().GetOxygenSaturation(), cardiopulmonary));
-        blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Blood PH"), &_engine->GetBloodChemistry().GetArterialBloodPH(), cardiopulmonary));
-        blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Hematocrit"), &_engine->GetBloodChemistry().GetHematocrit(), cardiopulmonary));
-        blood_chemistry->appendChild(std::make_unique<PhysiologyRequest>(QString("Blood Chemistry"), QString("Strong Ion Difference"), &_engine->GetBloodChemistry().GetStrongIonDifference(), cardiopulmonary));
+      blood_chemistry->child(0)->scalar(&_engine->GetBloodChemistry().GetCarbonDioxideSaturation());
+      blood_chemistry->child(1)->scalar(&_engine->GetBloodChemistry().GetCarbonMonoxideSaturation());
+      blood_chemistry->child(2)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
+      blood_chemistry->child(3)->scalar(&_engine->GetBloodChemistry().GetArterialBloodPH());
+      blood_chemistry->child(4)->scalar(&_engine->GetBloodChemistry().GetHematocrit());
+      blood_chemistry->child(5)->scalar(&_engine->GetBloodChemistry().GetStrongIonDifference());
       }
-      auto renal = static_cast<PhysiologyRequest*>(_patient_request_model->index(0, Categories::RENAL, QModelIndex()).internalPointer());
+    auto renal = static_cast<PhysiologyRequest*>(_physiology_model->index(0, Categories::RENAL, QModelIndex()).internalPointer());
       {
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Mean Urine Output"), &_engine->GetRenal().GetMeanUrineOutput(), cardiopulmonary));
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine ProductionRate"), &_engine->GetRenal().GetUrineProductionRate(), cardiopulmonary));
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine Volume"), &_engine->GetRenal().GetUrineVolume(), cardiopulmonary));
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine Osmolality"), &_engine->GetRenal().GetUrineOsmolality(), cardiopulmonary));
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Urine Osmolarity"), &_engine->GetRenal().GetUrineOsmolarity(), cardiopulmonary));
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Glomerular Filtration Rate"), &_engine->GetRenal().GetGlomerularFiltrationRate(), cardiopulmonary));
-        renal->appendChild(std::make_unique<PhysiologyRequest>(QString("Renal"), QString("Renal Blood Flow"), &_engine->GetRenal().GetRenalBloodFlow(), cardiopulmonary));
+      renal->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+      renal->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
+      renal->child(2)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
+      renal->child(3)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
+      renal->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
+      renal->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
+      renal->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
       }
 
-      auto energy_and_metabolism = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::ENERGY_AND_METABOLISM, 0, QModelIndex()).internalPointer());
+    auto energy_and_metabolism = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::ENERGY_AND_METABOLISM, 0, QModelIndex()).internalPointer());
       {
-        energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Core Temperature"), &_engine->GetEnergy().GetCoreTemperature(), cardiopulmonary));
-        energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Sweat Rate"), &_engine->GetEnergy().GetSweatRate(), cardiopulmonary));
-        energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Skin Temperature"), &_engine->GetEnergy().GetSkinTemperature(), cardiopulmonary));
-        energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Total Metabolic Rate"), &_engine->GetEnergy().GetTotalMetabolicRate(), cardiopulmonary));
-        energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Stomach Contents"), cardiopulmonary));
+      energy_and_metabolism->child(0)->unit_scalar(&_engine->GetEnergy().GetCoreTemperature());
+      energy_and_metabolism->child(1)->unit_scalar(&_engine->GetEnergy().GetSweatRate());
+      energy_and_metabolism->child(2)->unit_scalar(&_engine->GetEnergy().GetSkinTemperature());
+      energy_and_metabolism->child(3)->unit_scalar(&_engine->GetEnergy().GetTotalMetabolicRate());
+      energy_and_metabolism->appendChild((QString("Energy and Metabolism"), QString("Stomach Contents"), cardiopulmonary));
         auto stomach_contents = energy_and_metabolism->child(4);
         auto& neutrition = _engine->GetGastrointestinal().GetStomachContents();
         {
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Calcium"), &neutrition.GetCalcium(), stomach_contents));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Carbohydrates"), &neutrition.GetCarbohydrate(), stomach_contents));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Fat"), &neutrition.GetFat(), stomach_contents));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Protein"), &neutrition.GetProtein(), stomach_contents));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Sodium"), &neutrition.GetSodium(), stomach_contents));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Stomach Contents"), QString("Water"), &neutrition.GetWater(), stomach_contents));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("Oxygen Consumption Rate"), &_engine->GetTissue().GetOxygenConsumptionRate(), cardiopulmonary));
-          energy_and_metabolism->appendChild(std::make_unique<PhysiologyRequest>(QString("Energy and Metabolism"), QString("CO2 Production Rate"), &_engine->GetTissue().GetCarbonDioxideProductionRate(), cardiopulmonary));
+        stomach_contents->child(0)->unit_scalar( &neutrition.GetCalcium());
+        stomach_contents->child(1)->unit_scalar( &neutrition.GetCarbohydrate());
+        stomach_contents->child(2)->unit_scalar( &neutrition.GetFat());
+        stomach_contents->child(3)->unit_scalar( &neutrition.GetProtein());
+        stomach_contents->child(4)->unit_scalar( &neutrition.GetSodium());
+        stomach_contents->child(5)->unit_scalar( &neutrition.GetWater());
         }
+      energy_and_metabolism->child(4)->unit_scalar( &_engine->GetTissue().GetOxygenConsumptionRate());
+      energy_and_metabolism->child(5)->unit_scalar( &_engine->GetTissue().GetCarbonDioxideProductionRate());
       }
 
-      auto fluid_balance = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::FLUID_BALANCE, 0, QModelIndex()).internalPointer());
+    auto fluid_balance = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::FLUID_BALANCE, 0, QModelIndex()).internalPointer());
       {
-        fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("Total Body Fluid"), &_engine->GetTissue().GetTotalBodyFluidVolume(), fluid_balance));
-        fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("ExtracellularFluidVolume"), &_engine->GetTissue().GetExtracellularFluidVolume(), fluid_balance));
-        fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("IntracellularFluidVolume"), &_engine->GetTissue().GetIntracellularFluidVolume(), fluid_balance));
-        fluid_balance->appendChild(std::make_unique<PhysiologyRequest>(QString("Fluid Balance"), QString("ExtravascularFluidVolume"), &_engine->GetTissue().GetExtravascularFluidVolume(), fluid_balance));
+      fluid_balance->child(0)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
+      fluid_balance->child(1)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
+      fluid_balance->child(2)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
+      fluid_balance->child(3)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
       }
 
-      auto drugs = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::DRUGS, 0, QModelIndex()).internalPointer());
+    auto drugs = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::DRUGS, 0, QModelIndex()).internalPointer());
       {
-        drugs->appendChild(std::make_unique<PhysiologyRequest>(QString("Drugs"), QString("Cerebral Perfusion Pressure"), &_engine->GetCardiovascular().GetCerebralPerfusionPressure(), cardiopulmonary));
+      drugs->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       }
 
-      auto substances = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::SUBSTANCES, 0, QModelIndex()).internalPointer());
+    auto substances = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::SUBSTANCES, 0, QModelIndex()).internalPointer());
       {
-        substances->appendChild(std::make_unique<PhysiologyRequest>(QString("Substances"), QString("Cerebral Perfusion Pressure"), &_engine->GetCardiovascular().GetCerebralPerfusionPressure(), cardiopulmonary));
+      substances->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       }
 
-      auto panels = static_cast<PhysiologyRequest*>(_patient_request_model->index(Categories::PANELS, 0, QModelIndex()).internalPointer());
+    auto panels = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::PANELS, 0, QModelIndex()).internalPointer());
       {
-        panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Renal"), &_engine->GetCardiovascular().GetCerebralPerfusionPressure(), cardiopulmonary));
-        panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Metabolic"), &_engine->GetCardiovascular().GetCerebralPerfusionPressure(), cardiopulmonary));
-        panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Pulmonary Function Test"), &_engine->GetCardiovascular().GetCerebralPerfusionPressure(), cardiopulmonary));
+      panels->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      panels->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      panels->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       }
-    }
-
-
 
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
-    emit substanceDataChanged(_engine->GetSimulationTime().GetValue(biogears::TimeUnit::s), get_physiology_substances());
+    emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
     emit stateChanged();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
@@ -336,7 +425,8 @@ inline void Scenario::physiology_thread_step()
     emit patientStateChanged(get_physiology_state());
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientConditionsChanged(get_physiology_conditions());
-    emit substanceDataChanged(_engine->GetSimulationTime().GetValue(biogears::TimeUnit::s), get_physiology_substances());
+    emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
+    emit physiologyChanged(_physiology_model);
 
   } else {
     std::this_thread::sleep_for(16ms);
@@ -345,43 +435,48 @@ inline void Scenario::physiology_thread_step()
 //---------------------------------------------------------------------------------
 auto Scenario::get_physiology_state() -> PatientState
 {
-  PatientState current;
+  if (!_current_state) {
+    _current_state = std::make_unique<PatientState>();
+  }
+  
   const auto& patient = _engine->GetPatient();
-  current.alive = "True";
-  current.tacycardia = "False";
+  _current_state->alive = "True";
+  _current_state->tacycardia = "False";
 
-  current.age = (patient.HasAge()) ? QString::number(patient.GetAge(biogears::TimeUnit::yr), 'f', 0)
+  _current_state->age = (patient.HasAge()) ? QString::number(patient.GetAge(biogears::TimeUnit::yr), 'f', 0)
                                    : "N/A";
-  current.height_cm = (patient.HasHeight()) ? QString::number(patient.GetHeight(biogears::LengthUnit::cm), 'f', 0)
+  _current_state->height_cm = (patient.HasHeight()) ? QString::number(patient.GetHeight(biogears::LengthUnit::cm), 'f', 0)
                                             : "N/A";
-  current.gender = (!patient.HasGender()) ? "N/A"
+  _current_state->gender = (!patient.HasGender()) ? "N/A"
                                           : (patient.GetGender() == CDM::enumSex::Male) ? "Male"
                                                                                         : "Female";
-  current.weight_kg = (patient.HasWeight()) ? QString::number(patient.GetWeight(biogears::MassUnit::kg), 'f', 2)
+  _current_state->weight_kg = (patient.HasWeight()) ? QString::number(patient.GetWeight(biogears::MassUnit::kg), 'f', 2)
                                             : "N/A";
   if (patient.HasWeight()) {
     auto BSA = std::sqrt(patient.GetHeight(biogears::LengthUnit::cm) * patient.GetWeight(biogears::MassUnit::kg) / 3600.0);
-    current.body_surface_area_m_sq = QString::number(BSA, 'f', 2);
+    _current_state->body_surface_area_m_sq = QString::number(BSA, 'f', 2);
     auto BMI = patient.GetWeight(biogears::MassUnit::kg) / std::pow(patient.GetHeight(biogears::LengthUnit::m), 2);
-    current.body_mass_index_kg_per_m_sq = QString::number(BMI, 'f', 2);
+    _current_state->body_mass_index_kg_per_m_sq = QString::number(BMI, 'f', 2);
   } else {
-    current.body_surface_area_m_sq = "N/A";
-    current.body_mass_index_kg_per_m_sq = "N/A";
+    _current_state->body_surface_area_m_sq = "N/A";
+    _current_state->body_mass_index_kg_per_m_sq = "N/A";
   }
-  current.body_fat_pct = (patient.HasBodyFatFraction()) ? QString::number(patient.GetBodyFatFraction(), 'f', 2)
+  _current_state->body_fat_pct = (patient.HasBodyFatFraction()) ? QString::number(patient.GetBodyFatFraction(), 'f', 2)
                                                         : "N/A";
   //TODO: Lets take intensity and make a series of animated GIFs inspired off vault-boy
-  current.exercise_state = (_engine->GetActions().GetPatientActions().HasExercise()) ? "Running" : "Standing";
+  _current_state->exercise_state = (_engine->GetActions().GetPatientActions().HasExercise()) ? "Running" : "Standing";
 
-  return current;
+  return *_current_state;
 }
 //---------------------------------------------------------------------------------
 auto Scenario::get_physiology_metrics() -> PatientMetrics*
 {
+  if(!_current_metrics) {
   _current_metrics = std::make_unique<PatientMetrics>();
+  }
 
-  _current_metrics->simulationTime = _engine->GetSimulationTime().GetValue(biogears::TimeUnit::s);
-  _current_metrics->timeStep = _engine->GetTimeStep().GetValue(biogears::TimeUnit::s);
+  _current_metrics->simulationTime = _engine->GetSimulationTime(biogears::TimeUnit::s);
+  _current_metrics->timeStep = _engine->GetTimeStep(biogears::TimeUnit::s);
 
   _current_metrics->heart_rate_bpm = (_engine->GetCardiovascular().HasHeartRate())
     ? QString::number(_engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min), 'f', 2)
@@ -401,7 +496,6 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
   _current_metrics->diastolic_blood_pressure_mmHg = (_engine->GetCardiovascular().HasDiastolicArterialPressure())
     ? QString::number(_engine->GetCardiovascular().GetDiastolicArterialPressure().GetValue(biogears::PressureUnit::mmHg), 'f', 2)
     : "N/A";
-
 
   auto& bloodChemistry = _engine->GetBloodChemistry();
   _current_metrics->arterialBloodPH = (bloodChemistry.HasArterialBloodPH()) ? bloodChemistry.GetArterialBloodPH().GetValue() : 0.0;
@@ -657,21 +751,24 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
 //---------------------------------------------------------------------------------
 auto Scenario::get_physiology_conditions() -> PatientConditions
 {
-  PatientConditions current;
-  current.diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
-  return current;
+  if (!_current_conditions) {
+    _current_conditions = std::make_unique<PatientConditions>();
+  }
+  _current_conditions->diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
+  return *_current_conditions;
 }
 //---------------------------------------------------------------------------------
 QVariantMap Scenario::get_physiology_substances()
 {
   //substanceMap.getSubstanceMap().clear();
-  biogears::SETissueCompartment* lKidney = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::LeftKidney);
-  biogears::SETissueCompartment* rKidney = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::RightKidney);
-  biogears::SETissueCompartment* liver = _engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::Liver);
+  biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
+  biogears::SETissueCompartment* lKidney = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::LeftKidney);
+  biogears::SETissueCompartment* rKidney = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::RightKidney);
+  biogears::SETissueCompartment* liver = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::Liver);
 
-  biogears::SELiquidCompartment& lKidneyIntracellular = _engine->GetCompartments().GetIntracellularFluid(*lKidney);
-  biogears::SELiquidCompartment& rKidneyIntracellular = _engine->GetCompartments().GetIntracellularFluid(*rKidney);
-  biogears::SELiquidCompartment& liverIntracellular = _engine->GetCompartments().GetIntracellularFluid(*liver);
+  biogears::SELiquidCompartment& lKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*lKidney);
+  biogears::SELiquidCompartment& rKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*rKidney);
+  biogears::SELiquidCompartment& liverIntracellular = engine->GetCompartments().GetIntracellularFluid(*liver);
 
   QVariant subVariant;
   Substance* sub;
@@ -737,7 +834,7 @@ QVariantMap Scenario::get_physiology_substances()
 //---------------------------------------------------------------------------------
 double Scenario::get_simulation_time()
 {
-  return _engine->GetSimulationTime().GetValue(biogears::TimeUnit::s);
+  return _engine->GetSimulationTime(biogears::TimeUnit::s);
 }
 //---------------------------------------------------------------------------------
 void Scenario::substances_to_lists()
@@ -1021,7 +1118,7 @@ void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W 
   if (intensity > 0.0) {
     action->GetIntensity().SetValue(intensity);
   } else if (workRate_W > 0.0) {
-    action->GetDesiredWorkRate().SetValue(workRate_W);
+    action->GetDesiredWorkRate().SetValue(workRate_W, biogears::PowerUnit::W);
   } else {
     //Reach this block if both inputs are 0, meaning we turn off action)
     action->GetIntensity().SetValue(0.0);

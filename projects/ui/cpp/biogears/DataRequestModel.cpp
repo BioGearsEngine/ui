@@ -17,6 +17,7 @@ PhysiologyModel::PhysiologyModel(QString name, QObject* parent)
 //------------------------------------------------------------------------------------
 PhysiologyModel::~PhysiologyModel()
 {
+
 }
 //------------------------------------------------------------------------------------
 int PhysiologyModel::columnCount(const QModelIndex& parent) const
@@ -33,9 +34,7 @@ QVariant PhysiologyModel::data(const QModelIndex& index, int role) const
     return QVariant();
   }
 
-  if (role != Qt::DisplayRole) {
-    return QVariant();
-  }
+
 
   PhysiologyRequest* item = static_cast<PhysiologyRequest*>(index.internalPointer());
   switch (role) {
@@ -47,6 +46,8 @@ QVariant PhysiologyModel::data(const QModelIndex& index, int role) const
     return static_cast<PhysiologyRequest*>(index.internalPointer())->data(Columns::UNIT);
   case FullNameRole:
     return static_cast<PhysiologyRequest*>(index.internalPointer())->data(Columns::FULLNAME);
+  default:
+    return QVariant();
   }
   return item->data(index.column());
 }

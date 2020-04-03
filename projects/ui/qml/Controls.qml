@@ -66,6 +66,10 @@ ControlsForm {
       root.patientConditionsChanged(conditions)
     }
 
+    onPhysiologyChanged: {
+
+      console.log(" Some Data " + physiology.data(physiology.index(1,0,physiology.index(0,0)), 259))
+    }
     onSubstanceDataChanged : {
       root.substanceDataChanged(time, subData);
     }
