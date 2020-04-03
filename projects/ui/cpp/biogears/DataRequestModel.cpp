@@ -1,43 +1,57 @@
 #include "DataRequestModel.h"
 
 namespace bio {
-/// DataRequestModel Model
 
-DataRequestModel::DataRequestModel(std::unique_ptr<DataRequest>&& model, QObject* parent)
+PhysiologyModel& PhysiologyModel::add_category(QString name)
+{
+  auto  category = std::make_unique<PhysiologyRequest>( QString(""), name );
+  _root.appendChild(category.release());
+  return *this;
+}
+/// PhysiologyModel Model
+PhysiologyModel::PhysiologyModel(QString name, QObject* parent)
   : QAbstractItemModel(parent)
-  , _root(model.release())
+  , _root("", name)
 {
 }
-
-DataRequestModel::~DataRequestModel()
+//------------------------------------------------------------------------------------
+PhysiologyModel::~PhysiologyModel()
 {
-  delete _root;
 }
-
-int DataRequestModel::columnCount(const QModelIndex& parent) const
+//------------------------------------------------------------------------------------
+int PhysiologyModel::columnCount(const QModelIndex& parent) const
 {
   if (parent.isValid()) {
-    return static_cast<DataRequest*>(parent.internalPointer())->columnCount();
+    return static_cast<PhysiologyRequest*>(parent.internalPointer())->columnCount();
   }
-  return _root->columnCount();
+  return _root.columnCount();
 }
-
-QVariant DataRequestModel::data(const QModelIndex& index, int role) const
+//------------------------------------------------------------------------------------
+QVariant PhysiologyModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid()) {
     return QVariant();
   }
 
   if (role != Qt::DisplayRole) {
-  return QVariant();
+    return QVariant();
   }
 
-  DataRequest* item = static_cast<DataRequest*>(index.internalPointer());
-
+  PhysiologyRequest* item = static_cast<PhysiologyRequest*>(index.internalPointer());
+  switch (role) {
+  case RequestRole:
+    return static_cast<PhysiologyRequest*>(index.internalPointer())->data(Columns::NAME);
+  case ValueRole:
+    return static_cast<PhysiologyRequest*>(index.internalPointer())->data(Columns::VALUE);
+  case UnitRole:
+    return static_cast<PhysiologyRequest*>(index.internalPointer())->data(Columns::UNIT);
+  case FullNameRole:
+    return static_cast<PhysiologyRequest*>(index.internalPointer())->data(Columns::FULLNAME);
+  }
   return item->data(index.column());
 }
-
-Qt::ItemFlags DataRequestModel::flags(const QModelIndex& index) const
+//------------------------------------------------------------------------------------
+Qt::ItemFlags PhysiologyModel::flags(const QModelIndex& index) const
 {
   if (!index.isValid()) {
     return Qt::NoItemFlags;
@@ -45,67 +59,67 @@ Qt::ItemFlags DataRequestModel::flags(const QModelIndex& index) const
 
   return QAbstractItemModel::flags(index);
 }
-
-QVariant DataRequestModel::headerData(int section, Qt::Orientation orientation, int role) const
+//------------------------------------------------------------------------------------
+QVariant PhysiologyModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-    return _root->data(section);
+    return _root.data(section);
   }
 
   return QVariant();
 }
-
-QModelIndex DataRequestModel::index(int row, int column, const QModelIndex& parent) const
+//------------------------------------------------------------------------------------
+QModelIndex PhysiologyModel::index(int row, int column, const QModelIndex& parent) const
 {
-  if (!hasIndex(row, column, parent))
+  if (!hasIndex(row, column, parent)) {
     return QModelIndex();
-
-  DataRequest* parentItem;
-
-  if (!parent.isValid()) {
-    parentItem = _root;
-  } else {
-    parentItem = static_cast<DataRequest*>(parent.internalPointer());
   }
 
-  DataRequest* childItem = parentItem->child(row);
+  PhysiologyRequest const* parentItem;
+
+  if (!parent.isValid()) {
+    parentItem = &_root;
+  } else {
+    parentItem = static_cast<PhysiologyRequest*>(parent.internalPointer());
+  }
+
+  PhysiologyRequest* childItem = const_cast<PhysiologyRequest*>(parentItem->child(row));
   if (childItem) {
     return createIndex(row, column, childItem);
   }
   return QModelIndex();
 }
-
-QModelIndex DataRequestModel::parent(const QModelIndex& index) const
+//------------------------------------------------------------------------------------
+QModelIndex PhysiologyModel::parent(const QModelIndex& index) const
 {
   if (!index.isValid()) {
     return QModelIndex();
   }
 
-  DataRequest* childItem = static_cast<DataRequest*>(index.internalPointer());
-  DataRequest* parentItem = childItem->parentItem();
+  PhysiologyRequest* childItem = static_cast<PhysiologyRequest*>(index.internalPointer());
+  PhysiologyRequest* parentItem = childItem->parentItem();
 
-  if (parentItem == _root) {
+  if (parentItem == &_root) {
     return QModelIndex();
   }
 
   return createIndex(parentItem->row(), 0, parentItem);
 }
-
-int DataRequestModel::rowCount(const QModelIndex& parent) const
+//------------------------------------------------------------------------------------
+int PhysiologyModel::rowCount(const QModelIndex& parent) const
 {
-  DataRequest* parentItem;
+  PhysiologyRequest const * parentItem;
   if (parent.column() > 0) {
     return 0;
   }
 
   if (!parent.isValid()) {
-    parentItem = _root;
+    parentItem = &_root;
   } else {
-    parentItem = static_cast<DataRequest*>(parent.internalPointer());
+    parentItem = static_cast<PhysiologyRequest*>(parent.internalPointer());
   }
 
   return parentItem->childCount();
 }
-
 
 }

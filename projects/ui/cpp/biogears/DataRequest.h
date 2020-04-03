@@ -8,25 +8,51 @@
 #include <biogears/cdm/properties/SEUnitScalar.h>
 
 namespace bio {
-class DataRequest {
+
+enum Columns {
+  PREFIX,
+  NAME,
+  VALUE,
+  UNIT,
+  FULLNAME,
+  COLUMN_COUNT
+};
+
+class PhysiologyRequest {
 public:
-  explicit DataRequest(QString prefix, QString name, DataRequest* parent = nullptr);
-  explicit DataRequest(QString prefix, QString name, const biogears::SEScalar* data, DataRequest* parent = nullptr);
-  explicit DataRequest(QString prefix, QString name, const biogears::SEUnitScalar* data, DataRequest* parent = nullptr);
-  ~DataRequest();
+  explicit PhysiologyRequest(QString prefix, QString name, PhysiologyRequest* parent = nullptr);
+  explicit PhysiologyRequest(QString prefix, QString name, const biogears::SEScalar* data, PhysiologyRequest* parent = nullptr);
+  explicit PhysiologyRequest(QString prefix, QString name, const biogears::SEUnitScalar* data, PhysiologyRequest* parent = nullptr);
+  ~PhysiologyRequest();
 
-  void appendChild(DataRequest* child);
+  bool operator==(const PhysiologyRequest& rhs)
+  {
+    return _name == rhs._name
+      && _prefix == rhs._prefix;
+  }
+  bool operator!=(const PhysiologyRequest& rhs)
+  {
+    return !(*this == rhs);
+  }
+  void appendChild(PhysiologyRequest* child);
+  void appendChild(std::unique_ptr<PhysiologyRequest>&& child);
 
-  DataRequest* child(int row);
+  PhysiologyRequest* child(int row);
+  PhysiologyRequest const * child(int row) const;
   int childCount() const;
   int columnCount() const;
+
   QVariant data(int column) const;
+
   int row() const;
-  DataRequest* parentItem();
+  PhysiologyRequest* parentItem();
 
 private:
-  DataRequest* _parent;
-  QVector<DataRequest*> _children;
+  PhysiologyRequest* _parent;
+
+  QVector<PhysiologyRequest*> _children;
+  QVector<QVariant> _columns;
+
   QString _prefix;
   QString _name;
   biogears::SEScalar const *    _value;

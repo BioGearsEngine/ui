@@ -7,7 +7,9 @@ struct PatientMetrics : QObject {
     : QObject(parent)
   {
   }
-
+  ~PatientMetrics() override {
+    std::cout << "simulationTime : " << simulationTime << "\n;";
+  };
   QString respiratory_rate_bpm;
   QString heart_rate_bpm;
   QString core_temperature_c;
@@ -738,5 +740,5 @@ private:
   Q_PROPERTY(double liverGlycogen MEMBER liverGlycogen)
   Q_PROPERTY(double muscleGlycogen MEMBER muscleGlycogen)
   Q_PROPERTY(double storedProtein MEMBER storedProtein)
-  Q_PROPERTY(double storedFat MEMBER storedFat)
+  Q_PROPERTY(double storedFat MEMBER storedFat) 
 };

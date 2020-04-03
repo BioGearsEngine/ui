@@ -11,19 +11,22 @@
 
 namespace bio {
 
-class DataRequestModel : public QAbstractItemModel {
+class PhysiologyModel : public QAbstractItemModel {
   Q_OBJECT
 
 public:
-  explicit DataRequestModel(std::unique_ptr<DataRequest>&& model, QObject* parent = nullptr);
-  ~DataRequestModel();
+  explicit PhysiologyModel(QString name = "Unknown Patient", QObject* parent = nullptr);
+  ~PhysiologyModel();
 
-  enum  DataRequestRoles {
+  enum  PhysiologyRequestRoles {
     PrefixRole = Qt::UserRole + 1,
     RequestRole,
     ValueRole,
-    UnitRole
+    UnitRole,
+    FullNameRole
   };
+
+  PhysiologyModel& add_category(QString name);
 
   QVariant data(const QModelIndex& index, int role) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -40,12 +43,13 @@ public:
     roles[RequestRole] = "request";
     roles[ValueRole] = "value";
     roles[UnitRole] = "unit";
+    roles[FullNameRole] = "fullname";
     return roles;
   }
 
 
 private:
   
-  DataRequest* _root;
+  PhysiologyRequest _root;
 };
 }
