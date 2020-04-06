@@ -67,9 +67,9 @@ if(WIN32)
   target_compile_options(${PROJECT_NAME} PRIVATE $<$<PLATFORM_ID:Windows>:/bigobj>  PRIVATE $<$<PLATFORM_ID:Windows>:/MP>)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
 endif()
-if(NOT Boost_USE_STATIC_LIBS)
-   target_compile_definitions(${PROJECT_NAME} PUBLIC "BOOST_PROGRAM_OPTIONS_DYN_LINK=1")
-endif()
+#if(NOT Boost_USE_STATIC_LIBS)
+#   target_compile_definitions(${PROJECT_NAME} PUBLIC "BOOST_PROGRAM_OPTIONS_DYN_LINK=1")
+#endif()
 
 ###############################################################################
 # COMPILATION & LINKAGE MODIFICATIONS
@@ -87,9 +87,9 @@ target_include_directories(${PROJECT_NAME}
 set(${PREFIX}_LIBS
     Threads::Threads
 
-    Boost::disable_autolinking
-    Boost::filesystem
-    Boost::program_options
+#    Boost::disable_autolinking
+#    Boost::filesystem
+#    Boost::program_options
 
     Qt5::Core
     Qt5::Widgets
