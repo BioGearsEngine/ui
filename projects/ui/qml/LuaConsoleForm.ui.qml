@@ -9,27 +9,26 @@ import QtQml.Models 2.2
 Rectangle {
   property alias view : consoleView
   property alias content : consoleArea
-  property alias hScrollBar: consoleView.hScrollBar
-  property alias vScrollBar: consoleView.vScrollBar
-  
+
   id: root
   Layout.margins: 0
     ScrollView {
     id: consoleView
-    property ScrollBar hScrollBar: ScrollBar.horizontal
-    property ScrollBar vScrollBar: ScrollBar.vertical
 
     anchors.left : root.left
     anchors.right : root.right
     anchors.top : root.top
     height: root.height * .70
+    
+    // contentWidth : consoleArea.contentWidth
 
     TextArea {  
       id: consoleArea
-      enabled : false
       height: root.height * .70
+      width : root.width
+      readOnly : true
       textFormat : TextEdit.RichText
-      text :"--> Results Here\n"
+      placeholderText :"--> Results Here\n"
     }
   }
 

@@ -1,5 +1,6 @@
 
 import QtQuick 2.4
+import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtCharts 2.3
 import QtQml.Models 2.2
@@ -15,10 +16,16 @@ LuaConsoleForm{
     feeds.messageReceived.connect(messageHandler)
   }
 
-  function messageHandler(message){
-    content.text += message
+  Component.onCompleted : {
     scrollTo(Qt.Vertical,1.0)
-    // flickableItem.contentX = flickableItem.contentWidth / 2 - width / 2
+  }
+
+  onHeightChanged : {
+    scrollTo(Qt.Vertical,1.0)
+  }
+  function messageHandler(message){
+    content.text += message + "\n"
+    scrollTo(Qt.Vertical,1.0)
   }
 
   /**
@@ -27,15 +34,8 @@ LuaConsoleForm{
   */
   function scrollTo(type, ratio) {
       var scrollFunc = function (bar, ratio) {
-          bar.setPosition(ratio - bar.size)
+          bar.position = ratio - bar.size
       }
-      switch(type) {
-      case Qt.Horizontal:
-          scrollFunc(root.hScrollBar, ratio)
-          break;
-      case Qt.Vertical:
-          scrollFunc(root.vScrollBar, ratio)
-          break;
-      }
+      scrollFunc(view.ScrollBar.vertical, ratio)
   }
 }
