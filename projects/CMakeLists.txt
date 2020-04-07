@@ -36,10 +36,10 @@ setup_unified_output_directory()
 add_subdirectory(ui)
 
 find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+option(BUILD_Biogears "Build Biogears using provided submodule" ON)
 # Update submodules as needed
-    option(BUILD_Biogears "Build Biogears using provided submodule" ON)
-    if(BUILD_Biogears AND NOT Biogears_SUBMODULE_PULLED )
+if(BUILD_Biogears)
+    if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git" AND NOT Biogears_SUBMODULE_PULLED )
         message(STATUS "Updating Biogears Submodule")
         execute_process(
                         COMMAND ${CMAKE_COMMAND} -E echo ${GIT_EXECUTABLE} submodule init extern/biogears
@@ -53,15 +53,15 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
                        )
         if(NOT GIT_SUBMOD_RESULT EQUAL "0")
             message(FATAL_ERROR "Git operation failed with ${GIT_ERROR}, please checkout submodules")
-       else ()
+        else ()
             set (Biogears_SUBMODULE_PULLED "The Cmake Build Machine has Initialized the Build System" CACHE BOOL ON)
         endif()
     endif()
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/biogears/CMakeLists.txt")
+        message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+    endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/biogears/CMakeLists.txt")
-    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
-endif()
 
 
 set(Biogears_BUILD_CIRCUIT_PROFILER CACHE BOOL OFF)
@@ -73,7 +73,7 @@ set(Biogears_BUILD_TEST           CACHE BOOL OFF)
 set(Biogears_BUILD_TEST_DRIVER    CACHE BOOL OFF)
 set(Biogears_BUILD_SCENARIO_DRIVER CACHE BOOL OFF)
 set(Biogears_RUNTIME_DIR ${PROJECT_BINARY_DIR}/runtime)
-if(BUILD_Biogears AND GIT_FOUND)
+if(BUILD_Biogears AND EXISTS "${PROJECT_SOURCE_DIR}/extern/biogears/CMakeLists.txt")
 	add_subdirectory(${PROJECT_SOURCE_DIR}/extern/biogears libbiogears)
 else()
   find_package(Biogears QUIET)
@@ -82,5 +82,3 @@ else()
                          Eitehr turn on BUILD_Biogears or provide it using CMAKE_PREFIX_PATH")
   endif()
 endif()
-
-
