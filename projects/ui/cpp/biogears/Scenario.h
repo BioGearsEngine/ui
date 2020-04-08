@@ -122,24 +122,28 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
 
 signals:
-  void patientStateChanged(PatientState patientState);
-  void patientMetricsChanged(PatientMetrics* metrics);
-  void physiologyChanged(PhysiologyModel* physiology);
   void substanceDataChanged(double time, QVariantMap subData);
   void activeSubstanceAdded(Substance* sub);
-  void patientConditionsChanged(PatientConditions conditions);
-  void timeAdvance();
-  void stateChanged();
+  void timeAdvance(double SimulationTime_s);
+  void physiologyChanged(PhysiologyModel* model);
+  void stateLoad();
   void runningToggled(bool isRunning);
   void pausedToggled(bool isPaused);
   void throttledToggled(bool isThrottled);
   void loggerChanged();
+  //void stateChanged();
+  //void patientStateChanged(PatientState patientState);
+  //void patientMetricsChanged(PatientMetrics* metrics);
+  //void physiologyChanged(PhysiologyModel* physiology);
+  //void patientConditionsChanged(PatientConditions conditions);
 
 protected:
   PatientState get_physiology_state();
   PatientMetrics* get_physiology_metrics();
   PatientConditions get_physiology_conditions();
   QVariantMap get_physiology_substances();
+
+  void initialize_physiology_model();
 
 protected:
   void physiology_thread_main();

@@ -44,21 +44,28 @@ GridLayout {
       Layout.fillHeight: false
       Layout.rowSpan : 2
 
-      onPatientMetricsChanged : {
-        graphArea.metricUpdates(metrics)
-      }
-      onPatientConditionsChanged : {
-        graphArea.conditionUpdates(conditions)
-      }
-      onPatientStateChanged : {
-        graphArea.stateUpdates(state)
-      }
+        // onPatientMetricsChanged : {
+        //   graphArea.metricUpdates(metrics)
+        // }
+        // onPatientConditionsChanged : {
+        //   graphArea.conditionUpdates(conditions)
+        // }
+        // onPatientStateChanged : {
+        //   graphArea.stateUpdates(state)
+        // }
       onSubstanceDataChanged : {
         graphArea.substanceDataUpdates(time, subData)
       }
       onActiveSubstanceAdded : {
         graphArea.newActiveSubstance(sub)
       }
+        onPatientPhysiologyChanged : {
+          console.log ("physiology changed %1".arg(model))
+          graphArea.newPhysiologyModel(model)
+        }
+        onSimulationTimeAdvance : {
+          graphArea.plot(time)
+        }
     }
 
     GraphArea {

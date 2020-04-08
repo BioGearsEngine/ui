@@ -17,20 +17,28 @@ GraphAreaForm {
   signal pause(bool paused)
   signal speedToggled(int speed)
 
-  signal tenHzPlotRefresh(PatientMetrics metrics)
-  signal oneHzPlotRefresh(PatientMetrics metrics)
+  // signal tenHzPlotRefresh(PatientMetrics metrics)
+  // signal oneHzPlotRefresh(PatientMetrics metrics)
 
-  signal metricUpdates(PatientMetrics metrics)
+  signal tenHzPlotRefresh()
+  signal oneHzPlotRefresh()
+
+  // signal metricUpdates(PatientMetrics metrics)
+
   signal substanceDataUpdates(real time, var subData)
   signal stateUpdates(PatientState state)
   signal conditionUpdates(PatientConditions conditions)
   signal newActiveSubstance(Substance sub)
 
+  signal newPhysiologyModel(PhysiologyModel model)
+  signal timeAdvance(double time)
+
   property double count_1 : 0.0
   property double count_2 : 0.0
   property int tickCount : -1
 
-  property PatientMetrics plotMetrics
+  // property PatientMetrics plotMetrics
+
   property ObjectModel vitalsModel : vitalsObjectModel
   property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
   property ObjectModel bloodChemistryModel : bloodChemistryObjectModel
@@ -40,6 +48,15 @@ GraphAreaForm {
   property ListModel substanceMenuListModel : substanceMenuListModel
   property ObjectModel customModel : customObjectModel
 
+  property double currentTime
+
+  onNewPhysiologyModel : {
+    physiologyRequestModel = model;
+  }
+
+					onTimeAdvance : {
+    currentTime = time
+  }
   onStart : {
     oneHzPlotTimer.start()
     tenHzPlotTimer.start()
@@ -82,15 +99,15 @@ GraphAreaForm {
     ++tickCount;
   }
 
-  onMetricUpdates: {
-    plotMetrics = metrics
-  }
+  // onMetricUpdates: {
+  //   plotMetrics = metrics
+  // }
 
-  onStateUpdates: {
-  }
+  // onStateUpdates: {
+  // }
 
-  onConditionUpdates: {
-  }
+  // onConditionUpdates: {
+  // }
 
 
   onNewActiveSubstance : {

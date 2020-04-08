@@ -5,12 +5,13 @@ import QtQuick.Layouts 1.3
 import QtCharts 2.3
 import QtQml.Models 2.2
 
+import com.biogearsengine.ui.scenario 1.0
 Page {
   //id: root
   z : 0 //Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
 
-  property alias physiologyRequestModel : physiologyRequestModel
-
+  // property alias physiologyRequestModel : physiologyRequestModel
+  property PhysiologyModel physiologyRequestModel
 	property alias vitalsGridView : vitalsGridView
 	property alias cardiopulmonaryGridView : cardiopulmonaryGridView
 	property alias bloodChemistryGridView : bloodChemistryGridView
@@ -435,128 +436,8 @@ Page {
         }
 	    }
     }
-  /*  Item {
-	    id: hepaticSeries
-	    Layout.fillWidth: true
-	    Layout.fillHeight: true
-	    Rectangle {
-		    id: hepaticBackground
-		    anchors.fill: parent
-		    color: "#7CB342"
-	    }
-	    GridView {
-		    id: hepaticGridView
-		    anchors.fill: parent
-		    clip: true
-		    cellWidth: plots.width / 2
-		    cellHeight: plots.height / 2
-		    model: hepaticModel
-		    ScrollBar.vertical: ScrollBar {
-          parent: hepaticGridView.parent
-          anchors.top: hepaticGridView.top
-          anchors.right: hepaticGridView.right
-          anchors.bottom: hepaticGridView.bottom
-        }
-	    }
-    }
-    Item {
-	    id: nervousSeries
-	    Layout.fillWidth: true
-	    Layout.fillHeight: true
-	    Rectangle {
-		    id: nervousBackground
-		    anchors.fill: parent
-		    color: "#7CB342"
-	    }
-	    GridView {
-		    id: nervousGridView
-		    anchors.fill: parent
-		    clip: true
-		    cellWidth: plots.width / 2
-		    cellHeight: plots.height / 2
-		    model: nervousModel
-		    ScrollBar.vertical: ScrollBar {
-          parent: nervousGridView.parent
-          anchors.top: nervousGridView.top
-          anchors.right: nervousGridView.right
-          anchors.bottom: nervousGridView.bottom
-        }
-	    }
-    }
-    Item {
-	    id: renalSeries
-	    Layout.fillWidth: true
-	    Layout.fillHeight: true
-	    Rectangle {
-		    id: renalBackground
-		    anchors.fill: parent
-		    color: "#7CB342"
-	    }
-	    GridView {
-		    id: renalGridView
-		    anchors.fill: parent
-		    clip: true
-		    cellWidth: plots.width / 2
-		    cellHeight: plots.height / 2
-		    model: renalModel
-		    ScrollBar.vertical: ScrollBar {
-          parent: renalGridView.parent
-          anchors.top: renalGridView.top
-          anchors.right: renalGridView.right
-          anchors.bottom: renalGridView.bottom
-        }
-	    }
-    }
-    Item {
-	    id: respiratorySeries
-	    Layout.fillWidth: true
-	    Layout.fillHeight: true
-	    Rectangle {
-		    id: respiratoryBackground
-		    anchors.fill: parent
-		    color: "#7CB342"
-	    }
-	    GridView {
-		    id: respiratoryGridView
-		    anchors.fill: parent
-		    clip: true
-		    cellWidth: plots.width / 2
-		    cellHeight: plots.height / 2
-		    model: respiratoryModel
-		    ScrollBar.vertical: ScrollBar {
-          parent: respiratoryGridView.parent
-          anchors.top: respiratoryGridView.top
-          anchors.right: respiratoryGridView.right
-          anchors.bottom: respiratoryGridView.bottom
-        }
-	    }
-    }
-    Item {
-	    id: tissueSeries
-	    Layout.fillWidth: true
-	    Layout.fillHeight: true
-	    Rectangle {
-		    id: tissueBackground
-		    anchors.fill: parent
-		    color: "#7CB342"
-	    }
-	    GridView {
-		    id: tissueGridView
-		    anchors.fill: parent
-		    clip: true
-		    cellWidth: plots.width / 2
-		    cellHeight: plots.height / 2
-		    model: tissueModel
-		    ScrollBar.vertical: ScrollBar {
-          parent: tissueGridView.parent
-          anchors.top: tissueGridView.top
-          anchors.right: tissueGridView.right
-          anchors.bottom: tissueGridView.bottom
-        }
-	    }
-    }
- */   
   }
+
   PageIndicator {
     id: indicator
 
@@ -568,99 +449,99 @@ Page {
   }
 
 
-ListModel {
-  id: physiologyRequestModel
-  ListElement {
-    system : "Vitals"
-	  activeRequests: [ ]
-    requests:  [
-      ListElement {request:"bloodPressure"; active: false;
-                    subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
-      ,ListElement {request:"respirationRate"; active: false}
-      ,ListElement {request:"heartRate"; active: false}
-      ,ListElement {request:"oxygenSaturation"; active: false}
-      ,ListElement {request:"cardiacOutput"; active: false}
-      ,ListElement {request:"bloodVolume"; active: false}
-      ,ListElement {request:"heartStrokeVolume"; active: false}
-      ,ListElement {request:"tidalVolume"; active: true}
-      ,ListElement {request:"centralVenousPressure"; active: false}
-    ]
-  }
-  ListElement {
-    system : "Cardiopulmonary"
-	  activeRequests: []
-    requests:  [
-      ListElement {request:"cerebralPerfusionPressure"; active: false}
-      ,ListElement {request:"intracranialPressure"; active: false}
-      ,ListElement {request:"systemicVascularResistance"; active: false}
-      ,ListElement {request:"pulsePressure"; active: false}
-      ,ListElement {request:"inspiratoryExpiratoryRatio"; active: false}
-      ,ListElement {request:"cerebralBloodFlow"; active: false}
-      ,ListElement {request:"totalPulmonaryVentilation"; active: false}
-      ,ListElement {request:"totalLungVolume"; active: false}
-      ,ListElement {request:"totalAlveolarVentilation"; active: false}
-      ,ListElement {request:"deadSpaceVentilation"; active: false}
-      ,ListElement {request:"transpulmonaryPressure"; active: false}
-      ,ListElement {request:"meanArterialPressure"; active: false}
-    ]
-  }
-  ListElement {
-    system : "BloodChemistry"
-	  activeRequests: []
-    requests:  [
-      ListElement {request:"bloodGasLevels"; active: false;
-        subRequests: [ListElement {subRequest: "arterialOxygenPressure"}, ListElement{subRequest:"arterialCarbonDioxidePressure"}]}
-      ,ListElement {request:"arterialBloodPH"; active: false}
-      ,ListElement {request:"hematocrit"; active: false}
-    ]
-  }
-  ListElement {
-    system : "EnergyMetabolism"
-	  activeRequests: []
-    requests:  [
-      ListElement {request:"coreTemperature"; active: false}
-      ,ListElement {request:"skinTemperature"; active: false}
-      ,ListElement {request:"totalMetabolicRate"; active: false}
-      ,ListElement {request:"sweatRate"; active: false}
-      ,ListElement {request:"carbonDioxideProductionRate"; active: false}
-      ,ListElement {request:"oxygenConsumptionRate"; active: false}
-      ,ListElement {request:"stomachContents"; active: false;
-        subRequests: [ListElement {subRequest: "stomachContents_carbohydrates"}, ListElement{subRequest: "stomachContents_fat"}, ListElement{subRequest:"stomachContents_protein"}, ListElement{subRequest:"stomachContents_water"}]}
-    ]
-  }
+// ListModel {
+//   id: physiologyRequestModel
+//   ListElement {
+//     system : "Vitals"
+// 	  activeRequests: [ ]
+//     requests:  [
+//       ListElement {request:"bloodPressure"; active: false;
+//                     subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
+//       ,ListElement {request:"respirationRate"; active: false}
+//       ,ListElement {request:"heartRate"; active: false}
+//       ,ListElement {request:"oxygenSaturation"; active: false}
+//       ,ListElement {request:"cardiacOutput"; active: false}
+//       ,ListElement {request:"bloodVolume"; active: false}
+//       ,ListElement {request:"heartStrokeVolume"; active: false}
+//       ,ListElement {request:"tidalVolume"; active: true}
+//       ,ListElement {request:"centralVenousPressure"; active: false}
+//     ]
+//   }
+//   ListElement {
+//     system : "Cardiopulmonary"
+// 	  activeRequests: []
+//     requests:  [
+//       ListElement {request:"cerebralPerfusionPressure"; active: false}
+//       ,ListElement {request:"intracranialPressure"; active: false}
+//       ,ListElement {request:"systemicVascularResistance"; active: false}
+//       ,ListElement {request:"pulsePressure"; active: false}
+//       ,ListElement {request:"inspiratoryExpiratoryRatio"; active: false}
+//       ,ListElement {request:"cerebralBloodFlow"; active: false}
+//       ,ListElement {request:"totalPulmonaryVentilation"; active: false}
+//       ,ListElement {request:"totalLungVolume"; active: false}
+//       ,ListElement {request:"totalAlveolarVentilation"; active: false}
+//       ,ListElement {request:"deadSpaceVentilation"; active: false}
+//       ,ListElement {request:"transpulmonaryPressure"; active: false}
+//       ,ListElement {request:"meanArterialPressure"; active: false}
+//     ]
+//   }
+//   ListElement {
+//     system : "BloodChemistry"
+// 	  activeRequests: []
+//     requests:  [
+//       ListElement {request:"bloodGasLevels"; active: false;
+//         subRequests: [ListElement {subRequest: "arterialOxygenPressure"}, ListElement{subRequest:"arterialCarbonDioxidePressure"}]}
+//       ,ListElement {request:"arterialBloodPH"; active: false}
+//       ,ListElement {request:"hematocrit"; active: false}
+//     ]
+//   }
+//   ListElement {
+//     system : "EnergyMetabolism"
+// 	  activeRequests: []
+//     requests:  [
+//       ListElement {request:"coreTemperature"; active: false}
+//       ,ListElement {request:"skinTemperature"; active: false}
+//       ,ListElement {request:"totalMetabolicRate"; active: false}
+//       ,ListElement {request:"sweatRate"; active: false}
+//       ,ListElement {request:"carbonDioxideProductionRate"; active: false}
+//       ,ListElement {request:"oxygenConsumptionRate"; active: false}
+//       ,ListElement {request:"stomachContents"; active: false;
+//         subRequests: [ListElement {subRequest: "stomachContents_carbohydrates"}, ListElement{subRequest: "stomachContents_fat"}, ListElement{subRequest:"stomachContents_protein"}, ListElement{subRequest:"stomachContents_water"}]}
+//     ]
+//   }
 
 
-  ListElement {
-    system : "RenalFluidBalance"
-    activeRequests: []
-    requests:  [
-      ListElement {request:"renalBloodFlow"; active: false}
-      ,ListElement {request:"glomerularFiltrationRate"; active: false}
-      ,ListElement {request:"urineOutput"; active: false; 
-        subRequests : [ListElement {subRequest : "urineProductionRate"}, ListElement {subRequest : "meanUrineOutput"}]}
-      ,ListElement{request:"urineVolume"; active: false}
-      ,ListElement{request:"extracellularFluidVolume"; active: false}
-      ,ListElement{request:"extravascularFluidVolume"; active: false}
-      ,ListElement{request:"intracellularFluidVolume"; active: false}
-      ,ListElement{request:"totalBodyFluidVolume"; active: false}
+//   ListElement {
+//     system : "RenalFluidBalance"
+//     activeRequests: []
+//     requests:  [
+//       ListElement {request:"renalBloodFlow"; active: false}
+//       ,ListElement {request:"glomerularFiltrationRate"; active: false}
+//       ,ListElement {request:"urineOutput"; active: false; 
+//         subRequests : [ListElement {subRequest : "urineProductionRate"}, ListElement {subRequest : "meanUrineOutput"}]}
+//       ,ListElement{request:"urineVolume"; active: false}
+//       ,ListElement{request:"extracellularFluidVolume"; active: false}
+//       ,ListElement{request:"extravascularFluidVolume"; active: false}
+//       ,ListElement{request:"intracellularFluidVolume"; active: false}
+//       ,ListElement{request:"totalBodyFluidVolume"; active: false}
       
-    ]
-  }
+//     ]
+//   }
 
-  ListElement {
-    system : "Substances"
-    activeRequests : []
-    requests : []    //Requests are managed by substanceMenuListModel--going to try to merge all these lists soon
-  }
+//   ListElement {
+//     system : "Substances"
+//     activeRequests : []
+//     requests : []    //Requests are managed by substanceMenuListModel--going to try to merge all these lists soon
+//   }
 
-  ListElement {
-    system : "CustomViews"
-    activeRequests : []
-    requests : [
-      ListElement {request: "respiratoryPVCycle"; active :false} 
-    ]
-  }
-}
+//   ListElement {
+//     system : "CustomViews"
+//     activeRequests : []
+//     requests : [
+//       ListElement {request: "respiratoryPVCycle"; active :false} 
+//     ]
+//   }
+// }
 
 Timer {
   id : tenHzPlotTimer

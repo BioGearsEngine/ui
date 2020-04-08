@@ -51,6 +51,9 @@ Scenario::Scenario(QString name, QObject* parent)
   biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
   engine->GetPatient().SetName(name.toStdString());
 
+}
+void Scenario::initialize_physiology_model()
+{
   _physiology_model = std::make_unique<PhysiologyModel>(QString(_engine->GetPatient().GetName_cStr()), this).release();
   _physiology_model->add_category("Vitals").add_category("Cardiopulmonary").add_category("Blood Chemistry");
   _physiology_model->add_category("Renal").add_category("Energy and Metabolism").add_category("Fluid Balance");
@@ -147,6 +150,7 @@ Scenario::Scenario(QString name, QObject* parent)
       panels->appendChild(std::make_unique<PhysiologyRequest>(QString("Panels"), QString("Pulmonary Function Test"), cardiopulmonary));
     }
   }
+  emit physiologyChanged(_physiology_model);
 }
 //-------------------------------------------------------------------------------
 Scenario::~Scenario()
@@ -286,6 +290,9 @@ Scenario& Scenario::load_patient(QString file)
   _logger.SetForward(_consoleLog);
 
   if (_engine->LoadState(path)) {
+    if(!_physiology_model) {
+      initialize_physiology_model();
+    }
     auto vitals = static_cast<PhysiologyRequest*>(_physiology_model->index(Categories::VITALS, 0, QModelIndex()).internalPointer());
       {
       vitals->child(0)->unit_scalar(&_engine->GetCardiovascular().GetSystolicArterialPressure());
@@ -378,10 +385,12 @@ Scenario& Scenario::load_patient(QString file)
       panels->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       }
 
-    emit patientStateChanged(get_physiology_state());
-    emit patientMetricsChanged(get_physiology_metrics());
-    emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
-    emit stateChanged();
+    //emit patientStateChanged(get_physiology_state());
+    //emit patientMetricsChanged(get_physiology_metrics());
+    //emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
+    //emit stateChanged();
+
+    emit stateLoad();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
   }
@@ -417,16 +426,16 @@ inline void Scenario::physiology_thread_step()
     _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
     if (_action_queue.size()) {
-      dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->ProcessAction(*_action_queue.consume());
+      _engine->ProcessAction(*_action_queue.consume());
     }
-    dynamic_cast<biogears::BioGearsEngine*>(_engine.get())->AdvanceModelTime(0.1, biogears::TimeUnit::s);
+    _engine->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
 
-    emit patientStateChanged(get_physiology_state());
-    emit patientMetricsChanged(get_physiology_metrics());
-    emit patientConditionsChanged(get_physiology_conditions());
-    emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
-    emit physiologyChanged(_physiology_model);
+    //emit patientStateChanged(get_physiology_state());
+    //emit patientMetricsChanged(get_physiology_metrics());
+    //emit patientConditionsChanged(get_physiology_conditions());
+    //emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
+    emit timeAdvance(_engine->GetSimulationTime(biogears::TimeUnit::s));
 
   } else {
     std::this_thread::sleep_for(16ms);
@@ -1118,7 +1127,7 @@ void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W 
   if (intensity > 0.0) {
     action->GetIntensity().SetValue(intensity);
   } else if (workRate_W > 0.0) {
-    action->GetDesiredWorkRate().SetValue(workRate_W, biogears::PowerUnit::W);
+    action->GetDesiredWorkRate().SetValue(workRate_W);
   } else {
     //Reach this block if both inputs are 0, meaning we turn off action)
     action->GetIntensity().SetValue(0.0);
