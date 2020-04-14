@@ -17,8 +17,7 @@
 #include <biogears/threading/runnable.h>
 #include <biogears/threading/steppable.h>
 
-#include "DataRequest.h"
-#include "DataRequestModel.h"
+#include "BioGearsData.h"
 #include "Logger.h"
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
@@ -34,17 +33,6 @@ class SESubstanceCompound;
 
 namespace bio {
 
-enum Categories {
-  VITALS,
-  CARDIOPULMONARY,
-  BLOOD_CHEMISTRY,
-  RENAL,
-  ENERGY_AND_METABOLISM,
-  FLUID_BALANCE,
-  DRUGS,
-  SUBSTANCES,
-  PANELS
-};
 
 class Scenario : public QObject, public biogears::Runnable {
 
@@ -125,7 +113,7 @@ signals:
   void substanceDataChanged(double time, QVariantMap subData);
   void activeSubstanceAdded(Substance* sub);
   void timeAdvance(double SimulationTime_s);
-  void physiologyChanged(PhysiologyModel* model);
+  void physiologyChanged(BioGearsData* model);
   void stateLoad();
   void runningToggled(bool isRunning);
   void pausedToggled(bool isPaused);
@@ -134,7 +122,7 @@ signals:
   //void stateChanged();
   //void patientStateChanged(PatientState patientState);
   //void patientMetricsChanged(PatientMetrics* metrics);
-  //void physiologyChanged(PhysiologyModel* physiology);
+  //void physiologyChanged(PhysiologyTree* physiology);
   //void patientConditionsChanged(PatientConditions conditions);
 
 protected:
@@ -168,7 +156,7 @@ private:
   QVector<QString> _drugs_list;
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
-  PhysiologyModel* _physiology_model;
+  BioGearsData* _physiology_model;
 
   QVariantMap substanceData;
 
