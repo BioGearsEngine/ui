@@ -1092,12 +1092,37 @@ QtLogForward* Scenario::getLogFoward()
 
 void Scenario::save_patient(QString patientFileName)
 {
+  std::string fileLoc = "./patients/" + patientFileName.toStdString();
+  std::string fullPath = biogears::ResolvePath(fileLoc);
+  biogears::CreateFilePath(fullPath);
+  std::ofstream stream(fullPath);
+  xml_schema::namespace_infomap info;
+  info[""].name = "uri:/mil/tatrc/physiology/datamodel";
+
+  std::unique_ptr<CDM::PatientData> pData(_engine->GetPatient().Unload());
+  Patient(stream, *pData, info);
+  stream.close();
+  return;
+}
+
+void Scenario::save_environment(QString environmentFileName)
+{
+  std::string fileLoc = "./environments/" + environmentFileName.toStdString();
+  std::string fullPath = biogears::ResolvePath(fileLoc);
+  biogears::CreateFilePath(fullPath);
+  std::ofstream stream(fullPath);
+  xml_schema::namespace_infomap info;
+  info[""].name = "uri:/mil/tatrc/physiology/datamodel";
+
+  std::unique_ptr<CDM::EnvironmentData> eData(_engine->GetEnvironment().Unload());
+  Environment(stream, *eData, info);
+  stream.close();
   return;
 }
 
 void Scenario::save_state(QString stateFileName)
 {
-  std::string fileLoc = "./states/SavedStates/" + stateFileName.toStdString();
+  std::string fileLoc = "./states/" + stateFileName.toStdString();
   std::string fullPath = biogears::ResolvePath(fileLoc);
   biogears::CreateFilePath(fullPath);
   std::ofstream stream(fullPath);
@@ -1139,7 +1164,7 @@ void Scenario::save_state(QString stateFileName)
   state->System().push_back(*(_engine->GetRenal().Unload()));
   state->System().push_back(*(_engine->GetRespiratory().Unload()));
   state->System().push_back(*(_engine->GetTissue().Unload()));
-  //state->System().push_back(std::unique_ptr<CDM::BioGearsEnvironmentData>(m_Environment->Unload()));
+  state->System().push_back(*(_engine->GetEnvironment().Unload()));
   state->System().push_back(*(_engine->GetAnesthesiaMachine().Unload()));
   state->System().push_back(*(_engine->GetECG().Unload()));
   state->System().push_back(*(_engine->GetInhaler().Unload()));
@@ -1147,7 +1172,7 @@ void Scenario::save_state(QString stateFileName)
   state->CompartmentManager(*(_engine->GetCompartments().Unload()));
   // Configuration
   state->Configuration(*(_engine->GetConfiguration().Unload()));
-  // Circuitsk
+  // Circuits
   state->CircuitManager(*(_engine->GetCircuits().Unload()));
   BioGearsState(stream, *state, info);
   stream.close();

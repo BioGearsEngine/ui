@@ -42,18 +42,30 @@ MenuBar {
     title : "Export"
     Action {
       text : "Patient"
+      onTriggered : {
+        let simTime = Math.ceil(scenario.get_simulation_time())
+        let patient = scenario.patient_name()
+        let fileName =  patient + "@" + simTime + "s.xml"
+        scenario.save_patient(fileName)
+      }
     }
     Action {
       text : "State"
       onTriggered : {
-        let simTime = scenario.get_simulation_time()
+        let simTime =Math.ceil(scenario.get_simulation_time())
         let patient = scenario.patient_name()
-        let fileName =  patient + "@" + simTime + "s.xml"
+        let fileName =  patient + "_state@" + simTime + "s.xml"
         scenario.save_state(fileName)
       }
     }
     Action {
       text : "Environment"
+      onTriggered : {
+        let simTime = Math.ceil(scenario.get_simulation_time())
+        let enviro = scenario.environment_name()
+        let fileName =  enviro + "@" + simTime + "s.xml"
+        scenario.save_environment(fileName)
+      }
     }
     Action {
       text : "Scenario"
