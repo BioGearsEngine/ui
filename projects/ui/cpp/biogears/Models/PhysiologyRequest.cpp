@@ -1,5 +1,6 @@
 #include "PhysiologyRequest.h"
 
+#include <QDebug>
 #include <QVariant>
 
 PhysiologyRequest::PhysiologyRequest()
@@ -8,6 +9,8 @@ PhysiologyRequest::PhysiologyRequest()
 //------------------------------------------------------------------------------------
 PhysiologyRequest::PhysiologyRequest(QString prefix, QString name, PhysiologyRequest* parent)
   : _parent(parent)
+  , _name(name)
+  , _prefix(prefix)
 {
 }
 //------------------------------------------------------------------------------------
@@ -97,12 +100,15 @@ void PhysiologyRequest::modify(int row, const biogears::SEScalar* data)
   }
 }
 //------------------------------------------------------------------------------------
+#pragma optimize("", off)
 QVariant PhysiologyRequest::data(int role) const
 {
   switch (role) {
   case PREFIX:
     return QVariant(_prefix); // PREFIX ROLE
+  case Qt::DisplayRole:
   case NAME:
+    qDebug() << _prefix + "_" + _name;
     return QVariant(_name);
   case VALUE: //VALUE ROLE
     try {
@@ -113,7 +119,8 @@ QVariant PhysiologyRequest::data(int role) const
   case UNIT: //UNIT ROLE
     return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant();
   default:
-    return QVariant(QString("%s_%s").arg(_prefix).arg(_name));
+    return QVariant();
   }
 }
+#pragma optimize("", on)
 //------------------------------------------------------------------------------------

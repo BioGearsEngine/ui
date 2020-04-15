@@ -6,7 +6,6 @@ BioGearsData::BioGearsData()
   : QAbstractItemModel(nullptr)
   , _rootRequest("", "", nullptr)
 {
-    
 }
 
 BioGearsData::BioGearsData(QString n, QObject* p)
@@ -29,10 +28,9 @@ int BioGearsData::categories()
   return TOTAL_CATEGORIES;
 }
 
-BioGearsData* BioGearsData::category(Categories category)
+BioGearsData* BioGearsData::category(int category)
 {
-  switch (category)
-  {
+  switch (category) {
   case VITALS:
     return _vitals;
   case CARDIOPULMONARY:
@@ -148,30 +146,10 @@ BioGearsData::~BioGearsData()
 //------------------------------------------------------------------------------------
 int BioGearsData::rowCount(const QModelIndex& index) const
 {
-  if (!index.isValid()) {
+  if (!_rootModel) {
     return TOTAL_CATEGORIES;
-  } else {
-    if (_vitals == index.internalPointer()) {
-      return _vitals->_rootRequest.rows();
-    } else if (_cardiopulmonary == index.internalPointer()) {
-      return _cardiopulmonary->_rootRequest.rows();
-    } else if (_blood_chemistry == index.internalPointer()) {
-      return _blood_chemistry->_rootRequest.rows();
-    } else if (_renal == index.internalPointer()) {
-      return _renal->_rootRequest.rows();
-    } else if (_energy_and_metabolism == index.internalPointer()) {
-      return _energy_and_metabolism->_rootRequest.rows();
-    } else if (_fluid_balance == index.internalPointer()) {
-      return _fluid_balance->_rootRequest.rows();
-    } else if (_drugs == index.internalPointer()) {
-      return _drugs->_rootRequest.rows();
-    } else if (_substances == index.internalPointer()) {
-      return _substances->_rootRequest.rows();
-    } else if (_panels == index.internalPointer()) {
-      return _panels->_rootRequest.rows();
-    }
   }
-  return static_cast<PhysiologyRequest*>(index.internalPointer())->rows();
+  return _rootRequest.rows();
 }
 //------------------------------------------------------------------------------------
 int BioGearsData::columnCount(const QModelIndex& index) const
@@ -201,61 +179,57 @@ int BioGearsData::columnCount(const QModelIndex& index) const
   }
   return static_cast<PhysiologyRequest*>(index.internalPointer())->columns();
 }
-
 //------------------------------------------------------------------------------------
+QVariant BioGearsData::data(int role) const
+{
+
+  switch (role) {
+  case Qt::DisplayRole:
+  case RequestRole:
+    return QVariant(_name);
+  case PrefixRole:
+  case ValueRole: //VALUE ROLE
+  case UnitRole: //UNIT ROLE
+    return QVariant();
+  case FullNameRole:
+    return _name;
+  default:
+    return QVariant();
+  }
+}
+//------------------------------------------------------------------------------------
+#pragma optimize("", off)
 QVariant BioGearsData::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid()) {
     return QVariant();
   }
-
-  if (index.internalPointer() == this && role == Qt::DisplayRole) {
-    auto* item = static_cast<PhysiologyRequest*>(index.internalPointer());
-
-    switch (index.row()) {
-    case VITALS:
-      return "Vitals";
-    case CARDIOPULMONARY:
-      return "Cardiopulmonary";
-    case BLOOD_CHEMISTRY:
-      return "Blood Chemistry";
-    case RENAL:
-      return "Renal";
-    case ENERGY_AND_METABOLISM:
-      return "Energy and Metabolism";
-    case FLUID_BALANCE:
-      return "Fluid Balance";
-    case DRUGS:
-      return "Drugs";
-    case SUBSTANCES:
-      return "Substances";
-    case PANELS:
-      return "Panels";
+  if (index.internalPointer()) {
+    if (_vitals == index.internalPointer()) {
+      return _vitals->data(role);
+    } else if (_cardiopulmonary == index.internalPointer()) {
+      return _cardiopulmonary->data(role);
+    } else if (_blood_chemistry == index.internalPointer()) {
+      return _blood_chemistry->data(role);
+    } else if (_renal == index.internalPointer()) {
+      return _renal->data(role);
+    } else if (_energy_and_metabolism == index.internalPointer()) {
+      return _energy_and_metabolism->data(role);
+    } else if (_fluid_balance == index.internalPointer()) {
+      return _fluid_balance->data(role);
+    } else if (_drugs == index.internalPointer()) {
+      return _drugs->data(role);
+    } else if (_substances == index.internalPointer()) {
+      return _substances->data(role);
+    } else if (_panels == index.internalPointer()) {
+      return _panels->data(role);
+    } else {
+      return static_cast<PhysiologyRequest*>(index.internalPointer())->data(role);
     }
-  } else if (_vitals == index.internalPointer()) {
-    return _vitals->data(index, role);
-  } else if (_cardiopulmonary == index.internalPointer()) {
-    return _cardiopulmonary->data(index, role);
-  } else if (_blood_chemistry == index.internalPointer()) {
-    return _blood_chemistry->data(index, role);
-  } else if (_renal == index.internalPointer()) {
-    return _renal->data(index, role);
-  } else if (_energy_and_metabolism == index.internalPointer()) {
-    return _energy_and_metabolism->data(index, role);
-  } else if (_fluid_balance == index.internalPointer()) {
-    return _fluid_balance->data(index, role);
-  } else if (_drugs == index.internalPointer()) {
-    return _drugs->data(index, role);
-  } else if (_substances == index.internalPointer()) {
-    return _substances->data(index, role);
-  } else if (_panels == index.internalPointer()) {
-    return _panels->data(index, role);
-  } else {
-    return static_cast<PhysiologyRequest*>(index.internalPointer())->data(role);
   }
   return QVariant();
 }
-
+#pragma optimize("", on)
 //------------------------------------------------------------------------------------
 Qt::ItemFlags BioGearsData::flags(const QModelIndex& index) const
 {
@@ -277,66 +251,72 @@ QVariant BioGearsData::headerData(int section, Qt::Orientation orientation, int 
   return QVariant();
 }
 //------------------------------------------------------------------------------------
+#pragma optimize("", off)
 QModelIndex BioGearsData::index(int row, int column, const QModelIndex& parent) const
 {
   if (!hasIndex(row, column, parent)) {
     return QModelIndex();
   }
-  BioGearsData* childItem;
-  if (!parent.isValid() && !_rootModel) {
-    switch (row) {
-    case VITALS:
-      childItem = _vitals;
-      break;
-    case CARDIOPULMONARY:
-      childItem = _cardiopulmonary;
-      break;
-    case BLOOD_CHEMISTRY:
-      childItem = _blood_chemistry;
-      break;
-    case RENAL:
-      childItem = _renal;
-      break;
-    case ENERGY_AND_METABOLISM:
-      childItem = _energy_and_metabolism;
-      break;
-    case FLUID_BALANCE:
-      childItem = _fluid_balance;
-      break;
-    case DRUGS:
-      childItem = _drugs;
-      break;
-    case SUBSTANCES:
-      childItem = _substances;
-      break;
-    case PANELS:
-      childItem = _panels;
-      break;
+  if (!parent.isValid()) {
+    BioGearsData* childItem;
+    if (!_rootModel) {
+      switch (row) {
+      case VITALS:
+        childItem = _vitals;
+        break;
+      case CARDIOPULMONARY:
+        childItem = _cardiopulmonary;
+        break;
+      case BLOOD_CHEMISTRY:
+        childItem = _blood_chemistry;
+        break;
+      case RENAL:
+        childItem = _renal;
+        break;
+      case ENERGY_AND_METABOLISM:
+        childItem = _energy_and_metabolism;
+        break;
+      case FLUID_BALANCE:
+        childItem = _fluid_balance;
+        break;
+      case DRUGS:
+        childItem = _drugs;
+        break;
+      case SUBSTANCES:
+        childItem = _substances;
+        break;
+      case PANELS:
+        childItem = _panels;
+        break;
+      }
+      return createIndex(row, column, childItem);
+    } else {
+      return createIndex(row, column, const_cast<PhysiologyRequest*>(_rootRequest.child(row)));
     }
-    return createIndex(row, column, childItem);
-  } else if (_vitals == parent.internalPointer()) {
+  } else if (_vitals && _vitals == parent.internalPointer()) {
     return _vitals->createIndex(row, column, _vitals->child(row));
-  } else if (_cardiopulmonary == parent.internalPointer()) {
-    return _cardiopulmonary->createIndex(row, column, _vitals->child(row));
-  } else if (_blood_chemistry == parent.internalPointer()) {
-    return _blood_chemistry->createIndex(row, column, _vitals->child(row));
-  } else if (_renal == parent.internalPointer()) {
-    return _renal->createIndex(row, column, _vitals->child(row));
-  } else if (_energy_and_metabolism == parent.internalPointer()) {
-    return _energy_and_metabolism->createIndex(row, column, _vitals->child(row));
-  } else if (_fluid_balance == parent.internalPointer()) {
-    return _fluid_balance->createIndex(row, column, _vitals->child(row));
-  } else if (_drugs == parent.internalPointer()) {
-    return _drugs->createIndex(row, column, _vitals->child(row));
-  } else if (_substances == parent.internalPointer()) {
-    return _substances->createIndex(row, column, _vitals->child(row));
-  } else if (_panels == parent.internalPointer()) {
-    return _panels->createIndex(row, column, _vitals->child(row));
+  } else if (_cardiopulmonary && _cardiopulmonary == parent.internalPointer()) {
+    return _cardiopulmonary->createIndex(row, column, _cardiopulmonary->child(row));
+  } else if (_blood_chemistry && _blood_chemistry == parent.internalPointer()) {
+    return _blood_chemistry->createIndex(row, column, _blood_chemistry->child(row));
+  } else if (_renal && _renal == parent.internalPointer()) {
+    return _renal->createIndex(row, column, _renal->child(row));
+  } else if (_energy_and_metabolism && _energy_and_metabolism == parent.internalPointer()) {
+    return _energy_and_metabolism->createIndex(row, column, _energy_and_metabolism->child(row));
+  } else if (_fluid_balance && _fluid_balance == parent.internalPointer()) {
+    return _fluid_balance->createIndex(row, column, _fluid_balance->child(row));
+  } else if (_drugs && _drugs == parent.internalPointer()) {
+    return _drugs->createIndex(row, column, _drugs->child(row));
+  } else if (_substances && _substances == parent.internalPointer()) {
+    return _substances->createIndex(row, column, _substances->child(row));
+  } else if (_panels && _panels == parent.internalPointer()) {
+    return _panels->createIndex(row, column, _panels->child(row));
   } else {
     return createIndex(row, column, static_cast<PhysiologyRequest*>(parent.internalPointer())->child(row));
   }
   return QModelIndex();
 }
+#pragma optimize("", on)
 //------------------------------------------------------------------------------------
 QModelIndex BioGearsData::parent(const QModelIndex& index) const
 {

@@ -12,7 +12,7 @@
 class PhysiologyRequest {
 public:
   enum Columns {
-    PREFIX,
+    PREFIX = Qt::UserRole + 1,
     NAME,
     VALUE,
     UNIT,

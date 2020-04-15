@@ -89,48 +89,30 @@ Page {
     }
     SwipeView {
       id : systemSwipeView
-      contentHeight: 40
+      clip:true
       Layout.fillWidth : true
       Layout.preferredWidth : 200
       Layout.preferredHeight : 40
-      font.pointSize: 12
-      clip:true
-      UITabButtonForm {
-        id: bloodChemistryButton
-        text: qsTr("Vitals")
+      Repeater {
+        //contentHeight: 40
+        Layout.fillWidth : true
+        Layout.preferredWidth : 200
+        Layout.preferredHeight : 40
+        // font.pointSize: 12        
+        model: physiologyRequestModel
+
+        delegate :  UITabButtonForm {
+            text: name
       }
-      UITabButtonForm {
-        id: cardiovascularButton
-        text: qsTr("Cardiopulmonary")
-      }
-      UITabButtonForm {
-        id: drugsButton
-        text: qsTr("Blood Chemistry")
-      }
-      UITabButtonForm {
-        id: endocrineButton
-        text: qsTr("Energy and Metabolism")
-      }
-      UITabButtonForm {
-        id: energyButton
-        text: qsTr("Renal and Fluid Balance")
-      }
-      UITabButtonForm {
-        id : substanceButton
-        text : qsTr("Substances")
-      }
-      UITabButtonForm {
-        id : customPlotsButton
-        text : qsTr("Custom Plots")
       }
       currentIndex: plots.currentIndex
-
       onCurrentIndexChanged : {
           if( plots.currentIndex != currentIndex){
               plots.currentIndex = currentIndex;
           }
       }
     }
+ 
     Button {
       id: filterMenuButton
       text: "Filter Menu"
@@ -163,12 +145,12 @@ Page {
         closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
         Repeater {
           id : filterMenuInstance
-          model : physiologyRequestModel.get(plots.currentIndex).requests
+          model : physiologyRequestModel.category(plots.currentIndex)
           delegate : MenuItem {
             CheckBox { 
               checkable : true
               checked : active
-              text : root.formatRequest(request)
+              text : name
               onClicked : {
                 active = checked
                 if (checked){
