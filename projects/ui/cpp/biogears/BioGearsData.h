@@ -7,11 +7,7 @@
 #include <QObject>
 #include <QAbstractItemModel>
 
-#include "Models/PhysiologyRequestModel.h"
-#include "Models/SubstanceModel.h"
-#include "Models/CustomWidgetModel.h"
-
-namespace bio {
+#include "Models/PhysiologyRequest.h"
 
 class BioGearsData : public QAbstractItemModel {
   Q_OBJECT
@@ -30,8 +26,11 @@ public:
     TOTAL_CATEGORIES
   };
 
-  explicit BioGearsData(QString name = "Unknown Patient", QObject* parent = nullptr);
+  explicit BioGearsData();
+  explicit BioGearsData(QString name, QObject* parent);
+  explicit BioGearsData(QString name, BioGearsData* parent);
   ~BioGearsData() override;
+  void initialize();
 
   enum  PhysiologyRequestRoles {
     PrefixRole = Qt::UserRole + 1,
@@ -40,6 +39,9 @@ public:
     UnitRole,
     FullNameRole
   };
+
+  Q_INVOKABLE int categories();
+  Q_INVOKABLE BioGearsData* category(Categories category);
 
   QVariant data(const QModelIndex& index, int role) const override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -50,6 +52,7 @@ public:
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
   QModelIndex index(QAbstractItemModel const* model) const;
+
   QHash<int, QByteArray> roleNames() const
   {
     QHash<int, QByteArray> roles;
@@ -62,17 +65,25 @@ public:
     return roles;
   }
 
+  void append(QString prefix, QString name);
+  PhysiologyRequest const* child(int row) const;
+  PhysiologyRequest * child(int row);
 
 private:
-  
-    PhysiologyRequestModel* _vitals;
-    PhysiologyRequestModel* _cardiopulmonary;
-    PhysiologyRequestModel* _blood_chemistry;
-    PhysiologyRequestModel* _renal;
-    PhysiologyRequestModel* _energy_and_metabolism;
-    PhysiologyRequestModel* _fluid_balance;
-    SubstanceModel* _drugs;
-    SubstanceModel* _substances;
-    CustomWidgetModel* _panel;
+    QString _name;
+
+
+    BioGearsData* _rootModel = nullptr;
+    PhysiologyRequest _rootRequest;
+
+    BioGearsData* _vitals = nullptr;
+    BioGearsData* _cardiopulmonary = nullptr;
+    BioGearsData* _blood_chemistry = nullptr;
+    BioGearsData* _renal = nullptr;
+    BioGearsData* _energy_and_metabolism = nullptr;
+    BioGearsData* _fluid_balance = nullptr;
+    BioGearsData* _drugs = nullptr;
+    BioGearsData* _substances = nullptr;
+    BioGearsData* _panels = nullptr;
 };
-}
+
