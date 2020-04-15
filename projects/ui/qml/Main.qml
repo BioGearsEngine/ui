@@ -15,7 +15,6 @@ ApplicationWindow {
     width: 1280
     height: 768
 
-
     MainForm {
         anchors.rightMargin: 0
         anchors.bottomMargin: 1
@@ -38,6 +37,9 @@ ApplicationWindow {
         }
         controls.onOpenActionDrawer: {
           actionDrawer.openActionDrawer();
+        }
+        menuArea.onStateLoadedFromMenu : {
+          controls.stateLoadedFromMenu()
         }
     }
 

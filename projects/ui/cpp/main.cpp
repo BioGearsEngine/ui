@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
 {
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QApplication app(argc, argv);
+  app.setOrganizationDomain("Applied Research Associates");
+  app.setOrganizationName("https://biogearsengine.com");
 
   QQuickStyle::setStyle("Material");
 

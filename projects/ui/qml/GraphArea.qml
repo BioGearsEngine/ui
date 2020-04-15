@@ -39,12 +39,6 @@ GraphAreaForm {
   property ObjectModel substanceModel : substanceObjectModel
   property ListModel substanceMenuListModel : substanceMenuListModel
   property ObjectModel customModel : customObjectModel
-  //property ObjectModel hepaticModel : hepaticObjectModel
-  //property ObjectModel nervousModel : nervousObjectModel
-  //property ObjectModel renalModel : renalObjectModel
-  //property ObjectModel respiratoryModel : respiratoryObjectModel
-  //property ObjectModel tissueModel : tissueObjectModel
-
 
   onStart : {
     oneHzPlotTimer.start()
@@ -63,11 +57,6 @@ GraphAreaForm {
     renalFluidBalanceObjectModel.clearPlots()
     substanceObjectModel.clearPlots()
     customObjectModel.clearPlots()
-    //hepaticObjectModel.clearPlots()
-    //nervousObjectModel.clearPlots()
-    //renalObjectModel.clearPlots()
-    //respiratoryObjectModel.clearPlots()
-    //tissueObjectModel.clearPlots()
   }
 
   onPause: {
@@ -161,41 +150,6 @@ GraphAreaForm {
         customModel.createPlotView(customReq.get(i))
       }
     }
-    /*var hepaticReq = physiologyRequestModel.get(6).requests
-    for ( var i = 0; i < hepaticReq.count ; ++i){
-      if(hepaticReq.get(i).active){
-        physiologyRequestModel.get(6).activeRequests.append({"request": hepaticReq.get(i).request})
-        hepaticModel.createPlotView(hepaticReq.get(i))
-      }
-    }
-    var nervousReq = physiologyRequestModel.get(7).requests
-    for ( var i = 0; i < nervousReq.count; ++i){
-      if( nervousReq.get(i).active){
-        physiologyRequestModel.get(7).activeRequests.append({"request": nervousReq.get(i).request})
-        nervousModel.createPlotView(nervousReq.get(i))
-      } 
-    }
-    var renalReq = physiologyRequestModel.get(8).requests
-    for ( var i = 0; i < renalReq.count ; ++i){
-      if(renalReq.get(i).active){
-        physiologyRequestModel.get(8).activeRequests.append({"request": renalReq.get(i).request})
-        renalModel.createPlotView(renalReq.get(i))
-      } 
-    }
-    var respiratoryReq = physiologyRequestModel.get(9).requests
-    for ( var i = 0; i < respiratoryReq.count ; ++i){
-      if(respiratoryReq.get(i).active){
-        physiologyRequestModel.get(9).activeRequests.append({"request": respiratoryReq.get(i).request})
-        respiratoryModel.createPlotView(respiratoryReq.get(i))
-      }
-    }
-    var tissueReq = physiologyRequestModel.get(10).requests
-    for ( var i = 0; i < tissueReq.count ; ++i){
-      if(tissueReq.get(i).active){
-        physiologyRequestModel.get(10).activeRequests.append({"request": tissueReq.get(i).request})
-        tissueModel.createPlotView(tissueReq.get(i))
-      }
-    }*/
   }
   //Vitals//
   ObjectModel {
@@ -467,192 +421,6 @@ GraphAreaForm {
     customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
 
-  /*
-  //Hepatic//
-  ObjectModel {
-    id: hepaticObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(hepaticGridView,{"width" : hepaticGridView.cellWidth, "height" : hepaticGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
-        hepaticObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < hepaticObjectModel.count; ++i){
-        hepaticObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        hepaticObjectModel.get(i).clear();
-      }
-    }
-  }
-
-  hepaticGridView.onCellWidthChanged : {
-    hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
-  }
-  hepaticGridView.onCellHeightChanged : {
-    hepaticObjectModel.resizePlots(hepaticGridView.cellWidth, hepaticGridView.cellHeight)
-  }
-
-  //Nervous//
-  ObjectModel {
-    id: nervousObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(nervousGridView,{"width" : nervousGridView.cellWidth, "height" : nervousGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
-        nervousObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < nervousObjectModel.count; ++i){
-        nervousObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        nervousObjectModel.get(i).clear();
-      }
-    }
-  }
-
-  nervousGridView.onCellWidthChanged : {
-    nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
-  }
-  nervousGridView.onCellHeightChanged : {
-    nervousObjectModel.resizePlots(nervousGridView.cellWidth, nervousGridView.cellHeight)
-  }
-
-  //Renal//
-  ObjectModel {
-    id: renalObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(renalGridView,{"width" : renalGridView.cellWidth, "height" : renalGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
-        renalObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < renalObjectModel.count; ++i){
-        renalObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        renalObjectModel.get(i).clear();
-      }
-    }
-  }
-
-  renalGridView.onCellWidthChanged : {
-    renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
-  }
-  renalGridView.onCellHeightChanged : {
-    renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
-  }
-
-  //Respiratory//
-  ObjectModel {
-    id: respiratoryObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(respiratoryGridView,{"width" : respiratoryGridView.cellWidth, "height" : respiratoryGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
-        respiratoryObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < respiratoryObjectModel.count; ++i){
-        respiratoryObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        respiratoryObjectModel.get(i).clear();
-      }
-    }
-  }
-
-  respiratoryGridView.onCellWidthChanged : {
-    respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
-  }
-  respiratoryGridView.onCellHeightChanged : {
-    respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
-  }
-
-  //Tissue//
-  ObjectModel {
-    id: tissueObjectModel
-    function createPlotView (request) {
-      var chartComponent = Qt.createComponent("UIPlotSeries.qml");
-      if ( chartComponent.status != Component.Ready){
-        if (chartComponent.status == Component.Error){
-        console.log("Error : " + chartComponent.errorString() );
-        return;
-        }
-        console.log("Error : Chart component not ready");
-      } else {
-        var chartObject = chartComponent.createObject(tissueGridView,{"width" : tissueGridView.cellWidth, "height" : tissueGridView.cellHeight });
-        chartObject.initializeChart(request, tickCount);
-        oneHzPlotRefresh.connect(chartObject.updatePatientSeries)
-        tissueObjectModel.append(chartObject)
-      }
-    }
-    function resizePlots(newWidth, newHeight){
-      for (var i = 0; i < tissueObjectModel.count; ++i){
-        tissueObjectModel.get(i).resizePlot(newWidth, newHeight);
-      }
-    }
-    function clearPlots() {
-      for (var i = 0; i < count; ++i){
-        tissueObjectModel.get(i).clear();
-      }
-    }
-  }
-
-  tissueGridView.onCellWidthChanged : {
-    tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
-  }
-  tissueGridView.onCellHeightChanged : {
-    tissueObjectModel.resizePlots(tissueGridView.cellWidth, tissueGridView.cellHeight)
-  }
-  */
 
   //This function is specific to searching physiology request lists for an element with a "request" field that matches the input
   //We can look to generalize this to other fields if/when needed
@@ -691,21 +459,6 @@ GraphAreaForm {
       case 6:
         customModel.createPlotView(modelElement);
         break;
-      /*case 7:
-        hepaticModel.createPlotView(modelElement);
-        break;
-      case 8:
-        nervousModel.createPlotView(modelElement);
-        break;
-      case 9:
-        renalModel.createPlotView(modelElement);
-        break;
-      case 10:
-        respiratoryModel.createPlotView(modelElement);
-        break;
-      case 11:
-        tissueModel.createPlotView(modelElement);
-        break;*/
     }
   }
 
@@ -749,22 +502,6 @@ GraphAreaForm {
         case 6:
           customModel.remove(i,1)
           break;
-        /*case 7:
-          hepaticModel.remove(i,1)
-          break;
-        case 8:
-          nervousModel.remove(i,1)
-          break;
-        case 9:
-          renalModel.remove(i,1)
-          break;
-        case 10:
-          respiratoryModel.remove(i,1)
-          break;
-        case 11:
-          tissueModel.remove(i,1)
-          break;
-        */
       }
     } else {
       console.log("No active plot : " + request)

@@ -65,7 +65,7 @@ GridLayout {
       id: graphArea
       Layout.row : 1
       Layout.column : 2
-      Layout.preferredHeight:root.height * (3./4.);
+      Layout.preferredHeight:root.height * (3./4.)-10;
       Layout.rowSpan : 2
       Layout.fillWidth: true
       Layout.fillHeight: false

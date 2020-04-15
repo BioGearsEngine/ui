@@ -1,11 +1,14 @@
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick 2.12
+import QtQuick.Dialogs 1.3
 
 import com.biogearsengine.ui.scenario 1.0
 
 MenuBar {
   id: menuBar
+  property alias saveAsDialog : saveAsDialog
+  property alias openDialog : openDialog
  Menu {
     id : fileMenu
     title : "File"
@@ -15,14 +18,20 @@ MenuBar {
         let simTime = Math.ceil(scenario.get_simulation_time())
         let patient = scenario.patient_name()
         let fileName =  patient + "@" + simTime + "s.xml"
-        scenario.save_state(fileName)
+        scenario.export_state(fileName)
       }
     }
     Action {
       text : "Save As"
+      onTriggered : {
+        saveAsDialog.open();
+      }
     }
     Action {
       text : "Open"
+      onTriggered : {
+        openDialog.open();
+      }
     }
     delegate : MenuItem {
       id : menuItem
@@ -46,7 +55,7 @@ MenuBar {
         let simTime = Math.ceil(scenario.get_simulation_time())
         let patient = scenario.patient_name()
         let fileName =  patient + "@" + simTime + "s.xml"
-        scenario.save_patient(fileName)
+        scenario.export_patient(fileName)
       }
     }
     Action {
@@ -54,8 +63,8 @@ MenuBar {
       onTriggered : {
         let simTime =Math.ceil(scenario.get_simulation_time())
         let patient = scenario.patient_name()
-        let fileName =  patient + "_state@" + simTime + "s.xml"
-        scenario.save_state(fileName)
+        let fileName =  patient + "@" + simTime + "s.xml"
+        scenario.export_state(fileName)
       }
     }
     Action {
@@ -64,7 +73,7 @@ MenuBar {
         let simTime = Math.ceil(scenario.get_simulation_time())
         let enviro = scenario.environment_name()
         let fileName =  enviro + "@" + simTime + "s.xml"
-        scenario.save_environment(fileName)
+        scenario.export_environment(fileName)
       }
     }
     Action {
@@ -110,5 +119,24 @@ MenuBar {
       height : 1
       anchors.bottom : parent.bottom
     }
+  }
+
+  FileDialog {
+    id : saveAsDialog
+    title : "Save state as..."
+    visible : false
+    folder : "./"
+    nameFilters : ["(*.xml)", "All files (*)"]
+    selectMultiple : false
+    selectExisting: false
+  }
+  FileDialog {
+    id : openDialog
+    title : "Open state file"
+    folder : "/states"
+    visible : false
+    nameFilters : ["states (*.xml)", "All files (*)"]
+    selectMultiple : false
+    selectExisting : true
   }
 }

@@ -64,7 +64,9 @@ void Scenario::restart(QString patient_file)
   emit pausedToggled(_paused);
   _throttle = true;
   emit throttledToggled(_throttle);
-  load_patient(patient_file);
+  //"Open" command from visualizer sends full file path.  Getting fileName using QFileInfo gets state base name (e.g. StandardMale@0s.xml) relative to states folder
+  QFileInfo pFile(patient_file);
+  load_patient(pFile.fileName());
   _logger.SetForward(_consoleLog);
 }
 //-------------------------------------------------------------------------------
@@ -1090,7 +1092,7 @@ QtLogForward* Scenario::getLogFoward()
   return _consoleLog;
 }
 
-void Scenario::save_patient(QString patientFileName)
+void Scenario::export_patient(QString patientFileName)
 {
   std::string fileLoc = "./patients/" + patientFileName.toStdString();
   std::string fullPath = biogears::ResolvePath(fileLoc);
@@ -1102,10 +1104,11 @@ void Scenario::save_patient(QString patientFileName)
   std::unique_ptr<CDM::PatientData> pData(_engine->GetPatient().Unload());
   Patient(stream, *pData, info);
   stream.close();
+  _engine->GetLogger()->Info("Saved patient " + fullPath);
   return;
 }
 
-void Scenario::save_environment(QString environmentFileName)
+void Scenario::export_environment(QString environmentFileName)
 {
   std::string fileLoc = "./environments/" + environmentFileName.toStdString();
   std::string fullPath = biogears::ResolvePath(fileLoc);
@@ -1117,15 +1120,22 @@ void Scenario::save_environment(QString environmentFileName)
   std::unique_ptr<CDM::EnvironmentData> eData(_engine->GetEnvironment().Unload());
   Environment(stream, *eData, info);
   stream.close();
+  _engine->GetLogger()->Info("Saved environemnt: " + fullPath);
   return;
 }
 
-void Scenario::save_state(QString stateFileName)
+void Scenario::export_state(QString stateFileName)
 {
   std::string fileLoc = "./states/" + stateFileName.toStdString();
   std::string fullPath = biogears::ResolvePath(fileLoc);
-  biogears::CreateFilePath(fullPath);
-  std::ofstream stream(fullPath);
+  save_state(QString::fromStdString(fullPath));
+}
+
+void Scenario::save_state(QString filePath)
+{
+  std::string stateFileFullPath = filePath.toStdString();
+  biogears::CreateFilePath(stateFileFullPath);
+  std::ofstream stream(stateFileFullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
 
@@ -1176,6 +1186,7 @@ void Scenario::save_state(QString stateFileName)
   state->CircuitManager(*(_engine->GetCircuits().Unload()));
   BioGearsState(stream, *state, info);
   stream.close();
+  _engine->GetLogger()->Info("Saved state: " + stateFileFullPath);
 }
 
 }

@@ -59,9 +59,10 @@ public:
   Q_INVOKABLE Scenario& environment_name(QString);
 
   Q_INVOKABLE Scenario& load_patient(QString);
-  Q_INVOKABLE void save_patient(QString patientFileName);
-  Q_INVOKABLE void save_state(QString stateFileName);
-  Q_INVOKABLE void save_environment(QString environmentFileName);
+  Q_INVOKABLE void export_patient(QString patientFileName);
+  Q_INVOKABLE void export_state(QString stateFileName);
+  Q_INVOKABLE void export_environment(QString environmentFileName);
+  Q_INVOKABLE void save_state(QString filePath);
 
   Q_INVOKABLE double get_simulation_time();
 

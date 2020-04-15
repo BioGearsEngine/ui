@@ -8,6 +8,7 @@ ControlsForm {
   signal pauseClicked(bool paused)
   signal playClicked()
   signal speedToggled(int speed)
+  signal stateLoadedFromMenu()
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
@@ -20,7 +21,10 @@ ControlsForm {
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
   patientBox.scenario : biogears_scenario
-    
+  
+  onStateLoadedFromMenu : {
+    patientBox.updateDisplayText()
+  }
 
   Scenario {
     id: biogears_scenario
@@ -72,6 +76,7 @@ ControlsForm {
 
     onStateChanged : {
       root.restartClicked();
+      patientBox.checkDisplayText(scenario.patient_name());
     }
     onRunningToggled : {
       patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
@@ -148,7 +153,6 @@ ControlsForm {
   openDrawerButton.onPressed : {
     root.openActionDrawer();
   }
-
 }
 
 /*##^## Designer {
