@@ -65,6 +65,7 @@ void Scenario::restart(QString patient_file)
   _throttle = true;
   emit throttledToggled(_throttle);
   //"Open" command from visualizer sends full file path.  Getting fileName using QFileInfo gets state base name (e.g. StandardMale@0s.xml) relative to states folder
+  //We could also remove the "file:\\\" tag, but that seems like it could cause platform specific issues
   QFileInfo pFile(patient_file);
   load_patient(pFile.fileName());
   _logger.SetForward(_consoleLog);

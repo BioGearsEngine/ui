@@ -50,7 +50,6 @@ UIComboBox {
       root.loadState();
     }
     onScenarioChanged: {
-      console.log("Scenario changed")
     }
     onPatientFolderReady:{
       root.loadState();
