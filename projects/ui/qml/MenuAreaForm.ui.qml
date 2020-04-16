@@ -3,132 +3,170 @@ import QtQuick.Layouts 1.12
 import QtQuick 2.12
 import QtQuick.Dialogs 1.3
 
-
-MenuBar {
-  id: menuBar
+Item {
   property alias saveAsDialog : saveAsDialog
   property alias openDialog : openDialog
-  
- Menu {
-    id : fileMenu
-    title : "File"
+  width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
+  height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
+  MenuBar {
+    id: menuBar
+   //----------------File Menu-------------------
     Menu {
-      id : newMenu
-      title: "New"
+      id : fileMenu
+      title : "File"
       Action {
-        text : "Patient"
+        text : "Load State"
+        onTriggered : {
+          openDialog.open();
+        }
       }
       Action {
-        text : "Environment"
+        text : "Save State"
+        onTriggered : {
+          root.exportData(0)
+        }
+      }
+      Action {
+        text : "Save State As"
+        onTriggered : {
+          saveAsDialog.open();
+        }
       }
       delegate : MenuItem {
-      id : newMenuItem
+        id : fileMenuItem
+        contentItem : Text {
+          text : fileMenuItem.text
+          font.pointSize : 10
+        }
+        background : Rectangle {
+          color : "transparent"
+          border.color : "#1A5276"
+          border.width : fileMenuItem.highlighted ? 2 : 0
+        }
+      }
+    }
+    //----------------Tools Menu-------------------
+    Menu {
+      id : toolsMenu
+      title : "Tools"
+      delegate : MenuItem {
+        //Controls the appearance of items in tools menu --> actual definition of submenus occurs in instantiator
+        id : toolsMenuItem
+        contentItem : Text {
+          text : toolsMenuItem.text
+          font.pointSize : 10
+        }
+        background : Rectangle {
+          color : "transparent"
+          border.color : "#1A5276"
+          border.width : toolsMenuItem.highlighted ? 2 : 0
+        }
+      }
+      Instantiator {
+        //Create a menu within tools for object building (patient, substance, etc)
+        id : toolMenuInstantiator
+        model : toolsListModel
+        delegate : Menu {
+          id : toolsDelegate
+          title : name  //role from toolsListModel
+          Repeater {
+            //Create options "Edit", "New", and "Export" for submenu
+            id : toolOptionMenu
+            model : toolsOptionsListModel
+            delegate : MenuItem {
+              id : toolsOptionsDelegate
+              text : option  //role from toolsOptionListModel
+              contentItem : Text {
+                text : toolsOptionsDelegate.text
+                font.pointSize : 10
+              }
+              background : Rectangle {
+                color : "transparent"
+                border.color : "#1A5276"
+                border.width : toolsOptionsDelegate.highlighted ? 2 : 0
+              }
+              onTriggered : {
+                console.log(text + ' ' + toolsDelegate.title)
+              }
+            }
+          }    
+        }
+        onObjectAdded : {
+          toolsMenu.addMenu(object)
+        }
+        onObjectRemoved : {
+          toolsMenu.removeMenu(object)
+        }
+      }
+     }
+    //----------------About Menu-------------------
+    Menu {
+      id : helpMenu
+      title : "About"
+      Action {
+        text : "Help"
+      }
+      Action {
+        text : "Info"
+      }
+      delegate : MenuItem {
+        //Controls the appearance of items in tools menu --> actual definition of submenus occurs in instantiator
+        id : aboutMenuItem
+        contentItem : Text {
+          text : aboutMenuItem.text
+          font.pointSize : 10
+        }
+        background : Rectangle {
+          color : "transparent"
+          border.color : "#1A5276"
+          border.width : aboutMenuItem.highlighted ? 2 : 0
+        }
+      }
+    }
+    //Controls the appearance of the top level options (File, Tools, About)
+    delegate : MenuBarItem {
+      id : menuBarItem
       contentItem : Text {
-        text : newMenuItem.text
-        font.pointSize : 10
+        text : menuBarItem.text
+        font.pointSize : 12
+        horizontalAlignment : Text.AlignLeft
+        verticalAlignment : Text.AlignVCenter
+        color : menuBarItem.highlighted ? "white" : "black"
       }
       background : Rectangle {
-        color : "transparent"
-        border.color : "#1A5276"
-        border.width : newMenuItem.highlighted ? 2 : 0
+        anchors.fill : parent 
+        color : menuBarItem.highlighted ? "#1A5276" : "transparent"
       }
-    }
-    }
-    Action {
-      text : "Save State"
-      onTriggered : {
-        root.exportData(0)
-      }
-    }
-    Action {
-      text : "Save State As"
-      onTriggered : {
-        saveAsDialog.open();
-      }
-    }
-    Action {
-      text : "Open State"
-      onTriggered : {
-        openDialog.open();
-      }
-    }
-    delegate : MenuItem {
-      id : fileMenuItem
-      contentItem : Text {
-        text : fileMenuItem.text
-        font.pointSize : 10
-      }
-      background : Rectangle {
-        color : "transparent"
-        border.color : "#1A5276"
-        border.width : fileMenuItem.highlighted ? 2 : 0
-      }
-    }
-  }
-  Menu {
-    id : exportMenu
-    title : "Export"
-    Action {
-      text : "Patient"
-      onTriggered : {
-        root.exportData(1)
-      }
-    }
-    Action {
-      text : "State"
-      onTriggered : {
-        root.exportData(0)
-      }
-    }
-    Action {
-      text : "Environment"
-      onTriggered : {
-        root.exportData(2)
-      }
-    }
-    Action {
-      text : "Scenario"
-    }
-    delegate : MenuItem {
-      id : menuItem
-      contentItem : Text {
-        text : menuItem.text
-        font.pointSize : 10
-      }
-      background : Rectangle {
-        color : "transparent"
-        border.color : "#1A5276"
-        border.width : menuItem.highlighted ? 2 : 0
-      }
-    }
-  }
-  Menu {
-    id : helpMenu
-    title : "Help"
-  }
-  delegate : MenuBarItem {
-    id : menuBarItem
-    contentItem : Text {
-      text : menuBarItem.text
-      font.pointSize : 12
-      horizontalAlignment : Text.AlignLeft
-      verticalAlignment : Text.AlignVCenter
-      color : menuBarItem.highlighted ? "white" : "black"
     }
     background : Rectangle {
-      anchors.fill : parent 
-      color : menuBarItem.highlighted ? "#1A5276" : "transparent"
+      color : "transparent"
+      anchors.fill : parent
+      Rectangle {
+        color : "#1A5276"
+        width : parent.width
+        height : 1
+        anchors.bottom : parent.bottom
+      }
     }
   }
-  background : Rectangle {
-    color : "transparent"
-    anchors.fill : parent
-    Rectangle {
-      color : "#1A5276"
-      width : parent.width
-      height : 1
-      anchors.bottom : parent.bottom
-    }
+  //--------Helper components-------------------
+  ListModel {
+    //Elements for all options within tools
+    id: toolsListModel
+    ListElement { name : "Patient"}
+    ListElement { name : "Environment"}
+    ListElement { name : "Substance"}
+    ListElement { name : "Compound"}
+    ListElement { name : "Nutrient"}
+    ListElement { name : "ECG"}
+  }
+
+  ListModel {
+    //Elements for all options within each tools submenu
+    id: toolsOptionsListModel
+    ListElement { option : "New"}
+    ListElement { option : "Edit"}
+    ListElement { option : "Load"}
   }
 
   FileDialog {
@@ -148,5 +186,11 @@ MenuBar {
     nameFilters : ["states (*.xml)", "All files (*)"]
     selectMultiple : false
     selectExisting : true
+  }
+
+  UIObjectBuilder {
+    id : objectWizard
+    width : menuBar.parent.width / 3
+    height : menuBar.parent.height
   }
 }

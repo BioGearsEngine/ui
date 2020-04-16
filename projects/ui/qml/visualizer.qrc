@@ -35,6 +35,8 @@
         <file>CustomPlotsForm.ui.qml</file>
         <file>MenuArea.qml</file>
         <file>MenuAreaForm.ui.qml</file>
+        <file>UIObjectBuilder.qml</file>
+        <file>UIObjectBuilderForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

@@ -60,11 +60,16 @@ public:
   Q_INVOKABLE Scenario& patient_name(QString);
   Q_INVOKABLE Scenario& environment_name(QString);
 
+  //Load and save functions
   Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE void export_patient(QString patientFileName);
   Q_INVOKABLE void export_state(QString stateFileName);
   Q_INVOKABLE void export_environment(QString environmentFileName);
   Q_INVOKABLE void save_state(QString filePath);
+
+  //Build functions (use CDM to return data fields to include in creator wizard)
+ // Q_INVOKABLE QVector<
+
 
   Q_INVOKABLE double get_simulation_time();
 
