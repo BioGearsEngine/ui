@@ -6,6 +6,7 @@ import QtQuick.Dialogs 1.3
 Item {
   property alias saveAsDialog : saveAsDialog
   property alias openDialog : openDialog
+  property alias wizardDialog : wizardDialog
   width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
   height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
   MenuBar {
@@ -23,7 +24,7 @@ Item {
       Action {
         text : "Save State"
         onTriggered : {
-          root.exportData(0)
+          root.exportData(6)
         }
       }
       Action {
@@ -36,7 +37,7 @@ Item {
         id : fileMenuItem
         contentItem : Text {
           text : fileMenuItem.text
-          font.pointSize : 10
+          font.pointSize : 8
         }
         background : Rectangle {
           color : "transparent"
@@ -54,7 +55,7 @@ Item {
         id : toolsMenuItem
         contentItem : Text {
           text : toolsMenuItem.text
-          font.pointSize : 10
+          font.pointSize : 8
         }
         background : Rectangle {
           color : "transparent"
@@ -69,6 +70,7 @@ Item {
         delegate : Menu {
           id : toolsDelegate
           title : name  //role from toolsListModel
+          property int toolIndex : index
           Repeater {
             //Create options "Edit", "New", and "Export" for submenu
             id : toolOptionMenu
@@ -78,7 +80,7 @@ Item {
               text : option  //role from toolsOptionListModel
               contentItem : Text {
                 text : toolsOptionsDelegate.text
-                font.pointSize : 10
+                font.pointSize : 8
               }
               background : Rectangle {
                 color : "transparent"
@@ -86,7 +88,8 @@ Item {
                 border.width : toolsOptionsDelegate.highlighted ? 2 : 0
               }
               onTriggered : {
-                console.log(text + ' ' + toolsDelegate.title)
+                //toolIndex = Patient/Environment/..., currentIndex = New/Export/Edit, 
+                root.parseToolsSelection(toolsDelegate.toolIndex, currentIndex)
               }
             }
           }    
@@ -114,7 +117,7 @@ Item {
         id : aboutMenuItem
         contentItem : Text {
           text : aboutMenuItem.text
-          font.pointSize : 10
+          font.pointSize : 8
         }
         background : Rectangle {
           color : "transparent"
@@ -128,7 +131,7 @@ Item {
       id : menuBarItem
       contentItem : Text {
         text : menuBarItem.text
-        font.pointSize : 12
+        font.pointSize : 8
         horizontalAlignment : Text.AlignLeft
         verticalAlignment : Text.AlignVCenter
         color : menuBarItem.highlighted ? "white" : "black"
@@ -165,8 +168,8 @@ Item {
     //Elements for all options within each tools submenu
     id: toolsOptionsListModel
     ListElement { option : "New"}
+    ListElement { option : "Export"}
     ListElement { option : "Edit"}
-    ListElement { option : "Load"}
   }
 
   FileDialog {
@@ -188,9 +191,8 @@ Item {
     selectExisting : true
   }
 
-  UIObjectBuilder {
-    id : objectWizard
-    width : menuBar.parent.width / 3
-    height : menuBar.parent.height
+  WizardDialog {
+    id : wizardDialog
+    visible : false
   }
 }

@@ -22,27 +22,46 @@ MenuAreaForm {
     }
   }
 
+  function parseToolsSelection (tool, option){
+    console.log(tool, option)
+    switch (option){
+      case 0 :
+        //New
+        wizardDialog.open()
+        break;
+      case 1 : 
+        //Export
+        exportData(tool)
+        break;
+      case 2 : 
+        //Edit
+        break;
+    }
+  }
+
   function exportData(type){
     let simTime = Math.ceil(scenario.get_simulation_time())
     let patient = scenario.patient_name().replace(/\s+/g,'')        //Get rid of white space (not common for patient files)
     let enviro = scenario.environment_name().replace(/\s+/g,'')     //Get rid of white space (e.g. "Unknown Environment")
     switch (type) {
       case 0:
-        //Export state
-        let stateFile =  patient + "@" + simTime + "s.xml"
-        scenario.export_state(stateFile)
-        break;
-      case 1:
         //Export patient
         let patientFile =  patient + "@" + simTime + "s.xml"
         scenario.export_patient(patientFile)
         break;
-      case 2:
+      case 1:
         //Export environment
         let enviroFile =  enviro + "@" + simTime + "s.xml"
         scenario.export_environment(enviroFile)
         break;
+      case 2:
+        //Substance
+        break;
+      default :
+        //Export state
+        let stateFile =  patient + "@" + simTime + "s.xml"
+        scenario.export_state(stateFile)
+        break;
     }
   }
-
 }
