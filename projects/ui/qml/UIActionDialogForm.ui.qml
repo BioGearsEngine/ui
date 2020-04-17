@@ -15,11 +15,9 @@ Dialog {
   property int numColumns : 1
   property int colSpace: 0
   property int rowSpace : 0
-  property int width
-  property int height
   //Base properties
-  width : width
-  height : height
+  width : 500
+  height : 250
   modal : true
   closePolicy : Popup.NoAutoClose
   //Header

@@ -24,6 +24,9 @@ UIActionDialogForm {
   onRejected : {
     close();
   }
+  Component.onDestruction : {
+    console.log("Destroying action dialog");
+  }
 
   //----------------------Functions-----------------------
 

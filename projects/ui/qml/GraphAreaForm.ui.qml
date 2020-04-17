@@ -79,6 +79,7 @@ Page {
                 }
             }
         }
+
         SwipeView {
             id : systemSwipeView
             clip : true

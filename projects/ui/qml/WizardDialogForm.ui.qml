@@ -17,7 +17,7 @@ Dialog {
     color: "#1A5276"
     border.color: "#1A5276"
     Text {
-      id:content
+      id: headerContent
       anchors.fill : parent
       text: wizardDialog.title
 		  font.pointSize : 12
@@ -30,6 +30,15 @@ Dialog {
   //Add standard buttons to footer
   footer : DialogButtonBox {
     standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel
+  }
+    //Main content
+  contentItem : Rectangle {
+    id : mainContent
+    color : "transparent"
+		anchors.left : parent.left;
+		anchors.right : parent.right;
+    anchors.top : header.bottom
+    anchors.bottom : footer.top
   }
 }
 /*##^## Designer {

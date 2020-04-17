@@ -2,52 +2,68 @@ import QtQuick.Controls 2.12
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
 
-
-Dialog {
-  id: patientDialog
-  //Properties -- used to customize the functionality / look of the dialog window
-  property int numRows : 1
-  property int numColumns : 2
-  property int colSpace : 5
-  property int rowSpace : 5
-  //Base properties
-  modal : true
-  title : "Patient Creator"
-  closePolicy : Popup.NoAutoClose
-  //Header
-  header : Rectangle {
-    id : headerBackground
-    width : parent.width
-    height : parent.height * 0.05
-    color: "#1A5276"
-    border.color: "#1A5276"
-    Text {
-      id:content
-      anchors.fill : parent
-      text: patientDialog.title
-		  font.pointSize : 12
-      leftPadding : 10
-      color: "white"
-      horizontalAlignment: Text.AlignLeft
-      verticalAlignment: Text.AlignVCenter
+GridView {
+  id: patientWizard
+  clip : true
+  model : patientDataModel //32
+  anchors.fill : parent
+  cellHeight : parent.height / 10
+  cellWidth : parent.width / 2
+  delegate : Row {
+    width : cellWidth
+    Label {
+      width : parent.width / 2
+      text : name
+      font.pointSize : 8
+      verticalAlignment : Text.AlignBottom
+      horizontalAlignment : Text.AlignLeft
+      padding : 5
+    }
+    TextField {
+      placeholderText: "Data"
+      width : parent.width / 4
+      font.pointSize : 8
+      verticalAlignment : Text.AlignVCenter
+      horizontalAlignment : Text.AlignHCenter
+    }
+    ComboBox {
+      width : parent.width / 4
+      model : patientWizard.units[patientDataModel.get(index).unit]
+      font.pointSize : 6
     }
   }
-  //Add standard buttons to footer
-  footer : DialogButtonBox {
-    standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel
+
+  ListModel {
+    id : patientDataModel
+    ListElement {name : "Name"; section : "General"}
+    ListElement {name : "Gender"; section : "General"; unit : "gender"}
+    ListElement {name : "Age"; section : "General"; unit : "time" }
+    ListElement {name : "Weight"; section : "General"; unit : "mass"}
+    ListElement {name : "Height"; section : "General"; unit : "length"}
+    ListElement {name : "Body Density"; section : "General"; unit : "density"}
+    ListElement {name : "Body Fat Fraction"; section : "General"; unit : "fraction"}
+    ListElement {name : "Lean Body Mass"; section : "General"; unit : "mass"}
+    ListElement {name : "Muscle Mass"; section : "General"; unit : "mass"}
+    ListElement {name : "Blood Volume"; section : "Cardiovascular"; unit : "volume"}
+    ListElement {name : "Blood Type"; section : "Cardiovascular"; unit : "bloodType"}
+    ListElement {name : "Blood Volume Baseline"; section : "Cardiovascular"; unit : "volume"}
+    ListElement {name : "Diastolic Arterial Pressure"; section : "Cardiovasular"; unit : "pressure"}
+    ListElement {name : "Systolic Arterial Pressure"; section : "Cardiovasular"; unit : "pressure"}
+    ListElement {name : "Heart Rate Minimum"; section : "Cardiovasular"; unit : "frequency"}
+    ListElement {name : "Heart Rate Maximum"; section : "Cardiovasular"; unit : "frequency"}
+    ListElement {name : "Respiration Rate"; section : "Respiratory"; unit : "frequency"}
+    ListElement {name : "Tidal Volume"; section : "Respiratory"; unit : "volume"}
   }
-  //Main content
-  contentItem : GridLayout {
-    id : contentGrid
-		anchors.left : parent.left;
-		anchors.right : parent.right;
-    anchors.top : header.bottom
-    anchors.bottom : footer.top
-    rows : numRows
-    columns : numColumns
-    columnSpacing : colSpace
-    rowSpacing : rowSpace
-  }
+
+  property var units : ({'mass' : ['cm', 'kg'],
+                         'length' : ['in', 'm'],
+                         'volume' : ['L','mL','uL'],
+                         'gender' : ['F', 'M'],
+                         'bloodType' : ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
+                         'frequency' : ['1/s', '1/min'],
+                         'density' : ['g/mL','kg/m^3'],
+                         'time' : ['yr', 'hr','min','s'],
+                         'pressure' : ['mmHg', 'cmH2O']})
 }
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

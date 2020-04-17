@@ -23,7 +23,6 @@ MenuAreaForm {
   }
 
   function parseToolsSelection (tool, option){
-    console.log(tool, option)
     switch (option){
       case 0 :
         //New

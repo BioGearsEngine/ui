@@ -503,6 +503,7 @@ auto Scenario::get_physiology_conditions() -> PatientConditions
   if (!_current_conditions) {
     _current_conditions = std::make_unique<PatientConditions>();
   }
+
   _current_conditions->diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
   return *_current_conditions;
 }

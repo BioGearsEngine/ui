@@ -4,6 +4,7 @@ import QtQuick 2.12
 import QtQuick.Dialogs 1.3
 
 Item {
+  id : menuArea
   property alias saveAsDialog : saveAsDialog
   property alias openDialog : openDialog
   property alias wizardDialog : wizardDialog
@@ -194,5 +195,8 @@ Item {
   WizardDialog {
     id : wizardDialog
     visible : false
+    height : menuArea.parent.height
+    width : menuArea.parent.width / 2
+    x : menuArea.parent.width / 4
   }
 }

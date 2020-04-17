@@ -67,10 +67,6 @@ public:
   Q_INVOKABLE void export_environment(QString environmentFileName);
   Q_INVOKABLE void save_state(QString filePath);
 
-  //Build functions (use CDM to return data fields to include in creator wizard)
- // Q_INVOKABLE QVector<
-
-
   Q_INVOKABLE double get_simulation_time();
 
   Q_INVOKABLE void restart(QString patient_file);
@@ -168,7 +164,9 @@ private:
   QVector<QString> _drugs_list;
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
+
   BioGearsData* _physiology_model;
+
 
   QtLogForward* _consoleLog;
 

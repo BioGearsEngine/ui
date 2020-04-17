@@ -57,7 +57,8 @@ ActionDrawerForm {
 																																							)
 																										}
 																	)
-      hemDialog.open()
+      actionDrawer.closed.connect(hemDialog.destroy)
+			hemDialog.open()
 	  }
 	}
 
@@ -90,7 +91,8 @@ ActionDrawerForm {
 																										}
 																	)
 			//Note that "2" option for level in "Off Function" corresponds to "No tourniquet" in CDM::TourniquetApplicationLevel
-      tourniquetDialog.open()
+      actionDrawer.closed.connect(tourniquetDialog.destroy)
+			tourniquetDialog.open()
 		}
 	}
 	
@@ -123,6 +125,7 @@ ActionDrawerForm {
 																																								)
 																													}
 																				)
+			actionDrawer.closed.connect(infectionDialog.destroy)
 			infectionDialog.open()
 		}
 	}
@@ -149,6 +152,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																	)
+			actionDrawer.closed.connect(burnDialog.destroy)
 			burnDialog.open()
 		}
 	}
@@ -180,6 +184,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																		)
+			actionDrawer.closed.connect(painDialog.destroy)
 			painDialog.open();
 		}
 	}
@@ -215,6 +220,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																		)
+			actionDrawer.closed.connect(tensionDialog.destroy)
 			tensionDialog.open()
 		}
 	}
@@ -244,6 +250,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																		)
+			actionDrawer.closed.connect(needleDialog.destroy)
 			needleDialog.open()
 		}
 	}
@@ -277,6 +284,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																		)
+			actionDrawer.closed.connect(tbiDialog.destroy)
 			tbiDialog.open();
 		}	
 	}
@@ -315,7 +323,7 @@ ActionDrawerForm {
 																																								)
 																												}
 																			)
-
+			actionDrawer.closed.connect(exerciseDialog.destroy)
 			exerciseDialog.open()
 		}
 	}
@@ -411,6 +419,7 @@ ActionDrawerForm {
 																																									)
 																													}
 																				)
+			actionDrawer.closed.connect(severityDialog.destroy)
 			severityDialog.open()
 		}
 	}
@@ -449,6 +458,7 @@ ActionDrawerForm {
 			let rateField = drugDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
 			drugDialog.applyProps.connect(root.apply_drugAction)
 			adminCombo.comboUpdate.connect(function (value) { root.manage_drugOptions(value, doseField, concentrationField, rateField)} )
+			actionDrawer.closed.connect(drugDialog.destroy)
 			drugDialog.open();
 		}
 	}
@@ -503,7 +513,6 @@ ActionDrawerForm {
 			case 'Bolus-Intraarterial' :
 				//Intraarterial is CDM::enumBolusAdministration::0
 				description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
-				console.log('Here')
 				actionModel.addSwitch(description, 
 															function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
 															);
@@ -577,6 +586,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																	)
+			actionDrawer.closed.connect(infusionDialog.destroy)
 			infusionDialog.open()
 		}
 	}
@@ -611,6 +621,7 @@ ActionDrawerForm {
 																																							)
 																											}
 																	)
+			actionDrawer.closed.connect(transfusionDialog.destroy)
 			transfusionDialog.open()
 		}
 	}
