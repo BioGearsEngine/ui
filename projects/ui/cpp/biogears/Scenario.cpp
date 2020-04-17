@@ -236,16 +236,6 @@ Scenario& Scenario::load_patient(QString file)
       blood_chemistry->child(4)->scalar(&_engine->GetBloodChemistry().GetHematocrit());
       blood_chemistry->child(5)->scalar(&_engine->GetBloodChemistry().GetStrongIonDifference());
       }
-    auto renal = static_cast<BioGearsData*>(_physiology_model->index( BioGearsData::RENAL, 0, QModelIndex()).internalPointer());
-      {
-      renal->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
-      renal->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
-      renal->child(2)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
-      renal->child(3)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
-      renal->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
-      renal->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
-      renal->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
-      }
 
     auto energy_and_metabolism = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::ENERGY_AND_METABOLISM, 0, QModelIndex()).internalPointer());
       {
@@ -267,17 +257,21 @@ Scenario& Scenario::load_patient(QString file)
       energy_and_metabolism->child(5)->unit_scalar( &_engine->GetTissue().GetCarbonDioxideProductionRate());
       }
 
-    auto fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::FLUID_BALANCE, 0, QModelIndex()).internalPointer());
+    auto renal_fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_FLUID_BALANCE, 0, QModelIndex()).internalPointer());
       {
-      fluid_balance->child(0)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
-      fluid_balance->child(1)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
-      fluid_balance->child(2)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
-      fluid_balance->child(3)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
-      }
 
-    auto drugs = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::DRUGS, 0, QModelIndex()).internalPointer());
-      {
-      drugs->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      renal_fluid_balance->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+      renal_fluid_balance->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
+      renal_fluid_balance->child(2)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
+      renal_fluid_balance->child(3)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
+      renal_fluid_balance->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
+      renal_fluid_balance->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
+      renal_fluid_balance->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
+
+      renal_fluid_balance->child(7)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
+      renal_fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
+      renal_fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
+      renal_fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
       }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
@@ -285,17 +279,13 @@ Scenario& Scenario::load_patient(QString file)
       substances->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       }
 
-    auto panels = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::PANELS, 0, QModelIndex()).internalPointer());
+    auto customs = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CUSTOM, 0, QModelIndex()).internalPointer());
       {
-      panels->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-      panels->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-      panels->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      customs->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      customs->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      customs->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       }
-
-    //emit patientStateChanged(get_physiology_state());
-    //emit patientMetricsChanged(get_physiology_metrics());
-    //emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
-    //emit stateChanged();
 
     emit stateLoad();
   } else {
@@ -338,10 +328,6 @@ inline void Scenario::physiology_thread_step()
     _engine->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
 
-    //emit patientStateChanged(get_physiology_state());
-    //emit patientMetricsChanged(get_physiology_metrics());
-    //emit patientConditionsChanged(get_physiology_conditions());
-    //emit substanceDataChanged(_engine->GetSimulationTime(biogears::TimeUnit::s), get_physiology_substances());
     emit timeAdvance(_engine->GetSimulationTime(biogears::TimeUnit::s));
 
   } else {

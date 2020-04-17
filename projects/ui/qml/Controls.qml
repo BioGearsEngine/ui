@@ -32,67 +32,25 @@ ControlsForm {
 
   Scenario {
     id: biogears_scenario
-  //   onPatientMetricsChanged: {
-  //     if(metrics){
-  //       root.respiratoryRate.value        = metrics.RespiratoryRate
-  //       root.heartRate.value             = metrics.HeartRate 
-  //       root.core_temp_c.value           = metrics.CoreTemp + "c"
-  //       root.oxygenSaturation.value      = metrics.OxygenSaturation
-  //       root.systolicBloodPressure.value = metrics.SystolicBloodPressure
-  //       root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
-                
-
-  //       var seconds = metrics.SimulationTime % 60
-  //       var minutes = Math.floor(metrics.SimulationTime / 60) % 60
-  //       var hours   = Math.floor(metrics.SimulationTime / 3600)
-
-  //       seconds = (seconds<60) ? "0%1".arg(seconds) : "%1".arg(seconds)
-  //       minutes = (minutes<60) ? "0%1".arg(minutes) : "%1".arg(minutes)
-
-  //       playback.simulationTime = "%1:%2:%3".arg(hours).arg(minutes).arg(seconds)
-  //       root.patientMetricsChanged(metrics)
-                
-  //     }
-  //   }
-
-    // onPatientStateChanged: {
-    //   root.age_yr.value    = patientState.Age
-    //   root.gender.value    = patientState.Gender
-    //   root.height_cm.value = patientState.Height + " cm"
-    //   root.weight_kg.value = patientState.Weight + " kg"
-    //   root.condition.value = patientState.ExerciseState
-    //   root.bodySufaceArea.value       = patientState.BodySurfaceArea
-    //   root.bodyMassIndex.value        = patientState.BodyMassIndex
-    //   root.fat_pct.value              = patientState.BodyFat
-                
-    //   root.patientStateChanged(patientState)
-    // }
-
-    // onPatientConditionsChanged:{
-    //   root.patientConditionsChanged(conditions)
-    // }
 
     onPhysiologyChanged:  {
-      console.log("Controls.qml:onPhysiologyChanged")
       root.patientPhysiologyChanged(model)
     }  
                 
     onStateLoad: {
-      console.log("Controls.qml:onStateLoad")
       root.restartClicked()
     }
 
     onTimeAdvance: {
-      console.log("Controls.qml:onTimeAdvance")
-        var seconds = SimulationTime % 60
-        var minutes = Math.floor(SimulationTime / 60) % 60
-        var hours   = Math.floor(SimulationTime / 3600)
+        var seconds = SimulationTime_s % 60
+        var minutes = Math.floor(SimulationTime_s / 60) % 60
+        var hours   = Math.floor(SimulationTime_s / 3600)
 
         seconds = (seconds<60) ? "0%1".arg(seconds) : "%1".arg(seconds)
         minutes = (minutes<60) ? "0%1".arg(minutes) : "%1".arg(minutes)
 
         playback.simulationTime = "%1:%2:%3".arg(hours).arg(minutes).arg(seconds)
-        root.simulationTimeAdvance(SimulationTime)
+        root.simulationTimeAdvance(SimulationTime_s)
     }
                 
     onSubstanceDataChanged : {

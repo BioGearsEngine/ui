@@ -1,5 +1,7 @@
 #include "PhysiologyRequest.h"
 
+#include "../BioGearsData.h"
+
 #include <QDebug>
 #include <QVariant>
 
@@ -7,9 +9,10 @@ PhysiologyRequest::PhysiologyRequest()
 {
 }
 //------------------------------------------------------------------------------------
-PhysiologyRequest::PhysiologyRequest(QString prefix, QString name, PhysiologyRequest* parent)
+PhysiologyRequest::PhysiologyRequest(QString prefix, QString name, bool active, PhysiologyRequest* parent)
   : _parent(parent)
   , _name(name)
+  , _active(active)
   , _prefix(prefix)
 {
 }
@@ -19,6 +22,26 @@ PhysiologyRequest::~PhysiologyRequest()
   _children.clear();
 }
 //------------------------------------------------------------------------------------
+bool PhysiologyRequest::active() const
+{
+  return _active;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::active(bool value)
+{
+  _active = value;
+}
+//------------------------------------------------------------------------------------
+int PhysiologyRequest::rate() const
+{
+  return _refresh_rate;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::rate(int value)
+{
+  _refresh_rate = value;
+}
+//------------------------------------------------------------------------------------
 int PhysiologyRequest::rows() const
 {
   return _children.size();
@@ -26,7 +49,7 @@ int PhysiologyRequest::rows() const
 //------------------------------------------------------------------------------------
 int PhysiologyRequest::columns() const
 {
-  return COLUMN_COUNT;
+  return 5;
 }
 //------------------------------------------------------------------------------------
 PhysiologyRequest const* PhysiologyRequest::parent() const
@@ -78,11 +101,13 @@ auto PhysiologyRequest::header(int section) const -> QString
   }
 }
 //------------------------------------------------------------------------------------
-void PhysiologyRequest::append(QString prefix, QString name)
+void PhysiologyRequest::append(QString prefix, QString name, bool active)
 {
   PhysiologyRequest request;
   request._prefix = prefix;
   request._name = name;
+  request._parent = this;
+  request._active = active;
   _children.append(request);
 }
 //------------------------------------------------------------------------------------
@@ -100,24 +125,46 @@ void PhysiologyRequest::modify(int row, const biogears::SEScalar* data)
   }
 }
 //------------------------------------------------------------------------------------
+void PhysiologyRequest::modify(int row, int refreshRate)
+{
+  if (0 <= row && row < _children.size()) {
+    _children[row]._refresh_rate = refreshRate;
+  }
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::modify(int row, bool enabled)
+{
+  if (0 <= row && row < _children.size()) {
+    _children[row]._active = enabled;
+  }
+}
+//------------------------------------------------------------------------------------
 #pragma optimize("", off)
 QVariant PhysiologyRequest::data(int role) const
 {
   switch (role) {
-  case PREFIX:
+  case BioGearsData::PrefixRole:
     return QVariant(_prefix); // PREFIX ROLE
   case Qt::DisplayRole:
-  case NAME:
-    qDebug() << _prefix + "_" + _name;
     return QVariant(_name);
-  case VALUE: //VALUE ROLE
+  case BioGearsData::ValueRole: //VALUE ROLE
     try {
       return (_unit) ? QVariant(_unit->GetValue()) : (_value) ? QVariant(_value) : QVariant();
     } catch (biogears::CommonDataModelException e) {
       return "NaN";
     }
-  case UNIT: //UNIT ROLE
+  case BioGearsData::UnitRole: //UNIT ROLE
     return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant();
+  case BioGearsData::EnabledRole:
+    return _active;
+  case BioGearsData::RowRole:
+    return _children.size();
+  case BioGearsData::RateRole:
+    return _refresh_rate;
+  case BioGearsData::ChildrenRole:
+    return _children.size();
+  case BioGearsData::ColumnRole:
+    return 4;
   default:
     return QVariant();
   }

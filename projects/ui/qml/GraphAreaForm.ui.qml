@@ -7,10 +7,9 @@ import QtQml.Models 2.2
 
 import com.biogearsengine.ui.scenario 1.0
 Page {
-  //id: root
   z : 0 //Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
 
-  // property alias physiologyRequestModel : physiologyRequestModel
+  property bool initialized: false
   property PhysiologyModel physiologyRequestModel
 	property alias vitalsGridView : vitalsGridView
 	property alias cardiopulmonaryGridView : cardiopulmonaryGridView
@@ -22,14 +21,6 @@ Page {
 
   property alias tenHzPlotTimer : tenHzPlotTimer
   property alias oneHzPlotTimer : oneHzPlotTimer
-	//property alias hepaticGridView : hepaticGridView
-	//property alias nervousGridView : nervousGridView
-	//property alias renalGridView : renalGridView
-	//property alias respiratoryGridView : respiratoryGridView
-	//property alias tissueGridView : tissueGridView
-  
-  
-	//property alias plotObjectModel : plotObjectModel
 
   state : "realTime"
 
@@ -145,24 +136,28 @@ Page {
         closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
         Repeater {
           id : filterMenuInstance
-          model : physiologyRequestModel.category(plots.currentIndex)
+          model : (physiologyRequestModel) ? physiologyRequestModel.category(plots.currentIndex) : null
           delegate : MenuItem {
             CheckBox { 
               checkable : true
-              checked : active
-              text : name
+              checked : model.active
+              text : model.name
               onClicked : {
                 active = checked
                 if (checked){
-							    createPlotView(plots.currentIndex, model)
+                  model.active = true
+                  createPlotView(plots.currentIndex, index, model)
 								} else {
-									removePlotView(plots.currentIndex, model.request)
+                  model.active = false
+                  removePlotView(plots.currentIndex, index,  model.name)
 								}
               }
             }
           }
         }
       }
+
+      //TODO: Fix Substance Menu
       Menu {
         id : substanceMenu
         x : -200
@@ -178,7 +173,7 @@ Page {
             property string sub : subName
             Repeater {
               id : subMenuInstance
-              model : substanceMenuListModel.get(substanceSubMenu.delegateIndex).props
+              model : substanceMenuListModel//.get(substanceSubMenu.delegateIndex).props
               delegate : MenuItem {
                 CheckBox { 
                   checkable : true
@@ -187,9 +182,9 @@ Page {
                   onClicked : {
                     console.log(sub + " : " + text)
                     if (checked){
-											createPlotView(plots.currentIndex, {"request" : sub + "-" + text})    //createPlotView expects an object with "request" role
+                      createPlotView(plots.currentIndex, index, {"request" : sub + "-" + text})    //createPlotView expects an object with "request" role
 										} else {
-											removePlotView(plots.currentIndex, sub + "-" + text)
+                      removePlotView(plots.currentIndex, index, sub + "-" + text)
 										}
                   }
                 }
@@ -430,110 +425,12 @@ Page {
     anchors.horizontalCenter: plots.horizontalCenter
   }
 
-
-// ListModel {
-//   id: physiologyRequestModel
-//   ListElement {
-//     system : "Vitals"
-// 	  activeRequests: [ ]
-//     requests:  [
-//       ListElement {request:"bloodPressure"; active: false;
-//                     subRequests: [ListElement {subRequest: "diastolicArterialPressure"}, ListElement{subRequest:"systolicArterialPressure"}]}
-//       ,ListElement {request:"respirationRate"; active: false}
-//       ,ListElement {request:"heartRate"; active: false}
-//       ,ListElement {request:"oxygenSaturation"; active: false}
-//       ,ListElement {request:"cardiacOutput"; active: false}
-//       ,ListElement {request:"bloodVolume"; active: false}
-//       ,ListElement {request:"heartStrokeVolume"; active: false}
-//       ,ListElement {request:"tidalVolume"; active: true}
-//       ,ListElement {request:"centralVenousPressure"; active: false}
-//     ]
-//   }
-//   ListElement {
-//     system : "Cardiopulmonary"
-// 	  activeRequests: []
-//     requests:  [
-//       ListElement {request:"cerebralPerfusionPressure"; active: false}
-//       ,ListElement {request:"intracranialPressure"; active: false}
-//       ,ListElement {request:"systemicVascularResistance"; active: false}
-//       ,ListElement {request:"pulsePressure"; active: false}
-//       ,ListElement {request:"inspiratoryExpiratoryRatio"; active: false}
-//       ,ListElement {request:"cerebralBloodFlow"; active: false}
-//       ,ListElement {request:"totalPulmonaryVentilation"; active: false}
-//       ,ListElement {request:"totalLungVolume"; active: false}
-//       ,ListElement {request:"totalAlveolarVentilation"; active: false}
-//       ,ListElement {request:"deadSpaceVentilation"; active: false}
-//       ,ListElement {request:"transpulmonaryPressure"; active: false}
-//       ,ListElement {request:"meanArterialPressure"; active: false}
-//     ]
-//   }
-//   ListElement {
-//     system : "BloodChemistry"
-// 	  activeRequests: []
-//     requests:  [
-//       ListElement {request:"bloodGasLevels"; active: false;
-//         subRequests: [ListElement {subRequest: "arterialOxygenPressure"}, ListElement{subRequest:"arterialCarbonDioxidePressure"}]}
-//       ,ListElement {request:"arterialBloodPH"; active: false}
-//       ,ListElement {request:"hematocrit"; active: false}
-//     ]
-//   }
-//   ListElement {
-//     system : "EnergyMetabolism"
-// 	  activeRequests: []
-//     requests:  [
-//       ListElement {request:"coreTemperature"; active: false}
-//       ,ListElement {request:"skinTemperature"; active: false}
-//       ,ListElement {request:"totalMetabolicRate"; active: false}
-//       ,ListElement {request:"sweatRate"; active: false}
-//       ,ListElement {request:"carbonDioxideProductionRate"; active: false}
-//       ,ListElement {request:"oxygenConsumptionRate"; active: false}
-//       ,ListElement {request:"stomachContents"; active: false;
-//         subRequests: [ListElement {subRequest: "stomachContents_carbohydrates"}, ListElement{subRequest: "stomachContents_fat"}, ListElement{subRequest:"stomachContents_protein"}, ListElement{subRequest:"stomachContents_water"}]}
-//     ]
-//   }
-
-
-//   ListElement {
-//     system : "RenalFluidBalance"
-//     activeRequests: []
-//     requests:  [
-//       ListElement {request:"renalBloodFlow"; active: false}
-//       ,ListElement {request:"glomerularFiltrationRate"; active: false}
-//       ,ListElement {request:"urineOutput"; active: false; 
-//         subRequests : [ListElement {subRequest : "urineProductionRate"}, ListElement {subRequest : "meanUrineOutput"}]}
-//       ,ListElement{request:"urineVolume"; active: false}
-//       ,ListElement{request:"extracellularFluidVolume"; active: false}
-//       ,ListElement{request:"extravascularFluidVolume"; active: false}
-//       ,ListElement{request:"intracellularFluidVolume"; active: false}
-//       ,ListElement{request:"totalBodyFluidVolume"; active: false}
-      
-//     ]
-//   }
-
-//   ListElement {
-//     system : "Substances"
-//     activeRequests : []
-//     requests : []    //Requests are managed by substanceMenuListModel--going to try to merge all these lists soon
-//   }
-
-//   ListElement {
-//     system : "CustomViews"
-//     activeRequests : []
-//     requests : [
-//       ListElement {request: "respiratoryPVCycle"; active :false} 
-//     ]
-//   }
-// }
-
 Timer {
   id : tenHzPlotTimer
   interval : 100
   running : false
   repeat : true
   triggeredOnStart : true
-  onTriggered : {
-    root.tenHzPlotRefresh(plotMetrics)
-  }
 }
 
 Timer {
@@ -542,9 +439,6 @@ Timer {
   running : false
   repeat : true
   triggeredOnStart : true
-  onTriggered : {
-    root.oneHzPlotRefresh(plotMetrics)
-  }
 }
 }
 

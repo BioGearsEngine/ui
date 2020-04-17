@@ -119,11 +119,6 @@ signals:
   void pausedToggled(bool isPaused);
   void throttledToggled(bool isThrottled);
   void loggerChanged();
-  //void stateChanged();
-  //void patientStateChanged(PatientState patientState);
-  //void patientMetricsChanged(PatientMetrics* metrics);
-  //void physiologyChanged(PhysiologyTree* physiology);
-  //void patientConditionsChanged(PatientConditions conditions);
 
 protected:
   PatientState get_physiology_state();

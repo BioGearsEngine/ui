@@ -17,14 +17,26 @@ public:
     VITALS = 0,
     CARDIOPULMONARY,
     BLOOD_CHEMISTRY,
-    RENAL,
     ENERGY_AND_METABOLISM,
-    FLUID_BALANCE,
-    DRUGS,
+    RENAL_FLUID_BALANCE,
     SUBSTANCES,
-    PANELS,
+    CUSTOM,
     TOTAL_CATEGORIES
   };
+  Q_ENUMS(Categories)
+  enum PhysiologyRequestRoles {
+    PrefixRole = Qt::UserRole + 1,
+    RequestRole,
+    ValueRole,
+    UnitRole,
+    FullNameRole,
+    EnabledRole,
+    RateRole,
+    RowRole,
+    ChildrenRole,
+    ColumnRole
+  };
+  Q_ENUMS(PhysiologyRequestRoles)
 
   explicit BioGearsData();
   explicit BioGearsData(QString name, QObject* parent);
@@ -32,19 +44,13 @@ public:
   ~BioGearsData() override;
   void initialize();
 
-  enum PhysiologyRequestRoles {
-    PrefixRole = Qt::UserRole + 1,
-    RequestRole,
-    ValueRole,
-    UnitRole,
-    FullNameRole
-  };
 
   Q_INVOKABLE int categories();
   Q_INVOKABLE BioGearsData* category(int category);
 
   QVariant data(int role) const;
   QVariant data(const QModelIndex& index, int role) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
   QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
@@ -63,6 +69,11 @@ public:
     roles[ValueRole] = "value";
     roles[UnitRole] = "unit";
     roles[FullNameRole] = "fullname";
+    roles[EnabledRole] = "active";
+    roles[RateRole] = "rate";
+    roles[RowRole] = "rows";
+    roles[ChildrenRole] = "rows";
+    roles[ColumnRole] = "columns";
     return roles;
   }
 
@@ -79,10 +90,8 @@ private:
   BioGearsData* _vitals = nullptr;
   BioGearsData* _cardiopulmonary = nullptr;
   BioGearsData* _blood_chemistry = nullptr;
-  BioGearsData* _renal = nullptr;
   BioGearsData* _energy_and_metabolism = nullptr;
-  BioGearsData* _fluid_balance = nullptr;
-  BioGearsData* _drugs = nullptr;
+  BioGearsData* _renal_fluid_balance = nullptr;
   BioGearsData* _substances = nullptr;
-  BioGearsData* _panels = nullptr;
+  BioGearsData* _customs = nullptr;
 };

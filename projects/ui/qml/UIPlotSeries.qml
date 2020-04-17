@@ -1,54 +1,44 @@
 import QtQuick 2.12
 import QtCharts 2.3
 
-import com.biogearsengine.ui.scenario 
+import com.biogearsengine.ui.scenario 1.0
 UIPlotSeriesForm {
   id: root
 
   property int windowWidth_min : 10
   property var requestNames : []
-
+  property var dataSource : null
   //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
-  function initializeChart (requestElement, tickCount) {
-    if(requestElement.subRequests){
-      for (let i = 0; i < requestElement.subRequests.count; ++i){
-        let subRequest = requestElement.subRequests.get(i).subRequest
-        let series = root.createSeries(ChartView.SeriesTypeLine, formatRequest(subRequest), xAxis, yAxis);
-        root.requestNames.push(subRequest)
+  function initializeChart (tickCount) {
+     if(physiologyRequest.rows){
+      for (let i = 0; i < dataSource.rows)); ++i){
+        console.log("Found Data Request %1 implement this functionality".arg(i))
       }
       root.legend.visible = true
-    } else {
-      let series = root.createSeries(ChartView.SeriesTypeLine, requestElement.request, xAxis, yAxis);
+     } 
+     else
+     {
+      let series = root.createSeries(ChartView.SeriesTypeLine, dataSource.name, xAxis, yAxis);
       yAxis.visible = false
-      root.requestNames.push(requestElement.request);
+      root.requestNames.push(dataSource.name);
     }
     xAxis.tickCount = tickCount;
-    root.title = formatRequest(requestElement.request);
-  }
-
-  //Takes request (or subrequest) name (in camel case) and converts to normal format, e.g. systolicArterialPressure -> Systolic Arterial Pressure, for clear plot title and lengend labels
-  function formatRequest(request){
-    //Expression ([a-z])([A-Z]) searches for lower case letter followed by upper case (this way, something like "PH" isn't split into "P H").  
-    //Parenthesis around each range capture the value in string, which we can call using $ syntax.  '$1 $2' means put a space between the first captured value (lower) and second captured value (upper)
-    let formatted = request.replace(/([a-z])([A-Z])/g, '$1 $2')
-    //Next, make sure that first character is upper case.  ^[a-z] specifies that we are only looking at leading character.
-    formatted = formatted.replace(/^[a-z]/, u=>u.toUpperCase());
-    return formatted
+    root.title = dataSource.name;
   }
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
-  function updatePatientSeries(metrics){
-    let time = metrics.SimulationTime / 60;
+  function updatePatientSeries(time_s){
+    let time = time_s / 60;
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
         let subRequest = root.requestNames[i]
-        let prop = metrics[subRequest]
-        //Need to grab the formatted request since sub-series use that version to make the legend labels look good.  Could loop through by index number, but this seems safer
-        root.series(formatRequest(subRequest)).append(time,prop)
+        let prop = dataSource.value
+        
+        root.series(subRequest).append(time,prop)
       }
     } else {
-      let prop = metrics[root.requestNames[0]];
+      let prop = dataSource.value;
       root.series(root.requestNames[0]).append(time,prop)
     }
     updateDomainAndRange()

@@ -44,15 +44,6 @@ GridLayout {
       Layout.fillHeight: false
       Layout.rowSpan : 2
 
-        // onPatientMetricsChanged : {
-        //   graphArea.metricUpdates(metrics)
-        // }
-        // onPatientConditionsChanged : {
-        //   graphArea.conditionUpdates(conditions)
-        // }
-        // onPatientStateChanged : {
-        //   graphArea.stateUpdates(state)
-        // }
       onSubstanceDataChanged : {
         graphArea.substanceDataUpdates(time, subData)
       }
@@ -64,7 +55,7 @@ GridLayout {
           graphArea.newPhysiologyModel(model)
         }
         onSimulationTimeAdvance : {
-          graphArea.plot(time)
+          graphArea.timeAdvance(time)
         }
     }
 
