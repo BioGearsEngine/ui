@@ -93,6 +93,7 @@ void BioGearsData::initialize()
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Stomach Contents"));
   auto stomach_contents = _energy_and_metabolism->child(4);
   {
+    stomach_contents->nested(false);
     stomach_contents->append(QString("Stomach Contents"), QString("Calcium"));
     stomach_contents->append(QString("Stomach Contents"), QString("Carbohydrates"));
     stomach_contents->append(QString("Stomach Contents"), QString("Fat"));

@@ -15,16 +15,24 @@ UIPlotSeriesForm {
   function initializeChart (physiologyRequest, tickCount) {
      root.model = physiologyRequest.model
      root.index = physiologyRequest
-     yAxis.titleText = model.data(index, PhysiologyModel.UnitRole)
+     yAxis.titleText = model.data(root.index, PhysiologyModel.UnitRole)
      root.rate = model.data(index, PhysiologyModel.RateRole)
-     if(physiologyRequest.rows){
-      for (let i = 0; i < physiologyRequest.rows; ++i){
-        console.log("Found Data Request %1 implement this functionality".arg(i))
-      }
-      root.legend.visible = true
-     } 
-     else
-     {
+    
+     if(root.model.rowCount(root.index)){
+       if( root.model.data(root.index, PhysiologyModel.NestedRole)){
+         //NOTE: We should not ever get here as GraphAreaForm.ui should have
+         //      broken the nested ot individual calls, but 
+       } else {
+          requestNames = []
+          for (let i = 0; i < root.model.rowCount(root.index); ++i){
+            let subIndex = root.model.index(i,0,index)
+            requestNames.push(model.data(subIndex,Qt.DisplayRole))
+            let series = root.createSeries(ChartView.SeriesTypeLine, model.data(subIndex,Qt.DisplayRole), xAxis, yAxis);
+          }
+          root.legend.visible = true
+       }
+     } else  {
+      //Common single line plot
       let series = root.createSeries(ChartView.SeriesTypeLine, model.data(index,Qt.DisplayRole), xAxis, yAxis);
       yAxis.visible = false
       root.requestNames.push(model.data(index,Qt.DisplayRole));
@@ -39,7 +47,8 @@ UIPlotSeriesForm {
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
         let subRequest = root.requestNames[i]
-        let prop = model.data(index, PhysiologyModel.ValueRole)
+        let subIndex = model.index(i,0,index)
+        let prop = model.data(subIndex, PhysiologyModel.ValueRole)
         root.series(subRequest).append(time,prop)
       }
     } else {
