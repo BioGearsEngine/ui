@@ -61,23 +61,12 @@ Page {
         } else {
           plots.currentIndex = plots.currentIndex - 1
         }
-        if (systemSwipeView.currentItem.text != "Substances"){
-          if (substanceMenu.visible){
-            substanceMenu.close();
-            filterMenu.open();
-          } else {
             if (filterMenu.visible){
               //This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
               filterMenu.open()
             }
           }
         }
-        if (systemSwipeView.currentItem.text === "Substances" && filterMenu.visible){
-          substanceMenu.open();
-          filterMenu.close();
-        }
-      }
-    }
     SwipeView {
       id : systemSwipeView
       clip:true
@@ -112,20 +101,12 @@ Page {
       icon.name: "terminate"
       icon.color: "transparent"
       onClicked: {
-        if (systemSwipeView.currentItem.text === "Substances"){
-          if (substanceMenu.visible){
-            substanceMenu.close()
-          } else {
-            substanceMenu.open()
-          }
-        } else {
           if (filterMenu.visible){
             filterMenu.close()
           } else {
             filterMenu.open()
           }
         }
-      }
       background: Rectangle {
         color:"transparent"
       }
@@ -136,72 +117,86 @@ Page {
         closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
         Repeater {
           id : filterMenuInstance
+          
+
           model : (physiologyRequestModel) ? physiologyRequestModel.category(plots.currentIndex) : null
-          delegate : MenuItem {
+          //!
+          //! Component for Selecting a Data Request.  
+          //! Creates a checkbox which activates a plot when clicked
+          //! Covers signle and multiplots
+          Component {
+            id: singleItemComponent
+            MenuItem {
             CheckBox { 
               checkable : true
-              checked : model.active
-              text : model.name
+                checked : _active
+                text : _name
               onClicked : {
                 active = checked
                 if (checked){
-                  model.active = true
-                  createPlotView(plots.currentIndex, index, model.row, model.column)
+                    _active = _item.active = true
+                    createPlotView(plots.currentIndex, _index, _item.row, _item.column)
 								} else {
-                  model.active = false
-                  removePlotView(plots.currentIndex, index,  model.name)
-								}
+                    _active = _item.active = false
+                    removePlotView(plots.currentIndex, _index,  _item.name)
               }
             }
           }
         }
       }
 
-      //TODO: Fix Substance Menu
-      Menu {
-        id : substanceMenu
-        x : -200
-        y : 50
-        closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
+          //! When a item is nested like substances
+          //! We want to be able to select individual data request 
+          //! Under a nested menu to plot multiple single plots
+          Component {
+            id: categorySelectionComponent
         Instantiator {
           id : menuItemInstance
-          model : substanceMenuListModel
+              model : _item 
           delegate : Menu {
             id : substanceSubMenu
-            title : subName
-            property int delegateIndex : index
-            property string sub : subName
+                title : _name
             Repeater {
               id : subMenuInstance
-              model : substanceMenuListModel//.get(substanceSubMenu.delegateIndex).props
-              delegate : MenuItem {
-                CheckBox { 
-                  checkable : true
-                  checked : false
-                  text : root.formatRequest(propName)
-                  onClicked : {
-                    console.log(sub + " : " + text)
-                    if (checked){
-                      createPlotView(plots.currentIndex, index, {"request" : sub + "-" + text})    //createPlotView expects an object with "request" role
-										} else {
-                      removePlotView(plots.currentIndex, index, sub + "-" + text)
-										}
-                  }
+                  model : DelegateModel {
+                    model :  _model
+                    rootIndex : _model.index(_index,0)
+                    delegate : Loader {
+                      property bool _active : model.active
+                      property string  _name : model.name
+                      property var _item : model
+                      property int _index : subMenuInstance._index
+                      sourceComponent : singleItemComponent
                 }
               }
             }
           }
           onObjectAdded : {
-            substanceMenu.addMenu(object)  
+                filterMenu.addMenu(object)  
           }
           onObjectRemoved : {
-            substanceMenu.removeMenu(object)
+                filterMenu.removeMenu(object)
           }
         }    
       }
 
+          delegate : Loader {
+            property var _item : { return model}
+            property PhysiologyModel _model : root.physiologyRequestModel.category(plots.currentIndex)
+            property int _index : index
+            property bool _active : model.active
+            property string  _name : model.name
+            sourceComponent : {
+              if( !model.nested ) {
+                return singleItemComponent
+              } else {
+                return categorySelectionComponent
+              }
+            } 
+          }
+        }
+      }
     }
-
     Button {
       id: next
       text: "Next"
@@ -215,22 +210,11 @@ Page {
         } else {
           plots.currentIndex = plots.currentIndex + 1
         }
-        if (systemSwipeView.currentItem.text != "Substances"){
-          if (substanceMenu.visible){
-            substanceMenu.close();
-            filterMenu.open();
-          } else {
             if (filterMenu.visible){
               //This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
               filterMenu.open()
             }
           }
-        }
-        if (systemSwipeView.currentItem.text === "Substances" && filterMenu.visible){
-          substanceMenu.open();
-          filterMenu.close();
-        }
-      }
       background: Rectangle {
         color:"transparent"
       }

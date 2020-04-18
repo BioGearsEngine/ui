@@ -4,13 +4,13 @@
 ///
 BioGearsData::BioGearsData()
   : QAbstractItemModel(nullptr)
-  , _rootRequest("", "", nullptr)
+  , _rootRequest("", "", false,  nullptr)
 {
 }
 
 BioGearsData::BioGearsData(QString n, QObject* p)
   : QAbstractItemModel(p)
-  , _rootRequest("", n, nullptr)
+  , _rootRequest("", n, false, nullptr)
   , _name(n)
 {
 }
@@ -19,7 +19,7 @@ BioGearsData::BioGearsData(QString n, BioGearsData* p)
   : QAbstractItemModel(p)
   , _rootModel(p)
   , _name(n)
-  , _rootRequest("", n, nullptr)
+  , _rootRequest("", n, false, nullptr)
 {
 }
 
@@ -86,7 +86,6 @@ void BioGearsData::initialize()
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Hematocrit"));
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Strong Ion Difference"));
 
-
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Core Temperature"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Sweat Rate"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Skin Temperature"));
@@ -116,15 +115,36 @@ void BioGearsData::initialize()
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("IntracellularFluidVolume"));
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
 
- 
+  //TODO: Pass SubstanceMgr to Init and let it creat this automatically
   _substances->append(QString("Substances"), QString("Sodium"));
+  auto substance = _substances->child(0);
+  {
+    substance->nested(true);
+    substance->append(QString("Sodium"), QString("Sub 1"));
+    substance->append(QString("Sodium"), QString("Sub 2"));
+  }
+  _substances->append(QString("Substances"), QString("Oxygen"));
+  substance = _substances->child(1);
+  {
+    substance->nested(true);
+    substance->append(QString("Oxygen"), QString("Oxygen 1"));
+    substance->append(QString("Oxygen"), QString("Oxygen 2"));
+    substance->append(QString("Oxygen"), QString("Oxygen 3"));
+    substance->append(QString("Oxygen"), QString("Oxygen 4"));
+  }
+  _substances->append(QString("Substances"), QString("Carbon Monoxide"));
+  substance = _substances->child(2);
+  {
+    substance->nested(true);
+    substance->append(QString("Carbon Monoxide"), QString("CO 1"));
+    substance->append(QString("Carbon Monoxide"), QString("CO 2"));
+    substance->append(QString("Carbon Monoxide"), QString("CO 3"));
+  }
 
   _customs->append(QString("Plots"), QString("Flow Volume Loop"));
   _customs->append(QString("Panels"), QString("Renal"));
   _customs->append(QString("Panels"), QString("Metabolic"));
   _customs->append(QString("Panels"), QString("Pulmonary Function Test"));
-
-
 }
 //------------------------------------------------------------------------------------
 BioGearsData::~BioGearsData()
@@ -141,10 +161,31 @@ BioGearsData::~BioGearsData()
 int BioGearsData::rowCount(const QModelIndex& index) const
 {
   if (!_rootModel) {
-    return TOTAL_CATEGORIES;
+    if (!index.internalPointer()) {
+      return TOTAL_CATEGORIES;
+    } else {
+      if (_vitals && _vitals == index.internalPointer()) {
+        return _vitals->_rootRequest.rows();
+      } else if (_cardiopulmonary && _cardiopulmonary == index.internalPointer()) {
+        return _cardiopulmonary->_rootRequest.rows();
+      } else if (_blood_chemistry && _blood_chemistry == index.internalPointer()) {
+        return _blood_chemistry->_rootRequest.rows();
+      } else if (_energy_and_metabolism && _energy_and_metabolism == index.internalPointer()) {
+        return _energy_and_metabolism->_rootRequest.rows();
+      } else if (_renal_fluid_balance && _renal_fluid_balance == index.internalPointer()) {
+        return _renal_fluid_balance->_rootRequest.rows();
+      } else if (_substances && _substances == index.internalPointer()) {
+        return _substances->_rootRequest.rows();
+      } else if (_customs && _customs == index.internalPointer()) {
+        return _customs->_rootRequest.rows();
+      }
+    }
+  } else if (!index.internalPointer()) {
+    return _rootRequest.rows();
   }
-  return _rootRequest.rows();
+  return static_cast<PhysiologyRequest*>(index.internalPointer())->rows();
 }
+
 //------------------------------------------------------------------------------------
 int BioGearsData::columnCount(const QModelIndex& index) const
 {
@@ -178,10 +219,6 @@ QVariant BioGearsData::data(int role) const
   case Qt::DisplayRole:
   case RequestRole:
     return QVariant(_name);
-  case PrefixRole:
-  case ValueRole: //VALUE ROLE
-  case UnitRole: //UNIT ROLE
-    return QVariant();
   case FullNameRole:
     return _name;
   default:
@@ -220,7 +257,7 @@ QVariant BioGearsData::data(const QModelIndex& index, int role) const
 //------------------------------------------------------------------------------------
 bool BioGearsData::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-  if ( role == EnabledRole && index.internalPointer() ) {
+  if (role == EnabledRole && index.internalPointer()) {
     static_cast<PhysiologyRequest*>(index.internalPointer())->active(value.toBool());
     return true;
   } else if (role == RateRole && index.internalPointer()) {
@@ -342,7 +379,7 @@ QModelIndex BioGearsData::index(QAbstractItemModel const* model) const
 }
 //------------------------------------------------------------------------------------
 void BioGearsData::
-append(QString prefix, QString name)
+  append(QString prefix, QString name)
 {
   _rootRequest.append(prefix, name);
 }

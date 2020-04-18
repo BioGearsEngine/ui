@@ -122,7 +122,6 @@ signals:
 
 protected:
   PatientState get_physiology_state();
-  PatientMetrics* get_physiology_metrics();
   PatientConditions get_physiology_conditions();
   QVariantMap get_physiology_substances();
 
@@ -140,7 +139,6 @@ private:
 
   std::mutex _engine_mutex;
 
-  std::unique_ptr<PatientMetrics> _current_metrics;
   std::unique_ptr<PatientConditions> _current_conditions;
   std::unique_ptr<PatientState> _current_state;
 

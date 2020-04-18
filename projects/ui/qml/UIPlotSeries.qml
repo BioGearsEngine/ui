@@ -15,8 +15,8 @@ UIPlotSeriesForm {
   function initializeChart (physiologyRequest, tickCount) {
      root.model = physiologyRequest.model
      root.index = physiologyRequest
+     yAxis.titleText = model.data(index, PhysiologyModel.UnitRole)
      root.rate = model.data(index, PhysiologyModel.RateRole)
-     console.log("%1 %2 %3".arg(root.model).arg(root.index).arg(root.rate))
      if(physiologyRequest.rows){
       for (let i = 0; i < physiologyRequest.rows; ++i){
         console.log("Found Data Request %1 implement this functionality".arg(i))
@@ -35,7 +35,6 @@ UIPlotSeriesForm {
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
   function update(time_s){
-    console.log("Updating %1 with %2 @ %3".arg(root.title).arg(model.data(index, PhysiologyModel.ValueRole)).arg(time_s))
     let time = time_s / 60;
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
@@ -51,7 +50,7 @@ UIPlotSeriesForm {
 
     if (!yAxis.visible){
       yAxis.visible = true
-      yAxis.titleText = "Unit Placeholder";
+      yAxis.titleText = root.model.data(root.index, PhysiologyModel.UnitRole)
     }
   }
 

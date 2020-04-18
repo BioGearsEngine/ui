@@ -33,6 +33,7 @@ public:
     EnabledRole,
     RateRole,
     RowRole,
+    NestedRole,
     ChildrenRole,
     ColumnRole
   };
@@ -48,8 +49,8 @@ public:
   Q_INVOKABLE int categories();
   Q_INVOKABLE BioGearsData* category(int category);
 
-  QVariant data(int role) const;
-  QVariant data(const QModelIndex& index, int role) const override;
+  Q_INVOKABLE QVariant data(int role) const;
+  Q_INVOKABLE QVariant data(const QModelIndex& index, int role) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -72,6 +73,7 @@ public:
     roles[EnabledRole] = "active";
     roles[RateRole] = "rate";
     roles[RowRole] = "rows";
+    roles[NestedRole] = "nested";
     roles[ChildrenRole] = "rows";
     roles[ColumnRole] = "columns";
     return roles;
@@ -94,4 +96,6 @@ private:
   BioGearsData* _renal_fluid_balance = nullptr;
   BioGearsData* _substances = nullptr;
   BioGearsData* _customs = nullptr;
+
+  Q_PROPERTY ( QString name MEMBER _name CONSTANT)
 };

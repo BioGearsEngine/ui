@@ -50,12 +50,8 @@ GraphAreaForm {
       console.log("Error : Chart component not ready");
     } else {
       var chartObject = chartComponent.createObject(view,{"width" : view.cellWidth, "height" : view.cellHeight });
-      request.rate = refreshRate
-      
       chartObject.initializeChart(request, tickCount);
       objectModel.append(chartObject)
-
-
     }
   }
   function updatePlotHelper(plot, series, value){
@@ -189,7 +185,7 @@ GraphAreaForm {
   ObjectModel {
     id: vitalsObjectModel
 
-    function createPlotView (index, row, column) {
+    function createPlotView (row, column) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.VITALS)
      root.createPlotViewHelper(vitals.index(row,column), vitalsObjectModel, vitalsGridView, 1)
     }
@@ -215,7 +211,7 @@ GraphAreaForm {
  //Cardiopulmonary//
   ObjectModel {
     id: cardiopulmonaryObjectModel
-    function createPlotView   (index, row, column) {
+    function createPlotView   (row, column) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
      root.createPlotViewHelper(vitals.index(row,column), cardiopulmonaryObjectModel, cardiopulmonaryGridView, 1)
     }
@@ -237,7 +233,7 @@ GraphAreaForm {
   //Blood Chemistry//
   ObjectModel {
     id: bloodChemistryObjectModel
-    function createPlotView   (index, row, column){
+    function createPlotView   (row, column){
       var blood = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
       root.createPlotViewHelper(blood.index(row,column), bloodChemistryObjectModel, bloodChemistryGridView, 1)
     }
@@ -259,7 +255,7 @@ GraphAreaForm {
   //Energy - Metabolism//
   ObjectModel {
     id: energyMetabolismObjectModel
-    function createPlotView   (index, row, column) {
+    function createPlotView   (row, column) {
      var energy = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
      root.createPlotViewHelper(energy.index(row,column), energyMetabolismObjectModel, energyMetabolismGridView, 1)
     }
@@ -281,7 +277,7 @@ GraphAreaForm {
   //Renal - Fluid Balance//
   ObjectModel {
     id: renalFluidBalanceObjectModel
-    function createPlotView   (index, row, column){
+    function createPlotView   (row, column){
      var vitals = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
     root.createPlotViewHelper(vitals.index(row,column), renalFluidBalanceObjectModel, renalFluidBalanceGridView, 1)
     }
@@ -307,7 +303,7 @@ GraphAreaForm {
   }
   ObjectModel {
     id: substanceObjectModel
-    function createPlotView   (index, row, column) {
+    function createPlotView   (row, column) {
      var subs = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
      root.createPlotViewHelper(subs.index(row,column), substanceObjectModel, substanceGridView, 1)
     }
@@ -329,9 +325,9 @@ GraphAreaForm {
   //Custom Views//
   ObjectModel {
     id: customObjectModel
-    function createPlotView   (index, row, column) {
+    function createPlotView   (row, column) {
      var customs = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
-     root.createPlotViewHelper(vitals.index(row,column), customObjectModel, customGridView, 10)
+      root.createPlotViewHelper(customs.index(row,column), customObjectModel, customGridView, 10)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,customObjectModel)
@@ -348,28 +344,28 @@ GraphAreaForm {
     customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
 
-  function createPlotView(category, menuIndex, modelElement){
+  function createPlotView(category, menuIndex, row, column){
     switch(category) {
       case PhysiologyModel.VITALS:
-        vitalsModel.createPlotView(menuIndex,modelElement);
+        vitalsModel.createPlotView(row, column);
         break;
       case PhysiologyModel.CARDIOPULMONARY:
-        cardiopulmonaryModel.createPlotView(menuIndex,modelElement);
+        cardiopulmonaryModel.createPlotView(row, column);
         break;
       case PhysiologyModel.BLOOD_CHEMISTRY:
-        bloodChemistryModel.createPlotView(menuIndex,modelElement);
+        bloodChemistryModel.createPlotView(row, column);
         break;
       case PhysiologyModel.ENERGY_AND_METABOLISM:
-        energyMetabolismModel.createPlotView(menuIndex,modelElement);
+        energyMetabolismModel.createPlotView(row, column);
         break;
       case PhysiologyModel.RENAL_FLUID_BALANCE:
-        renalFluidBalanceModel.createPlotView(menuIndex,modelElement);
+        renalFluidBalanceModel.createPlotView(row, column);
         break;
       case PhysiologyModel.SUBSTANCES:
-        substanceModel.createPlotView(menuIndex,modelElement);
+        substanceModel.createPlotView(row, column);
         break;
       case PhysiologyModel.CUSTOM:
-        customModel.createPlotView(menuIndex,modelElement);
+        customModel.createPlotView(row, column);
         break;
     }
   }
@@ -401,7 +397,6 @@ GraphAreaForm {
           console.log("Could not find Category  : %1".arg(category))
           return
       }
-      console.log(model)
       for ( var i = 0; i < model.count; ++i ){
         var plot = model.get(i)
         if(plot.title == request)

@@ -20,6 +20,8 @@ public:
   void active(bool value);
   int rate() const;
   void rate(int value);
+  int nested() const;
+  void nested(int value);
 
   int rows() const;
   int columns() const;
@@ -64,6 +66,7 @@ private:
   QString _prefix;
   QString _name;
   bool _active = false;
+  bool _nested = false;
   int _refresh_rate = 1;
   biogears::SEScalar const* _value = nullptr;
   biogears::SEUnitScalar const* _unit = nullptr;

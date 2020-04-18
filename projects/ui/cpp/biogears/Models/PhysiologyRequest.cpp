@@ -42,6 +42,16 @@ void PhysiologyRequest::rate(int value)
   _refresh_rate = value;
 }
 //------------------------------------------------------------------------------------
+int PhysiologyRequest::nested() const
+{
+  return _nested;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::nested(int value)
+{
+  _nested = value;
+}
+//------------------------------------------------------------------------------------
 int PhysiologyRequest::rows() const
 {
   return _children.size();
@@ -96,6 +106,12 @@ auto PhysiologyRequest::header(int section) const -> QString
   case 4:
     return "Full Name";
     break;
+  case 5:
+    return "Refresh Rate";
+    break;
+  case 6:
+    return "Nested";
+    break;
   default:
     return "";
   }
@@ -149,18 +165,20 @@ QVariant PhysiologyRequest::data(int role) const
     return QVariant(_name);
   case BioGearsData::ValueRole: //VALUE ROLE
     try {
-      return (_unit) ? QVariant(_unit->GetValue()) : (_value) ? QVariant(_value) : QVariant();
+      return (_unit) ? QVariant(_unit->GetValue()) : (_value) ? QVariant(_value->GetValue()) : QVariant(0.0);
     } catch (biogears::CommonDataModelException e) {
       return "NaN";
     }
   case BioGearsData::UnitRole: //UNIT ROLE
-    return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant();
+    return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant("");
   case BioGearsData::EnabledRole:
     return _active;
   case BioGearsData::RowRole:
     return _children.size();
   case BioGearsData::RateRole:
     return _refresh_rate;
+  case BioGearsData::NestedRole:
+    return _nested;
   case BioGearsData::ChildrenRole:
     return _children.size();
   case BioGearsData::ColumnRole:
