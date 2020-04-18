@@ -1,10 +1,11 @@
 #include "BioGearsData.h"
+#include "biogears/engine/Controller/BioGearsSubstances.h"
 
 /// BioGearsData Model
 ///
 BioGearsData::BioGearsData()
   : QAbstractItemModel(nullptr)
-  , _rootRequest("", "", false,  nullptr)
+  , _rootRequest("", "", false, nullptr)
 {
 }
 
@@ -116,37 +117,28 @@ void BioGearsData::initialize()
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("IntracellularFluidVolume"));
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
 
-  //TODO: Pass SubstanceMgr to Init and let it creat this automatically
-  _substances->append(QString("Substances"), QString("Sodium"));
-  auto substance = _substances->child(0);
+  _customs->append(QString("Plots"), QString("Flow Volume Loop"));
+  auto custom = _customs->child(0);
   {
-    substance->nested(true);
-    substance->append(QString("Sodium"), QString("Sub 1"));
-    substance->append(QString("Sodium"), QString("Sub 2"));
-  }
-  _substances->append(QString("Substances"), QString("Oxygen"));
-  substance = _substances->child(1);
-  {
-    substance->nested(true);
-    substance->append(QString("Oxygen"), QString("Oxygen 1"));
-    substance->append(QString("Oxygen"), QString("Oxygen 2"));
-    substance->append(QString("Oxygen"), QString("Oxygen 3"));
-    substance->append(QString("Oxygen"), QString("Oxygen 4"));
-  }
-  _substances->append(QString("Substances"), QString("Carbon Monoxide"));
-  substance = _substances->child(2);
-  {
-    substance->nested(true);
-    substance->append(QString("Carbon Monoxide"), QString("CO 1"));
-    substance->append(QString("Carbon Monoxide"), QString("CO 2"));
-    substance->append(QString("Carbon Monoxide"), QString("CO 3"));
+    custom->append(QString("Flow Volume Loop"), QString("Inspiratory Flow"));
+    custom->append(QString("Flow Volume Loop"), QString("Exspiratory Flow"));
+    custom->rate(10);
   }
 
-  _customs->append(QString("Plots"), QString("Flow Volume Loop"));
   _customs->append(QString("Panels"), QString("Renal"));
+  {
+    //TODO: Implement Renal Panel on 1/5Hz Update Rate
+  }
   _customs->append(QString("Panels"), QString("Metabolic"));
+  {
+    //TODO: Implement Metabolic Panel on 1/5Hz Update Rate
+  }
   _customs->append(QString("Panels"), QString("Pulmonary Function Test"));
+  {
+    //TODO: Implement Pulmonary Function Test 1/5Hz Update Rate
+  }
 }
+
 //------------------------------------------------------------------------------------
 BioGearsData::~BioGearsData()
 {
@@ -379,10 +371,10 @@ QModelIndex BioGearsData::index(QAbstractItemModel const* model) const
   }
 }
 //------------------------------------------------------------------------------------
-void BioGearsData::
+PhysiologyRequest* BioGearsData::
   append(QString prefix, QString name)
 {
-  _rootRequest.append(prefix, name);
+  return _rootRequest.append(prefix, name);
 }
 //------------------------------------------------------------------------------------
 PhysiologyRequest const* BioGearsData::child(int row) const

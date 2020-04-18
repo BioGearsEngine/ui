@@ -22,6 +22,16 @@ PhysiologyRequest::~PhysiologyRequest()
   _children.clear();
 }
 //------------------------------------------------------------------------------------
+QString PhysiologyRequest::name() const
+{
+  return _name;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::name(const QString& value)
+{
+  _name = value;
+}
+//------------------------------------------------------------------------------------
 bool PhysiologyRequest::active() const
 {
   return _active;
@@ -60,6 +70,35 @@ int PhysiologyRequest::rows() const
 int PhysiologyRequest::columns() const
 {
   return 5;
+}
+bool PhysiologyRequest::enabled() const
+{
+  return _active;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::enabled(bool value)
+{
+  _active = value;
+}
+//------------------------------------------------------------------------------------
+biogears::SEUnitScalar const* PhysiologyRequest::unit_scalar() const
+{
+  return _unit;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::unit_scalar(biogears::SEUnitScalar* value)
+{
+  _unit = value;
+}
+//------------------------------------------------------------------------------------
+biogears::SEScalar const* PhysiologyRequest::scalar() const
+{
+  return _value;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::scalar(biogears::SEScalar* value)
+{
+  _value = value;
 }
 //------------------------------------------------------------------------------------
 PhysiologyRequest const* PhysiologyRequest::parent() const
@@ -117,7 +156,7 @@ auto PhysiologyRequest::header(int section) const -> QString
   }
 }
 //------------------------------------------------------------------------------------
-void PhysiologyRequest::append(QString prefix, QString name, bool active)
+PhysiologyRequest* PhysiologyRequest::append(QString prefix, QString name, bool active)
 {
   PhysiologyRequest request;
   request._prefix = prefix;
@@ -125,6 +164,7 @@ void PhysiologyRequest::append(QString prefix, QString name, bool active)
   request._parent = this;
   request._active = active;
   _children.append(request);
+  return &_children.back();
 }
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::modify(int row, const biogears::SEUnitScalar* data)

@@ -52,13 +52,82 @@ Scenario::Scenario(QString name, QObject* parent)
 
   biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
   engine->GetPatient().SetName(name.toStdString());
-
 }
-void Scenario::initialize_physiology_model()
+void Scenario::setup_physiology_model()
 {
   _physiology_model = std::make_unique<BioGearsData>(QString(_engine->GetPatient().GetName_cStr()), this).release();
   _physiology_model->initialize();
   emit physiologyChanged(_physiology_model);
+}
+//-------------------------------------------------------------------------------
+void Scenario::setup_physiology_substances(BioGearsData* substances)
+{
+  //NOTE: Must be called after setup_physiology_model, but after engine->load_state
+  //TODO: Destroy and Recreate substances ever load state or we will be hurting.
+  //
+  biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
+  biogears::SETissueCompartment* lKidney = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::LeftKidney);
+  biogears::SETissueCompartment* rKidney = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::RightKidney);
+  biogears::SETissueCompartment* liver = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::Liver);
+
+  biogears::SELiquidCompartment& lKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*lKidney);
+  biogears::SELiquidCompartment& rKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*rKidney);
+  biogears::SELiquidCompartment& liverIntracellular = engine->GetCompartments().GetIntracellularFluid(*liver);
+
+  for (auto _activeSub : _engine->GetSubstances().GetActiveSubstances()) {
+    if ((_activeSub->GetState() != CDM::enumSubstanceState::Liquid) && (_activeSub->GetState() != CDM::enumSubstanceState::Gas)) {
+      //This prevents us from tracking molecular (hemoglobin species) and whole blood components (cellular)--not of interest for PK or nutrition purposes
+      continue;
+    }
+    //The substance data map is type QVariantMap<QString, QVarint>, which automatically converts to javascript object in QML (and automatically converts back to QVariantMap in C++)
+    auto substance = substances->append(QString("Substances"), QString::fromStdString(_activeSub->GetName()));
+    substance->nested(true);
+    //Every substance should have blood concentration, mass in body, mass in blood, mass in tissue
+    auto metric = substance->append(substance->name(), "Blood Concentration");
+    metric->unit_scalar(_activeSub->HasBloodConcentration() ? &_activeSub->GetBloodConcentration() : nullptr);
+    metric = substance->append(substance->name(), "Mass in Body");
+    metric->unit_scalar(_activeSub->HasMassInBody() ? &_activeSub->GetMassInBody() : nullptr);
+    metric = substance->append(substance->name(), "Mass in Blood");
+    metric->unit_scalar(_activeSub->HasMassInBlood() ? &_activeSub->GetMassInBlood() : nullptr);
+    metric = substance->append(substance->name(), "Mass in Tissue");
+    metric->unit_scalar(_activeSub->HasMassInTissue() ? &_activeSub->GetMassInTissue() : nullptr);
+    //Only subs that are dissolved gases need alveolar transfer and end tidal.  Use relative diffusion coefficient to filter
+    if (_activeSub->HasRelativeDiffusionCoefficient()) {
+      metric = substance->append(substance->name(), "Alveolar Transfer");
+      metric->unit_scalar(_activeSub->HasAlveolarTransfer() ? &_activeSub->GetAlveolarTransfer() : nullptr);
+      metric = substance->append(substance->name(), "End Tidal Fraction");
+      metric->scalar(_activeSub->HasEndTidalFraction() ? &_activeSub->GetEndTidalFraction() : nullptr);
+    }
+    //Only subs that have PK need effect site, plasma, AUC
+    if (_activeSub->HasPK()) {
+      metric = substance->append(substance->name(), "EffectSiteConcentration");
+      metric->unit_scalar(_activeSub->HasEffectSiteConcentration() ? &_activeSub->GetEffectSiteConcentration() : nullptr);
+      metric = substance->append(substance->name(), "PlasmaConcentration");
+      metric->unit_scalar(_activeSub->HasPlasmaConcentration() ? &_activeSub->GetPlasmaConcentration() : nullptr);
+      metric = substance->append(substance->name(), "AreaUnderCurv");
+      metric->unit_scalar(_activeSub->HasAreaUnderCurve() ? &_activeSub->GetAreaUnderCurve() : nullptr);
+    }
+    //Assign clearances, if applicable
+    if (_activeSub->HasClearance()) {
+      if (_activeSub->GetClearance().HasRenalClearance()) {
+        //TODO: Upgrade Scalar PTRs to be a vector of PTRs so that we can do composite equations like this.
+        //TODO: Add Lambda functiosn for calculating data values from composite functions.
+        metric = substance->append(substance->name(), "Renal Clearance");
+        metric->unit_scalar(lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) ? &lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared() : nullptr);
+        //sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ?
+        //lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) +
+        //rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
+      }
+      if (_activeSub->GetClearance().HasIntrinsicClearance()) {
+        metric = substance->append(substance->name(), "Intrinsic Clearance");
+        metric->unit_scalar(liverIntracellular.HasSubstanceQuantity(*_activeSub) ? &liverIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared() : nullptr);
+      }
+      if (_activeSub->GetClearance().HasSystemicClearance()) {
+        metric = substance->append(substance->name(), "Systemic Clearance");
+        metric->unit_scalar(_activeSub->HasSystemicMassCleared() ? &_activeSub->GetSystemicMassCleared() : nullptr);
+      }
+    }
+  }
 }
 //-------------------------------------------------------------------------------
 Scenario::~Scenario()
@@ -199,7 +268,7 @@ Scenario& Scenario::load_patient(QString file)
 
   if (_engine->LoadState(path)) {
     if(!_physiology_model) {
-      initialize_physiology_model();
+      setup_physiology_model();
     }
     auto vitals = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::VITALS, 0, QModelIndex()).internalPointer());
       {
@@ -275,14 +344,13 @@ Scenario& Scenario::load_patient(QString file)
       }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
-      {
-       
-      }
+    setup_physiology_substances(substances);
 
     auto customs = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CUSTOM, 0, QModelIndex()).internalPointer());
       {
       auto custom = customs->child(0);
-      custom->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      custom->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetInspiratoryFlow());
+      custom->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetExpiratoryFlow());
       custom->rate(10);
       
       customs->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
@@ -383,80 +451,7 @@ auto Scenario::get_physiology_conditions() -> PatientConditions
   _current_conditions->diabieties = _engine->GetConditions().HasDiabetesType1() | _engine->GetConditions().HasDiabetesType2();
   return *_current_conditions;
 }
-//---------------------------------------------------------------------------------
-QVariantMap Scenario::get_physiology_substances()
-{
-  //substanceMap.getSubstanceMap().clear();
-  biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
-  biogears::SETissueCompartment* lKidney = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::LeftKidney);
-  biogears::SETissueCompartment* rKidney = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::RightKidney);
-  biogears::SETissueCompartment* liver = engine->GetCompartments().GetTissueCompartment(BGE::TissueCompartment::Liver);
 
-  biogears::SELiquidCompartment& lKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*lKidney);
-  biogears::SELiquidCompartment& rKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*rKidney);
-  biogears::SELiquidCompartment& liverIntracellular = engine->GetCompartments().GetIntracellularFluid(*liver);
-
-  QVariant subVariant;
-  Substance* sub;
-  bool newActiveSub = false;
-
-  for (auto _activeSub : _engine->GetSubstances().GetActiveSubstances()) {
-    if ((_activeSub->GetState() != CDM::enumSubstanceState::Liquid) && (_activeSub->GetState() != CDM::enumSubstanceState::Gas)) {
-      //This prevents us from tracking molecular (hemoglobin species) and whole blood components (cellular)--not of interest for PK or nutrition purposes
-      continue;
-    }
-    //The substance data map is type QVariantMap<QString, QVarint>, which automatically converts to javascript object in QML (and automatically converts back to QVariantMap in C++)
-    subVariant = substanceData[QString::fromStdString(_activeSub->GetName())];
-    newActiveSub = false;
-    if (!subVariant.isValid()) {
-      //QVariantMap returns an invalid object if key is not found.  If the substance does not exist yet, make a new entry for it and add it to map.
-      sub = new Substance();
-      sub->name = QString::fromStdString(_activeSub->GetName());
-      substanceData[QString::fromStdString(_activeSub->GetName())] = QVariant::fromValue<QObject*>(sub);
-      newActiveSub = true;
-    } else {
-      //If the substance does exist, we jsut need to update its values.  Firt we need to convert it back to Substance type.
-      //QVariant.value function requires custom type to be defined as metatype and also requires copy constructor to be defined
-      sub = subVariant.value<Substance*>();
-    }
-    //Let's be smart about what we define for each substance -- only assign props that apply (e.g. oxygen does not need an AUC)
-
-    //Every substance should have blood concentration, mass in body, mass in blood, mass in tissue
-    sub->blood_concentration = _activeSub->HasBloodConcentration() ? _activeSub->GetBloodConcentration(biogears::MassPerVolumeUnit::ug_Per_L) : 0;
-    sub->mass_in_body = _activeSub->HasMassInBody() ? _activeSub->GetMassInBody(biogears::MassUnit::ug) : 0;
-    sub->mass_in_blood = _activeSub->HasMassInBlood() ? _activeSub->GetMassInBlood(biogears::MassUnit::ug) : 0;
-    sub->mass_in_tissue = _activeSub->HasMassInTissue() ? _activeSub->GetMassInTissue(biogears::MassUnit::ug) : 0;
-    //Only subs that are dissolved gases need alveolar transfer and end tidal.  Use relative diffusion coefficient to filter
-    if (_activeSub->HasRelativeDiffusionCoefficient()) {
-      sub->alveolar_transfer = _activeSub->HasAlveolarTransfer() ? _activeSub->GetAlveolarTransfer(biogears::VolumePerTimeUnit::mL_Per_s) : 0;
-      sub->end_tidal_fraction = _activeSub->HasEndTidalFraction() ? _activeSub->GetEndTidalFraction().GetValue() : 0;
-    }
-    //Only subs that have PK need effect site, plasma, AUC
-    if (_activeSub->HasPK()) {
-      sub->effect_site_concentration = _activeSub->HasEffectSiteConcentration() ? _activeSub->GetEffectSiteConcentration(biogears::MassPerVolumeUnit::ug_Per_L) : 0;
-      sub->plasma_concentration = _activeSub->HasPlasmaConcentration() ? _activeSub->GetPlasmaConcentration(biogears::MassPerVolumeUnit::ug_Per_L) : 0;
-      sub->area_under_curve = _activeSub->HasAreaUnderCurve() ? _activeSub->GetAreaUnderCurve(biogears::TimeMassPerVolumeUnit::hr_ug_Per_mL) : 0;
-    }
-    //Assign clearances, if applicable
-    if (_activeSub->HasClearance()) {
-      if (_activeSub->GetClearance().HasRenalClearance()) {
-        sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
-      }
-      if (_activeSub->GetClearance().HasIntrinsicClearance()) {
-        sub->hepatic_mass_cleared = liverIntracellular.HasSubstanceQuantity(*_activeSub) ? liverIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::g) : 0;
-      }
-      if (_activeSub->GetClearance().HasSystemicClearance()) {
-        sub->systemic_mass_cleared = _activeSub->HasSystemicMassCleared() ? _activeSub->GetSystemicMassCleared(biogears::MassUnit::ug) : 0;
-      }
-    }
-    if (newActiveSub) {
-      //Wait to emit until we have initialized substances properties
-      emit activeSubstanceAdded(sub);
-    }
-  }
-
-  return substanceData;
-}
 //---------------------------------------------------------------------------------
 double Scenario::get_simulation_time()
 {

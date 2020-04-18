@@ -8,30 +8,43 @@
 #include <biogears/cdm/properties/SEScalar.h>
 #include <biogears/cdm/properties/SEUnitScalar.h>
 
-
 class PhysiologyRequest {
 public:
-
   PhysiologyRequest();
   PhysiologyRequest(QString prefix, QString name, bool active = false, PhysiologyRequest* parent = nullptr);
   ~PhysiologyRequest();
 
-  bool active() const ;
+  QString name() const;
+  void name(const QString&);
+
+  bool active() const;
   void active(bool value);
+
   int rate() const;
   void rate(int value);
+
   int nested() const;
   void nested(int value);
 
   int rows() const;
   int columns() const;
+
+  bool enabled() const;
+  void enabled(bool);
+
+  biogears::SEUnitScalar const * unit_scalar() const;
+  void unit_scalar(biogears::SEUnitScalar*);
+
+  biogears::SEScalar const* scalar() const;
+  void scalar(biogears::SEScalar*);
+
   PhysiologyRequest const* parent() const;
   PhysiologyRequest* parent();
-  PhysiologyRequest* child( int row);
+  PhysiologyRequest* child(int row);
   PhysiologyRequest const* child(int row) const;
 
   QString header(int col) const;
-  void append(QString prefix, QString name, bool active = false);
+  PhysiologyRequest* append(QString prefix, QString name, bool active = false);
   void modify(int row, const biogears::SEUnitScalar* data);
   void modify(int row, const biogears::SEScalar* data);
   void modify(int row, int refreshRate);
@@ -70,5 +83,4 @@ private:
   int _refresh_rate = 1;
   biogears::SEScalar const* _value = nullptr;
   biogears::SEUnitScalar const* _unit = nullptr;
-
 };

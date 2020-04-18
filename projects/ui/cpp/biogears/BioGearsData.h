@@ -8,6 +8,7 @@
 #include <QVariant>
 
 #include "Models/PhysiologyRequest.h"
+#include "biogears/engine/Controller/BioGearsSubstances.h"
 
 class BioGearsData : public QAbstractItemModel {
   Q_OBJECT
@@ -43,8 +44,11 @@ public:
   explicit BioGearsData(QString name, QObject* parent);
   explicit BioGearsData(QString name, BioGearsData* parent);
   ~BioGearsData() override;
-  void initialize();
 
+  void initialize();
+  void initialize_substances(const biogears::BioGearsSubstances&)
+  {
+  }
 
   Q_INVOKABLE int categories();
   Q_INVOKABLE BioGearsData* category(int category);
@@ -79,7 +83,7 @@ public:
     return roles;
   }
 
-  void append(QString prefix, QString name);
+  PhysiologyRequest* append(QString prefix, QString name);
   PhysiologyRequest const* child(int row) const;
   PhysiologyRequest* child(int row);
 

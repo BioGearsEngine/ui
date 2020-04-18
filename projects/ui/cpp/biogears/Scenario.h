@@ -123,9 +123,9 @@ signals:
 protected:
   PatientState get_physiology_state();
   PatientConditions get_physiology_conditions();
-  QVariantMap get_physiology_substances();
 
-  void initialize_physiology_model();
+  void setup_physiology_model();
+  void setup_physiology_substances(BioGearsData*);
 
 protected:
   void physiology_thread_main();
@@ -150,9 +150,6 @@ private:
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
   BioGearsData* _physiology_model;
-
-  QVariantMap substanceData;
-
 
   QtLogForward* _consoleLog;
 };
