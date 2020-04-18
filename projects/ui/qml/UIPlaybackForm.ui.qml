@@ -26,9 +26,6 @@ ColumnLayout {
     Text {
       text: root.simulationTime
     }
-    Text {
-      text: "Data"
-    }
   }
 
   RowLayout {

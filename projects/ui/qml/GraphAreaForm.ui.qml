@@ -146,7 +146,7 @@ Page {
                 active = checked
                 if (checked){
                   model.active = true
-                  createPlotView(plots.currentIndex, index, model)
+                  createPlotView(plots.currentIndex, index, model.row, model.column)
 								} else {
                   model.active = false
                   removePlotView(plots.currentIndex, index,  model.name)

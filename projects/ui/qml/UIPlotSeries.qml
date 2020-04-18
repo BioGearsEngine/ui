@@ -7,41 +7,48 @@ UIPlotSeriesForm {
 
   property int windowWidth_min : 10
   property var requestNames : []
-  property var dataSource : null
+  property var model : null
+  property var index : null
+  property int rate  : 1
   //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
-  function initializeChart (tickCount) {
+  function initializeChart (physiologyRequest, tickCount) {
+     root.model = physiologyRequest.model
+     root.index = physiologyRequest
+     root.rate = model.data(index, PhysiologyModel.RateRole)
+     console.log("%1 %2 %3".arg(root.model).arg(root.index).arg(root.rate))
      if(physiologyRequest.rows){
-      for (let i = 0; i < dataSource.rows)); ++i){
+      for (let i = 0; i < physiologyRequest.rows; ++i){
         console.log("Found Data Request %1 implement this functionality".arg(i))
       }
       root.legend.visible = true
      } 
      else
      {
-      let series = root.createSeries(ChartView.SeriesTypeLine, dataSource.name, xAxis, yAxis);
+      let series = root.createSeries(ChartView.SeriesTypeLine, model.data(index,Qt.DisplayRole), xAxis, yAxis);
       yAxis.visible = false
-      root.requestNames.push(dataSource.name);
+      root.requestNames.push(model.data(index,Qt.DisplayRole));
     }
     xAxis.tickCount = tickCount;
-    root.title = dataSource.name;
+    root.title = model.data(index,Qt.DisplayRole);
   }
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
-  function updatePatientSeries(time_s){
+  function update(time_s){
+    console.log("Updating %1 with %2 @ %3".arg(root.title).arg(model.data(index, PhysiologyModel.ValueRole)).arg(time_s))
     let time = time_s / 60;
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
         let subRequest = root.requestNames[i]
-        let prop = dataSource.value
-        
+        let prop = model.data(index, PhysiologyModel.ValueRole)
         root.series(subRequest).append(time,prop)
       }
     } else {
-      let prop = dataSource.value;
+      let prop = model.data(index, PhysiologyModel.ValueRole);
       root.series(root.requestNames[0]).append(time,prop)
     }
     updateDomainAndRange()
+
     if (!yAxis.visible){
       yAxis.visible = true
       yAxis.titleText = "Unit Placeholder";
