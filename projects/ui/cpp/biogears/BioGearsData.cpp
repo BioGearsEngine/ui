@@ -61,8 +61,13 @@ void BioGearsData::initialize()
   _substances = new BioGearsData("Substances", this);
   _customs = new BioGearsData("Custom", this);
 
-  _vitals->append(QString("Vitals"), QString("Systolic Arterial Pressure"));
-  _vitals->append(QString("Vitals"), QString("Diastolic Arterial Pressure"));
+  _vitals->append(QString("Vitals"), QString("Arterial Pressure"));
+  auto vital = _vitals->child(0);
+  {
+    vital->nested(false);
+    vital->append(QString("Vitals"), QString("Systolic Pressure"));
+    vital->append(QString("Vitals"), QString("Diastolic Pressure"));
+  }
   _vitals->append(QString("Vitals"), QString("Respiration Rate"));
   _vitals->append(QString("Vitals"), QString("Oxygen Saturation"));
   _vitals->append(QString("Vitals"), QString("Blood Volume"));

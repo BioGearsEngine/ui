@@ -46,10 +46,8 @@ UIPlotSeriesForm {
   function update(time_s){
     let time = time_s / 60;
     if (root.count>1){
-      console.log("Updating Children")
       for (let i = 0; i < root.count; ++i){
         let subRequest = requestNames[i]
-        console.log("Updating", subRequest)
         let subIndex = model.index(i,0,index)
         let prop = root.model.data(subIndex,PhysiologyModel.ValueRole)
         root.series(subRequest).append(time,prop)

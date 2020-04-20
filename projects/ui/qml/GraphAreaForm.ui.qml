@@ -199,7 +199,6 @@ Page {
                             if (!model.nested) {
                                 return singleItemComponent
                             } else {
-                                console.log("Compound Menu Item Component")
                                 return categorySelectionComponent
                             }
                         }
