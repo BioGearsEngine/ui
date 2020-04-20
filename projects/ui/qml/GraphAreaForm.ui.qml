@@ -142,10 +142,10 @@ Page {
                                 text :    _model.data(_item, PhysiologyModel.RequestRole) 
                                 onClicked : {
                                     if (checked) {
-                                        _item.active = true
+                                        _model.setData(_item, true, PhysiologyModel.EnabledRole)
                                         createPlotView(plots.currentIndex, _model, _item, _title)
                                     } else {
-                                        _item.active = false
+                                        _model.setData(_item, false, PhysiologyModel.EnabledRole)
                                         removePlotView(plots.currentIndex, _item.row, _title)
                                     }
                                 }
