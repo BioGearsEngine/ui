@@ -6,16 +6,17 @@ import QtQuick.Controls.Material 2.3
 RowLayout {
   id: scalarEntry
   //Properties -- used to customize look and functionality of component
-  property real labelFieldRatio : 0.5
   property real prefWidth : parent.width
   property real prefHeight : scalarEntry.implicitHeight
   property string entry : "Default"
   property string unit : ""
   property bool textEntry : true
+  property DoubleValidator entryValidator : null
   //Property aliases
   property alias entryLabel : entryLabel
   property alias entryField : entryField
   property alias entryUnit : entryUnit
+
   //Layout options
   Layout.preferredWidth : prefWidth
   Layout.preferredHeight : prefHeight
@@ -32,7 +33,7 @@ RowLayout {
 
     Column {
       anchors.fill : parent
-      spacing : 20
+      spacing : 10
       Label {
         id: entryLabel
         width : parent.width
@@ -54,6 +55,7 @@ RowLayout {
         placeholderText: "Data"
         font.pointSize : 9
         horizontalAlignment : Text.AlignLeft
+        validator : scalarEntry.entryValidator
         background : Rectangle {
           anchors.fill : parent
           color : "transparent"
@@ -62,39 +64,6 @@ RowLayout {
       }
     }
   }
-
-
-  /*Label {
-    id: entryLabel
-    Layout.maximumWidth : scalarEntry.prefWidth * labelFieldRatio * 0.75
-    Layout.preferredWidth : scalarEntry.prefWidth * labelFieldRatio * 0.75
-    Layout.maximumHeight : scalarEntry.prefHeight
-    Layout.fillHeight : true
-    Layout.alignment: Qt.AlignBottom
-    text : scalarEntry.entry
-    color : "white"
-    font.pointSize : 9
-    verticalAlignment : Text.AlignVCenter
-    horizontalAlignment : Text.AlignHCenter
-    padding : 5
-    background : Rectangle {
-      color : "teal"
-      border.color : "teal"
-      radius : 20
-      anchors.fill : parent
-    }
-  }
-
-  TextField {
-    id : entryField
-    Layout.maximumWidth : scalarEntry.prefWidth * (1.0 - labelFieldRatio) * 0.75
-    Layout.preferredWidth : textEntry ? scalarEntry.prefWidth * (1.0 - labelFieldRatio) * 0.75 : 0
-    Layout.fillWidth : true
-    Layout.alignment: Qt.AlignBottom
-    placeholderText: "Data"
-    font.pointSize : 8
-    horizontalAlignment : Text.AlignHCenter
-  }*/
 
   ComboBox {
     id : entryUnit
@@ -105,10 +74,11 @@ RowLayout {
     Layout.alignment: Qt.AlignBottom
     model : scalarEntry.units[unit]
     font.pointSize : 6
+    currentIndex : -1
   }
 
-  property var units : ({'mass' : ['cm', 'kg'],
-                         'length' : ['in', 'm'],
+  property var units : ({'mass' : ['lbs', 'kg'],
+                         'length' : ['in', 'm', 'cm'],
                          'volume' : ['L','mL','uL'],
                          'gender' : ['F', 'M'],
                          'bloodType' : ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
