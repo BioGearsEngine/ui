@@ -10,35 +10,39 @@ UIPlotSeriesForm {
   property var model : null
   property var index : null
   property int rate  : 1
+
   //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
-  function initializeChart (physiologyRequest, tickCount) {
-     root.model = physiologyRequest.model
-     root.index = physiologyRequest
-     yAxis.titleText = model.data(root.index, PhysiologyModel.UnitRole)
-     root.rate = model.data(index, PhysiologyModel.RateRole)
+  function initializeChart (biogearsData, physiologyRequest, tickCount) {
+     model = biogearsData
+     index = physiologyRequest
+     var name = model.data(index, Qt.DisplayRole)
     
-     if(root.model.rowCount(root.index)){
-       if( root.model.data(root.index, PhysiologyModel.NestedRole)){
+     yAxis.titleText = model.data(index, Qt.UnitRole)
+     root.rate = model.data(index, PhysiologyModel.RateRole)
+     if(model.rowCount(index)){
+       if( model.data(index, PhysiologyModel.NestedRole) ){
          //NOTE: We should not ever get here as GraphAreaForm.ui should have
          //      broken the nested ot individual calls, but 
        } else {
           requestNames = []
-          for (let i = 0; i < root.model.rowCount(root.index); ++i){
-            let subIndex = root.model.index(i,0,index)
-            requestNames.push(model.data(subIndex,Qt.DisplayRole))
-            let series = root.createSeries(ChartView.SeriesTypeLine, model.data(subIndex,Qt.DisplayRole), xAxis, yAxis);
+          for (let i = 0; i < model.rowCount(index); ++i){
+            let subIndex = biogearsData.index(i,0,physiologyRequest)
+            yAxis.titleText = model.data(subIndex, Qt.UnitRole)
+            requestNames.push(biogearsData.data(subIndex,Qt.DisplayRole))
+            let series = root.createSeries(ChartView.SeriesTypeLine, biogearsData.data(subIndex,Qt.DisplayRole), xAxis, yAxis);
           }
           root.legend.visible = true
        }
      } else  {
       //Common single line plot
-      let series = root.createSeries(ChartView.SeriesTypeLine, model.data(index,Qt.DisplayRole), xAxis, yAxis);
+      
+      let series = root.createSeries(ChartView.SeriesTypeLine, name, xAxis, yAxis);
       yAxis.visible = false
-      root.requestNames.push(model.data(index,Qt.DisplayRole));
+      root.requestNames.push(name);
     }
     xAxis.tickCount = tickCount;
-    root.title = model.data(index,Qt.DisplayRole);
+    root.title = name;
   }
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
@@ -46,21 +50,28 @@ UIPlotSeriesForm {
     let time = time_s / 60;
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
-        let subRequest = root.requestNames[i]
+        let subRequest = requestNames[i]
         let subIndex = model.index(i,0,index)
-        let prop = model.data(subIndex, PhysiologyModel.ValueRole)
+        let prop = root.model.data(subIndex,PhysiologyModel.ValueRole)
         root.series(subRequest).append(time,prop)
+
+        if (!yAxis.visible){
+          yAxis.visible = true
+          yAxis.titleText = root.model.data(subRequest, PhysiologyModel.UnitRole)
+        }
       }
     } else {
-      let prop = model.data(index, PhysiologyModel.ValueRole);
+      let prop = root.model.data(index, PhysiologyModel.ValueRole);
       root.series(root.requestNames[0]).append(time,prop)
+
+     if (!yAxis.visible){
+      yAxis.visible = true
+      yAxis.titleText = root.model.data(index, PhysiologyModel.UnitRole)
+    }
     }
     updateDomainAndRange()
 
-    if (!yAxis.visible){
-      yAxis.visible = true
-      yAxis.titleText = root.model.data(root.index, PhysiologyModel.UnitRole)
-    }
+
   }
 
   //Gets simulation time and substance data request from substance metrics, appending new point to each series

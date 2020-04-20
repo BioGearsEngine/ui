@@ -267,21 +267,21 @@ Scenario& Scenario::load_patient(QString file)
   _logger.SetForward(_consoleLog);
 
   if (_engine->LoadState(path)) {
-    if(!_physiology_model) {
+    if (!_physiology_model) {
       setup_physiology_model();
     }
     auto vitals = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::VITALS, 0, QModelIndex()).internalPointer());
-      {
+    {
       vitals->child(0)->unit_scalar(&_engine->GetCardiovascular().GetSystolicArterialPressure());
       vitals->child(1)->unit_scalar(&_engine->GetCardiovascular().GetDiastolicArterialPressure());
       vitals->child(2)->unit_scalar(&_engine->GetRespiratory().GetRespirationRate());
       vitals->child(3)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
       vitals->child(4)->unit_scalar(&_engine->GetCardiovascular().GetBloodVolume());
       vitals->child(5)->unit_scalar(&_engine->GetCardiovascular().GetCentralVenousPressure());
-          }
+    }
 
     auto cardiopulmonary = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());
-      {
+    {
       cardiopulmonary->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       cardiopulmonary->child(1)->unit_scalar(&_engine->GetCardiovascular().GetIntracranialPressure());
       cardiopulmonary->child(2)->unit_scalar(&_engine->GetCardiovascular().GetSystemicVascularResistance());
@@ -296,7 +296,7 @@ Scenario& Scenario::load_patient(QString file)
     }
 
     auto blood_chemistry = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::BLOOD_CHEMISTRY, 0, QModelIndex()).internalPointer());
-      {
+    {
 
       blood_chemistry->child(0)->scalar(&_engine->GetBloodChemistry().GetCarbonDioxideSaturation());
       blood_chemistry->child(1)->scalar(&_engine->GetBloodChemistry().GetCarbonMonoxideSaturation());
@@ -304,30 +304,30 @@ Scenario& Scenario::load_patient(QString file)
       blood_chemistry->child(3)->scalar(&_engine->GetBloodChemistry().GetArterialBloodPH());
       blood_chemistry->child(4)->scalar(&_engine->GetBloodChemistry().GetHematocrit());
       blood_chemistry->child(5)->scalar(&_engine->GetBloodChemistry().GetStrongIonDifference());
-      }
+    }
 
     auto energy_and_metabolism = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::ENERGY_AND_METABOLISM, 0, QModelIndex()).internalPointer());
-      {
+    {
       energy_and_metabolism->child(0)->unit_scalar(&_engine->GetEnergy().GetCoreTemperature());
       energy_and_metabolism->child(1)->unit_scalar(&_engine->GetEnergy().GetSweatRate());
       energy_and_metabolism->child(2)->unit_scalar(&_engine->GetEnergy().GetSkinTemperature());
       energy_and_metabolism->child(3)->unit_scalar(&_engine->GetEnergy().GetTotalMetabolicRate());
-        auto stomach_contents = energy_and_metabolism->child(4);
-        auto& neutrition = _engine->GetGastrointestinal().GetStomachContents();
-        {
-        stomach_contents->child(0)->unit_scalar( &neutrition.GetCalcium());
-        stomach_contents->child(1)->unit_scalar( &neutrition.GetCarbohydrate());
-        stomach_contents->child(2)->unit_scalar( &neutrition.GetFat());
-        stomach_contents->child(3)->unit_scalar( &neutrition.GetProtein());
-        stomach_contents->child(4)->unit_scalar( &neutrition.GetSodium());
-        stomach_contents->child(5)->unit_scalar( &neutrition.GetWater());
-        }
-      energy_and_metabolism->child(4)->unit_scalar( &_engine->GetTissue().GetOxygenConsumptionRate());
-      energy_and_metabolism->child(5)->unit_scalar( &_engine->GetTissue().GetCarbonDioxideProductionRate());
+      auto stomach_contents = energy_and_metabolism->child(4);
+      auto& neutrition = _engine->GetGastrointestinal().GetStomachContents();
+      {
+        stomach_contents->child(0)->unit_scalar(&neutrition.GetCalcium());
+        stomach_contents->child(1)->unit_scalar(&neutrition.GetCarbohydrate());
+        stomach_contents->child(2)->unit_scalar(&neutrition.GetFat());
+        stomach_contents->child(3)->unit_scalar(&neutrition.GetProtein());
+        stomach_contents->child(4)->unit_scalar(&neutrition.GetSodium());
+        stomach_contents->child(5)->unit_scalar(&neutrition.GetWater());
       }
+      energy_and_metabolism->child(4)->unit_scalar(&_engine->GetTissue().GetOxygenConsumptionRate());
+      energy_and_metabolism->child(5)->unit_scalar(&_engine->GetTissue().GetCarbonDioxideProductionRate());
+    }
 
     auto renal_fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_FLUID_BALANCE, 0, QModelIndex()).internalPointer());
-      {
+    {
 
       renal_fluid_balance->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
       renal_fluid_balance->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
@@ -341,22 +341,22 @@ Scenario& Scenario::load_patient(QString file)
       renal_fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
       renal_fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
       renal_fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
-      }
+    }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
     setup_physiology_substances(substances);
 
     auto customs = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CUSTOM, 0, QModelIndex()).internalPointer());
-      {
+    {
       auto custom = customs->child(0);
       custom->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetInspiratoryFlow());
       custom->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetExpiratoryFlow());
       custom->rate(10);
-      
-      customs->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-      customs->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-      customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-      }
+    }
+
+    customs->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+    customs->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+    customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
 
     emit stateLoad();
   } else {
@@ -411,20 +411,20 @@ auto Scenario::get_physiology_state() -> PatientState
   if (!_current_state) {
     _current_state = std::make_unique<PatientState>();
   }
-  
+
   const auto& patient = _engine->GetPatient();
   _current_state->alive = "True";
   _current_state->tacycardia = "False";
 
   _current_state->age = (patient.HasAge()) ? QString::number(patient.GetAge(biogears::TimeUnit::yr), 'f', 0)
-                                   : "N/A";
+                                           : "N/A";
   _current_state->height_cm = (patient.HasHeight()) ? QString::number(patient.GetHeight(biogears::LengthUnit::cm), 'f', 0)
-                                            : "N/A";
+                                                    : "N/A";
   _current_state->gender = (!patient.HasGender()) ? "N/A"
-                                          : (patient.GetGender() == CDM::enumSex::Male) ? "Male"
-                                                                                        : "Female";
+                                                  : (patient.GetGender() == CDM::enumSex::Male) ? "Male"
+                                                                                                : "Female";
   _current_state->weight_kg = (patient.HasWeight()) ? QString::number(patient.GetWeight(biogears::MassUnit::kg), 'f', 2)
-                                            : "N/A";
+                                                    : "N/A";
   if (patient.HasWeight()) {
     auto BSA = std::sqrt(patient.GetHeight(biogears::LengthUnit::cm) * patient.GetWeight(biogears::MassUnit::kg) / 3600.0);
     _current_state->body_surface_area_m_sq = QString::number(BSA, 'f', 2);
@@ -435,7 +435,7 @@ auto Scenario::get_physiology_state() -> PatientState
     _current_state->body_mass_index_kg_per_m_sq = "N/A";
   }
   _current_state->body_fat_pct = (patient.HasBodyFatFraction()) ? QString::number(patient.GetBodyFatFraction(), 'f', 2)
-                                                        : "N/A";
+                                                                : "N/A";
   //TODO: Lets take intensity and make a series of animated GIFs inspired off vault-boy
   _current_state->exercise_state = (_engine->GetActions().GetPatientActions().HasExercise()) ? "Running" : "Standing";
 

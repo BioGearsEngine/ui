@@ -201,6 +201,7 @@ QVariant PhysiologyRequest::data(int role) const
   switch (role) {
   case BioGearsData::PrefixRole:
     return QVariant(_prefix); // PREFIX ROLE
+  case BioGearsData::RequestRole:
   case Qt::DisplayRole:
     return QVariant(_name);
   case BioGearsData::ValueRole: //VALUE ROLE
