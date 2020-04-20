@@ -39,6 +39,8 @@
         <file>UIPatientWizardForm.ui.qml</file>
         <file>WizardDialog.qml</file>
         <file>WizardDialogForm.ui.qml</file>
+        <file>UIUnitScalarEntry.qml</file>
+        <file>UIUnitScalarEntryForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
