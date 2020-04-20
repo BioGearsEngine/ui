@@ -549,7 +549,7 @@ void Scenario::export_environment(QString environmentFileName)
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
 
-  std::unique_ptr<CDM::EnvironmentData> eData(_engine->GetEnvironment().Unload());
+  std::unique_ptr<CDM::EnvironmentData> eData(_engine->GetEnvironment()->Unload());
   Environment(stream, *eData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved environemnt: " + fullPath);
@@ -606,14 +606,14 @@ void Scenario::save_state(QString filePath)
   state->System().push_back(*(_engine->GetRenal().Unload()));
   state->System().push_back(*(_engine->GetRespiratory().Unload()));
   state->System().push_back(*(_engine->GetTissue().Unload()));
-  state->System().push_back(*(_engine->GetEnvironment().Unload()));
-  state->System().push_back(*(_engine->GetAnesthesiaMachine().Unload()));
+  state->System().push_back(*(_engine->GetEnvironment()->Unload()));
+  state->System().push_back(*(_engine->GetAnesthesiaMachine()->Unload()));
   state->System().push_back(*(_engine->GetECG().Unload()));
-  state->System().push_back(*(_engine->GetInhaler().Unload()));
+  state->System().push_back(*(_engine->GetInhaler()->Unload()));
   // Compartments
   state->CompartmentManager(*(_engine->GetCompartments().Unload()));
   // Configuration
-  state->Configuration(*(_engine->GetConfiguration().Unload()));
+  state->Configuration(*(_engine->GetConfiguration()->Unload()));
   // Circuits
   state->CircuitManager(*(_engine->GetCircuits().Unload()));
   BioGearsState(stream, *state, info);

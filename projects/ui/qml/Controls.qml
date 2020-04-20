@@ -61,10 +61,11 @@ ControlsForm {
       root.activeSubstanceAdded(sub);
     }
 
-    onStateChanged : {
-      root.restartClicked();
-      patientBox.checkDisplayText(scenario.patient_name());
-    }
+    //TODO: Matt needs to review this signal
+    // onStateChanged : {
+    //   root.restartClicked();
+    //   patientBox.checkDisplayText(scenario.patient_name());
+    // }
 
     onRunningToggled : {
       patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
