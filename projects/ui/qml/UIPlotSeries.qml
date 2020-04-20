@@ -13,12 +13,11 @@ UIPlotSeriesForm {
 
   //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
-  function initializeChart (biogearsData, physiologyRequest, tickCount) {
+  function initializeChart (biogearsData, physiologyRequest, title, tickCount) {
      model = biogearsData
      index = physiologyRequest
-     var name = model.data(index, Qt.DisplayRole)
+     var name = title
     
-     yAxis.titleText = model.data(index, Qt.UnitRole)
      root.rate = model.data(index, PhysiologyModel.RateRole)
      if(model.rowCount(index)){
        if( model.data(index, PhysiologyModel.NestedRole) ){
@@ -28,7 +27,6 @@ UIPlotSeriesForm {
           requestNames = []
           for (let i = 0; i < model.rowCount(index); ++i){
             let subIndex = biogearsData.index(i,0,physiologyRequest)
-            yAxis.titleText = model.data(subIndex, Qt.UnitRole)
             requestNames.push(biogearsData.data(subIndex,Qt.DisplayRole))
             let series = root.createSeries(ChartView.SeriesTypeLine, biogearsData.data(subIndex,Qt.DisplayRole), xAxis, yAxis);
           }
@@ -36,11 +34,10 @@ UIPlotSeriesForm {
        }
      } else  {
       //Common single line plot
-      
       let series = root.createSeries(ChartView.SeriesTypeLine, name, xAxis, yAxis);
-      yAxis.visible = false
       root.requestNames.push(name);
     }
+    yAxis.visible = false
     xAxis.tickCount = tickCount;
     root.title = name;
   }
@@ -49,15 +46,17 @@ UIPlotSeriesForm {
   function update(time_s){
     let time = time_s / 60;
     if (root.count>1){
+      console.log("Updating Children")
       for (let i = 0; i < root.count; ++i){
         let subRequest = requestNames[i]
+        console.log("Updating", subRequest)
         let subIndex = model.index(i,0,index)
         let prop = root.model.data(subIndex,PhysiologyModel.ValueRole)
         root.series(subRequest).append(time,prop)
 
         if (!yAxis.visible){
           yAxis.visible = true
-          yAxis.titleText = root.model.data(subRequest, PhysiologyModel.UnitRole)
+          yAxis.titleText = root.model.data(subIndex, PhysiologyModel.UnitRole)
         }
       }
     } else {

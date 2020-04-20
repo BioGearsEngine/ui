@@ -41,7 +41,7 @@ BioGearsData* BioGearsData::category(int category)
   case ENERGY_AND_METABOLISM:
     return _energy_and_metabolism;
   case RENAL_FLUID_BALANCE:
-    //return _renal_fluid_balance;
+    return _renal_fluid_balance;
   case SUBSTANCES:
     return _substances;
   case CUSTOM:

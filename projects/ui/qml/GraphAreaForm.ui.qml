@@ -139,14 +139,14 @@ Page {
                             CheckBox {
                                 checkable : true
                                 checked : _model.data(_item, PhysiologyModel.EnabledRole)
-                                text :   _model.data(_item, PhysiologyModel.RequestRole) 
+                                text :    _model.data(_item, PhysiologyModel.RequestRole) 
                                 onClicked : {
                                     if (checked) {
                                         _item.active = true
-                                        createPlotView(plots.currentIndex, _model, _item)
+                                        createPlotView(plots.currentIndex, _model, _item, _title)
                                     } else {
                                         _item.active = false
-                                        removePlotView(plots.currentIndex, _item.row, _item.name)
+                                        removePlotView(plots.currentIndex, _item.row, _title)
                                     }
                                 }
                             }
@@ -160,18 +160,22 @@ Page {
                         id : categorySelectionComponent
                         Instantiator {
                             id : menuItemInstance
-                            model : _item
+                            property var bgData : _model
+                            property var entry : _item
+                            model : _current
                             delegate : Menu {
                                 id : substanceSubMenu
-                                title : _model.data(_item, PhysiolgoyModel.RequestRole)
+                                title : _model.data(_item, PhysiologyModel.RequestRole)
                                 Repeater {
                                     id : subMenuInstance
                                     model : DelegateModel {
                                         model : _model
-                                        rootIndex : _model.index(_item, 0)
+                                        rootIndex : _model.index(index, 0)
                                         delegate : Loader {
-                                            property var _model: parent.model
-                                            property var  _item  : _model.index(index, 0)
+                                            property var _model: menuItemInstance.bgData//subMenuInstance.rootIndex.model
+                                            property var _item:  menuItemInstance.bgData.index(index,0,entry)//subMenuInstance.model.index(index, 0, subMenuInstance.rootIndex)
+                                            property var _title: "%1 - %2".arg(menuItemInstance.bgData.data(entry, Qt.DisplayRole))
+                                                                          .arg(menuItemInstance.bgData.data(_item, Qt.DisplayRole))
                                             sourceComponent : singleItemComponent
                                         }
                                     }
@@ -187,8 +191,10 @@ Page {
                     }
 
                     delegate : Loader {
+                        property var             _current : model
                         property PhysiologyModel _model : root.physiologyRequestModel.category(plots.currentIndex)
                         property var             _item  : _model.index(index, 0)
+                        property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
                         sourceComponent : {
                             if (!model.nested) {
                                 return singleItemComponent

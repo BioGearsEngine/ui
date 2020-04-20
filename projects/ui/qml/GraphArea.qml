@@ -40,7 +40,7 @@ GraphAreaForm {
   // ObjectModel = QML ObjectModel
   // View = QML QT QUICK View
   // eventSignal = Signal that will fire updatePatientSeries
-  function createPlotViewHelper (model, request,objectModel, view, refreshRate) {
+  function createPlotViewHelper (model, request, title, objectModel, view, refreshRate) {
     var chartComponent = Qt.createComponent("UIPlotSeries.qml");
     if ( chartComponent.status != Component.Ready){
       if (chartComponent.status == Component.Error){
@@ -50,7 +50,7 @@ GraphAreaForm {
       console.log("Error : Chart component not ready");
     } else {
       var chartObject = chartComponent.createObject(view,{"width" : view.cellWidth, "height" : view.cellHeight });
-      chartObject.initializeChart(model, request,tickCount);
+      chartObject.initializeChart(model, request, title, tickCount);
       objectModel.append(chartObject)
     }
   }
@@ -185,9 +185,9 @@ GraphAreaForm {
   ObjectModel {
     id: vitalsObjectModel
 
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.VITALS)
-     root.createPlotViewHelper(model, request,vitalsObjectModel, vitalsGridView, 1)
+     root.createPlotViewHelper(model, request, title,vitalsObjectModel, vitalsGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,vitalsObjectModel)
@@ -211,9 +211,9 @@ GraphAreaForm {
  //Cardiopulmonary//
   ObjectModel {
     id: cardiopulmonaryObjectModel
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-     root.createPlotViewHelper(model, request,cardiopulmonaryObjectModel, cardiopulmonaryGridView, 1)
+     root.createPlotViewHelper(model, request, title,cardiopulmonaryObjectModel, cardiopulmonaryGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,cardiopulmonaryObjectModel)
@@ -233,9 +233,9 @@ GraphAreaForm {
   //Blood Chemistry//
   ObjectModel {
     id: bloodChemistryObjectModel
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
       var blood = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
-      root.createPlotViewHelper(model, request,bloodChemistryObjectModel, bloodChemistryGridView, 1)
+      root.createPlotViewHelper(model, request, title,bloodChemistryObjectModel, bloodChemistryGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,bloodChemistryObjectModel)
@@ -255,9 +255,9 @@ GraphAreaForm {
   //Energy - Metabolism//
   ObjectModel {
     id: energyMetabolismObjectModel
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
      var energy = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
-     root.createPlotViewHelper(model, request,energyMetabolismObjectModel, energyMetabolismGridView, 1)
+     root.createPlotViewHelper(model, request, title,energyMetabolismObjectModel, energyMetabolismGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,energyMetabolismObjectModel)
@@ -277,9 +277,9 @@ GraphAreaForm {
   //Renal - Fluid Balance//
   ObjectModel {
     id: renalFluidBalanceObjectModel
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
-    root.createPlotViewHelper(model, request,renalFluidBalanceObjectModel, renalFluidBalanceGridView, 1)
+    root.createPlotViewHelper(model, request, title,renalFluidBalanceObjectModel, renalFluidBalanceGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,renalFluidBalanceObjectModel)
@@ -303,9 +303,9 @@ GraphAreaForm {
   }
   ObjectModel {
     id: substanceObjectModel
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
      var subs = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
-     root.createPlotViewHelper(model, request, substanceObjectModel, substanceGridView, 1)
+     root.createPlotViewHelper(model, request, title, substanceObjectModel, substanceGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,substanceObjectModel)
@@ -325,9 +325,9 @@ GraphAreaForm {
   //Custom Views//
   ObjectModel {
     id: customObjectModel
-    function createPlotView (model, request) {
+    function createPlotView (model, request, title) {
      var customs = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
-      root.createPlotViewHelper(model, request, customObjectModel, customGridView, 10)
+      root.createPlotViewHelper(model, request, title, customObjectModel, customGridView, 10)
     }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,customObjectModel)
@@ -344,28 +344,28 @@ GraphAreaForm {
     customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
 
-  function createPlotView(category, model, request){
+  function createPlotView(category, model, request, title){
     switch(category) {
       case PhysiologyModel.VITALS:
-        vitalsModel.createPlotView(model, request);
+        vitalsModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.CARDIOPULMONARY:
-        cardiopulmonaryModel.createPlotView(model, request);
+        cardiopulmonaryModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.BLOOD_CHEMISTRY:
-        bloodChemistryModel.createPlotView(model, request);
+        bloodChemistryModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.ENERGY_AND_METABOLISM:
-        energyMetabolismModel.createPlotView(model, request);
+        energyMetabolismModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.RENAL_FLUID_BALANCE:
-        renalFluidBalanceModel.createPlotView(model, request);
+        renalFluidBalanceModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.SUBSTANCES:
-        substanceModel.createPlotView(model, request);
+        substanceModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.CUSTOM:
-        customModel.createPlotView(model, request);
+        customModel.createPlotView(model, request, title);
         break;
     }
   }
