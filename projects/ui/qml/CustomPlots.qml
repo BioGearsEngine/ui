@@ -16,12 +16,14 @@ CustomPlotsForm {
   function initializeRespiratoryPVSeries(biogearsData, physiologyRequest, title) {
     root.model = biogearsData
     root.index = physiologyRequest
-    
+    root.rate  =  model.data(physiologyRequest, PhysiologyModel.RateRole)
+
     root.plotName = "pvCurve"
     let pvSeries = root.createSeries(ChartView.SeriesTypeLine, root.plotName, xAxis, yAxis);
     root.title = "Pressure-Volume Curve";
     xAxis.titleText = "Pleural Pressure (cmH2O)";
     yAxis.titleText = "Lung Volume (L)";
+
   }
  
    function update(currentTime_s){
@@ -42,12 +44,16 @@ CustomPlotsForm {
     let cycleIndex = model.index(2,0,index)
 
     let pressure = model.data(pIndex, PhysiologyModel.ValueRole)
-    let volume = model.data(pIndex, PhysiologyModel.ValueRole) / 1000
-     
-    console.log(pressure,volume)
+    let volume   = model.data(vIndex, PhysiologyModel.ValueRole) / 1000
 
     root.series(root.plotName).append(pressure, volume)
-    if ( model.data(cycleIndex, PhysiologyModel.ValueRole)){
+    if ( root.series(root.plotName).count == 1){
+      yAxis.min =  root.series(root.plotName).at(0).y
+      yAxis.max =  root.series(root.plotName).at(0).y
+      xAxis.min =  root.series(root.plotName).at(0).x
+      xAxis.max =  root.series(root.plotName).at(0).x
+    }
+    if ( model.data(cycleIndex, PhysiologyModel.ValueRole) > 0.5 ){
       ++breathingCycles;
     }
     if (breathingCycles > maxCycles){
@@ -59,7 +65,6 @@ CustomPlotsForm {
   function updateDomainAndRange(){
     let index = root.series(root.plotName).count-1
     let newPoint = root.series(root.plotName).at(index)
-
     if(newPoint.x >=0){
       xAxis.min = xAxis.min == 0 ? 0.975 * newPoint.x : Math.min(xAxis.min, Math.floor(0.975 * newPoint.x))
       xAxis.max = xAxis.max == 1 ? 1.025 * newPoint.x : Math.max(xAxis.max, Math.ceil(1.025 * newPoint.x))
@@ -71,8 +76,8 @@ CustomPlotsForm {
       yAxis.min = yAxis.min == 0 ? 0.975 * newPoint.y : Math.min(yAxis.min, Math.floor(0.975 * newPoint.y))
       yAxis.max = yAxis.max == 1 ? 1.025 * newPoint.y : Math.max(yAxis.max, Math.ceil(1.025 * newPoint.y))
     } else {
-      yAxis.min = yAxis.min == 0 ? 1.025 * newPoint.y : Math.min(yAxis.min, Math.floor(1.025 * newPoint.y))
-      yAxis.max = yAxis.max == 1 ? 0.975 * newPoint.y : Math.max(yAxis.max, Math.ceil(0.975 * newPoint.y))
+      yAxis.min =  Math.min(yAxis.min, 1.025 * newPoint.y)
+      yAxis.max =  Math.max(yAxis.max, 0.975 * newPoint.y)
     }
   }
 

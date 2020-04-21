@@ -345,10 +345,7 @@ GraphAreaForm {
         } 
       }
     }
-    // function createPlotView (model, request, title) {
-    //  var customs = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
-      // root.createPlotViewHelper(model, request, title, customObjectModel, customGridView, 10)
-    // }
+    
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,customObjectModel)
     }

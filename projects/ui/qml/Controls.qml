@@ -52,8 +52,7 @@ ControlsForm {
       root.bodySufaceArea.value       = patientState.BodySurfaceArea
       root.bodyMassIndex.value        = patientState.BodyMassIndex
       root.fat_pct.value              = patientState.BodyFat
-      
-      console.log("Patient Age = ", root.age_yr)
+
       root.patientStateChanged(patientState)
     }
 

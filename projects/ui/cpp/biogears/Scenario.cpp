@@ -415,6 +415,9 @@ inline void Scenario::physiology_thread_step()
     _engine->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
 
+    auto test = _engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale);
+    if(test) std::cout << test  << "\n";
+
     _new_respiratory_cycle->SetValue(_engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale));
 
     emit patientMetricsChanged(get_physiology_metrics());
@@ -856,7 +859,7 @@ void Scenario::create_apnea_action(double severity)
 {
   auto action = std::make_unique<biogears::SEApnea>();
   action->GetSeverity().SetValue(severity);
-
+    
   _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_acute_stress_action(double severity)
