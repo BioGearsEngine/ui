@@ -135,7 +135,7 @@ MenuBar {
     id : saveAsDialog
     title : "Save state as..."
     visible : false
-    folder : "./"
+    folder : "file://states"
     nameFilters : ["(*.xml)", "All files (*)"]
     selectMultiple : false
     selectExisting: false
@@ -144,7 +144,7 @@ MenuBar {
     id : openDialog
     title : "Open state file"
     visible : false
-    folder : "file:///.states" //This url identifies the correct folder but logs warnings to the debug console from QWindowsNativeFileDialogBase.  This seems to be a Qml bug
+    folder : "file://states" //This url identifies the correct folder but logs warnings to the debug console from QWindowsNativeFileDialogBase.  This seems to be a Qml bug
     nameFilters : ["states (*.xml)", "All files (*)"]
     selectMultiple : false
     selectExisting : true
