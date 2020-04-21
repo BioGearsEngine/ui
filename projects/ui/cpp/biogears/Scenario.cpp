@@ -285,10 +285,10 @@ Scenario& Scenario::load_patient(QString file)
         vital->child(0)->unit_scalar(&_engine->GetCardiovascular().GetSystolicArterialPressure());
         vital->child(1)->unit_scalar(&_engine->GetCardiovascular().GetDiastolicArterialPressure());
       }
-      vitals->child(2)->unit_scalar(&_engine->GetRespiratory().GetRespirationRate());
-      vitals->child(3)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
-      vitals->child(4)->unit_scalar(&_engine->GetCardiovascular().GetBloodVolume());
-      vitals->child(5)->unit_scalar(&_engine->GetCardiovascular().GetCentralVenousPressure());
+      vitals->child(1)->unit_scalar(&_engine->GetRespiratory().GetRespirationRate());
+      vitals->child(2)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
+      vitals->child(3)->unit_scalar(&_engine->GetCardiovascular().GetBloodVolume());
+      vitals->child(4)->unit_scalar(&_engine->GetCardiovascular().GetCentralVenousPressure());
     }
 
     auto cardiopulmonary = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());

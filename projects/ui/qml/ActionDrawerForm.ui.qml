@@ -84,7 +84,7 @@ Drawer {
             ListModel {
                 id : actionMenuModel
                 ListElement { name : "Exercise"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_exercise(actionItem)}}
-                ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
                 ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(actionItem) {root.setup_acuteStress(actionItem)}}
                 ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(actionItem) {root.setup_airwayObstruction(actionItem)}}
                 ListElement { name : "Apnea"; section : "Insults"; property var func : function(actionItem) {root.setup_apnea(actionItem)}}
@@ -102,11 +102,11 @@ Drawer {
                 ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_needleDecompression(actionItem)}}
                 ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(actionItem) { root.setup_tourniquet(actionItem)}}
                 ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_transfusion(actionItem)}}
-                ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
-                ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.setup_otherActions(actionItem)}}
+                ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
+                ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
+                ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
+                ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
+                ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
             }
         }
         Button {
