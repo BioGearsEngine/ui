@@ -7,7 +7,6 @@ WizardDialogForm {
 	id: root
 
 	onAboutToShow : {
-		console.log('About to show')
 		let patientComponent = Qt.createComponent("UIPatientWizard.qml");
 	  if ( patientComponent.status != Component.Ready){
 		  if (patientComponent.status == Component.Error){

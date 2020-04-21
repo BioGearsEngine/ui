@@ -12,6 +12,7 @@ RowLayout {
   property string unit : ""
   property string type : "string"
   property DoubleValidator entryValidator : null
+  property bool editing : entryField.activeFocus || entryUnit.activeFocus
   //Property aliases
   property alias entryLabel : entryLabel
   property alias entryField : entryField
@@ -20,6 +21,23 @@ RowLayout {
   //Layout options
   Layout.preferredWidth : prefWidth
   Layout.preferredHeight : prefHeight
+
+  state : "standard"
+
+  states : [ 
+      State {
+        name : "standard"; when : root.validEntry() && !root.editing
+        PropertyChanges {target : labelRectangle; border.color : "black"}
+      }
+      ,State {
+        name : "editing"; when : root.editing
+        PropertyChanges {target : labelRectangle; border.color : "teal"}
+      }
+      ,State {
+        name : "invalid"; when : !root.validEntry() && !root.editing
+        PropertyChanges {target : labelRectangle; border.color : "red"}
+      }
+    ]
   
   Rectangle {
     id : labelRectangle
@@ -28,7 +46,6 @@ RowLayout {
     Layout.maximumHeight : scalarEntry.prefHeight
     Layout.fillHeight : true
     color : "transparent"
-    border.color : entryField.activeFocus ? "teal" : "black"
     border.width : 2
 
     Column {

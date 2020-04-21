@@ -12,11 +12,27 @@ UIPatientWizardForm {
 
 	onSaveConfiguration : {
 		root.patientReady(patientData)
+		root.destroy()
 	}
 
 	function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])/g, '$1 $2')
 		return formatted
+	}
+
+	function assignValidator (type) {
+		if (type === "double"){
+			console.log('double')
+			return doubleValidator
+		} else if (type === "0To1"){
+			console.log('fraction')
+			return fractionValidator
+		} else if (type === "-1To1") {
+			console.log('-1to1')
+			return neg1To1Validator
+		} else {
+			return null
+		}
 	}
 
 	Component.onCompleted : {

@@ -21,11 +21,23 @@ UIUnitScalarEntryForm {
 
   function validEntry(){
     let valid = true
-    if (entryUnit.currentIndex == -1 && entryUnit.count > 0){
+   // if (entryUnit.currentIndex == -1 && entryUnit.count > 0){
+     // root.state = "invalid"
+    //  valid = false
+   // }
+    if (entryField.text.length == 0 && entryUnit.currentIndex > -1){
+      //We selected a unit but haven't entered a value
       valid = false
     }
-    if (entryField.text.length == 0){
-      valid = false
+    if (entryField.text.length > 0){
+      if (!entryField.acceptableInput){
+        //We entered a value that did not satisfy the validator (if it exists)
+        valid = false
+      }
+      if (entryUnit.count > 0 && entryUnit.currentIndex == -1){
+        //We entered a value but selected no unit (only if there are units to choose from)
+        valid = false
+      }
     }
     return valid
   }

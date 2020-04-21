@@ -6,6 +6,8 @@ import QtQuick.Layouts 1.12
 GridView {
   id: patientWizard
   property alias doubleValidator : doubleValidator
+  property alias fractionValidator : fractionValidator
+  property alias neg1To1Validator : neg1To1Validator
   property alias patientDataModel : patientDataModel 
 
   clip : true
@@ -20,7 +22,7 @@ GridView {
     entry : root.displayFormat(model.name)
     unit : model.unit
     type : model.type
-    entryValidator : entry == "Name" ? null : patientWizard.doubleValidator
+    entryValidator : root.assignValidator(model.type)
     onEntryUpdated : {
       root.patientData[model.name] = [value, unit]
       for (let p in patientData){
@@ -34,6 +36,18 @@ GridView {
     bottom : 0
     decimals : 2
   }
+  DoubleValidator {
+    id : fractionValidator
+    bottom : 0
+    top : 1.0
+    decimals : 2
+  }
+  DoubleValidator {
+    id : neg1To1Validator
+    bottom : -1.0
+    top : 1.0
+    decimals : 2
+  }
 
   ListModel {
     id : patientDataModel
@@ -42,7 +56,7 @@ GridView {
     ListElement {name : "Age";  unit : "time"; type : "double" }
     ListElement {name : "Weight";  unit : "mass"; type : "double"}
     ListElement {name : "Height";  unit : "length"; type : "double"}
-    ListElement {name : "BodyFatFraction";  unit : "fraction"; type : "double"}
+    ListElement {name : "BodyFatFraction";  unit : ""; type : "0To1"}
     ListElement {name : "BloodVolumeBaseline";  unit : "volume"; type : "double"}
     ListElement {name : "BloodType";  unit : "bloodType"; type : "enum"}
     ListElement {name : "DiastolicArterialPressureBaseline";  unit : "pressure"; type : "double"}
@@ -51,13 +65,13 @@ GridView {
     ListElement {name : "HeartRateMaximum";  unit : "frequency"; type : "double"}
     ListElement {name : "RespirationRateBaseline";  unit : "frequency"; type : "double"}
     ListElement {name : "AlveoliSurfaceArea"; unit : "area"; type : "double"}
-    ListElement {name : "RightLungRatio"; unit : "fraction"; type : "double"}
+    ListElement {name : "RightLungRatio"; unit : ""; type : "0To1"}
     ListElement {name : "FunctionalResidualCapacity"; unit : "volume"; type : "double"}
     ListElement {name : "ResidualVolume"; unit : "volume"; type : "double"}
     ListElement {name : "TotalLungCapacity"; unit : "volume"; type : "double"}
     ListElement {name : "SkinSurfaceArea"; unit : "area"; type : "double"}
-    ListElement {name : "PainSusceptibility"; unit : "-1To1"; type : "double"}
-    ListElement {name : "Hyperhidrosis"; unit : "-1To1"; type : "double"}
+    ListElement {name : "PainSusceptibility"; unit : ""; type : "-1To1"}
+    ListElement {name : "Hyperhidrosis"; unit : ""; type : "-1To1"}
   }
 
 }
