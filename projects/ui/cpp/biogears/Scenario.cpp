@@ -74,7 +74,7 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
   biogears::SELiquidCompartment& rKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*rKidney);
   biogears::SELiquidCompartment& liverIntracellular = engine->GetCompartments().GetIntracellularFluid(*liver);
 
-  for (auto _activeSub : _engine->GetSubstances().GetActiveSubstances()) {
+  for (auto& _activeSub : _engine->GetSubstances().GetActiveSubstances()) {
     if ((_activeSub->GetState() != CDM::enumSubstanceState::Liquid) && (_activeSub->GetState() != CDM::enumSubstanceState::Gas)) {
       //This prevents us from tracking molecular (hemoglobin species) and whole blood components (cellular)--not of interest for PK or nutrition purposes
       continue;
@@ -113,10 +113,18 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
         //TODO: Upgrade Scalar PTRs to be a vector of PTRs so that we can do composite equations like this.
         //TODO: Add Lambda functiosn for calculating data values from composite functions.
         metric = substance->append(substance->name(), "Renal Clearance");
-        metric->unit_scalar(lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) ? &lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared() : nullptr);
-        //sub->renal_mass_cleared = (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ?
-        //lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) +
-        //rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) : 0;
+        
+        std::function<QString(void)> unitFunc = [&lKidneyIntracellular]()
+        {
+          return "ug";
+        };
+        std::function<double(void)> valueFunc = [&, _activeSub]() { 
+                 return (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? 
+                   lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug)
+                 : 0;
+        };
+
+        metric->custom(std::move(valueFunc), std::move(unitFunc)); 
       }
       if (_activeSub->GetClearance().HasIntrinsicClearance()) {
         metric = substance->append(substance->name(), "Intrinsic Clearance");

@@ -32,6 +32,9 @@ public:
   bool enabled() const;
   void enabled(bool);
 
+  bool custom() const;
+  void custom(std::function<double(void)>&& value, std::function<QString(void)>&& unit);
+
   biogears::SEUnitScalar const * unit_scalar() const;
   void unit_scalar(biogears::SEUnitScalar*);
 
@@ -79,8 +82,12 @@ private:
   QString _prefix;
   QString _name;
   bool _active = false;
+  bool _custom = false;
   bool _nested = false;
   int _refresh_rate = 1;
   biogears::SEScalar const* _value = nullptr;
   biogears::SEUnitScalar const* _unit = nullptr;
+
+  std::function<double(void)> _customValueFunc;
+  std::function<QString(void)> _customUnitFunc;
 };

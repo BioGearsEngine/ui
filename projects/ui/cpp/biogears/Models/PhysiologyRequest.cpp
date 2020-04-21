@@ -81,6 +81,18 @@ void PhysiologyRequest::enabled(bool value)
   _active = value;
 }
 //------------------------------------------------------------------------------------
+bool PhysiologyRequest::custom() const
+{
+  return _custom;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::custom(std::function<double(void)>&& value, std::function<QString(void)>&& unit)
+{
+  _custom = true;
+  _customValueFunc = value;
+  _customUnitFunc = unit;
+}
+//------------------------------------------------------------------------------------
 biogears::SEUnitScalar const* PhysiologyRequest::unit_scalar() const
 {
   return _unit;
@@ -205,13 +217,21 @@ QVariant PhysiologyRequest::data(int role) const
   case Qt::DisplayRole:
     return QVariant(_name);
   case BioGearsData::ValueRole: //VALUE ROLE
-    try {
-      return (_unit) ? QVariant(_unit->GetValue()) : (_value) ? QVariant(_value->GetValue()) : QVariant(0.0);
-    } catch (biogears::CommonDataModelException e) {
-      return "NaN";
+    if (_custom) {
+      return _customValueFunc();
+    } else {
+      try {
+        return (_unit) ? QVariant(_unit->GetValue()) : (_value) ? QVariant(_value->GetValue()) : QVariant(0.0);
+      } catch (biogears::CommonDataModelException e) {
+        return "NaN";
+      }
     }
   case BioGearsData::UnitRole: //UNIT ROLE
-    return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant("");
+    if (_custom) {
+      return _customUnitFunc();
+    } else {
+      return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant("");
+    }
   case BioGearsData::EnabledRole:
     return _active;
   case BioGearsData::RowRole:

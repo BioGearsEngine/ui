@@ -32,6 +32,7 @@ public:
     UnitRole,
     FullNameRole,
     EnabledRole,
+    CustomRole,
     RateRole,
     RowRole,
     NestedRole,
@@ -75,6 +76,7 @@ public:
     roles[UnitRole] = "unit";
     roles[FullNameRole] = "fullname";
     roles[EnabledRole] = "active";
+    roles[CustomRole] = "custom";
     roles[RateRole] = "rate";
     roles[RowRole] = "rows";
     roles[NestedRole] = "nested";
