@@ -72,8 +72,8 @@ ControlsForm {
         var minutes = Math.floor(SimulationTime_s / 60) % 60
         var hours   = Math.floor(SimulationTime_s / 3600)
 
-        seconds = (seconds<60) ? "0%1".arg(seconds) : "%1".arg(seconds)
-        minutes = (minutes<60) ? "0%1".arg(minutes) : "%1".arg(minutes)
+        seconds = (seconds<10) ? "0%1".arg(seconds) : "%1".arg(seconds)
+        minutes = (minutes<10) ? "0%1".arg(minutes) : "%1".arg(minutes)
 
         playback.simulationTime = "%1:%2:%3".arg(hours).arg(minutes).arg(seconds)
         root.simulationTimeAdvance(SimulationTime_s)

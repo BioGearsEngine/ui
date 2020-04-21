@@ -13,7 +13,7 @@ UIPlotSeriesForm {
 
   //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
-  function initializeChart (biogearsData, physiologyRequest, title, tickCount) {
+  function initializeChart (biogearsData, physiologyRequest, title) {
      model = biogearsData
      index = physiologyRequest
      var name = title
@@ -38,7 +38,6 @@ UIPlotSeriesForm {
       root.requestNames.push(name);
     }
     yAxis.visible = false
-    xAxis.tickCount = tickCount;
     root.title = name;
   }
 
@@ -61,14 +60,12 @@ UIPlotSeriesForm {
       let prop = root.model.data(index, PhysiologyModel.ValueRole);
       root.series(root.requestNames[0]).append(time,prop)
 
-     if (!yAxis.visible){
-      yAxis.visible = true
-      yAxis.titleText = root.model.data(index, PhysiologyModel.UnitRole)
+      if (!yAxis.visible){
+        yAxis.visible = true
+        yAxis.titleText = root.model.data(index, PhysiologyModel.UnitRole)
+      }
     }
-    }
-    updateDomainAndRange()
-
-
+    updateDomainAndRange(time_s)
   }
 
   //Gets simulation time and substance data request from substance metrics, appending new point to each series
@@ -79,7 +76,7 @@ UIPlotSeriesForm {
     let propName = requestComponents[1]
     let prop = subData[substance][propName]
     root.series(root.requestNames[0]).append(time/60.0, prop)
-    updateDomainAndRange();
+    updateDomainAndRange(time);
     if (!yAxis.visible){
       yAxis.visible = true
     }
@@ -98,18 +95,19 @@ UIPlotSeriesForm {
       series.removePoints(0, series.count)
     }
 
-    updateDomainAndRange()
+    updateDomainAndRange(0)
   }
 
   //Moves x-axis range if new data point is out of specified windowWidth and removes points no longer in visible range.  Update yAxis range according to min/max y-values
-  function updateDomainAndRange(){
-    ++xAxis.tickCount;
+  function updateDomainAndRange(time_s){
     const interval_s = 60 * root.windowWidth_min
     //Domain
-    if(xAxis.tickCount > interval_s){
-      xAxis.min = (xAxis.tickCount - interval_s) / 60;
-      xAxis.max = xAxis.tickCount / 60
+    if(time_s > interval_s){
+      console.log("time > interval_s - %1, %2 > %3".arg(root.title).arg(time_s).arg(interval_s))
+      xAxis.min = (time_s - interval_s) / 60;
+      xAxis.max = time_s / 60
     } else {
+      console.log("else - %1, %2 > %3".arg(root.title).arg(time_s).arg(interval_s))
       xAxis.min = 0
       xAxis.max=interval_s / 60
     }

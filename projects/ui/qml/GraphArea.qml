@@ -23,7 +23,6 @@ GraphAreaForm {
 
   property double count_1 : 0.0
   property double count_2 : 0.0
-  property int tickCount : -1
 
   property ObjectModel vitalsModel : vitalsObjectModel
   property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
@@ -50,7 +49,7 @@ GraphAreaForm {
       console.log("Error : Chart component not ready");
     } else {
       var chartObject = chartComponent.createObject(view,{"width" : view.cellWidth, "height" : view.cellHeight });
-      chartObject.initializeChart(model, request, title, tickCount);
+      chartObject.initializeChart(model, request, title, currentTime_s);
       objectModel.append(chartObject)
     }
   }
@@ -77,9 +76,8 @@ GraphAreaForm {
     physiologyRequestModel = model;
   }
 
-					onTimeAdvance : {
+  onTimeAdvance : {
     currentTime_s = time
-    tickCount++
   }
   onStart : {
     oneHzPlotTimer.start()
@@ -345,7 +343,7 @@ GraphAreaForm {
         } 
       }
     }
-    
+
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,customObjectModel)
     }
