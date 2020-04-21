@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
+import com.biogearsengine.ui.scenario 1.0
 
 
 WizardDialogForm {
@@ -18,8 +19,17 @@ WizardDialogForm {
 		  var patientWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'PatientWizard'});
 			root.title = 'Patient Wizard'
 			root.onAccepted.connect(patientWizard.saveConfiguration)
+			patientWizard.onPatientReady.connect(root.savePatient)
 			root.onRejected.connect(patientWizard.destroy)
 		}
+	}
+
+	function savePatient (patient){
+		scenario.new_patient(patient)
+		//for (let p in patient){
+		//	console.log(p + ": " + patient[p])
+    //}
+
 	}
 
 	onRejected : {

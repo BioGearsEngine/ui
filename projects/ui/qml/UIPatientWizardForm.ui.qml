@@ -17,14 +17,15 @@ GridView {
   delegate : UIUnitScalarEntry {
     prefWidth : cellWidth * 0.9
     prefHeight : cellHeight * 0.95
-    entry : model.name
+    entry : root.displayFormat(model.name)
     unit : model.unit
-    textEntry : model.textEntry
+    type : model.type
     entryValidator : entry == "Name" ? null : patientWizard.doubleValidator
     onEntryUpdated : {
-      model.currentValue = value
-      model.currentUnit = unit
-      console.log(model.currentValue, model.currentUnit)
+      root.patientData[model.name] = [value, unit]
+      for (let p in patientData){
+        console.log(p + ": " + patientData[p])
+      }
     }
   }
 
@@ -34,26 +35,29 @@ GridView {
     decimals : 2
   }
 
-
   ListModel {
     id : patientDataModel
-    ListElement {name : "Name"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Gender"; unit : "gender"; textEntry : false; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Age";  unit : "time"; textEntry : true; currentValue : ""; currentUnit : "" }
-    ListElement {name : "Weight";  unit : "mass"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Height";  unit : "length"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Body Density";  unit : "density"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Body Fat Fraction";  unit : "fraction"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Lean Body Mass";  unit : "mass"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Muscle Mass";  unit : "mass"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Blood Volume";  unit : "volume"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Blood Type";  unit : "bloodType"; textEntry : false; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Diastolic Pressure";  unit : "pressure"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Systolic Pressure";  unit : "pressure"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Heart Rate Minimum";  unit : "frequency"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Heart Rate Maximum";  unit : "frequency"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Respiration Rate";  unit : "frequency"; textEntry : true; currentValue : ""; currentUnit : ""}
-    ListElement {name : "Tidal Volume"; unit : "volume"; textEntry : true; currentValue : ""; currentUnit : ""}
+    ListElement {name : "Name"; type : "string"}
+    ListElement {name : "Gender"; unit : "gender"; type : "enum"}
+    ListElement {name : "Age";  unit : "time"; type : "double" }
+    ListElement {name : "Weight";  unit : "mass"; type : "double"}
+    ListElement {name : "Height";  unit : "length"; type : "double"}
+    ListElement {name : "BodyFatFraction";  unit : "fraction"; type : "double"}
+    ListElement {name : "BloodVolumeBaseline";  unit : "volume"; type : "double"}
+    ListElement {name : "BloodType";  unit : "bloodType"; type : "enum"}
+    ListElement {name : "DiastolicArterialPressureBaseline";  unit : "pressure"; type : "double"}
+    ListElement {name : "SystolicArterialPressureBaseline";  unit : "pressure"; type : "double"}
+    ListElement {name : "HeartRateMinimum";  unit : "frequency"; type : "double"}
+    ListElement {name : "HeartRateMaximum";  unit : "frequency"; type : "double"}
+    ListElement {name : "RespirationRateBaseline";  unit : "frequency"; type : "double"}
+    ListElement {name : "AlveoliSurfaceArea"; unit : "area"; type : "double"}
+    ListElement {name : "RightLungRatio"; unit : "fraction"; type : "double"}
+    ListElement {name : "FunctionalResidualCapacity"; unit : "volume"; type : "double"}
+    ListElement {name : "ResidualVolume"; unit : "volume"; type : "double"}
+    ListElement {name : "TotalLungCapacity"; unit : "volume"; type : "double"}
+    ListElement {name : "SkinSurfaceArea"; unit : "area"; type : "double"}
+    ListElement {name : "PainSusceptibility"; unit : "-1To1"; type : "double"}
+    ListElement {name : "Hyperhidrosis"; unit : "-1To1"; type : "double"}
   }
 
 }

@@ -30,7 +30,7 @@ Dialog {
   }
   //Add standard buttons to footer
   footer : DialogButtonBox {
-    standardButtons : Dialog.Save | Dialog.Reset | Dialog.Cancel
+    standardButtons : Dialog.Save | Dialog.Help | Dialog.Reset | Dialog.Cancel
   }
     //Main content
   contentItem : Rectangle {

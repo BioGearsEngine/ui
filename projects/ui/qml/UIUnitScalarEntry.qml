@@ -7,16 +7,27 @@ UIUnitScalarEntryForm {
   id: root
 
   signal entryUpdated (var value, string unit)
-
+ 
   entryField.onEditingFinished : {
-    root.entryUpdated (entryField.text, entryUnit.currentText)
+    if (validEntry()){
+      root.entryUpdated(entryField.text, entryUnit.currentText)
+    }
   }
   entryUnit.onActivated : {
-    let currentUnit = ""
-    if (entryUnit.currentIndex != -1) {
-      currentUnit = entryUnit.currentText
+    if (validEntry()){
+      root.entryUpdated(entryField.text, entryUnit.currentText)
     }
-    root.entryUpdated(entryField.text, currentUnit)
+  }
+
+  function validEntry(){
+    let valid = true
+    if (entryUnit.currentIndex == -1 && entryUnit.count > 0){
+      valid = false
+    }
+    if (entryField.text.length == 0){
+      valid = false
+    }
+    return valid
   }
 
 }

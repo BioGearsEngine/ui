@@ -580,16 +580,173 @@ QtLogForward* Scenario::getLogFoward()
   return _consoleLog;
 }
 
-void Scenario::export_patient(QString patientFileName)
+void Scenario::new_patient(QVariantMap patient)
 {
-  std::string fileLoc = "./patients/" + patientFileName.toStdString();
+  biogears::SEPatient* newPatient = new biogears::SEPatient(_engine->GetLogger());
+  //JS objects are returned from QML as QVariantMap<QString (key), QVariant (item)>
+  //The key will be the field in the patient CDM (e.g. Name, Age, Gender...)
+  //The item is a pair (value, unit), which is returned by QML as QList<QVariant>
+  //We first convert the QVariantList to a QList, which allows us to index the value and unit
+  //We then access values and convert them from QVariant to the appropriate type (string, double, int, etc)
+
+  std::string unit = "";
+
+  //Name
+  QList<QVariant> pMetric = patient["Name"].toList();
+  QString patientName = pMetric[0].toString(); //Used to gen file name
+  newPatient->SetName(patientName.toStdString());
+  //Gender
+  pMetric = patient["Gender"].toList();
+  //metricList = pMetric.toStringList();
+  //newPatient->SetGender("")
+  //Age
+  pMetric = patient["Age"].toList();
+  if (!pMetric[0].isNull()) {
+    double age = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetAge().SetValue(age, biogears::TimeUnit(unit));
+  }
+  //Weight
+  pMetric = patient["Weight"].toList();
+  if (!pMetric[0].isNull()) {
+    double weight = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetWeight().SetValue(weight, biogears::MassUnit(unit));
+  }
+  //Height
+  pMetric = patient["Height"].toList();
+  if (!pMetric[0].isNull()) {
+    double height = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetHeight().SetValue(height, biogears::LengthUnit(unit));
+  }
+  //Body Fat Fraction
+  pMetric = patient["BodyFatFraction"].toList();
+  if (!pMetric[0].isNull()) {
+    double bodyFatFraction = pMetric[0].toDouble();
+    newPatient->GetBodyFatFraction().SetValue(bodyFatFraction);
+  }
+  //Blood volume
+  pMetric = patient["BloodVolumeBaseline"].toList();
+  if (!pMetric[0].isNull()) {
+    double bloodVolume = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetBloodVolumeBaseline().SetValue(bloodVolume, biogears::VolumeUnit(unit));
+  }
+  //Blood Type
+  pMetric = patient["BloodType"].toList();
+  if (!pMetric[0].isNull()) {
+    //double bloodVolume = pMetric[0].toDouble();
+    //unit = pMetric[1].toString().toStdString();
+    //newPatient->GetBloodVolumeBaseline().SetValue(bloodVolume, biogears::VolumeUnit(unit));
+  }
+  //Diastolic pressure
+  pMetric = patient["DiastolicArterialPressureBaseline"].toList();
+  if (!pMetric[0].isNull()) {
+    double dapBaseline = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetDiastolicArterialPressureBaseline().SetValue(dapBaseline, biogears::PressureUnit(unit));
+  }
+  //Systolic pressure
+  pMetric = patient["SystolicArterialPressureBaseline"].toList();
+  if (!pMetric[0].isNull()) {
+    double sapBaseline = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetSystolicArterialPressureBaseline().SetValue(sapBaseline, biogears::PressureUnit(unit));
+  }
+  //Heart Rate Max
+  pMetric = patient["HeartRateMaximum"].toList();
+  if (!pMetric[0].isNull()) {
+    double hrMax = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetHeartRateMaximum().SetValue(hrMax, biogears::FrequencyUnit(unit));
+  }
+  //Heart Rate Min
+  pMetric = patient["HeartRateMinimum"].toList();
+  if (!pMetric[0].isNull()) {
+    double hrMin = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetHeartRateMinimum().SetValue(hrMin, biogears::FrequencyUnit(unit));
+  }
+  //Respiration Rate
+  pMetric = patient["RespirationRateBaseline"].toList();
+  if (!pMetric[0].isNull()) {
+    double respirationBase = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetRespirationRateBaseline().SetValue(respirationBase, biogears::FrequencyUnit(unit));
+  }
+  //Alveoli surface area
+  pMetric = patient["AlveoliSurfaceArea"].toList();
+  if (!pMetric[0].isNull()) {
+    double alveoliSurfaceArea = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetAlveoliSurfaceArea().SetValue(alveoliSurfaceArea, biogears::AreaUnit(unit));
+  }
+  //Right Lung Ratio
+  pMetric = patient["RightLungRatio"].toList();
+  if (!pMetric[0].isNull()) {
+    double rightLungRatio = pMetric[0].toDouble();
+    newPatient->GetRightLungRatio().SetValue(rightLungRatio);
+  }
+  //Functional residual capacity
+  pMetric = patient["FunctionalResidualCapacity"].toList();
+  if (!pMetric[0].isNull()) {
+    double frc = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetFunctionalResidualCapacity().SetValue(frc, biogears::VolumeUnit(unit));
+  }
+  //Residual volume
+  pMetric = patient["ResidualVolume"].toList();
+  if (!pMetric[0].isNull()) {
+    double residualVolume = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetResidualVolume().SetValue(residualVolume, biogears::VolumeUnit(unit));
+  }
+  //Total lung capacity
+  pMetric = patient["TotalLungCapacity"].toList();
+  if (!pMetric[0].isNull()) {
+    double totalCapacity = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetTotalLungCapacity().SetValue(totalCapacity, biogears::VolumeUnit(unit));
+  }
+  //Skin Surface Area
+  pMetric = patient["SkinSurfaceArea"].toList();
+  if (!pMetric[0].isNull()) {
+    double skinArea = pMetric[0].toDouble();
+    unit = pMetric[1].toString().toStdString();
+    newPatient->GetSkinSurfaceArea().SetValue(skinArea, biogears::AreaUnit(unit));
+  }
+  //Pain susceptibility
+  pMetric = patient["PainSusceptibility"].toList();
+  if (!pMetric[0].isNull()) {
+    double pain = pMetric[0].toDouble();
+    newPatient->GetPainSusceptibility().SetValue(pain);
+  }
+  //Hyperhidrosis
+  pMetric = patient["Hyperhidrosis"].toList();
+  if (!pMetric[0].isNull()) {
+    double schweaty = pMetric[0].toDouble();
+    newPatient->GetHyperhidrosis().SetValue(schweaty);
+  }
+
+  save_patient(newPatient);
+}
+
+void Scenario::export_patient()
+{
+  save_patient(&(_engine->GetPatient()));
+}
+
+void Scenario::save_patient(biogears::SEPatient* patient)
+{
+  std::string fileLoc = "./patients/" + patient->GetName() + ".xml";
   std::string fullPath = biogears::ResolvePath(fileLoc);
   biogears::CreateFilePath(fullPath);
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
 
-  std::unique_ptr<CDM::PatientData> pData(_engine->GetPatient().Unload());
+  std::unique_ptr<CDM::PatientData> pData(patient->Unload());
   Patient(stream, *pData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved patient " + fullPath);

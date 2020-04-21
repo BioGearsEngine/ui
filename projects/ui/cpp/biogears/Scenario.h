@@ -60,9 +60,11 @@ public:
   Q_INVOKABLE Scenario& patient_name(QString);
   Q_INVOKABLE Scenario& environment_name(QString);
 
-  //Load and save functions
+  //Load, new, and save functions
   Q_INVOKABLE Scenario& load_patient(QString);
-  Q_INVOKABLE void export_patient(QString patientFileName);
+  Q_INVOKABLE void export_patient();  //Export current patient (uses save_patient)
+  Q_INVOKABLE void new_patient(QVariantMap patient);    //Create and save a new patient
+  void save_patient(biogears::SEPatient* patient);
   Q_INVOKABLE void export_state(QString stateFileName);
   Q_INVOKABLE void export_environment(QString environmentFileName);
   Q_INVOKABLE void save_state(QString filePath);

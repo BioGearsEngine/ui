@@ -45,8 +45,7 @@ MenuAreaForm {
     switch (type) {
       case 0:
         //Export patient
-        let patientFile =  patient + "@" + simTime + "s.xml"
-        scenario.export_patient(patientFile)
+        scenario.export_patient()
         break;
       case 1:
         //Export environment

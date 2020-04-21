@@ -10,7 +10,7 @@ RowLayout {
   property real prefHeight : scalarEntry.implicitHeight
   property string entry : "Default"
   property string unit : ""
-  property bool textEntry : true
+  property string type : "string"
   property DoubleValidator entryValidator : null
   //Property aliases
   property alias entryLabel : entryLabel
@@ -77,15 +77,16 @@ RowLayout {
     currentIndex : -1
   }
 
-  property var units : ({'mass' : ['lbs', 'kg'],
-                         'length' : ['in', 'm', 'cm'],
+  property var units : ({'mass' : ['lb', 'kg', 'g', 'mg','ug'],
+                         'length' : ['in', 'ft', 'm', 'cm','mm','um'],
                          'volume' : ['L','mL','uL'],
                          'gender' : ['F', 'M'],
                          'bloodType' : ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
-                         'frequency' : ['1/s', '1/min'],
+                         'frequency' : ['1/s', '1/min', 'Hz', '1/hr'],
                          'density' : ['g/mL','kg/m^3'],
                          'time' : ['yr', 'hr','min','s'],
-                         'pressure' : ['mmHg', 'cmH2O']})
+                         'pressure' : ['mmHg', 'cmH2O'],
+                         'area' : ['cm^2', 'm^2']})
 
 }
 
