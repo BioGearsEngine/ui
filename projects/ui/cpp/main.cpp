@@ -37,10 +37,6 @@ int main(int argc, char* argv[])
   QMetaType::registerEqualsComparator<PatientConditions>();
   qmlRegisterUncreatableType<PatientConditions>("com.biogearsengine.ui.scenario", 1,  0, "PatientConditions", "Conditions of the Patient");
 
-  //qRegisterMetaType<PatientMetrics>();
-  //QMetaType::registerEqualsComparator<PatientMetrics>();
-  //qmlRegisterUncreatableType<PatientMetrics>("com.biogearsengine.ui.scenario", 1, 0, "PatientMetrics", "Metrics of the Patient");
-
   engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
 
     return app.exec();

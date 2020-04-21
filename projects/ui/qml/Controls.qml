@@ -10,11 +10,11 @@ ControlsForm {
   signal speedToggled(int speed)
   signal stateLoadedFromMenu()
 
-  // signal patientMetricsChanged(PatientMetrics metrics )
-  // signal patientStateChanged(PatientState patientState )
+  signal patientMetricsChanged(PatientMetrics metrics )
+  signal patientStateChanged(PatientState patientState )
   // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
-  // signal patientStateLoad()
+  signal patientStateLoad()
   signal simulationTimeAdvance(double time)
 
   signal activeSubstanceAdded(Substance sub)
@@ -22,6 +22,7 @@ ControlsForm {
 
   signal openActionDrawer()
 
+  property PhysiologyModel bgData
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
   patientBox.scenario : biogears_scenario
@@ -33,8 +34,34 @@ ControlsForm {
   Scenario {
     id: biogears_scenario
 
+    onPatientMetricsChanged: {
+        root.respiratoryRate.value       = metrics.RespiratoryRate
+        root.heartRate.value             = metrics.HeartRate 
+        root.core_temp_c.value           = metrics.CoreTemp + "c"
+        root.oxygenSaturation.value      = metrics.OxygenSaturation
+        root.systolicBloodPressure.value = metrics.SystolicBloodPressure
+        root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
+    }
+
+    onPatientStateChanged: {
+      root.age_yr.value    = patientState.Age
+      root.gender.value    = patientState.Gender
+      root.height_cm.value = patientState.Height + " cm"
+      root.weight_kg.value = patientState.Weight + " kg"
+      root.condition.value = patientState.ExerciseState
+      root.bodySufaceArea.value       = patientState.BodySurfaceArea
+      root.bodyMassIndex.value        = patientState.BodyMassIndex
+      root.fat_pct.value              = patientState.BodyFat
+      
+      console.log("Patient Age = ", root.age_yr)
+      root.patientStateChanged(patientState)
+    }
+
     onPhysiologyChanged:  {
+      bgData = model
       root.patientPhysiologyChanged(model)
+      root.restartClicked();
+      patientBox.checkDisplayText(scenario.patient_name());
     }  
                 
     onStateLoad: {
@@ -60,12 +87,6 @@ ControlsForm {
     onActiveSubstanceAdded : {
       root.activeSubstanceAdded(sub);
     }
-
-    //TODO: Matt needs to review this signal
-    // onStateChanged : {
-    //   root.restartClicked();
-    //   patientBox.checkDisplayText(scenario.patient_name());
-    // }
 
     onRunningToggled : {
       patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused

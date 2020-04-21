@@ -326,9 +326,29 @@ GraphAreaForm {
   ObjectModel {
     id: customObjectModel
     function createPlotView (model, request, title) {
-     var customs = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
-      root.createPlotViewHelper(model, request, title, customObjectModel, customGridView, 10)
+      var chartComponent = Qt.createComponent("CustomPlots.qml");
+      if ( chartComponent.status != Component.Ready){
+        if (chartComponent.status == Component.Error){
+        console.log("Error : " + chartComponent.errorString() );
+        return;
+        }
+        console.log("Error : Chart component not ready");
+      } else {
+        switch (title) {
+          case "Respiratory PV Cycle" :
+            var chartObject = chartComponent.createObject(customGridView,{"width" : customGridView.cellWidth, "height" : customGridView.cellHeight });
+            chartObject.initializeRespiratoryPVSeries(model,request,title);
+            customObjectModel.append(chartObject);
+            break;
+          default :
+            console.log(title + " not found");
+        } 
+      }
     }
+    // function createPlotView (model, request, title) {
+    //  var customs = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
+      // root.createPlotViewHelper(model, request, title, customObjectModel, customGridView, 10)
+    // }
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,customObjectModel)
     }

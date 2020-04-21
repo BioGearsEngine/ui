@@ -1,26 +1,53 @@
 import QtQuick 2.12
 import QtCharts 2.3
 
+import com.biogearsengine.ui.scenario 1.0
+
 CustomPlotsForm {
   id: root
 
   property real breathingCycles : 0
   property string plotName: ""
 
-  function initializeRespiratoryPVSeries() {
+  property var model : null
+  property var index : null
+  property int rate  : 1
+
+  function initializeRespiratoryPVSeries(biogearsData, physiologyRequest, title) {
+    root.model = biogearsData
+    root.index = physiologyRequest
+    
     root.plotName = "pvCurve"
     let pvSeries = root.createSeries(ChartView.SeriesTypeLine, root.plotName, xAxis, yAxis);
     root.title = "Pressure-Volume Curve";
     xAxis.titleText = "Pleural Pressure (cmH2O)";
     yAxis.titleText = "Lung Volume (L)";
   }
-
-  function updateRespiratoryPVSeries(metrics){
+ 
+   function update(currentTime_s){
+     switch (root.title){
+       case "Pressure-Volume Curve":
+          updateRespiratoryPVSeries()
+        break
+        default:
+          console.log("Unknown Graph %1".arg(root.title))
+        break
+     }
+   }
+  function updateRespiratoryPVSeries(){
     let maxCycles = 3;
-    let pressure = metrics.respirationMusclePressure
-    let volume = metrics["totalLungVolume"] / 1000
+
+    let pIndex = model.index(0,0,index)
+    let vIndex = model.index(1,0,index)
+    let cycleIndex = model.index(2,0,index)
+
+    let pressure = model.data(pIndex, PhysiologyModel.ValueRole)
+    let volume = model.data(pIndex, PhysiologyModel.ValueRole) / 1000
+     
+    console.log(pressure,volume)
+
     root.series(root.plotName).append(pressure, volume)
-    if (metrics.newBreathingCycle){
+    if ( model.data(cycleIndex, PhysiologyModel.ValueRole)){
       ++breathingCycles;
     }
     if (breathingCycles > maxCycles){

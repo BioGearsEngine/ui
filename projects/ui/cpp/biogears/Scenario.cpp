@@ -46,6 +46,7 @@ Scenario::Scenario(QString name, QObject* parent)
   , _paused(true)
   , _throttle(true)
   , _physiology_model(nullptr)
+  , _new_respiratory_cycle(std::make_unique<biogears::SEScalar>(0.0))
 {
   _consoleLog = new QtLogForward(this);
   _logger.SetForward(_consoleLog);
@@ -347,7 +348,6 @@ Scenario& Scenario::load_patient(QString file)
       renal_fluid_balance->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
       renal_fluid_balance->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
       renal_fluid_balance->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
-
       renal_fluid_balance->child(7)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
       renal_fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
       renal_fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
@@ -360,15 +360,20 @@ Scenario& Scenario::load_patient(QString file)
     auto customs = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CUSTOM, 0, QModelIndex()).internalPointer());
     {
       auto custom = customs->child(0);
-      custom->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetInspiratoryFlow());
-      custom->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetExpiratoryFlow());
-      custom->rate(10);
+      {
+        custom->child(0)->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetRespirationMusclePressure());
+        custom->child(1)->unit_scalar(&dynamic_cast<biogears::BioGears*>(_engine.get())->GetRespiratory().GetTotalLungVolume());
+        custom->child(2)->scalar(_new_respiratory_cycle.get());
+        custom->rate(10);
+      }
+      customs->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      customs->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
     }
 
-    customs->child(1)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-    customs->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-    customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-
+    emit patientMetricsChanged(get_physiology_metrics());
+    emit patientStateChanged(get_physiology_state());
+    emit patientConditionsChanged(get_physiology_conditions());
     emit stateLoad();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
@@ -401,7 +406,7 @@ inline void Scenario::physiology_thread_step()
 {
   using namespace std::chrono_literals;
 
-  if (!_paused) {
+    if (!_paused) {
     _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
     if (_action_queue.size()) {
@@ -410,6 +415,11 @@ inline void Scenario::physiology_thread_step()
     _engine->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
 
+    _new_respiratory_cycle->SetValue(_engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale));
+
+    emit patientMetricsChanged(get_physiology_metrics());
+    emit patientStateChanged(get_physiology_state());
+    emit patientConditionsChanged(get_physiology_conditions());
     emit timeAdvance(_engine->GetSimulationTime(biogears::TimeUnit::s));
 
   } else {
@@ -417,6 +427,36 @@ inline void Scenario::physiology_thread_step()
   }
 }
 //---------------------------------------------------------------------------------
+auto Scenario::get_physiology_metrics() -> PatientMetrics*
+{
+  if (!_current_metrics) {
+    _current_metrics = std::make_unique<PatientMetrics>();
+  }
+  _current_metrics->simulationTime = _engine->GetSimulationTime(biogears::TimeUnit::s);
+  _current_metrics->timeStep = _engine->GetTimeStep(biogears::TimeUnit::s);
+
+  _current_metrics->heart_rate_bpm = (_engine->GetCardiovascular().HasHeartRate())
+    ? QString::number(_engine->GetCardiovascular().GetHeartRate().GetValue(biogears::FrequencyUnit::Per_min), 'f', 2)
+    : "N/A";
+  _current_metrics->respiratory_rate_bpm = (_engine->GetRespiratory().HasRespirationRate())
+    ? QString::number(_engine->GetRespiratory().GetRespirationRate().GetValue(biogears::FrequencyUnit::Per_min), 'f', 2)
+    : "N/A";
+  _current_metrics->core_temperature_c = (_engine->GetEnergy().HasCoreTemperature())
+    ? QString::number(_engine->GetEnergy().GetCoreTemperature(biogears::TemperatureUnit::C), 'f', 2)
+    : "N/A";
+  _current_metrics->oxygen_saturation_pct = (_engine->GetBloodChemistry().HasOxygenSaturation())
+    ? QString::number(_engine->GetBloodChemistry().GetOxygenSaturation().GetValue(), 'f', 2)
+    : "N/A";
+  _current_metrics->systolic_blood_pressure_mmHg = (_engine->GetCardiovascular().HasSystolicArterialPressure())
+    ? QString::number(_engine->GetCardiovascular().GetSystolicArterialPressure().GetValue(biogears::PressureUnit::mmHg), 'f', 2)
+    : "N/A";
+  _current_metrics->diastolic_blood_pressure_mmHg = (_engine->GetCardiovascular().HasDiastolicArterialPressure())
+    ? QString::number(_engine->GetCardiovascular().GetDiastolicArterialPressure().GetValue(biogears::PressureUnit::mmHg), 'f', 2)
+    : "N/A";
+
+  return _current_metrics.get();
+}
+  //---------------------------------------------------------------------------------
 auto Scenario::get_physiology_state() -> PatientState
 {
   if (!_current_state) {

@@ -110,6 +110,10 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
 
 signals:
+  void patientMetricsChanged(PatientMetrics* metrics);
+  void patientStateChanged(PatientState patientState);
+  void patientConditionsChanged(PatientConditions conditions);
+
   void substanceDataChanged(double time, QVariantMap subData);
   void activeSubstanceAdded(Substance* sub);
   void timeAdvance(double SimulationTime_s);
@@ -121,13 +125,13 @@ signals:
   void loggerChanged();
 
 protected:
+  PatientMetrics* get_physiology_metrics();
   PatientState get_physiology_state();
   PatientConditions get_physiology_conditions();
 
   void setup_physiology_model();
   void setup_physiology_substances(BioGearsData*);
 
-protected:
   void physiology_thread_main();
   void physiology_thread_step();
 
@@ -139,6 +143,7 @@ private:
 
   std::mutex _engine_mutex;
 
+  std::unique_ptr<PatientMetrics> _current_metrics;
   std::unique_ptr<PatientConditions> _current_conditions;
   std::unique_ptr<PatientState> _current_state;
 
@@ -152,6 +157,8 @@ private:
   BioGearsData* _physiology_model;
 
   QtLogForward* _consoleLog;
+
+  std::unique_ptr<biogears::SEScalar> _new_respiratory_cycle;
 };
 
 }
