@@ -42,6 +42,15 @@ UIUnitScalarEntryForm {
     return valid
   }
 
+  function setEntry(value, unit){
+    entryField.text = value
+    if (entryUnit.count > 0){
+      let index = entryUnit.find(unit)
+      console.log(index)
+      entryUnit.currentIndex = index
+    }
+  }
+
   function resetEntry(){
     entryField.clear()
     entryUnit.currentIndex = -1

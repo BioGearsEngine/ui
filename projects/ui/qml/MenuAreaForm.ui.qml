@@ -71,7 +71,6 @@ Item {
         delegate : Menu {
           id : toolsDelegate
           title : name  //role from toolsListModel
-          property int toolIndex : index
           Repeater {
             //Create options "Edit", "New", and "Export" for submenu
             id : toolOptionMenu
@@ -89,8 +88,7 @@ Item {
                 border.width : toolsOptionsDelegate.highlighted ? 2 : 0
               }
               onTriggered : {
-                //toolIndex = Patient/Environment/..., currentIndex = New/Export/Edit, 
-                root.parseToolsSelection(toolsDelegate.toolIndex, currentIndex)
+                root.parseToolsSelection(toolsDelegate.title, option)
               }
             }
           }    

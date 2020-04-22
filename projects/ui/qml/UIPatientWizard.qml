@@ -8,6 +8,7 @@ UIPatientWizardForm {
 	signal patientReady (var patient)
 	signal resetConfiguration()
 	signal saveConfiguration()
+	signal loadConfiguration(var patient)
 
 	property var patientData : ({})
 
@@ -16,6 +17,13 @@ UIPatientWizardForm {
 		root.destroy()
 	}
 	
+	function mergePatientData(patient){
+		for (let prop in patient){
+			patientData[prop] = patient[prop]
+		}
+		root.loadConfiguration(patientData)
+	}
+
 	function showHelp (){
 		helpDialog.open()
 	}
@@ -27,17 +35,26 @@ UIPatientWizardForm {
 
 	function assignValidator (type) {
 		if (type === "double"){
-			console.log('double')
 			return doubleValidator
 		} else if (type === "0To1"){
-			console.log('fraction')
 			return fractionValidator
 		} else if (type === "-1To1") {
-			console.log('-1to1')
 			return neg1To1Validator
 		} else {
 			return null
 		}
+	}
+
+	function setPatientEntry(prop){
+		let value = ''
+		let unit = ''
+		if (prop[0]!=null){
+			value = prop[0]
+		}
+		if(prop[1]!=null){
+			unit = prop[1]
+		}
+		return [value, unit]
 	}
 
 	Component.onCompleted : {

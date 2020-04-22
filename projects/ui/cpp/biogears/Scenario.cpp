@@ -114,9 +114,8 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
         //TODO: Upgrade Scalar PTRs to be a vector of PTRs so that we can do composite equations like this.
         //TODO: Add Lambda functiosn for calculating data values from composite functions.
         metric = substance->append(substance->name(), "Renal Clearance");
-        
-        std::function<QString(void)> unitFunc = [&lKidneyIntracellular]()
-        {
+
+        std::function<QString(void)> unitFunc = [&lKidneyIntracellular]() {
           return "ug";
         };
         std::function<double(void)> valueFunc = [&, _activeSub]() { 
@@ -125,7 +124,7 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
                  : 0;
         };
 
-        metric->custom(std::move(valueFunc), std::move(unitFunc)); 
+        metric->custom(std::move(valueFunc), std::move(unitFunc));
       }
       if (_activeSub->GetClearance().HasIntrinsicClearance()) {
         metric = substance->append(substance->name(), "Intrinsic Clearance");
@@ -407,7 +406,7 @@ inline void Scenario::physiology_thread_step()
 {
   using namespace std::chrono_literals;
 
-    if (!_paused) {
+  if (!_paused) {
     _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
     if (_action_queue.size()) {
@@ -417,7 +416,8 @@ inline void Scenario::physiology_thread_step()
     _engine_mutex.unlock();
 
     auto test = _engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale);
-    if(test) std::cout << test  << "\n";
+    if (test)
+      std::cout << test << "\n";
 
     _new_respiratory_cycle->SetValue(_engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale));
 
@@ -460,7 +460,7 @@ auto Scenario::get_physiology_metrics() -> PatientMetrics*
 
   return _current_metrics.get();
 }
-  //---------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
 auto Scenario::get_physiology_state() -> PatientState
 {
   if (!_current_state) {
@@ -580,7 +580,154 @@ QtLogForward* Scenario::getLogFoward()
   return _consoleLog;
 }
 
-void Scenario::new_patient(QVariantMap patient)
+QVariantMap Scenario::edit_patient()
+{
+  QString patientFile = QFileDialog::getOpenFileName(nullptr, "Edit Patient", "./patients");
+  if (!QFileInfo::exists(patientFile)) {
+    throw std::runtime_error("Unable to locate " + patientFile.toStdString());
+  }
+  std::unique_ptr<CDM::ObjectData> patientXmlData = biogears::Serializer::ReadFile(patientFile.toStdString(), _engine->GetLogger());
+  CDM::PatientData* patientData = dynamic_cast<CDM::PatientData*>(patientXmlData.get());
+  biogears::SEPatient* patient = new biogears::SEPatient(_engine->GetLogger());
+  patient->Load(*patientData);
+
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  //Qml interpets QVariantMaps as Javascript objects, which we can index by prop name
+  QVariantMap patientMap;
+  QList<QVariant> patientField{ "", "" };
+
+  //Name
+  patientField[0] = QString::fromStdString(patient->GetName());
+  patientField[1] = "";
+  patientMap["Name"] = patientField;
+  //Gender
+  patientField[0] = patient->GetGender();
+  patientMap["Gender"] = patientField;
+  //Age
+  if (patient->HasAge()) {
+    patientField[0] = patient->GetAge(biogears::TimeUnit::yr);
+    patientField[1] = "yr";
+    patientMap["Age"] = patientField;
+  }
+  //Weight
+  if (patient->HasWeight()) {
+    patientField[0] = patient->GetWeight(biogears::MassUnit::lb);
+    patientField[1] = "lb";
+    patientMap["Weight"] = patientField;
+  }
+  //Height
+  if (patient->HasHeight()) {
+    patientField[0] = patient->GetHeight(biogears::LengthUnit::in);
+    patientField[1] = "in";
+    patientMap["Height"] = patientField;
+  }
+  //Body Fat Fraction
+  if (patient->HasBodyFatFraction()) {
+    patientField[0] = patient->GetBodyFatFraction().GetValue();
+    patientField[1] = "";
+    patientMap["BodyFatFraction"] = patientField;
+  }
+  //Blood Volume baseline
+  if (patient->HasBloodVolumeBaseline()) {
+    patientField[0] = patient->GetBloodVolumeBaseline(biogears::VolumeUnit::L);
+    patientField[1] = "L";
+    patientMap["BloodVolumeBaseline"] = patientField;
+  }
+  //Blood type
+  if (patient->HasBloodType()) {
+    patientField[0] = patient->GetBloodType();
+    patientField[1] = "";
+    patientMap["BloodType"] = patientField;
+  }
+  //Diastolic pressure baseline
+  if (patient->HasDiastolicArterialPressureBaseline()) {
+    patientField[0] = patient->GetDiastolicArterialPressureBaseline(biogears::PressureUnit::mmHg);
+    patientField[1] = "mmHg";
+    patientMap["DiastolicArterialPressureBaseline"] = patientField;
+  }
+  //Systolic pressure baseline
+  if (patient->HasSystolicArterialPressureBaseline()) {
+    patientField[0] = patient->GetSystolicArterialPressureBaseline(biogears::PressureUnit::mmHg);
+    patientField[1] = "mmHg";
+    patientMap["SystolicArterialPressureBaseline"] = patientField;
+  }
+  //Heart rate minimum
+  if (patient->HasHeartRateMinimum()) {
+    patientField[0] = patient->GetHeartRateMinimum(biogears::FrequencyUnit::Per_min);
+    patientField[1] = "1/min";
+    patientMap["HeartRateMinimum"] = patientField;
+  }
+  //Heart rate maximum
+  if (patient->HasHeartRateMaximum()) {
+    patientField[0] = patient->GetHeartRateMaximum(biogears::FrequencyUnit::Per_min);
+    patientField[1] = "1/min";
+    patientMap["HeartRateMaximum"] = patientField;
+  }
+  //Respiration rate baseline
+  if (patient->HasRespirationRateBaseline()) {
+    patientField[0] = patient->GetRespirationRateBaseline(biogears::FrequencyUnit::Per_min);
+    patientField[1] = "1/min";
+    patientMap["RespirationRateBaseline"] = patientField;
+  }
+  //Alveoli surface area
+  if (patient->HasAlveoliSurfaceArea()) {
+    patientField[0] = patient->GetAlveoliSurfaceArea(biogears::AreaUnit::m2);
+    patientField[1] = "m^2";
+    patientMap["AlveoliSurfaceArea"] = patientField;
+  }
+  //Right lung ratio
+  if (patient->HasRightLungRatio()) {
+    patientField[0] = patient->GetRightLungRatio().GetValue();
+    patientField[1] = "";
+    patientMap["RightLungRatio"] = patientField;
+  }
+  //Functional residual capacity
+  if (patient->HasFunctionalResidualCapacity()) {
+    patientField[0] = patient->GetFunctionalResidualCapacity(biogears::VolumeUnit::L);
+    patientField[1] = "L";
+    patientMap["FunctionalResidualCapacity"] = patientField;
+  }
+  //Residual volume
+  if (patient->HasResidualVolume()) {
+    patientField[0] = patient->GetResidualVolume(biogears::VolumeUnit::L);
+    patientField[1] = "L";
+    patientMap["ResidualVolume"] = patientField;
+  }
+  //Total lung capacity
+  if (patient->HasTotalLungCapacity()) {
+    patientField[0] = patient->GetTotalLungCapacity(biogears::VolumeUnit::L);
+    patientField[1] = "L";
+    patientMap["TotalLungCapacity"] = patientField;
+  }
+  //Skin surface area
+  if (patient->HasSkinSurfaceArea()) {
+    patientField[0] = patient->GetSkinSurfaceArea(biogears::AreaUnit::m2);
+    patientField[1] = "m^2";
+    patientMap["SkinSurfaceArea"] = patientField;
+  }
+  //Max work rate
+  if (patient->HasMaxWorkRate()) {
+    patientField[0] = patient->GetMaxWorkRate(biogears::PowerUnit::W);
+    patientField[1] = "W";
+    patientMap["MaxWorkRate"] = patientField;
+  }
+  //Pain susceptibility
+  if (patient->HasPainSusceptibility()) {
+    patientField[0] = patient->GetPainSusceptibility().GetValue();
+    patientField[1] = "";
+    patientMap["PainSusceptibility"] = patientField;
+  }
+  //Hyperhidrosis
+  if (patient->HasHyperhidrosis()) {
+    patientField[0] = patient->GetHyperhidrosis().GetValue();
+    patientField[1] = "";
+    patientMap["Hyperhidrosis"] = patientField;
+  }
+
+  return patientMap;
+}
+
+void Scenario::create_patient(QVariantMap patient)
 {
   biogears::SEPatient* newPatient = new biogears::SEPatient(_engine->GetLogger());
   //JS objects are returned from QML as QVariantMap<QString (key), QVariant (item)>
@@ -713,6 +860,13 @@ void Scenario::new_patient(QVariantMap patient)
     double skinArea = pMetric[0].toDouble();
     auto& aUnit = biogears::AreaUnit::GetCompoundUnit(pMetric[1].toString().toStdString());
     newPatient->GetSkinSurfaceArea().SetValue(skinArea, aUnit);
+  }
+  //Max Work Rate
+  pMetric = patient["MaxWorkRate"].toList();
+  if (!pMetric[0].isNull()) {
+    double work = pMetric[0].toDouble();
+    auto& powerUnit = biogears::PowerUnit::GetCompoundUnit(pMetric[1].toString().toStdString());
+    newPatient->GetMaxWorkRate().SetValue(work, powerUnit);
   }
   //Pain susceptibility
   pMetric = patient["PainSusceptibility"].toList();
@@ -1016,7 +1170,7 @@ void Scenario::create_apnea_action(double severity)
 {
   auto action = std::make_unique<biogears::SEApnea>();
   action->GetSeverity().SetValue(severity);
-    
+
   _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_acute_stress_action(double severity)

@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.12
 Page {
   id : patientWizard
   anchors.fill : parent
+  property bool editMode : false
   property alias doubleValidator : doubleValidator
   property alias fractionValidator : fractionValidator
   property alias neg1To1Validator : neg1To1Validator
@@ -31,6 +32,7 @@ Page {
         root.patientData[model.name] = [value, unit]
       }
       Component.onCompleted : {
+        root.onLoadConfiguration.connect(function (patient) {let valueUnitPair = root.setPatientEntry(patient[model.name]); setEntry(valueUnitPair[0], valueUnitPair[1])})
         root.onResetConfiguration.connect(resetEntry)
       }
     }
@@ -75,6 +77,7 @@ Page {
     ListElement {name : "ResidualVolume"; unit : "volume"; type : "double"}
     ListElement {name : "TotalLungCapacity"; unit : "volume"; type : "double"}
     ListElement {name : "SkinSurfaceArea"; unit : "area"; type : "double"}
+    ListElement {name : "MaxWorkRate"; unit : "power"; type : "double"}
     ListElement {name : "PainSusceptibility"; unit : ""; type : "-1To1"}
     ListElement {name : "Hyperhidrosis"; unit : ""; type : "-1To1"}
   }

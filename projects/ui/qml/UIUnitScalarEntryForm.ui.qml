@@ -103,7 +103,8 @@ RowLayout {
                          'density' : ['g/mL','kg/m^3'],
                          'time' : ['yr', 'hr','min','s'],
                          'pressure' : ['mmHg', 'cmH2O'],
-                         'area' : ['cm^2', 'm^2']})
+                         'area' : ['cm^2', 'm^2'],
+                         'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr']})
 
 }
 

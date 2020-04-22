@@ -22,18 +22,39 @@ MenuAreaForm {
     }
   }
 
-  function parseToolsSelection (tool, option){
-    switch (option){
-      case 0 :
-        //New
-        wizardDialog.open()
+  function parseToolsSelection (dataType, mode){
+    var biogearsTypes = {
+      PATIENT : 'Patient',
+      ENVIRONMENT : 'Environment',
+      SUBSTANCE : 'Substance',
+      COMPOUND : 'Compound',
+      NUTRIENT : 'Nutrient',
+      ECG : 'ECG'
+    }
+    switch (dataType){
+      case biogearsTypes.PATIENT :
+        //Patient
+        wizardDialog.launchPatient(mode)
         break;
-      case 1 : 
-        //Export
-        exportData(tool)
+      case biogearsTypes.ENVIRONMENT : 
+        //Environment
+        wizardDialog.launchEnvironment(mode)
         break;
-      case 2 : 
-        //Edit
+      case biogearsTypes.SUBSTANCE : 
+        //Substance
+        wizardDialog.launchSubstance(mode)
+        break;
+      case biogearsTypes.COMPOUND :
+        //Compound
+        wizardDialog.launchCompound(mode)
+        break;
+      case biogearsTypes.NUTRIENT : 
+        //Nutrient
+        wizardDialog.launchNutrient(mode)
+        break;
+      case biogearsTypes.ECG : 
+        //ECG
+        wizardDialog.launchECG(mode)
         break;
     }
   }

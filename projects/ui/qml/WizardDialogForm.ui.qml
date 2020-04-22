@@ -2,7 +2,6 @@ import QtQuick.Controls 2.12
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
 
-
 Dialog {
   id: wizardDialog
   //Base properties

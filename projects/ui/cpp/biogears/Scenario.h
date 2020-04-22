@@ -7,6 +7,7 @@
 #include <QString>
 #include <QVariant>
 #include <QtQuick>
+#include <QFileDialog>
 
 #include <dirent.h>
 
@@ -63,7 +64,8 @@ public:
   //Load, new, and save functions
   Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE void export_patient();  //Export current patient (uses save_patient)
-  Q_INVOKABLE void new_patient(QVariantMap patient);    //Create and save a new patient
+  Q_INVOKABLE void create_patient(QVariantMap patient);    //Create and save a new patient
+  Q_INVOKABLE QVariantMap edit_patient();
   Q_INVOKABLE void export_state(QString stateFileName);
   Q_INVOKABLE void export_environment(QString environmentFileName);
   Q_INVOKABLE void save_state(QString filePath);
