@@ -5,14 +5,19 @@ import QtQuick.Window 2.12
 UIPatientWizardForm {
 	id: root
 
-	signal saveConfiguration ()
 	signal patientReady (var patient)
+	signal resetConfiguration()
+	signal saveConfiguration()
 
 	property var patientData : ({})
 
 	onSaveConfiguration : {
 		root.patientReady(patientData)
 		root.destroy()
+	}
+	
+	function showHelp (){
+		helpDialog.open()
 	}
 
 	function displayFormat (role) {

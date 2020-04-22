@@ -42,6 +42,11 @@ UIUnitScalarEntryForm {
     return valid
   }
 
+  function resetEntry(){
+    entryField.clear()
+    entryUnit.currentIndex = -1
+  }
+
 }
 
 

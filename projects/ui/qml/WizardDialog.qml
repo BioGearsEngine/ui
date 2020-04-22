@@ -18,6 +18,8 @@ WizardDialogForm {
 		  var patientWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'PatientWizard'});
 			root.title = 'Patient Wizard'
 			root.onAccepted.connect(patientWizard.saveConfiguration)
+			root.onHelpRequested.connect(patientWizard.showHelp)
+			root.onReset.connect(patientWizard.resetConfiguration)
 			patientWizard.onPatientReady.connect(root.savePatient)
 			root.onRejected.connect(patientWizard.destroy)
 		}
