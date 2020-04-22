@@ -735,7 +735,7 @@ void Scenario::export_patient()
   save_patient(&(_engine->GetPatient()));
 }
 
-void Scenario::save_patient(biogears::SEPatient* patient)
+void Scenario::save_patient(const biogears::SEPatient* patient)
 {
   std::string fileLoc = "./patients/" + patient->GetName() + ".xml";
   std::string fullPath = biogears::ResolvePath(fileLoc);

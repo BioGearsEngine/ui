@@ -64,7 +64,6 @@ public:
   Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE void export_patient();  //Export current patient (uses save_patient)
   Q_INVOKABLE void new_patient(QVariantMap patient);    //Create and save a new patient
-  void save_patient(biogears::SEPatient* patient);
   Q_INVOKABLE void export_state(QString stateFileName);
   Q_INVOKABLE void export_environment(QString environmentFileName);
   Q_INVOKABLE void save_state(QString filePath);
@@ -140,6 +139,8 @@ protected:
   PatientMetrics* get_physiology_metrics();
   PatientState get_physiology_state();
   PatientConditions get_physiology_conditions();
+
+  void save_patient(const biogears::SEPatient* patient);
 
   void setup_physiology_model();
   void setup_physiology_substances(BioGearsData*);
