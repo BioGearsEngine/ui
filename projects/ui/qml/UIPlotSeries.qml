@@ -103,11 +103,9 @@ UIPlotSeriesForm {
     const interval_s = 60 * root.windowWidth_min
     //Domain
     if(time_s > interval_s){
-      console.log("time > interval_s - %1, %2 > %3".arg(root.title).arg(time_s).arg(interval_s))
       xAxis.min = (time_s - interval_s) / 60;
       xAxis.max = time_s / 60
     } else {
-      console.log("else - %1, %2 > %3".arg(root.title).arg(time_s).arg(interval_s))
       xAxis.min = 0
       xAxis.max=interval_s / 60
     }
