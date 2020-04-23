@@ -33,7 +33,7 @@ ControlsForm {
   property ObjectModel actionModel : actionSwitchModel
   
   onStateLoadedFromMenu : {
-      patientMenu.updateText(biogears_scenario.patient_file_name())
+      patientMenu.updateText(biogears_scenario.patient_name_and_time())
   }
 
   Scenario {
