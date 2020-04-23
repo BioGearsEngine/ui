@@ -49,6 +49,8 @@ ColumnLayout {
   Button {
     id: patientMenuButton
     Layout.preferredWidth : root.width
+    flat: true
+    highlighted: false
     Text {
       id : patientText
       anchors.fill : parent
@@ -58,6 +60,9 @@ ColumnLayout {
       horizontalAlignment : Text.AlignHCenter
       verticalAlignment : Text.AlignVCenter
     }
+    //display : AbstractButton.TextBesideIcon
+    //icon.source: "qrc:/icons/menu.png"
+    //icon.color: "transparent"
     Menu {
       id : patientMenu
       x : -200
@@ -258,12 +263,10 @@ ColumnLayout {
     var list = biogears_scenario.get_nested_patient_state_list();
     var nlist = []
     for (var i = 0;i < list.length;++i) {
-      console.log(list[i])
       var split_files = list[i].split(",")
       var patient_name = split_files.shift()
       var split_objects = []
       for (var k = 0;k < split_files.length;++k) {
-        console.log(split_files[k])
         split_objects.push({"propName" : split_files[k]})
       }
       var menu_entry = {"patientName" : patient_name, "props" : split_objects}
