@@ -14,6 +14,8 @@ ColumnLayout {
   z : 1  //Setting to higher than graph area so that action messages will not be hidden behind plots
 
   //property alias patientBox: patientBox
+  property alias patientMenu: patientMenu
+  property alias patientMenuButtonText: patientText.text
   property alias age_yr: age
   property alias gender: gender
   property alias fat_pct: fat_pct
@@ -33,10 +35,6 @@ ColumnLayout {
   property alias playback : playback_controls
   property alias openDrawerButton : openDrawerButton
   property alias actionSwitchView : actionSwitchView
-
-  function loadState(fileName){
-    biogears_scenario.restart(fileName)
-  }
 
   Row {
     height: 10
@@ -67,6 +65,13 @@ ColumnLayout {
       id : patientMenu
       x : -200
       y : 50
+      function loadState(fileName){
+        biogears_scenario.restart(fileName)
+      }
+      function updateText(fileName){
+        var split_prop = fileName.split("@")
+        patientText.text = "Patient: " + split_prop[0] + "@" + split_prop[1].split(".")[0]   
+      }
       closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
       Instantiator {
         id : menuItemInstance
@@ -89,8 +94,8 @@ ColumnLayout {
                   patientMenu.close()
                   if (!biogears_scenario.isRunning || biogears_scenario.isPaused){ // This should be redundant with the check to open the Menu, but I'm including it to be safe
                     console.log(patient + " : " + text)
-                    root.loadState(propName)
-                    patientText.text = "Patient: " + patientName + "@" + propName.split("@")[1].split(".")[0]   
+                    patientMenu.loadState(propName)
+                    patientMenu.updateText(propName)
                   }          
                 }
               }
@@ -220,45 +225,8 @@ ColumnLayout {
       model : actionSwitchModel  //Defined in Controls.qml
     }
   }
-
-  Item {
-    id : actionButtonWrapper
-    Layout.preferredWidth : root.width
-    Layout.preferredHeight : 400
-    z : 2
-
-    ListView {
-      id : actionSwitchView
-      clip: true
-      anchors.fill : parent
-      focus : true
-      model : actionSwitchModel  //Defined in Controls.qml
-    }
-
-    Rectangle {
-      id : actionMessage
-      color : "#1A5276"
-      height : actionButtonWrapper.width / 5
-      width : actionButtonWrapper.height / 2
-      radius : 10
-      visible : false
-      property string actionText : ""
-      Text {
-        width : parent.width
-        height : parent.height
-        text: parent.actionText
-        color : "white"
-        anchors.fill: parent
-        horizontalAlignment : Text.AlignLeft
-        verticalAlignment : Text.AlignVCenter
-        elide: Text.ElideRight
-        font.pointSize : 8
-        wrapMode : Text.Wrap
-      }
-    }
-  }
   Component.onCompleted: {
-    root.loadState("DefaultMale@0s.xml")
+    patientMenu.loadState("DefaultMale@0s.xml")
     patientText.text = "Patient: DefaultMale@0s"
     var list = biogears_scenario.get_nested_patient_state_list();
     var nlist = []

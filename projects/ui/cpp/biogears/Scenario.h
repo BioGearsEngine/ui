@@ -110,6 +110,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_cardiac_arrest_action(int state);
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
+  Q_INVOKABLE QString patient_file_name();
   Q_INVOKABLE QString get_patient_state_files();
   Q_INVOKABLE QList<QString> get_nested_patient_state_list();
   Q_INVOKABLE QString get_patient_state_files(std::string patient);
@@ -144,6 +145,7 @@ protected:
   void physiology_thread_step();
 
 private:
+  std::string filename;
   std::thread _thread;
   biogears::Logger _logger;
   std::unique_ptr<biogears::BioGearsEngine> _engine;
