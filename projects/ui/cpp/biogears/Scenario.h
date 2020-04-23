@@ -8,6 +8,8 @@
 #include <QVariant>
 #include <QtQuick>
 
+#include <dirent.h>
+
 #include <biogears/cdm/Serializer.h>
 #include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/container/concurrent_queue.h>
@@ -108,6 +110,12 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_cardiac_arrest_action(int state);
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
+  Q_INVOKABLE QString get_patient_state_files();
+  Q_INVOKABLE QList<QString> get_nested_patient_state_list();
+  Q_INVOKABLE QString get_patient_state_files(std::string patient);
+  Q_INVOKABLE QString get_patient_state_files(QString patient);
+  Q_INVOKABLE bool file_exists(QString file);
+  Q_INVOKABLE bool file_exists(std::string file);
 
 signals:
   void patientMetricsChanged(PatientMetrics* metrics);

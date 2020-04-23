@@ -13,7 +13,7 @@ ColumnLayout {
   Layout.preferredWidth: implicitWidth
   z : 1  //Setting to higher than graph area so that action messages will not be hidden behind plots
 
-  property alias patientBox: patientBox
+  //property alias patientBox: patientBox
   property alias age_yr: age
   property alias gender: gender
   property alias fat_pct: fat_pct
@@ -34,22 +34,82 @@ ColumnLayout {
   property alias openDrawerButton : openDrawerButton
   property alias actionSwitchView : actionSwitchView
 
+  function loadState(fileName){
+    biogears_scenario.restart(fileName)
+  }
+
   Row {
     height: 10
     Layout.fillWidth: true
   }
 
-  PatientBox {
-    id: patientBox
-    Layout.preferredWidth : root.width
-    elementRatio : 0.4
-    label.text: "Patient"
-    label.font.pointSize : 12
-    label.verticalAlignment : Text.AlignVCenter
-    label.horizontalAlignment : Text.AlignHCenter
-    Layout.alignment: Qt.AlignHCenter
+  ListModel {
+    id : patientMenuListModel
   }
-
+  Button {
+    id: patientMenuButton
+    Layout.preferredWidth : root.width
+    Text {
+      id : patientText
+      anchors.fill : parent
+      text : "Select Patient" // If you actually see this then something is very wrong
+      font.capitalization : Font.MixedCase
+      fontSizeMode : Text.Fit
+      horizontalAlignment : Text.AlignHCenter
+      verticalAlignment : Text.AlignVCenter
+    }
+    Menu {
+      id : patientMenu
+      x : -200
+      y : 50
+      closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
+      Instantiator {
+        id : menuItemInstance
+        model : patientMenuListModel
+        delegate : Menu {
+          id : patientSubMenu
+          title : patientName
+          property int delegateIndex : index
+          property string patient : patientName
+          Repeater {
+            id : subMenuInstance
+            model : patientMenuListModel.get(patientSubMenu.delegateIndex).props
+            delegate : MenuItem {
+              Button { 
+                anchors.fill : parent
+                flat : true
+                highlighted : false
+                text : propName
+                onClicked : {
+                  patientMenu.close()
+                  if (!biogears_scenario.isRunning || biogears_scenario.isPaused){ // This should be redundant with the check to open the Menu, but I'm including it to be safe
+                    console.log(patient + " : " + text)
+                    root.loadState(propName)
+                    patientText.text = "Patient: " + patientName + "@" + propName.split("@")[1].split(".")[0]   
+                  }          
+                }
+              }
+            }
+          }
+        }
+        onObjectAdded : {
+          patientMenu.addMenu(object)  
+        }
+        onObjectRemoved : {
+          patientMenu.removeMenu(object)
+        }
+      }    
+    }
+    onClicked: {
+      if (!biogears_scenario.isRunning || biogears_scenario.isPaused) {
+        if (patientMenu.visible) {
+          patientMenu.close()
+        } else {
+          patientMenu.open()
+        }
+      } 
+    }
+  }
   RowLayout {
     id: configuration_row1
     Layout.fillWidth: true
@@ -155,8 +215,62 @@ ColumnLayout {
       model : actionSwitchModel  //Defined in Controls.qml
     }
   }
-  }
 
+  Item {
+    id : actionButtonWrapper
+    Layout.preferredWidth : root.width
+    Layout.preferredHeight : 400
+    z : 2
+
+    ListView {
+      id : actionSwitchView
+      clip: true
+      anchors.fill : parent
+      focus : true
+      model : actionSwitchModel  //Defined in Controls.qml
+    }
+
+    Rectangle {
+      id : actionMessage
+      color : "#1A5276"
+      height : actionButtonWrapper.width / 5
+      width : actionButtonWrapper.height / 2
+      radius : 10
+      visible : false
+      property string actionText : ""
+      Text {
+        width : parent.width
+        height : parent.height
+        text: parent.actionText
+        color : "white"
+        anchors.fill: parent
+        horizontalAlignment : Text.AlignLeft
+        verticalAlignment : Text.AlignVCenter
+        elide: Text.ElideRight
+        font.pointSize : 8
+        wrapMode : Text.Wrap
+      }
+    }
+  }
+  Component.onCompleted: {
+    root.loadState("DefaultMale@0s.xml")
+    patientText.text = "Patient: DefaultMale@0s"
+    var list = biogears_scenario.get_nested_patient_state_list();
+    var nlist = []
+    for (var i = 0;i < list.length;++i) {
+      console.log(list[i])
+      var split_files = list[i].split(",")
+      var patient_name = split_files.shift()
+      var split_objects = []
+      for (var k = 0;k < split_files.length;++k) {
+        console.log(split_files[k])
+        split_objects.push({"propName" : split_files[k]})
+      }
+      var menu_entry = {"patientName" : patient_name, "props" : split_objects}
+      patientMenuListModel.append(menu_entry)
+    }
+  }
+  }
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}
 }

@@ -869,5 +869,121 @@ void Scenario::create_acute_stress_action(double severity)
 
   _action_queue.as_source().insert(std::move(action));
 }
+bool Scenario::file_exists(QString file)
+{
+  return file_exists(file.toStdString());
+}
 
-} //namspace ui
+bool Scenario::file_exists(std::string file)
+{
+  std::ifstream f(file.c_str());
+  return f.good();
+}
+
+QList<QString> Scenario::get_nested_patient_state_list()
+{
+  DIR* dir;
+  struct dirent* ent;
+  std::map<std::string,int> patient_map;
+  std::string contents;
+  QList<QString> patient_list;
+  if ((dir = opendir("states/")) != NULL) {
+    while ((ent = readdir(dir)) != NULL) {
+      std::string dirname = std::string(ent->d_name);
+      if (dirname.find('@') == -1) {
+        continue;
+      }
+      std::string patient_name = dirname.substr(0, dirname.find('@'));
+      auto temp_patient = patient_map.find(patient_name);
+      if (temp_patient == patient_map.end())
+      {
+        QString temp_list;
+        temp_list += QString::fromStdString(patient_name);
+        temp_list += ",";
+        temp_list += ent->d_name;
+        patient_list.push_back(temp_list);
+        patient_map.insert(std::pair<std::string,int>(patient_name,patient_list.length()-1));
+      } else {
+        patient_list[temp_patient->second] += ",";
+        patient_list[temp_patient->second] += ent->d_name;        
+      }
+    }
+    closedir(dir);
+  } else {
+    std::cout << "Error could not read dir";
+  }
+  //for (int i = 0;i < patient_list.length();++i) {
+  //  std::cout << patient_list[i].toStdString() + "\n";
+  //}
+  return patient_list;
+}
+QString Scenario::get_patient_state_files()
+{
+  DIR* dir;
+  struct dirent* ent;
+  std::string contents;
+  if ((dir = opendir("states/")) != NULL) {
+    while ((ent = readdir(dir)) != NULL) {
+      if (ent->d_name[0] != static_cast<char>('.')) {        
+        contents += ent->d_name;
+        contents += "\n";
+      }
+    }
+    closedir(dir);
+  } else {
+    std::cout << "Error could not read dir";
+  }
+  return QString::fromStdString(contents);
+}
+
+QString Scenario::get_patient_state_files(std::string patient)
+{
+  return get_patient_state_files(QString::fromStdString(patient));
+}
+
+QString Scenario::get_patient_state_files(QString patient)
+{
+  DIR* dir;
+  struct dirent* ent;
+  std::string contents;
+  if ((dir = opendir("states/")) != NULL) {
+    while ((ent = readdir(dir)) != NULL) {
+      std::string dirname = std::string(ent->d_name);
+      if (dirname.find('@') == -1) {
+        continue;
+      }
+      if (patient.toStdString() == dirname.substr(0,dirname.find('@'))) {
+
+        contents += ent->d_name;
+        contents += '\n';
+      }
+    }
+    closedir(dir);
+  } else {
+    std::cout << "Error could not read dir";
+  }
+  if ((dir = opendir("states/advanced")) != NULL) {
+    while ((ent = readdir(dir)) != NULL) {
+      std::string dirname = std::string(ent->d_name);
+      if (dirname.find('@') == -1) {
+        continue;
+      }
+      if (patient.toStdString() == dirname.substr(0, dirname.find('@'))) {
+        contents += "advanced/";
+        contents += ent->d_name;
+        contents += '\n';
+      }
+    }
+    closedir(dir);
+  } else {
+    std::cout << "Error could not read dir";
+  }
+  if (!contents.empty()) {
+    contents.pop_back();
+  }
+  return QString::fromStdString(contents);
+}
+
+
+
+} //namespace ui

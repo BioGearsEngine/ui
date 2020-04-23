@@ -13,6 +13,7 @@ UIComboBox {
     signal checkDisplayText(string state)
 
     function loadState (){
+      console.log(comboBox.model.get(comboBox.currentIndex,'fileName'));
       scenario.restart(comboBox.model.get(comboBox.currentIndex, 'fileName'));
     }
     function updateDisplayText () {
@@ -53,6 +54,5 @@ UIComboBox {
     }
     onPatientFolderReady:{
       root.loadState();
-    }
-    
+    }   
 }
