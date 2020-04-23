@@ -18,8 +18,15 @@ WizardDialogForm {
 	  } else {
 		  var patientWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'PatientWizard'});
 			if (mode === "Edit"){
-				patientWizard.mergePatientData(scenario.edit_patient())
-				patientWizard.editMode = true
+				let patient = scenario.edit_patient()
+				if (Object.keys(patient).length == 0){
+					//We get an empty patient object if the user closed file explorer without selecting a patient
+					patientWizard.destroy()
+					return;
+				} else {
+					patientWizard.mergePatientData(patient)
+					patientWizard.editMode = true
+				}
 			}
 			//Connect standard dialog buttons to patient functions
 			root.saveButton.onClicked.connect(patientWizard.checkConfiguration)

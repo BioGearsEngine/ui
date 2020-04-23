@@ -582,7 +582,17 @@ QtLogForward* Scenario::getLogFoward()
 
 QVariantMap Scenario::edit_patient()
 {
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  //Qml interpets QVariantMaps as Javascript objects, which we can index by prop name
+  QVariantMap patientMap;
+
+  //Open file dialog in patients folder to select patient
   QString patientFile = QFileDialog::getOpenFileName(nullptr, "Edit Patient", "./patients");
+  if (patientFile.isNull()) {
+    //File returns null string if user cancels without selecting a patient.  Return empty map (Qml side will check for this) 
+    return patientMap;
+  }
+  //Load file and create and SEPatient object from it using serializer
   if (!QFileInfo::exists(patientFile)) {
     throw std::runtime_error("Unable to locate " + patientFile.toStdString());
   }
@@ -591,9 +601,7 @@ QVariantMap Scenario::edit_patient()
   biogears::SEPatient* patient = new biogears::SEPatient(_engine->GetLogger());
   patient->Load(*patientData);
 
-  //Create a QVariantMap with key = PropName and item = {value, unit}
-  //Qml interpets QVariantMaps as Javascript objects, which we can index by prop name
-  QVariantMap patientMap;
+  //Each map entry is a list of two items.  patientField[0] = value, patientField[1] = unit (or enum selection)
   QList<QVariant> patientField{ "", "" };
 
   //Name
