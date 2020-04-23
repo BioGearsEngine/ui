@@ -6,6 +6,8 @@ import com.biogearsengine.ui.scenario 1.0
 WizardDialogForm {
 	id: root
 
+	property var activeWizard;
+
 	function launchPatient(mode){
 		root.title = 'Patient Wizard'
 		let patientComponent = Qt.createComponent("UIPatientWizard.qml");
@@ -16,25 +18,24 @@ WizardDialogForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  var patientWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'PatientWizard'});
+		  activeWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'activeWizard'});
 			if (mode === "Edit"){
 				let patient = scenario.edit_patient()
 				if (Object.keys(patient).length == 0){
 					//We get an empty patient object if the user closed file explorer without selecting a patient
-					patientWizard.destroy()
+					activeWizard.destroy()
 					return;
 				} else {
-					patientWizard.mergePatientData(patient)
-					patientWizard.editMode = true
+					activeWizard.mergePatientData(patient)
+					activeWizard.editMode = true
 				}
 			}
 			//Connect standard dialog buttons to patient functions
-			root.saveButton.onClicked.connect(patientWizard.checkConfiguration)
-			root.onHelpRequested.connect(patientWizard.showHelp)
-			root.onReset.connect(patientWizard.resetConfiguration)
-			root.onRejected.connect(patientWizard.destroy)
+			root.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			root.onHelpRequested.connect(activeWizard.showHelp)
+			root.onReset.connect(activeWizard.resetConfiguration)
 			//Notify dialog that patient is ready
-			patientWizard.onPatientReady.connect(root.savePatient)
+			activeWizard.onPatientReady.connect(root.savePatient)
 			root.open()
 		}
 	}
@@ -60,6 +61,18 @@ WizardDialogForm {
 	}
 
 	onRejected : {
+		for (let p in activeWizard){
+			console.log(p + " : " + activeWizard[p])
+		}
+		root.saveButton.onClicked.disconnect(activeWizard.checkConfiguration)
+		root.onHelpRequested.disconnect(activeWizard.showHelp)
+		root.onReset.disconnect(activeWizard.resetConfiguration)
+		activeWizard.onPatientReady.disconnect(root.savePatient)
+		activeWizard.destroy()
+		activeWizard = null
 		console.log("Rejecting...")
+		for (let p in activeWizard){
+			console.log(p + " : " + activeWizard[p])
+		}
 	}
 }

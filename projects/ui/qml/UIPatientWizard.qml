@@ -35,10 +35,10 @@ UIPatientWizardForm {
 	function checkConfiguration(){
 		let validName = false
 		let validGender = false
-		if (patientData["Name"][0] && patientData["Name"][0].length > 0){
+		if (patientData["Name"][0]!=null && patientData["Name"][0].length > 0){
 			validName = true
 		}
-		if (patientData["Gender"][1] && patientData["Gender"][1]!=-1){
+		if (patientData["Gender"][1]!= null && patientData["Gender"][1]!=-1){
 			validGender = true
 		}
 		if (validName && validGender){
