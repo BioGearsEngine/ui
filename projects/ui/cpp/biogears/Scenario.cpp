@@ -374,7 +374,6 @@ Scenario& Scenario::load_patient(QString file)
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientStateChanged(get_physiology_state());
     emit patientConditionsChanged(get_physiology_conditions());
-    filename = file.toStdString();
     emit stateLoad();
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
@@ -871,9 +870,13 @@ void Scenario::create_acute_stress_action(double severity)
   _action_queue.as_source().insert(std::move(action));
 }
 
-QString Scenario::patient_file_name()
+QString Scenario::patient_name_and_time()
 {
-  return QString::fromStdString(filename);
+  int time = 0;
+  auto simulation_time = mil::tatrc::physiology::datamodel::PhysiologyEngineStateData::SimulationTime_type(time);
+  std::string time_in_simulation = std::to_string(time);
+  std::string patient_name = _engine->GetPatient().GetName_cStr();
+  return QString::fromStdString(patient_name+"@"+time_in_simulation+"s.xml");
 }
 
 bool Scenario::file_exists(QString file)
