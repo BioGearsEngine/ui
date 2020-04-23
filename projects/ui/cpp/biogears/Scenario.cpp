@@ -601,7 +601,8 @@ QVariantMap Scenario::edit_patient()
   patientField[1] = "";
   patientMap["Name"] = patientField;
   //Gender
-  patientField[0] = patient->GetGender();
+  patientField[0] = "";
+  patientField[1] = patient->GetGender();
   patientMap["Gender"] = patientField;
   //Age
   if (patient->HasAge()) {
@@ -635,8 +636,12 @@ QVariantMap Scenario::edit_patient()
   }
   //Blood type
   if (patient->HasBloodType()) {
-    patientField[0] = patient->GetBloodType();
-    patientField[1] = "";
+    int bloodType = 2 * patient->GetBloodType();
+    if (!patient->GetBloodRh()) {
+      ++bloodType;
+    }
+    patientField[0] = "";
+    patientField[1] = bloodType;
     patientMap["BloodType"] = patientField;
   }
   //Diastolic pressure baseline
@@ -742,8 +747,8 @@ void Scenario::create_patient(QVariantMap patient)
   newPatient->SetName(patientName.toStdString());
   //Gender
   pMetric = patient["Gender"].toList();
-  //metricList = pMetric.toStringList();
-  //newPatient->SetGender("")
+  int gender = pMetric[1].toInt(); //Gender assigned in "unit", i.e. F or M (no associated value)
+  newPatient->SetGender((CDM::enumSex::value)gender);
   //Age
   pMetric = patient["Age"].toList();
   if (!pMetric[0].isNull()) {
@@ -780,10 +785,12 @@ void Scenario::create_patient(QVariantMap patient)
   }
   //Blood Type
   pMetric = patient["BloodType"].toList();
-  if (!pMetric[0].isNull()) {
-    //double bloodVolume = pMetric[0].toDouble();
-    //unit = pMetric[1].toString().toStdString();
-    //newPatient->GetBloodVolumeBaseline().SetValue(bloodVolume, biogears::VolumeUnit(unit));
+  if (!pMetric[1].isNull()) {
+    int bloodType = pMetric[1].toInt();
+    bool rHPositive = bloodType % 2 == 0;
+    int abo = bloodType / 2;
+    newPatient->SetBloodType((CDM::enumBloodType::value)abo);
+    newPatient->SetBloodRh(rHPositive);
   }
   //Diastolic pressure
   pMetric = patient["DiastolicArterialPressureBaseline"].toList();

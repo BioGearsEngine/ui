@@ -6,17 +6,49 @@ UIPatientWizardForm {
 	id: root
 
 	signal patientReady (var patient)
+	signal patientChanged (string name)
 	signal resetConfiguration()
-	signal saveConfiguration()
 	signal loadConfiguration(var patient)
 
 	property var patientData : ({})
+	property bool editMode : false
+	property bool patientWarningFlagged : false
 
-	onSaveConfiguration : {
-		root.patientReady(patientData)
-		root.destroy()
+	Component.onCompleted : {
+		for (let i = 0; i < patientDataModel.count; ++i){
+			let dataObject = {[patientDataModel.get(i).name] : [null, null]}
+			Object.assign(patientData, dataObject)
+		}
+	}
+
+	Component.onDestruction : {
+		console.log('Bye wizard')
 	}
 	
+	onPatientChanged : {
+		if (editMode && !patientWarningFlagged){
+			patientChangeWarning.open()
+			patientWarningFlagged = true
+		}
+	}
+
+	function checkConfiguration(){
+		let validName = false
+		let validGender = false
+		if (patientData["Name"][0] && patientData["Name"][0].length > 0){
+			validName = true
+		}
+		if (patientData["Gender"][1] && patientData["Gender"][1]!=-1){
+			validGender = true
+		}
+		if (validName && validGender){
+			root.patientReady(patientData)
+		}
+		else {
+			invalidPatientWarning.open()
+		}
+	}
+
 	function mergePatientData(patient){
 		for (let prop in patient){
 			patientData[prop] = patient[prop]
@@ -57,15 +89,6 @@ UIPatientWizardForm {
 		return [value, unit]
 	}
 
-	Component.onCompleted : {
-		for (let i = 0; i < patientDataModel.count; ++i){
-			let dataObject = {[patientDataModel.get(i).name] : [null, null]}
-			Object.assign(patientData, dataObject)
-		}
-	}
 
-	Component.onDestruction : {
-		console.log('Bye wizard')
-	}
 
 }

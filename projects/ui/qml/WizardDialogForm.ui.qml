@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.12
 Dialog {
   id: wizardDialog
   //Base properties
+  property alias saveButton : saveButton
   modal : true
   title : "Wizard"
   closePolicy : Popup.NoAutoClose
@@ -29,7 +30,18 @@ Dialog {
   }
   //Add standard buttons to footer
   footer : DialogButtonBox {
-    standardButtons : Dialog.Save | Dialog.Help | Dialog.Reset | Dialog.Cancel
+    id : dialogButtons
+    Button {
+      id: saveButton
+      text : "Save"
+      hoverEnabled : true
+      background : Rectangle {
+        radius : 0
+        anchors.fill : parent
+        color : saveButton.hovered ? "whitesmoke" : "white"
+      }
+    }
+    standardButtons : DialogButtonBox.Help | DialogButtonBox.Reset | DialogButtonBox.Cancel
   }
     //Main content
   contentItem : Rectangle {

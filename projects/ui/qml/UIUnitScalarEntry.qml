@@ -7,6 +7,7 @@ UIUnitScalarEntryForm {
   id: root
 
   signal entryUpdated (var value, string unit)
+  signal nameUpdated (string name)
  
   entryField.onEditingFinished : {
     if (validEntry()){
@@ -15,19 +16,21 @@ UIUnitScalarEntryForm {
   }
   entryUnit.onActivated : {
     if (validEntry()){
-      root.entryUpdated(entryField.text, entryUnit.currentText)
+      let unitReturn = entryUnit.currentText
+      if (root.type === "enum"){
+        unitReturn = entryUnit.currentIndex
+        console.log(entryUnit.currentIndex)
+      }
+      console.log(unitReturn)
+      root.entryUpdated(entryField.text, unitReturn)
     }
   }
 
   function validEntry(){
     let valid = true
-   // if (entryUnit.currentIndex == -1 && entryUnit.count > 0){
-     // root.state = "invalid"
-    //  valid = false
-   // }
     if (entryField.text.length == 0 && entryUnit.currentIndex > -1){
-      //We selected a unit but haven't entered a value
-      valid = false
+      //We selected a unit but haven't entered a value -- only return false if text field is writable
+      valid = !root.writable
     }
     if (entryField.text.length > 0){
       if (!entryField.acceptableInput){
@@ -45,9 +48,12 @@ UIUnitScalarEntryForm {
   function setEntry(value, unit){
     entryField.text = value
     if (entryUnit.count > 0){
-      let index = entryUnit.find(unit)
-      console.log(index)
-      entryUnit.currentIndex = index
+      if (type === "enum"){
+        entryUnit.currentIndex = unit
+      } else {
+        let index = entryUnit.find(unit)
+        entryUnit.currentIndex = index
+      }
     }
   }
 

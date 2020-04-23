@@ -10,7 +10,8 @@ RowLayout {
   property real prefHeight : scalarEntry.implicitHeight
   property string entry : "Default"
   property string unit : ""
-  property string type : "string"
+  property string type : ""
+  property string hintText : ""
   property DoubleValidator entryValidator : null
   property bool editing : entryField.activeFocus || entryUnit.activeFocus
   //Property aliases
@@ -69,7 +70,8 @@ RowLayout {
         leftPadding : 10
         topPadding : 0
         bottomPadding : 0
-        placeholderText: "Data"
+        placeholderText: root.hintText
+        readOnly : root.type === "enum"
         font.pointSize : 9
         horizontalAlignment : Text.AlignLeft
         validator : scalarEntry.entryValidator
@@ -97,7 +99,7 @@ RowLayout {
   property var units : ({'mass' : ['lb', 'kg', 'g', 'mg','ug'],
                          'length' : ['in', 'ft', 'm', 'cm','mm','um'],
                          'volume' : ['L','mL','uL'],
-                         'gender' : ['F', 'M'],
+                         'gender' : ['M', 'F'],
                          'bloodType' : ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
                          'frequency' : ['1/s', '1/min', 'Hz', '1/hr'],
                          'density' : ['g/mL','kg/m^3'],

@@ -19,9 +19,10 @@ WizardDialogForm {
 		  var patientWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'PatientWizard'});
 			if (mode === "Edit"){
 				patientWizard.mergePatientData(scenario.edit_patient())
+				patientWizard.editMode = true
 			}
 			//Connect standard dialog buttons to patient functions
-			root.onAccepted.connect(patientWizard.saveConfiguration)
+			root.saveButton.onClicked.connect(patientWizard.checkConfiguration)
 			root.onHelpRequested.connect(patientWizard.showHelp)
 			root.onReset.connect(patientWizard.resetConfiguration)
 			root.onRejected.connect(patientWizard.destroy)
@@ -48,8 +49,8 @@ WizardDialogForm {
 
 	function savePatient (patient){
 		scenario.create_patient(patient)
+		root.accept()
 	}
-
 
 	onRejected : {
 		console.log("Rejecting...")
