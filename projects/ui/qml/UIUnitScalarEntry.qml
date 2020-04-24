@@ -6,60 +6,19 @@ import QtQuick.Controls.Material 2.3
 UIUnitScalarEntryForm {
   id: root
 
-  signal entryUpdated (var value, string unit)
   signal nameUpdated (string name)
+  signal inputAccepted (var input)
+
+  onInputAccepted : {
+    console.log(input)
+  }
  
-  entryField.onEditingFinished : {
-    if (validEntry()){
-      root.entryUpdated(entryField.text, entryUnit.currentText)
-    }
-  }
-  entryUnit.onActivated : {
-    if (validEntry()){
-      let unitReturn = entryUnit.currentText
-      if (root.type === "enum"){
-        unitReturn = entryUnit.currentIndex
-        console.log(entryUnit.currentIndex)
-      }
-      console.log(unitReturn)
-      root.entryUpdated(entryField.text, unitReturn)
-    }
+  function setEntry( fromInput ){
+    root.entry.setFromExisting(fromInput)
   }
 
-  function validEntry(){
-    let valid = true
-    if (entryField.text.length == 0 && entryUnit.currentIndex > -1){
-      //We selected a unit but haven't entered a value -- only return false if text field is writable
-      valid = entryField.readOnly
-    }
-    if (entryField.text.length > 0){
-      if (!entryField.acceptableInput){
-        //We entered a value that did not satisfy the validator (if it exists)
-        valid = false
-      }
-      if (entryUnit.count > 0 && entryUnit.currentIndex == -1){
-        //We entered a value but selected no unit (only if there are units to choose from)
-        valid = false
-      }
-    }
-    return valid
-  }
-
-  function setEntry(value, unit){
-    entryField.text = value
-    if (entryUnit.count > 0){
-      if (type === "enum"){
-        entryUnit.currentIndex = unit
-      } else {
-        let index = entryUnit.find(unit)
-        entryUnit.currentIndex = index
-      }
-    }
-  }
-
-  function resetEntry(){
-    entryField.clear()
-    entryUnit.currentIndex = -1
+  function reset(){
+    root.entry.reset()
   }
 
 }

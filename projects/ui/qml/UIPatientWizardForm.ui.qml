@@ -21,24 +21,25 @@ Page {
     anchors.fill : parent
     cellHeight : parent.height / 10
     cellWidth : parent.width / 2
-  
+    ScrollIndicator.vertical: ScrollIndicator { }
+
     delegate : UIUnitScalarEntry {
       prefWidth : patientGridView.cellWidth * 0.9
       prefHeight : patientGridView.cellHeight * 0.95
-      entry : root.displayFormat(model.name)
+      label : root.displayFormat(model.name)
       unit : model.unit
       type : model.type
       hintText : model.hint
       entryValidator : root.assignValidator(model.type)
-      onEntryUpdated : {
-        root.patientData[model.name] = [value, unit]
+      onInputAccepted : {
+        root.patientData[model.name] = input
         if (entry === "Name"){
           root.patientChanged(entryField.text)
         }
       }
       Component.onCompleted : {
-        root.onLoadConfiguration.connect(function (patient) {let valueUnitPair = root.setPatientEntry(patient[model.name]); setEntry(valueUnitPair[0], valueUnitPair[1])})
-        root.onResetConfiguration.connect(resetEntry)
+        root.onLoadConfiguration.connect(function (patient) {setEntry (patient[model.name]); console.log(model.name) } )
+        root.onResetConfiguration.connect(reset)
       }
     }
   }
