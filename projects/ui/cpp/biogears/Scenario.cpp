@@ -922,9 +922,6 @@ QList<QString> Scenario::get_nested_patient_state_list()
   } else {
     std::cout << "Error could not read dir";
   }
-  //for (int i = 0;i < patient_list.length();++i) {
-  //  std::cout << patient_list[i].toStdString() + "\n";
-  //}
   return patient_list;
 }
 QString Scenario::get_patient_state_files()

@@ -13,8 +13,6 @@
 
 int main(int argc, char* argv[])
 {
-  //bio::Scenario sce;
-  //sce.get_patient_state_files();
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QApplication app(argc, argv);
   app.setOrganizationDomain("Applied Research Associates");

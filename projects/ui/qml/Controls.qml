@@ -26,8 +26,6 @@ ControlsForm {
 
   signal openActionDrawer()
 
-  //property Menu patientMenu
-  //property Button patientMenuButton
   property PhysiologyModel bgData
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
