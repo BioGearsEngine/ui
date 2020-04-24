@@ -3,7 +3,7 @@ import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.3
 
-RowLayout {
+Rectangle {
   id: scalarEntry
   //Properties -- used to customize look and functionality of component
   property real prefWidth : parent.width
@@ -18,82 +18,113 @@ RowLayout {
   property alias entryLabel : entryLabel
   property alias entryField : entryField
   property alias entryUnit : entryUnit
-
-  //Layout options
-  Layout.preferredWidth : prefWidth
-  Layout.preferredHeight : prefHeight
-
+  //Initial view settings
+  height : prefHeight
+  width : prefWidth
+  color : "transparent"
+  border.width : 2
   state : "standard"
 
   states : [ 
       State {
         name : "standard"; when : root.validEntry() && !root.editing
-        PropertyChanges {target : labelRectangle; border.color : "black"}
+        PropertyChanges {target : scalarEntry; border.color : "black"}
       }
       ,State {
         name : "editing"; when : root.editing
-        PropertyChanges {target : labelRectangle; border.color : "teal"}
+        PropertyChanges {target : scalarEntry; border.color : "teal"}
       }
       ,State {
         name : "invalid"; when : !root.validEntry() && !root.editing
-        PropertyChanges {target : labelRectangle; border.color : "red"}
+        PropertyChanges {target : scalarEntry; border.color : "red"}
       }
     ]
   
-  Rectangle {
-    id : labelRectangle
-    Layout.maximumWidth : scalarEntry.prefWidth * 0.75
-    Layout.preferredWidth : scalarEntry.prefWidth * 0.75
-    Layout.maximumHeight : scalarEntry.prefHeight
+  GridLayout {
+    id : entryGrid
+    columns : 2
+    rows : 2
+    Layout.fillWidth : true
     Layout.fillHeight : true
-    color : "transparent"
-    border.width : 2
+    columnSpacing : 5
+    rowSpacing : 5
 
-    Column {
-      anchors.fill : parent
-      spacing : 10
-      Label {
-        id: entryLabel
-        width : parent.width
-        height : (parent.height - parent.spacing) * 0.3
-        text : scalarEntry.entry
-        color : "black"
-        font.pointSize : 7
-        horizontalAlignment : Text.AlignLeft
-        padding : 5
+    Label {
+      id: entryLabel
+      Layout.preferredWidth : prefWidth * 0.7 - entryGrid.rowSpacing / 2
+      Layout.preferredHeight : prefHeight * 0.3 - entryGrid.columnSpacing/ 2
+      text : scalarEntry.entry
+      color : "black"
+      font.pointSize : 8
+      horizontalAlignment : Text.AlignLeft
+      leftPadding : 5
+      topPadding : 5
+    }
+    Label {
+      Layout.preferredWidth : prefWidth * 0.3 - entryGrid.rowSpacing / 2
+      Layout.preferredHeight : prefHeight * 0.3 - entryGrid.columnSpacing / 2
+      text : "Unit"
+      color : "black"
+      font.pointSize : 8
+      horizontalAlignment : Text.AlignHCenter
+      rightPadding : 10
+      topPadding : 5
+    }
+    TextField {
+      id : entryField
+      Layout.preferredWidth : prefWidth * 0.7 - entryGrid.rowSpacing / 2
+      Layout.preferredHeight : prefHeight * 0.7 - entryGrid.columnSpacing / 2
+      leftPadding : 10
+      topPadding : 0
+      bottomPadding : 0
+      placeholderText: root.hintText
+      readOnly : root.type === "enum"
+      font.pointSize : 9
+      horizontalAlignment : Text.AlignLeft
+      validator : scalarEntry.entryValidator
+      background : Rectangle {
+        anchors.fill : parent
+        color : "transparent"
+        border.width : 0
       }
-      TextField {
-        id : entryField
-        width : parent.width
-        height : (parent.height - parent.spacing) * 0.7
-        Layout.alignment: Qt.AlignBottom
-        leftPadding : 10
-        topPadding : 0
-        bottomPadding : 0
-        placeholderText: root.hintText
-        readOnly : root.type === "enum"
-        font.pointSize : 9
-        horizontalAlignment : Text.AlignLeft
-        validator : scalarEntry.entryValidator
-        background : Rectangle {
-          anchors.fill : parent
-          color : "transparent"
-          border.width : 0
+    }
+    ComboBox {
+      id : entryUnit
+      Layout.preferredWidth : prefWidth * 0.25
+      Layout.preferredHeight : prefHeight * 0.7 - entryGrid.columnSpacing / 2
+      Layout.alignment: Qt.AlignHCenter
+      model : scalarEntry.units[unit]
+      flat : true
+      font.pointSize : 7
+      currentIndex : -1
+      contentItem : Text {
+        text : entryUnit.displayText
+        font : entryUnit.font
+        verticalAlignment : Text.AlignVCenter
+        horizontalAlignment : Text.AlignHCenter
+      }
+      indicator : Canvas {
+        id : comboCanvas
+        x : 0
+        y : 0
+        width : 10
+        height : entryUnit.height
+        contextType : "2d"
+        Connections {
+            target: entryUnit
+            onPressedChanged: comboCanvas.requestPaint()
+        }
+        onPaint: {
+            context.reset();
+            context.moveTo(0, height / 2);
+            context.lineTo(width, height / 2);
+            context.lineTo(width / 2, 2 * height / 3);
+            context.closePath();
+            context.fillStyle = "black";
+            context.fill();
         }
       }
     }
-  }
-
-  ComboBox {
-    id : entryUnit
-    Layout.maximumWidth : scalarEntry.prefWidth * 0.25
-    Layout.maximumHeight : scalarEntry.prefHeight
-    Layout.fillWidth : true
-    Layout.fillHeight : true
-    Layout.alignment: Qt.AlignBottom
-    model : scalarEntry.units[unit]
-    font.pointSize : 6
-    currentIndex : -1
   }
 
   property var units : ({'mass' : ['lb', 'kg', 'g', 'mg','ug'],
@@ -109,8 +140,6 @@ RowLayout {
                          'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr']})
 
 }
-
-
 
 
 /*##^## Designer {

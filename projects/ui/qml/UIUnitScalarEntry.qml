@@ -30,7 +30,7 @@ UIUnitScalarEntryForm {
     let valid = true
     if (entryField.text.length == 0 && entryUnit.currentIndex > -1){
       //We selected a unit but haven't entered a value -- only return false if text field is writable
-      valid = !root.writable
+      valid = entryField.readOnly
     }
     if (entryField.text.length > 0){
       if (!entryField.acceptableInput){
