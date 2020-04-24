@@ -379,7 +379,8 @@ Scenario& Scenario::load_patient(QString file)
     _engine->GetLogger()->Error("Could not load state, check the error");
   }
   _engine_mutex.unlock();
-
+  std::string log_message = "Successfully Loaded: "+path;
+  _logger.Info(log_message);
   return *this;
 }
 //-------------------------------------------------------------------------------

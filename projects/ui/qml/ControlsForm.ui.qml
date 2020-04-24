@@ -93,7 +93,6 @@ ColumnLayout {
                 onClicked : {
                   patientMenu.close()
                   if (!biogears_scenario.isRunning || biogears_scenario.isPaused){ // This should be redundant with the check to open the Menu, but I'm including it to be safe
-                    console.log(patient + " : " + text)
                     patientMenu.loadState(propName)
                     patientMenu.updateText(propName)
                   }          
