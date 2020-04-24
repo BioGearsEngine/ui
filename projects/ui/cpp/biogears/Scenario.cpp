@@ -873,9 +873,8 @@ void Scenario::create_acute_stress_action(double severity)
 
 QString Scenario::patient_name_and_time()
 {
-  int time = 0;
-  auto simulation_time = mil::tatrc::physiology::datamodel::PhysiologyEngineStateData::SimulationTime_type(time);
-  std::string time_in_simulation = std::to_string(time);
+  auto simulation_time = _engine->GetSimulationTime(biogears::TimeUnit::s);
+  std::string time_in_simulation = std::to_string(simulation_time);
   std::string patient_name = _engine->GetPatient().GetName_cStr();
   return QString::fromStdString(patient_name+"@"+time_in_simulation+"s.xml");
 }
