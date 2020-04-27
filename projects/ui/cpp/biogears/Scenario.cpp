@@ -151,11 +151,8 @@ void Scenario::restart(QString patient_file)
   _paused = true;
   emit pausedToggled(_paused);
   _throttle = true;
-  emit throttledToggled(_throttle);
-  //"Open" command from visualizer sends full file path.  Getting fileName using QFileInfo gets state base name (e.g. StandardMale@0s.xml) relative to states folder
-  //We could also remove the "file:\\\" tag, but that seems like it could cause platform specific issues
-  QFileInfo pFile(patient_file);
-  load_patient(pFile.fileName());
+
+  load_patient(patient_file);
   _logger.SetForward(_consoleLog);
 }
 //-------------------------------------------------------------------------------
@@ -587,9 +584,9 @@ QVariantMap Scenario::edit_patient()
   QVariantMap patientMap;
 
   //Open file dialog in patients folder to select patient
-  QString patientFile = QFileDialog::getOpenFileName(nullptr, "Edit Patient", "./patients");
+  QString patientFile = QFileDialog::getOpenFileName(nullptr, "Edit Patient", "./patients", "Patients (*.xml)");
   if (patientFile.isNull()) {
-    //File returns null string if user cancels without selecting a patient.  Return empty map (Qml side will check for this) 
+    //File returns null string if user cancels without selecting a patient.  Return empty map (Qml side will check for this)
     return patientMap;
   }
   //Load file and create and SEPatient object from it using serializer
@@ -895,16 +892,18 @@ void Scenario::create_patient(QVariantMap patient)
     double schweaty = pMetric[0].toDouble();
     newPatient->GetHyperhidrosis().SetValue(schweaty);
   }
-
-  save_patient(newPatient);
+  
+  //Export new patient
+  export_patient(newPatient);
 }
 
 void Scenario::export_patient()
 {
-  save_patient(&(_engine->GetPatient()));
+  //Function to export currently loaded patient
+  export_patient(&(_engine->GetPatient()));
 }
 
-void Scenario::save_patient(const biogears::SEPatient* patient)
+void Scenario::export_patient(const biogears::SEPatient* patient)
 {
   std::string fileLoc = "./patients/" + patient->GetName() + ".xml";
   std::string fullPath = biogears::ResolvePath(fileLoc);
@@ -936,18 +935,37 @@ void Scenario::export_environment(QString environmentFileName)
   return;
 }
 
-void Scenario::export_state(QString stateFileName)
+void Scenario::load_state()
 {
-  std::string fileLoc = "./states/" + stateFileName.toStdString();
-  std::string fullPath = biogears::ResolvePath(fileLoc);
-  save_state(QString::fromStdString(fullPath));
+  //Open file dialog in states
+  QString stateFile = QFileDialog::getOpenFileName(nullptr, "Load state", "./states", "States (*.xml)");
+  if (stateFile.isNull()) {
+    //File returns null string if user cancels without selecting a patient.  Return empty map (Qml side will check for this)
+    return;
+  } else {
+    restart(stateFile);
+  }
 }
 
-void Scenario::save_state(QString filePath)
+void Scenario::export_state(bool saveAs)
 {
-  std::string stateFileFullPath = filePath.toStdString();
-  biogears::CreateFilePath(stateFileFullPath);
-  std::ofstream stream(stateFileFullPath);
+  QString stateFilePathQStr;
+  std::string stateFilePath;
+  if (saveAs) {
+    stateFilePathQStr = QFileDialog::getSaveFileName(nullptr, "Save state as", "./states", "States (*.xml)");
+    if (stateFilePathQStr.isNull()) {
+      return;
+    }
+    stateFilePath = stateFilePathQStr.toStdString();
+  } else {
+    int simulationTime = std::round(_engine->GetSimulationTime(biogears::TimeUnit::s));
+    std::string simTime = std::to_string(simulationTime);
+    std::string stateName = "./states/" + _engine->GetPatient().GetName() + "@" + simTime + "s.xml";
+    stateFilePath = biogears::ResolvePath(stateName);
+  }
+
+  biogears::CreateFilePath(stateFilePath);
+  std::ofstream stream(stateFilePath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
 
@@ -998,7 +1016,7 @@ void Scenario::save_state(QString filePath)
   state->CircuitManager(*(_engine->GetCircuits().Unload()));
   BioGearsState(stream, *state, info);
   stream.close();
-  _engine->GetLogger()->Info("Saved state: " + stateFileFullPath);
+  _engine->GetLogger()->Info("Saved state: " + stateFilePath);
 }
 
 }

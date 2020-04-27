@@ -38,7 +38,7 @@ Page {
         }
       }
       Component.onCompleted : {
-        root.onLoadConfiguration.connect(function (patient) {setEntry (patient[model.name]); console.log(model.name) } )
+        root.onLoadConfiguration.connect(function (patient) {setEntry (patient[model.name]) } )
         root.onResetConfiguration.connect(reset)
       }
     }
@@ -63,7 +63,7 @@ Page {
 
   ListModel {
     id : patientDataModel
-    ListElement {name : "Name"; type : "string"; hint : "*Required"}
+    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"}
     ListElement {name : "Gender"; unit : "gender"; type : "enum"; hint : "Select option (*Required)"}
     ListElement {name : "Age";  unit : "time"; type : "double"; hint : "Enter value & select unit" }
     ListElement {name : "Weight";  unit : "mass"; type : "double"; hint : "Enter value & select unit"}

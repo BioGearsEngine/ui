@@ -5,23 +5,6 @@ MenuAreaForm {
   id : root
   signal stateLoadedFromMenu()
 
-  saveAsDialog.onAccepted : {
-    if (saveAsDialog.fileUrl){
-      scenario.save_state(saveAsDialog.fileUrl)
-    } else {
-      console.log('Error: File dialog did not return a path')
-    }
-  }
-  
-  openDialog.onAccepted : {
-    if (openDialog.fileUrl) {
-      scenario.restart(openDialog.fileUrl)
-      root.stateLoadedFromMenu()
-    } else {
-      console.log('Error: File dialog did not return a path');
-    }
-  }
-
   function parseToolsSelection (dataType, mode){
     var biogearsTypes = {
       PATIENT : 'Patient',
@@ -34,7 +17,11 @@ MenuAreaForm {
     switch (dataType){
       case biogearsTypes.PATIENT :
         //Patient
-        wizardDialog.launchPatient(mode)
+        if (mode === "Export"){
+          scenario.export_patient()
+        } else {
+          wizardDialog.launchPatient(mode)
+        }
         break;
       case biogearsTypes.ENVIRONMENT : 
         //Environment

@@ -2,11 +2,11 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick 2.12
 import QtQuick.Dialogs 1.3
+import com.biogearsengine.ui.scenario 1.0
 
 Item {
   id : menuArea
   property alias saveAsDialog : saveAsDialog
-  property alias openDialog : openDialog
   property alias wizardDialog : wizardDialog
   width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
   height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
@@ -19,19 +19,22 @@ Item {
       Action {
         text : "Load State"
         onTriggered : {
-          openDialog.open();
+          scenario.load_state();
+          root.stateLoadedFromMenu()
         }
       }
       Action {
         text : "Save State"
         onTriggered : {
-          root.exportData(6)
+          let saveAs = false
+          scenario.export_state(saveAs)
         }
       }
       Action {
         text : "Save State As"
         onTriggered : {
-          saveAsDialog.open();
+          let saveAs = true
+          scenario.export_state(saveAs);
         }
       }
       delegate : MenuItem {
@@ -179,15 +182,6 @@ Item {
     nameFilters : ["(*.xml)", "All files (*)"]
     selectMultiple : false
     selectExisting: false
-  }
-  FileDialog {
-    id : openDialog
-    title : "Open state file"
-    visible : false
-    folder : "file://states" //This url identifies the correct folder but logs warnings to the debug console from QWindowsNativeFileDialogBase.  This seems to be a Qml bug
-    nameFilters : ["states (*.xml)", "All files (*)"]
-    selectMultiple : false
-    selectExisting : true
   }
 
   WizardDialog {

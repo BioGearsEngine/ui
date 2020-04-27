@@ -50,7 +50,7 @@ Rectangle {
   //  created by Loader is stored in the "item" property of the loader. We can therefore make valid requests to
   //  entryLoader.item.PROPERTY and get the correct prop from the component (again, assuming common prop names).
 
-  //The enum component is a label with a combo box that holds available options.  It is applicable to fiels like
+  //The enum component is a label with a combo box that holds available options.  It is applicable to fields like
   // Gender and Blood Type
   Component {
     id : enumComponent
@@ -60,7 +60,7 @@ Rectangle {
       property bool editing : enumInput.activeFocus
       property bool validInput : true   //Input will always be valid (even if no option is chosen, most data is optional).  Exception is Gender, but we handle this in PatientWizard
       property var reset : function() {enumInput.currentIndex = -1}
-      property var setFromExisting : function (existing) { enumInput.currentIndex = existing[0] }
+      property var setFromExisting : function (existing) { if(existing[0]) {enumInput.currentIndex = existing[0]} }
       Layout.fillWidth : true
       Layout.fillHeight : true
       spacing : 5
@@ -160,7 +160,7 @@ Rectangle {
       property bool editing : scalarInput.activeFocus
       property bool validInput : scalarInput.acceptableInput || scalarInput.text.length == 0
       property var reset : function() {scalarInput.clear()}
-      property var setFromExisting : function (existing) { scalarInput.text = existing[0] }
+      property var setFromExisting : function (existing) { if (existing[0]) {scalarInput.text = existing[0]; } }
       Layout.fillWidth : true
       Layout.fillHeight : true
       spacing : 5
@@ -200,7 +200,7 @@ Rectangle {
       }
     }
   }
-
+  //The scalarWithUnit component is a label with a text field and combo box.
   Component {
     id : scalarWithUnitComponent
     GridLayout {
@@ -210,8 +210,8 @@ Rectangle {
       property bool validInput : (scalarInput.text.length > 0 && unitInput.currentIndex > -1)
                                   || (scalarInput.text.length == 0 && unitInput.currentIndex == -1)
       property var reset : function() {scalarInput.clear(); unitInput.currentIndex = -1}
-      property var setFromExisting : function (existing) { scalarInput.text = existing[0];
-                                                            unitInput.currentIndex = unitInput.find(existing[1]); }
+      property var setFromExisting : function (existing) {  if (existing[0]) { scalarInput.text = existing[0];
+                                                            unitInput.currentIndex = unitInput.find(existing[1]); } }
       columns : 2
       rows : 2
       Layout.fillWidth : true
