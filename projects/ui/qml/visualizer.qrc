@@ -10,7 +10,6 @@
         <file>LuaConsoleForm.ui.qml</file>
         <file>Main.qml</file>
         <file>MainForm.ui.qml</file>
-        <file>PatientBox.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>UIActionSwitch.qml</file>
         <file>UIActionSwitchForm.qml</file>
@@ -41,6 +40,8 @@
         <file>WizardDialogForm.ui.qml</file>
         <file>UIUnitScalarEntry.qml</file>
         <file>UIUnitScalarEntryForm.ui.qml</file>
+        <file>PatientMenu.qml</file>
+        <file>PatientMenuForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

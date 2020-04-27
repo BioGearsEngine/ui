@@ -15,7 +15,6 @@ ColumnLayout {
 
   //property alias patientBox: patientBox
   property alias patientMenu: patientMenu
-  property alias patientMenuButtonText: patientText.text
   property alias age_yr: age
   property alias gender: gender
   property alias fat_pct: fat_pct
@@ -36,89 +35,12 @@ ColumnLayout {
   property alias openDrawerButton : openDrawerButton
   property alias actionSwitchView : actionSwitchView
 
-  Row {
-    height: 10
-    Layout.fillWidth: true
+
+  PatientMenu {
+    id : patientMenu
+    Layout.preferredWidth : root.width
   }
 
-  ListModel {
-    id : patientMenuListModel
-  }
-  Button {
-    id: patientMenuButton
-    Layout.preferredWidth : root.width
-    flat: true
-    highlighted: false
-    Text {
-      id : patientText
-      anchors.fill : parent
-      text : "Select Patient" // If you actually see this then something is very wrong
-      font.capitalization : Font.MixedCase
-      fontSizeMode : Text.Fit
-      horizontalAlignment : Text.AlignHCenter
-      verticalAlignment : Text.AlignVCenter
-    }
-    //display : AbstractButton.TextBesideIcon
-    //icon.source: "qrc:/icons/menu.png"
-    //icon.color: "transparent"
-    Menu {
-      id : patientMenu
-      x : -200
-      y : 50
-      function loadState(fileName){
-        biogears_scenario.restart(fileName)
-      }
-      function updateText(fileName){
-        var split_prop = fileName.split("@")
-        patientText.text = "Patient: " + split_prop[0] + "@" + split_prop[1].split(".")[0]   
-      }
-      closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
-      Instantiator {
-        id : menuItemInstance
-        model : patientMenuListModel
-        delegate : Menu {
-          id : patientSubMenu
-          title : patientName
-          property int delegateIndex : index
-          property string patient : patientName
-          Repeater {
-            id : subMenuInstance
-            model : patientMenuListModel.get(patientSubMenu.delegateIndex).props
-            delegate : MenuItem {
-              Button { 
-                anchors.fill : parent
-                flat : true
-                highlighted : false
-                text : propName
-                onClicked : {
-                  patientMenu.close()
-                  if (!biogears_scenario.isRunning || biogears_scenario.isPaused){ // This should be redundant with the check to open the Menu, but I'm including it to be safe
-                    patientMenu.loadState(propName)
-                    patientMenu.updateText(propName)
-                  }          
-                }
-              }
-            }
-          }
-        }
-        onObjectAdded : {
-          patientMenu.addMenu(object)  
-        }
-        onObjectRemoved : {
-          patientMenu.removeMenu(object)
-        }
-      }    
-    }
-    onClicked: {
-      if (!biogears_scenario.isRunning || biogears_scenario.isPaused) {
-        if (patientMenu.visible) {
-          patientMenu.close()
-        } else {
-          patientMenu.open()
-        }
-      } 
-    }
-  }
   RowLayout {
     id: configuration_row1
     Layout.fillWidth: true
@@ -224,7 +146,7 @@ ColumnLayout {
       model : actionSwitchModel  //Defined in Controls.qml
     }
   }
-  Component.onCompleted: {
+/*  Component.onCompleted: {
     patientMenu.loadState("DefaultMale@0s.xml")
     patientText.text = "Patient: DefaultMale@0s"
     var list = biogears_scenario.get_nested_patient_state_list();
@@ -239,7 +161,7 @@ ColumnLayout {
       var menu_entry = {"patientName" : patient_name, "props" : split_objects}
       patientMenuListModel.append(menu_entry)
     }
-  }
+  }*/
   }
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

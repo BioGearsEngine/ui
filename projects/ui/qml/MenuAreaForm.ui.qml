@@ -6,7 +6,6 @@ import com.biogearsengine.ui.scenario 1.0
 
 Item {
   id : menuArea
-  property alias saveAsDialog : saveAsDialog
   property alias wizardDialog : wizardDialog
   width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
   height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
@@ -20,7 +19,6 @@ Item {
         text : "Load State"
         onTriggered : {
           scenario.load_state();
-          root.stateLoadedFromMenu()
         }
       }
       Action {
@@ -172,16 +170,6 @@ Item {
     ListElement { option : "New"}
     ListElement { option : "Export"}
     ListElement { option : "Edit"}
-  }
-
-  FileDialog {
-    id : saveAsDialog
-    title : "Save state as..."
-    visible : false
-    folder : "file://states"
-    nameFilters : ["(*.xml)", "All files (*)"]
-    selectMultiple : false
-    selectExisting: false
   }
 
   WizardDialog {

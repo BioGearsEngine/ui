@@ -3,7 +3,6 @@ import com.biogearsengine.ui.scenario 1.0
 
 MenuAreaForm {
   id : root
-  signal stateLoadedFromMenu()
 
   function parseToolsSelection (dataType, mode){
     var biogearsTypes = {

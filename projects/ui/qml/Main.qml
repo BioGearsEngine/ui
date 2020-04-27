@@ -38,9 +38,6 @@ ApplicationWindow {
         controls.onOpenActionDrawer: {
           actionDrawer.openActionDrawer();
         }
-        menuArea.onStateLoadedFromMenu : {
-          controls.stateLoadedFromMenu()
-        }
     }
 
     Info {

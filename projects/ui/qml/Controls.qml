@@ -12,7 +12,6 @@ ControlsForm {
   signal pauseClicked(bool paused)
   signal playClicked()
   signal speedToggled(int speed)
-  signal stateLoadedFromMenu()
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
@@ -30,10 +29,6 @@ ControlsForm {
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
   
-  onStateLoadedFromMenu : {
-      patientMenu.updateText(biogears_scenario.patient_name_and_time())
-  }
-
   Scenario {
     id: biogears_scenario
 
@@ -63,11 +58,35 @@ ControlsForm {
       bgData = model
       root.patientPhysiologyChanged(model)
       root.restartClicked();
-      //patientBox.checkDisplayText(scenario.patient_name());
     }  
                 
     onStateLoad: {
       root.restartClicked()
+      //Check if the patient base name (format : :"patient@xs") is substring of the text displayed in the patient menu
+      // (format : "Patient: patient@xs").  If it is, then we are up to date.  If not, we need to search patient file map 
+      // to find the right name and set it as the current text in the patient button.
+      if (!patientMenu.patientText.text.includes(stateBaseName)){
+        let menu = patientMenu.patientMenuListModel
+        for (let index = 0; index < menu.count; ++index){
+          let patient = menu.get(index).patientName
+          if (stateBaseName.includes(patient)){
+            //Found the right patient, now search for the specific file associated with patient state
+            let patientSubMenu = menu.get(index).props
+            for (let subIndex = 0; subIndex < patientSubMenu.count; ++subIndex){
+              let patientFile = patientSubMenu.get(subIndex).propName
+              if (patientFile.includes(stateBaseName)){
+                patientMenu.patientText.text = "Patient: " + stateBaseName
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    onNewStateAdded : {
+      patientMenu.newState(stateBaseName, stateFileName);
     }
 
     onTimeAdvance: {
@@ -91,7 +110,6 @@ ControlsForm {
     }
 
     onRunningToggled : {
-      //patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
       if( isRunning){
           playback.simButton.state = "Simulating";
       } else {
@@ -99,7 +117,6 @@ ControlsForm {
       }
     }
     onPausedToggled : {
-      //patientBox.enabled = !biogears_scenario.isRunning || biogears_scenario.isPaused
       if( biogears_scenario.isRunning) {
         root.pauseClicked(isPaused)
         if( isPaused ){
@@ -143,7 +160,7 @@ ControlsForm {
 
   playback.onRestartClicked: {
     playback.simulationTime = "%1:%2:%3".arg("0").arg("00").arg("00")
-    patientMenu.loadState(patientMenuButtonText.split(" ")[1]+".xml");
+    patientMenu.loadState(patientMenu.patientMenuButtonText.split(" ")[1]+".xml");
     root.restartClicked()
   } 
   playback.onPauseClicked: {
