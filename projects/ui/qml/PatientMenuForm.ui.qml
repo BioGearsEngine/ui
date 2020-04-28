@@ -28,11 +28,11 @@ Button {
       delegate : Menu {
         id : patientSubMenu
         title : patientName
-        property int delegateIndex : index
         property string patient : patientName
+        property var repeaterModel : []   //Assign when object is added to instantiator to make sure that model exists
         Repeater {
           id : subMenuInstance
-          model : patientMenuListModel.get(patientSubMenu.delegateIndex).props
+          model : repeaterModel
           delegate : MenuItem {
             Button { 
               anchors.fill : parent
@@ -53,7 +53,8 @@ Button {
         }
       }
       onObjectAdded : {
-        patientMenu.addMenu(object)  
+        object.repeaterModel = patientMenuListModel.get(index).props
+        patientMenu.insertMenu(index, object)  
       }
       onObjectRemoved : {
         patientMenu.removeMenu(object)

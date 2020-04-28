@@ -4,26 +4,6 @@ import com.biogearsengine.ui.scenario 1.0
 
 PatientMenuForm {
   id: root
-  
-  function newState(baseName, fileName){
-    //If base name is in List Model, add file name to sub menu
-    let existingGroup = false;
-    for (let index = 0; index < patientMenuListModel.count; ++index){
-      let patient = patientMenuListModel.get(index).patientName
-      if (baseName.includes(patient)){
-        //Found the right patient, now add file to sub menu
-        let patientSubMenu = patientMenuListModel.get(index).props
-        patientSubMenu.append({"propName" : fileName})
-        existingGroup = true
-        break;
-      }
-    }
-    if(!existingGroup){
-      let subMenu = {"propName" : fileName};
-      let newGroup = {"patientName" : baseName, "props" : subMenu}
-      patientMenuListModel.append(newGroup)
-    }
-  }
 
   function loadState(fileName){
     biogears_scenario.restart(fileName)
@@ -39,12 +19,10 @@ PatientMenuForm {
     }
   }
 
-  Component.onCompleted: {
-    patientMenu.loadState("DefaultMale@0s.xml")
-    patientText.text = "Patient: DefaultMale@0s"
+  function buildPatientMenu(){
+    patientMenuListModel.clear()
     var list = biogears_scenario.get_nested_patient_state_list();
-    var nlist = []
-    for (var i = 0;i < list.length;++i) {
+    for (var i = 0; i < list.length;++i) {
       var split_files = list[i].split(",")
       var patient_name = split_files.shift()
       var split_objects = []
@@ -54,5 +32,12 @@ PatientMenuForm {
       var menu_entry = {"patientName" : patient_name, "props" : split_objects}
       patientMenuListModel.append(menu_entry)
     }
+  }
+
+  Component.onCompleted: {
+    root.loadState("DefaultMale@0s.xml")
+    patientText.text = "Patient: DefaultMale@0s"
+    root.buildPatientMenu()
+    
   }
 }

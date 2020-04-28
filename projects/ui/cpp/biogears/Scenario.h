@@ -134,7 +134,7 @@ signals:
   void timeAdvance(double SimulationTime_s);
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);
-  void newStateAdded(QString stateBaseName, QString stateFileName);
+  void newStateAdded();
   void runningToggled(bool isRunning);
   void pausedToggled(bool isPaused);
   void throttledToggled(bool isThrottled);

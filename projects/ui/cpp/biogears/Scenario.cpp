@@ -1024,9 +1024,8 @@ void Scenario::export_state(bool saveAs)
   BioGearsState(stream, *state, info);
   stream.close();
   _engine->GetLogger()->Info("Saved state: " + stateFilePath);
-  //Notify QML PatientMenu that a new state has been added to directory.  Use file base name
-  QFileInfo stateFileInfo = QFileInfo(QString::fromStdString(stateFilePath));
-  emit newStateAdded(stateFileInfo.baseName(), stateFileInfo.fileName());
+  //Notify QML PatientMenu that a new state has been added to directory.
+  emit newStateAdded();
 
 }
 

@@ -86,7 +86,7 @@ ControlsForm {
     }
 
     onNewStateAdded : {
-      patientMenu.newState(stateBaseName, stateFileName);
+      patientMenu.buildPatientMenu()
     }
 
     onTimeAdvance: {
