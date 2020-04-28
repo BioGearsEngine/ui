@@ -5,13 +5,15 @@ import QtQuick.Window 2.12
 UIPatientWizardForm {
 	id: root
 
-	signal patientReady (var patient)
-	signal patientChanged (string name)
+	signal dataReady (string type, var patient)
+	signal patientChanged ()
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
 
 	property var patientData : ({})
+	property var resetData : ({})  //This will be empty strings when "new Patient", but when "edit patient" it will be file as when first loaded
 	property bool editMode : false
+	property var invalidEntries: ({})
 	property bool patientWarningFlagged : false
 
 	Component.onCompleted : {
@@ -33,19 +35,23 @@ UIPatientWizardForm {
 	}
 
 	function checkConfiguration(){
-		let validName = false
-		let validGender = false
-		if (patientData["Name"][0]!=null && patientData["Name"][0].length > 0){
-			validName = true
+		let validConfiguration = true
+		for (let i = 0; i < patientDataModel.count; ++i){
+			let validEntry = patientDataModel.get(i).valid
+			if (!validEntry){
+				validConfiguration = false
+				let invalidField = patientDataModel.get(i).name
+				if (invalidField === "Name" || invalidField === "Gender"){
+					invalidPatientWarning.warningText = invalidField + " is a required field."
+				} else {
+					invalidPatientWarning.warningText = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+				}
+				invalidPatientWarning.open()
+				break;
+			}
 		}
-		if (patientData["Gender"][0]!= null && patientData["Gender"][0]!=-1){
-			validGender = true
-		}
-		if (validName && validGender){
-			root.patientReady(patientData)
-		}
-		else {
-			invalidPatientWarning.open()
+		if (validConfiguration){
+			root.dataReady('Patient', patientData)  //'Patient' flag tells Wizard manager which type of data to save
 		}
 	}
 
@@ -53,6 +59,7 @@ UIPatientWizardForm {
 		for (let prop in patient){
 			patientData[prop] = patient[prop]
 		}
+		resetData = Object.assign({}, patientData)	//Copy data to resetData ( can't do = because this does copy by reference)
 		root.loadConfiguration(patientData)
 	}
 

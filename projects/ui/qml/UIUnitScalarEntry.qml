@@ -8,10 +8,6 @@ UIUnitScalarEntryForm {
 
   signal nameUpdated (string name)
   signal inputAccepted (var input)
-
-  onInputAccepted : {
-    console.log(input)
-  }
  
   function setEntry( fromInput ){
     root.entry.setFromExisting(fromInput)

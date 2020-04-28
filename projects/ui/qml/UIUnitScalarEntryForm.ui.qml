@@ -60,7 +60,7 @@ Rectangle {
       property bool editing : enumInput.activeFocus
       property bool validInput : true   //Input will always be valid (even if no option is chosen, most data is optional).  Exception is Gender, but we handle this in PatientWizard
       property var reset : function() {enumInput.currentIndex = -1}
-      property var setFromExisting : function (existing) { if(existing[0]) {enumInput.currentIndex = existing[0]} }
+      property var setFromExisting : function (existing) { if(existing[0] != null) {enumInput.currentIndex = existing[0]} }
       Layout.fillWidth : true
       Layout.fillHeight : true
       spacing : 5

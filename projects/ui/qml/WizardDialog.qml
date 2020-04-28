@@ -35,7 +35,7 @@ WizardDialogForm {
 			root.onHelpRequested.connect(activeWizard.showHelp)
 			root.onReset.connect(activeWizard.resetConfiguration)
 			//Notify dialog that patient is ready
-			activeWizard.onPatientReady.connect(root.savePatient)
+			activeWizard.onDataReady.connect(root.saveData)
 			root.open()
 		}
 	}
@@ -55,24 +55,28 @@ WizardDialogForm {
 		console.log(mode)
 	}
 
-	function savePatient (patient){
-		scenario.create_patient(patient)
+	function saveData(type, dataMap){
+		switch (type) {
+			case 'Patient' : 
+				scenario.create_patient(dataMap)
+				break;
+			} //Build in other cases as they are added
 		root.accept()
 	}
 
-	onRejected : {
-		for (let p in activeWizard){
-			console.log(p + " : " + activeWizard[p])
-		}
+	function clearWizard(){
 		root.saveButton.onClicked.disconnect(activeWizard.checkConfiguration)
 		root.onHelpRequested.disconnect(activeWizard.showHelp)
 		root.onReset.disconnect(activeWizard.resetConfiguration)
-		activeWizard.onPatientReady.disconnect(root.savePatient)
+		activeWizard.onDataReady.disconnect(root.saveData)
 		activeWizard.destroy()
 		activeWizard = null
-		console.log("Rejecting...")
-		for (let p in activeWizard){
-			console.log(p + " : " + activeWizard[p])
-		}
+	}
+
+	onAccepted : {
+		root.clearWizard()
+	}
+	onRejected : {
+		root.clearWizard()
 	}
 }
