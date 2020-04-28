@@ -42,6 +42,8 @@
         <file>UIUnitScalarEntryForm.ui.qml</file>
         <file>PatientMenu.qml</file>
         <file>PatientMenuForm.ui.qml</file>
+        <file>UINutritionWizard.qml</file>
+        <file>UINutritionWizardForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

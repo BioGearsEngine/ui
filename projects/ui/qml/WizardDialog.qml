@@ -48,8 +48,36 @@ WizardDialogForm {
 	function launchCompound(mode) {
 		console.log(mode)
 	}
-	function launchNutrient(mode) {
-		console.log(mode)
+	function launchNutrition(mode) {
+		root.title = 'Nutrition Wizard'
+		let nutritionComponent = Qt.createComponent("UINutritionWizard.qml");
+		if ( nutritionComponent.status != Component.Ready){
+		  if (nutritionComponent.status == Component.Error){
+			  console.log("Error : " + nutritionComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : Action dialog component not ready");
+	  } else {
+		  activeWizard = nutritionComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'activeWizard'});
+			if (mode === "Edit"){
+				let nutrition = scenario.edit_nutrition()
+				if (Object.keys(nutrition).length == 0){
+					//We get an empty nutrition object if the user closed file explorer without selecting a nutrition
+					activeWizard.destroy()
+					return;
+				} else {
+					activeWizard.mergeNutritionData(nutrition)
+					activeWizard.editMode = true
+				}
+			}
+			//Connect standard dialog buttons to nutrition functions
+			root.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			root.onHelpRequested.connect(activeWizard.showHelp)
+			root.onReset.connect(activeWizard.resetConfiguration)
+			//Notify dialog that nutrition is ready
+			activeWizard.onDataReady.connect(root.saveData)
+			root.open()
+		}
 	}
 	function launchECG(mode){
 		console.log(mode)
@@ -60,7 +88,10 @@ WizardDialogForm {
 			case 'Patient' : 
 				scenario.create_patient(dataMap)
 				break;
-			} //Build in other cases as they are added
+			case 'Nutrition':
+				scenario.create_nutrition(dataMap)
+				break;
+			}
 		root.accept()
 	}
 

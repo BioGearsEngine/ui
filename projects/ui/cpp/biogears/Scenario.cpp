@@ -118,10 +118,9 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
         std::function<QString(void)> unitFunc = [&lKidneyIntracellular]() {
           return "ug";
         };
-        std::function<double(void)> valueFunc = [&, _activeSub]() { 
-                 return (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? 
-                   lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug)
-                 : 0;
+        std::function<double(void)> valueFunc = [&, _activeSub]() {
+          return (lKidneyIntracellular.HasSubstanceQuantity(*_activeSub) && rKidneyIntracellular.HasSubstanceQuantity(*_activeSub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_activeSub)->GetMassCleared(biogears::MassUnit::ug)
+                                                                                                                                    : 0;
         };
 
         metric->custom(std::move(valueFunc), std::move(unitFunc));
@@ -381,7 +380,7 @@ Scenario& Scenario::load_patient(QString file)
     _engine->GetLogger()->Error("Could not load state, check the error");
   }
   _engine_mutex.unlock();
-  std::string log_message = "Successfully Loaded: "+path;
+  std::string log_message = "Successfully Loaded: " + path;
   _logger.Info(log_message);
   return *this;
 }
@@ -898,10 +897,9 @@ void Scenario::create_patient(QVariantMap patient)
     double schweaty = pMetric[0].toDouble();
     newPatient->GetHyperhidrosis().SetValue(schweaty);
   }
-  
+
   //Export new patient
   export_patient(newPatient);
-  
 }
 
 void Scenario::export_patient()
@@ -923,6 +921,109 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   Patient(stream, *pData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved patient " + fullPath);
+  return;
+}
+
+void Scenario::create_nutrition(QVariantMap nutrition)
+{
+  biogears::SENutrition* newNutrition = new biogears::SENutrition(_engine->GetLogger());
+  //JS objects are returned from QML as QVariantMap<QString (key), QVariant (item)>
+  //The key will be the field in the patient CDM (e.g. Name, Age, Gender...)
+  //The item is a pair (value, unit), which is returned by QML as QList<QVariant>
+  //We first convert the QVariantList to a QList, which allows us to index the value and unit
+  //We then access values and convert them from QVariant to the appropriate type (string, double, int, etc)
+
+  //Name
+  QList<QVariant> nMetric = nutrition["Name"].toList();
+  QString nutritionName = nMetric[0].toString(); //Used to gen file name
+  newNutrition->SetName(nutritionName.toStdString());
+  //Carbohydrate mass
+  nMetric = nutrition["Carbohydrate"].toList();
+  if (!nMetric[0].isNull()) {
+    double carbs = nMetric[0].toDouble();
+    auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetCarbohydrate().SetValue(carbs, massUnit);
+  }
+  //Carbohydrate digestion rate
+  nMetric = nutrition["CarbohydrateDigestionRate"].toList();
+  if (!nMetric[0].isNull()) {
+    double carbRate = nMetric[0].toDouble();
+    auto& massPerTimeUnit = biogears::MassPerTimeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetCarbohydrateDigestionRate().SetValue(carbRate, massPerTimeUnit);
+  }
+  //Protein mass
+  nMetric = nutrition["Protein"].toList();
+  if (!nMetric[0].isNull()) {
+    double protein = nMetric[0].toDouble();
+    auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetProtein().SetValue(protein, massUnit);
+  }
+  //Protein digestion rate
+  nMetric = nutrition["ProteinDigestionRate"].toList();
+  if (!nMetric[0].isNull()) {
+    double proteinRate = nMetric[0].toDouble();
+    auto& massPerTimeUnit = biogears::MassPerTimeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetProteinDigestionRate().SetValue(proteinRate, massPerTimeUnit);
+  }
+  //Fat mass
+  nMetric = nutrition["Fat"].toList();
+  if (!nMetric[0].isNull()) {
+    double fat = nMetric[0].toDouble();
+    auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetFat().SetValue(fat, massUnit);
+  }
+  //Fat digestion rate
+  nMetric = nutrition["FatDigestionRate"].toList();
+  if (!nMetric[0].isNull()) {
+    double fatRate = nMetric[0].toDouble();
+    auto& massPerTimeUnit = biogears::MassPerTimeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetFatDigestionRate().SetValue(fatRate, massPerTimeUnit);
+  }
+  //Calcium mass
+  nMetric = nutrition["Calcium"].toList();
+  if (!nMetric[0].isNull()) {
+    double calcium = nMetric[0].toDouble();
+    auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetCalcium().SetValue(calcium, massUnit);
+  }
+  //Sodium mass
+  nMetric = nutrition["Sodium"].toList();
+  if (!nMetric[0].isNull()) {
+    double sodium = nMetric[0].toDouble();
+    auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetSodium().SetValue(sodium, massUnit);
+  }
+  //Sodium mass
+  nMetric = nutrition["Water"].toList();
+  if (!nMetric[0].isNull()) {
+    double water = nMetric[0].toDouble();
+    auto& volUnit = biogears::VolumeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
+    newNutrition->GetWater().SetValue(water, volUnit);
+  }
+
+  export_nutrition(newNutrition);
+}
+
+void Scenario::export_nutrition()
+{
+  if (_engine->GetActions().GetPatientActions().HasConsumeNutrients()) {
+    export_nutrition(&(_engine->GetActions().GetPatientActions().GetConsumeNutrients()->GetNutrition()));
+  }
+}
+
+void Scenario::export_nutrition(const biogears::SENutrition* nutrition)
+{
+  std::string fileLoc = "./nutrition/" + nutrition->GetName() + ".xml";
+  std::string fullPath = biogears::ResolvePath(fileLoc);
+  biogears::CreateFilePath(fullPath);
+  std::ofstream stream(fullPath);
+  xml_schema::namespace_infomap info;
+  info[""].name = "uri:/mil/tatrc/physiology/datamodel";
+
+  std::unique_ptr<CDM::NutritionData> pData(nutrition->Unload());
+  Nutrition(stream, *pData, info);
+  stream.close();
+  _engine->GetLogger()->Info("Saved nutrition data: " + fullPath);
   return;
 }
 
@@ -1026,7 +1127,6 @@ void Scenario::export_state(bool saveAs)
   _engine->GetLogger()->Info("Saved state: " + stateFilePath);
   //Notify QML PatientMenu that a new state has been added to directory.
   emit newStateAdded();
-
 }
 
 }
@@ -1229,7 +1329,7 @@ QString Scenario::patient_name_and_time()
   auto simulation_time = _engine->GetSimulationTime(biogears::TimeUnit::s);
   std::string time_in_simulation = std::to_string(simulation_time);
   std::string patient_name = _engine->GetPatient().GetName_cStr();
-  return QString::fromStdString(patient_name+"@"+time_in_simulation+"s.xml");
+  return QString::fromStdString(patient_name + "@" + time_in_simulation + "s.xml");
 }
 
 bool Scenario::file_exists(QString file)
@@ -1247,7 +1347,7 @@ QList<QString> Scenario::get_nested_patient_state_list()
 {
   DIR* dir;
   struct dirent* ent;
-  std::map<std::string,int> patient_map;
+  std::map<std::string, int> patient_map;
   std::string contents;
   QList<QString> patient_list;
   if ((dir = opendir("states/")) != NULL) {
@@ -1264,17 +1364,16 @@ QList<QString> Scenario::get_nested_patient_state_list()
       }
       std::string patient_name = dirname.substr(0, splitLocation);
       auto temp_patient = patient_map.find(patient_name);
-      if (temp_patient == patient_map.end())
-      {
+      if (temp_patient == patient_map.end()) {
         QString temp_list;
         temp_list += QString::fromStdString(patient_name);
         temp_list += ",";
         temp_list += ent->d_name;
         patient_list.push_back(temp_list);
-        patient_map.insert(std::pair<std::string,int>(patient_name,patient_list.length()-1));
+        patient_map.insert(std::pair<std::string, int>(patient_name, patient_list.length() - 1));
       } else {
         patient_list[temp_patient->second] += ",";
-        patient_list[temp_patient->second] += ent->d_name;        
+        patient_list[temp_patient->second] += ent->d_name;
       }
     }
     closedir(dir);
@@ -1290,7 +1389,7 @@ QString Scenario::get_patient_state_files()
   std::string contents;
   if ((dir = opendir("states/")) != NULL) {
     while ((ent = readdir(dir)) != NULL) {
-      if (ent->d_name[0] != static_cast<char>('.')) {        
+      if (ent->d_name[0] != static_cast<char>('.')) {
         contents += ent->d_name;
         contents += "\n";
       }
@@ -1318,7 +1417,7 @@ QString Scenario::get_patient_state_files(QString patient)
       if (dirname.find('@') == -1) {
         continue;
       }
-      if (patient.toStdString() == dirname.substr(0,dirname.find('@'))) {
+      if (patient.toStdString() == dirname.substr(0, dirname.find('@'))) {
 
         contents += ent->d_name;
         contents += '\n';
@@ -1349,7 +1448,5 @@ QString Scenario::get_patient_state_files(QString patient)
   }
   return QString::fromStdString(contents);
 }
-
-
 
 } //namespace ui

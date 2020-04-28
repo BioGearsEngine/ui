@@ -160,7 +160,7 @@ Item {
     ListElement { name : "Environment"}
     ListElement { name : "Substance"}
     ListElement { name : "Compound"}
-    ListElement { name : "Nutrient"}
+    ListElement { name : "Nutrition"}
     ListElement { name : "ECG"}
   }
 

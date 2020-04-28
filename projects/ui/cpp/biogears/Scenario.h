@@ -62,14 +62,17 @@ public:
   Q_INVOKABLE Scenario& environment_name(QString);
 
   //Load, new, and save functions
-  Q_INVOKABLE Scenario& load_patient(QString);
-  Q_INVOKABLE void export_patient();  //Export current patient (uses save_patient)
-  void export_patient(const biogears::SEPatient* patient);
-  Q_INVOKABLE void create_patient(QVariantMap patient);    //Create and save a new patient
+  Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
+ // Q_INVOKABLE QVariantMap edit_nutrition();
+  Q_INVOKABLE void export_nutrition();
+  Q_INVOKABLE void create_patient(QVariantMap patient); //Create and save a new patient
   Q_INVOKABLE QVariantMap edit_patient();
+  Q_INVOKABLE void export_patient(); //Export current patient (uses save_patient)
+  Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE void export_state(bool saveAs);
   Q_INVOKABLE void load_state();
   Q_INVOKABLE void export_environment(QString environmentFileName);
+  
 
 
   Q_INVOKABLE double get_simulation_time();
@@ -150,6 +153,9 @@ protected:
 
   void physiology_thread_main();
   void physiology_thread_step();
+
+  void export_nutrition(const biogears::SENutrition* nutrition);
+  void export_patient(const biogears::SEPatient* patient);
 
 private:
   std::thread _thread;

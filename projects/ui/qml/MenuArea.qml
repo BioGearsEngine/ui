@@ -10,7 +10,7 @@ MenuAreaForm {
       ENVIRONMENT : 'Environment',
       SUBSTANCE : 'Substance',
       COMPOUND : 'Compound',
-      NUTRIENT : 'Nutrient',
+      NUTRITION : 'Nutrition',
       ECG : 'ECG'
     }
     switch (dataType){
@@ -34,9 +34,9 @@ MenuAreaForm {
         //Compound
         wizardDialog.launchCompound(mode)
         break;
-      case biogearsTypes.NUTRIENT : 
+      case biogearsTypes.NUTRITION : 
         //Nutrient
-        wizardDialog.launchNutrient(mode)
+        wizardDialog.launchNutrition(mode)
         break;
       case biogearsTypes.ECG : 
         //ECG
