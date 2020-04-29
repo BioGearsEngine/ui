@@ -9,7 +9,7 @@ WizardDialogForm {
 	property var activeWizard;
 
 	function launchPatient(mode){
-		root.title = 'Patient Wizard'
+		mainDialog.title = 'Patient Wizard'
 		let patientComponent = Qt.createComponent("UIPatientWizard.qml");
 		if ( patientComponent.status != Component.Ready){
 		  if (patientComponent.status == Component.Error){
@@ -18,7 +18,9 @@ WizardDialogForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  activeWizard = patientComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'activeWizard'});
+		  activeWizard = patientComponent.createObject(mainDialog.contentItem, {'width' : mainDialog.contentItem.width, 'height' : mainDialog.contentItem.height, 'name' : 'activeWizard'});
+			root.setHelpText("-Patient name and gender are required fields.  All other fields are optional and will be set to defaults in BioGears if not assigned. 
+                \n\n -Baseline inputs will be used as targets for the engine but final values may change during the stabilization process.")
 			if (mode === "Edit"){
 				let patient = scenario.edit_patient()
 				if (Object.keys(patient).length == 0){
@@ -31,12 +33,13 @@ WizardDialogForm {
 				}
 			}
 			//Connect standard dialog buttons to patient functions
-			root.saveButton.onClicked.connect(activeWizard.checkConfiguration)
-			root.onHelpRequested.connect(activeWizard.showHelp)
-			root.onReset.connect(activeWizard.resetConfiguration)
-			//Notify dialog that patient is ready
-			activeWizard.onDataReady.connect(root.saveData)
-			root.open()
+			mainDialog.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			mainDialog.onReset.connect(activeWizard.resetConfiguration)
+			//Notifications from patient editor to main dialog
+			activeWizard.onValidConfiguration.connect(root.saveData)
+			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
+			activeWizard.onNameChanged.connect(root.showNameWarning)
+			mainDialog.open()
 		}
 	}
 	function launchEnvironment(mode){
@@ -49,7 +52,7 @@ WizardDialogForm {
 		console.log(mode)
 	}
 	function launchNutrition(mode) {
-		root.title = 'Nutrition Wizard'
+		mainDialog.title = 'Nutrition Wizard'
 		let nutritionComponent = Qt.createComponent("UINutritionWizard.qml");
 		if ( nutritionComponent.status != Component.Ready){
 		  if (nutritionComponent.status == Component.Error){
@@ -58,7 +61,8 @@ WizardDialogForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  activeWizard = nutritionComponent.createObject(root.contentItem, {'width' : root.contentItem.width, 'height' : root.contentItem.height, 'name' : 'activeWizard'});
+		  activeWizard = nutritionComponent.createObject(mainDialog.contentItem, {'width' : mainDialog.contentItem.width, 'height' : mainDialog.contentItem.height, 'name' : 'activeWizard'});
+			root.setHelpText("-Nutrition name is required field.  All other fields are optional and will be set to 0 if not defined.")
 			if (mode === "Edit"){
 				let nutrition = scenario.edit_nutrition()
 				if (Object.keys(nutrition).length == 0){
@@ -71,12 +75,13 @@ WizardDialogForm {
 				}
 			}
 			//Connect standard dialog buttons to nutrition functions
-			root.saveButton.onClicked.connect(activeWizard.checkConfiguration)
-			root.onHelpRequested.connect(activeWizard.showHelp)
-			root.onReset.connect(activeWizard.resetConfiguration)
+			mainDialog.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			mainDialog.onReset.connect(activeWizard.resetConfiguration)
 			//Notify dialog that nutrition is ready
-			activeWizard.onDataReady.connect(root.saveData)
-			root.open()
+			activeWizard.onValidConfiguration.connect(root.saveData)
+			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
+			activeWizard.onNameChanged.connect(root.showNameWarning)
+			mainDialog.open()
 		}
 	}
 	function launchECG(mode){
@@ -92,22 +97,37 @@ WizardDialogForm {
 				scenario.create_nutrition(dataMap)
 				break;
 			}
-		root.accept()
+		mainDialog.accept()
+	}
+
+	function setHelpText(helpText){
+		helpDialog.helpText = helpText
+	}
+	function showNameWarning(){
+		nameWarningDialog.open()
+	}
+	function showConfigWarning(errorStr){
+		invalidConfigDialog.warningText = errorStr
+		invalidConfigDialog.open()
 	}
 
 	function clearWizard(){
-		root.saveButton.onClicked.disconnect(activeWizard.checkConfiguration)
-		root.onHelpRequested.disconnect(activeWizard.showHelp)
-		root.onReset.disconnect(activeWizard.resetConfiguration)
-		activeWizard.onDataReady.disconnect(root.saveData)
+		mainDialog.saveButton.onClicked.disconnect(activeWizard.checkConfiguration)
+		mainDialog.onReset.disconnect(activeWizard.resetConfiguration)
+		activeWizard.onValidConfiguration.disconnect(root.saveData)
+		activeWizard.onInvalidConfiguration.disconnect(root.showConfigWarning)
+		activeWizard.onNameChanged.disconnect(root.showNameWarning)
 		activeWizard.destroy()
 		activeWizard = null
 	}
 
-	onAccepted : {
+	mainDialog.onAccepted : {
 		root.clearWizard()
 	}
-	onRejected : {
+	mainDialog.onRejected : {
 		root.clearWizard()
+	}
+	mainDialog.onHelpRequested : {
+		helpDialog.open()
 	}
 }

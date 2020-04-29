@@ -9,9 +9,6 @@ Page {
   property alias fractionValidator : fractionValidator
   property alias neg1To1Validator : neg1To1Validator
   property alias patientDataModel : patientDataModel 
-  property alias helpDialog : helpDialog
-  property alias patientChangeWarning : patientChangeWarning
-  property alias invalidPatientWarning : invalidPatientWarning
   property alias patientGridView : patientGridView
 
   GridView {
@@ -33,8 +30,9 @@ Page {
       entryValidator : root.assignValidator(model.type)
       onInputAccepted : {
         root.patientData[model.name] = input
-        if (model.name === "Name"){
-          root.patientChanged()
+        if (model.name === "Name" && root.editMode && !nameWarningFlagged){
+          root.nameChanged()
+          nameWarningFlagged = true
         }
       }
       Component.onCompleted : {
@@ -96,152 +94,6 @@ Page {
     ListElement {name : "MaxWorkRate"; unit : "power"; type : "double"; hint : "Enter value & select unit"; valid : true }
     ListElement {name : "PainSusceptibility"; unit : ""; type : "-1To1"; hint : "Enter value in range [-1,1]"; valid : true}
     ListElement {name : "Hyperhidrosis"; unit : ""; type : "-1To1"; hint : "Enter value in range [-1,1]"; valid : true}
-  }
-
-  Dialog {
-    id : helpDialog
-    modal : true
-    closePolicy : Popup.NoAutoClose
-    width : parent.width / 2
-    height : parent.height / 3
-    anchors.centerIn : parent
-    header : Rectangle {
-      id : helpHeader
-      width : parent.width
-      height : parent.height * 0.1
-      color: "#1A5276"
-      Text {
-        id: helpHeaderText
-        anchors.fill : parent
-        text: "Patient Setup Help"
-		    font.pointSize : 10
-        leftPadding : 10
-        color: "white"
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-      }
-    }
-    footer : DialogButtonBox {
-      id : helpFooter
-      Button {
-        text : "Ok"
-        DialogButtonBox.buttonRole : DialogButtonBox.AcceptRole
-      }
-    }
-    contentItem : Rectangle {
-      id : helpMainContent
-      color : "transparent"
-		  anchors.left : parent.left;
-		  anchors.right : parent.right;
-      anchors.top : helpHeader.bottom
-      anchors.bottom : helpFooter.top
-      Text {
-        id : helpText
-        anchors.fill : parent
-        wrapMode : Text.WordWrap
-        text : "--Patient name and gender are required fields.  All other fields are optional and will be set to defaults in BioGears if not assigned. 
-                \n\n --Baseline inputs will be used as targets for the engine but final values may change during the stabilization process."
-      }
-    }
-  }
-
-  Dialog {
-    id : patientChangeWarning
-    modal : true
-    closePolicy : Popup.NoAutoClose
-    width : parent.width / 2
-    height : parent.height / 4
-    anchors.centerIn : parent
-    header : Rectangle {
-      id : patientChangeHeader
-      width : parent.width
-      height : parent.height * 0.15
-      color: "#1A5276"
-      Text {
-        id: patientChangeHeaderText
-        anchors.fill : parent
-        text: "Warning"
-		    font.pointSize : 10
-        leftPadding : 10
-        color: "white"
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-      }
-    }
-    footer : DialogButtonBox {
-      id : patientChangeFooter
-      Button {
-        text : "Ok"
-        DialogButtonBox.buttonRole : DialogButtonBox.AcceptRole
-      }
-    }
-    contentItem : Rectangle {
-      id : patientChangeMainContent
-      color : "transparent"
-		  anchors.left : parent.left;
-		  anchors.right : parent.right;
-      anchors.top : patientChangeHeader.bottom
-      anchors.bottom : patientChangeFooter.top
-      Text {
-        id : patientChangeText
-        anchors.fill : parent
-        wrapMode : Text.WordWrap
-        text : "Changing the patient name will change the file name under which data will be saved." 
-      }
-    }
-    onAccepted : {
-      close();
-    }
-  }
-
-  Dialog {
-    id : invalidPatientWarning
-    modal : true
-    closePolicy : Popup.NoAutoClose
-    width : parent.width / 2
-    height : parent.height / 5
-    anchors.centerIn : parent
-    property string warningText : ""
-    header : Rectangle {
-      id : invalidPatientHeader
-      width : parent.width
-      height : parent.height * 0.2
-      color: "#1A5276"
-      Text {
-        id: invalidPatientHeaderText
-        anchors.fill : parent
-        text: "Warning: Invalid configuration"
-		    font.pointSize : 10
-        leftPadding : 10
-        color: "white"
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-      }
-    }
-    footer : DialogButtonBox {
-      id : invalidPatientFooter
-      Button {
-        text : "Ok"
-        DialogButtonBox.buttonRole : DialogButtonBox.AcceptRole
-      }
-    }
-    contentItem : Rectangle {
-      id : invalidPatientMainContent
-      color : "transparent"
-		  anchors.left : parent.left;
-		  anchors.right : parent.right;
-      anchors.top : invalidPatientHeader.bottom
-      anchors.bottom : invalidPatientFooter.top
-      Text {
-        id : invalidPatientText
-        anchors.fill : parent
-        wrapMode : Text.WordWrap
-        text : invalidPatientWarning.warningText
-      }
-    }
-    onAccepted : {
-      close();
-    }
   }
 }
 /*##^## Designer {

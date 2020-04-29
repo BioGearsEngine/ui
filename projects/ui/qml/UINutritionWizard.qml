@@ -5,15 +5,16 @@ import QtQuick.Window 2.12
 UINutritionWizardForm {
 	id: root
 
-	signal dataReady (string type, var data)
-	signal nutritionChanged ()
+	signal validConfiguration (string type, var data)
+	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
+	signal nameChanged ()
 
 	property var nutritionData : ({})
 	property var resetData : ({})  //This will be empty strings when "new Nutrition", but when "edit Nutrition" it will be file as when first loaded
 	property bool editMode : false
-	property bool nutritionWarningFlagged : false
+	property bool nameWarningFlagged : false
 
 	Component.onCompleted : {
 		for (let i = 0; i < nutritionDataModel.count; ++i){
@@ -26,31 +27,25 @@ UINutritionWizardForm {
 		console.log('Bye wizard')
 	}
 	
-	onNutritionChanged : {
-		if (editMode && !nutritionWarningFlagged){
-			nutritionChangeWarning.open()
-			nutritionWarningFlagged = true
-		}
-	}
-
 	function checkConfiguration(){
 		let validConfiguration = true
 		for (let i = 0; i < nutritionDataModel.count; ++i){
 			let validEntry = nutritionDataModel.get(i).valid
 			if (!validEntry){
 				validConfiguration = false
+				let errorStr = ""
 				let invalidField = nutritionDataModel.get(i).name
 				if (invalidField === "Name"){
-					invalidNutritionWarning.warningText = invalidField + " is a required field."
+					errorStr = invalidField + " is a required field."
 				} else {
-					invalidNutritionWarning.warningText = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+					errorStr = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
 				}
-				invalidNutritionWarning.open()
+				root.invalidConfiguration(errorStr)
 				break;
 			}
 		}
 		if (validConfiguration){
-			root.dataReady('Nutrition', nutritionData)  //'nutrition' flag tells Wizard manager which type of data to save
+			root.validConfiguration('Nutrition', nutritionData)  //'nutrition' flag tells Wizard manager which type of data to save
 		}
 	}
 
@@ -60,10 +55,6 @@ UINutritionWizardForm {
 		}
 		resetData = Object.assign({}, nutritionData)	//Copy data to resetData ( can't do = because this does copy by reference)
 		root.loadConfiguration(nutritionData)
-	}
-
-	function showHelp (){
-		helpDialog.open()
 	}
 
 	function displayFormat (role) {

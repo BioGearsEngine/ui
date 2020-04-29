@@ -5,28 +5,22 @@ import QtQuick.Window 2.12
 UIPatientWizardForm {
 	id: root
 
-	signal dataReady (string type, var patient)
-	signal patientChanged ()
+	signal validConfiguration (string type, var data)
+	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
+	signal nameChanged ()
 
 	property var patientData : ({})
 	property var resetData : ({})  //This will be empty strings when "new Patient", but when "edit patient" it will be file as when first loaded
 	property bool editMode : false
 	property var invalidEntries: ({})
-	property bool patientWarningFlagged : false
+	property bool nameWarningFlagged : false
 
 	Component.onCompleted : {
 		for (let i = 0; i < patientDataModel.count; ++i){
 			let dataObject = {[patientDataModel.get(i).name] : [null, null]}
 			Object.assign(patientData, dataObject)
-		}
-	}
-
-	onPatientChanged : {
-		if (editMode && !patientWarningFlagged){
-			patientChangeWarning.open()
-			patientWarningFlagged = true
 		}
 	}
 
@@ -36,18 +30,19 @@ UIPatientWizardForm {
 			let validEntry = patientDataModel.get(i).valid
 			if (!validEntry){
 				validConfiguration = false
+				let errorStr = ""
 				let invalidField = patientDataModel.get(i).name
 				if (invalidField === "Name" || invalidField === "Gender"){
-					invalidPatientWarning.warningText = invalidField + " is a required field."
+					errorStr = invalidField + " is a required field."
 				} else {
-					invalidPatientWarning.warningText = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+					errorStr = invalidPatientWarning.warningText = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
 				}
-				invalidPatientWarning.open()
+				invalidConfiguration(errorStr)
 				break;
 			}
 		}
 		if (validConfiguration){
-			root.dataReady('Patient', patientData)  //'Patient' flag tells Wizard manager which type of data to save
+			root.validConfiguration('Patient', patientData)  //'Patient' flag tells Wizard manager which type of data to save
 		}
 	}
 
@@ -57,10 +52,6 @@ UIPatientWizardForm {
 		}
 		resetData = Object.assign({}, patientData)	//Copy data to resetData ( can't do = because this does copy by reference)
 		root.loadConfiguration(patientData)
-	}
-
-	function showHelp (){
-		helpDialog.open()
 	}
 
 	function displayFormat (role) {

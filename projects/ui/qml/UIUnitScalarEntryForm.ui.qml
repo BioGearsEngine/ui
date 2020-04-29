@@ -337,7 +337,7 @@ Rectangle {
     }
   }
   property var units : ({'mass' : ['lb', 'kg', 'g', 'mg','ug'],
-                         'massRate' : ['kg/min','g/s','g/min','g/day','mg/s','mg/min','ug/s','ug/min'],
+                         'massRate' : ['kg/s','g/s','g/min','g/day','mg/s','mg/min','ug/s','ug/min'],
                          'length' : ['in', 'ft', 'm', 'cm','mm','um'],
                          'volume' : ['L','mL','uL'],
                          'gender' : ['Male', 'Female'],
