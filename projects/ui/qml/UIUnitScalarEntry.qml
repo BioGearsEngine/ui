@@ -10,6 +10,14 @@ UIUnitScalarEntryForm {
   signal inputAccepted (var input)
  
   function setEntry( fromInput ){
+    //Trim decimals down to hundredths place. This is necessary when loading from an existing file, since
+    // QML interprets the QVariant [input, unit] as [number, string] when parsing a double.  When setting based off 
+    // values from the editor, we get strings from the text field.  Thus, we check if the input is typeof number
+    // before trimming.
+    if (fromInput[0]!=null && typeof fromInput[0]=="number"){
+      let formattedValue = fromInput[0].toFixed(2)
+      fromInput[0] = formattedValue
+    }
     root.entry.setFromExisting(fromInput)
   }
 

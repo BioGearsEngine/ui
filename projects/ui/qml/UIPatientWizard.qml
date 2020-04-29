@@ -23,10 +23,6 @@ UIPatientWizardForm {
 		}
 	}
 
-	Component.onDestruction : {
-		console.log('Bye wizard')
-	}
-	
 	onPatientChanged : {
 		if (editMode && !patientWarningFlagged){
 			patientChangeWarning.open()

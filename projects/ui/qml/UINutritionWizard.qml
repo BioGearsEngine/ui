@@ -6,11 +6,12 @@ UINutritionWizardForm {
 	id: root
 
 	signal dataReady (string type, var data)
-	signal nutritionChanged (string name)
+	signal nutritionChanged ()
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
 
 	property var nutritionData : ({})
+	property var resetData : ({})  //This will be empty strings when "new Nutrition", but when "edit Nutrition" it will be file as when first loaded
 	property bool editMode : false
 	property bool nutritionWarningFlagged : false
 
@@ -33,15 +34,23 @@ UINutritionWizardForm {
 	}
 
 	function checkConfiguration(){
-		let validName = false
-		if (nutritionData["Name"][0]!=null && nutritionData["Name"][0].length > 0){
-			validName = true
+		let validConfiguration = true
+		for (let i = 0; i < nutritionDataModel.count; ++i){
+			let validEntry = nutritionDataModel.get(i).valid
+			if (!validEntry){
+				validConfiguration = false
+				let invalidField = nutritionDataModel.get(i).name
+				if (invalidField === "Name"){
+					invalidNutritionWarning.warningText = invalidField + " is a required field."
+				} else {
+					invalidNutritionWarning.warningText = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+				}
+				invalidNutritionWarning.open()
+				break;
+			}
 		}
-		if (validName){
-			root.dataReady('Nutrition', nutritionData)
-		}
-		else {
-			invalidNutritionWarning.open()
+		if (validConfiguration){
+			root.dataReady('Nutrition', nutritionData)  //'nutrition' flag tells Wizard manager which type of data to save
 		}
 	}
 
@@ -49,6 +58,7 @@ UINutritionWizardForm {
 		for (let prop in nutrition){
 			nutritionData[prop] = nutrition[prop]
 		}
+		resetData = Object.assign({}, nutritionData)	//Copy data to resetData ( can't do = because this does copy by reference)
 		root.loadConfiguration(nutritionData)
 	}
 

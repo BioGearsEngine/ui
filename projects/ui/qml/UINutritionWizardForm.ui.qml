@@ -31,13 +31,22 @@ Page {
       entryValidator : root.assignValidator(model.type)
       onInputAccepted : {
         root.nutritionData[model.name] = input
-        if (entry === "Name"){
-          root.nutritionChanged(entryField.text)
+        if (model.name === "Name"){
+          root.nutritionChanged()
         }
       }
       Component.onCompleted : {
-        root.onLoadConfiguration.connect(function (nutrition) {setEntry (nutrition[model.name]) } )
-        root.onResetConfiguration.connect(reset)
+        //Binds the "valid" role of each element with the validInput property of the entry, with the exception of 
+        //"Name".  Since Name is a required input, we need to make sure it is filled.
+        if (model.name === "Name"){
+          model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0].length > 0)})
+        } else { 
+          model.valid = Qt.binding(function() {return entry.validInput}) 
+        }
+        //Connect load function of wizard (called when opening an existing nutrition file) to individual entries
+        root.onLoadConfiguration.connect(function (nutrition) { setEntry (nutrition[model.name]) } )
+        //Connect wizard reset button to entry reset functions
+        root.onResetConfiguration.connect(function () { if ( root.editMode ) { setEntry(root.resetData[model.name]); } else { reset(); } } )
       }
     }
   }
@@ -49,16 +58,16 @@ Page {
 
   ListModel {
     id : nutritionDataModel
-    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"}
-    ListElement {name : "Carbohydrate"; unit : "mass"; type : "double"; hint : "Mass of carbs to ingest"}
-    ListElement {name : "CarbohydrateDigestionRate";  unit : "massRate"; type : "double"; hint : "Carb absorption rate in GI" }
-    ListElement {name : "Protein"; unit : "mass"; type : "double"; hint : "Mass of protein to ingest"}
-    ListElement {name : "ProteinDigestionRate";  unit : "massRate"; type : "double"; hint : "Protein absorption rate in GI" }
-    ListElement {name : "Fat"; unit : "mass"; type : "double"; hint : "Mass of fat to ingest"}
-    ListElement {name : "FatDigestionRate";  unit : "massRate"; type : "double"; hint : "Fat absorption rate in GI" }
-    ListElement {name : "Calcium";  unit : "mass"; type : "double"; hint : "Amount of calcium to ingest"}
-    ListElement {name : "Sodium";  unit : "mass"; type : "double"; hint : "Amount of protein to ingest"}
-    ListElement {name : "Water";  unit : "volume"; type : "double"; hint : "Amount of water to ingest"}
+    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true}
+    ListElement {name : "Carbohydrate"; unit : "mass"; type : "double"; hint : "Mass of carbs to ingest"; valid : true}
+    ListElement {name : "CarbohydrateDigestionRate";  unit : "massRate"; type : "double"; hint : "Carb absorption rate in GI"; valid : true }
+    ListElement {name : "Protein"; unit : "mass"; type : "double"; hint : "Mass of protein to ingest"; valid : true}
+    ListElement {name : "ProteinDigestionRate";  unit : "massRate"; type : "double"; hint : "Protein absorption rate in GI"; valid : true }
+    ListElement {name : "Fat"; unit : "mass"; type : "double"; hint : "Mass of fat to ingest"; valid : true}
+    ListElement {name : "FatDigestionRate";  unit : "massRate"; type : "double"; hint : "Fat absorption rate in GI"; valid : true }
+    ListElement {name : "Calcium";  unit : "mass"; type : "double"; hint : "Amount of calcium to ingest"; valid : true}
+    ListElement {name : "Sodium";  unit : "mass"; type : "double"; hint : "Amount of protein to ingest"; valid : true}
+    ListElement {name : "Water";  unit : "volume"; type : "double"; hint : "Amount of water to ingest"; valid : true}
   }
 
   Dialog {
@@ -163,6 +172,7 @@ Page {
     width : parent.width / 2
     height : parent.height / 6
     anchors.centerIn : parent
+    property string warningText : ""
     header : Rectangle {
       id : invalidNutritionHeader
       width : parent.width
@@ -197,7 +207,7 @@ Page {
         id : invalidNutritionText
         anchors.fill : parent
         wrapMode : Text.WordWrap
-        text : "Name must be defined to save nutrition file." 
+        text : invalidNutritionWarning.warningText 
       }
     }
     onAccepted : {

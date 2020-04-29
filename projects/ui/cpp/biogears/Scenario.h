@@ -63,7 +63,7 @@ public:
 
   //Load, new, and save functions
   Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
- // Q_INVOKABLE QVariantMap edit_nutrition();
+  Q_INVOKABLE QVariantMap edit_nutrition();
   Q_INVOKABLE void export_nutrition();
   Q_INVOKABLE void create_patient(QVariantMap patient); //Create and save a new patient
   Q_INVOKABLE QVariantMap edit_patient();
