@@ -18,7 +18,7 @@ WizardDialogForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  activeWizard = patientComponent.createObject(mainDialog.contentItem, {'width' : mainDialog.contentItem.width, 'height' : mainDialog.contentItem.height, 'name' : 'activeWizard'});
+		  activeWizard = patientComponent.createObject(mainDialog.contentItem);
 			root.setHelpText("-Patient name and gender are required fields.  All other fields are optional and will be set to defaults in BioGears if not assigned. 
                 \n\n -Baseline inputs will be used as targets for the engine but final values may change during the stabilization process.")
 			if (mode === "Edit"){
@@ -58,7 +58,7 @@ WizardDialogForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  activeWizard = compoundComponent.createObject(mainDialog.contentItem, {'width' : mainDialog.contentItem.width, 'height' : mainDialog.contentItem.height, 'name' : 'activeWizard'});
+		  activeWizard = compoundComponent.createObject(mainDialog.contentItem);
 			root.setHelpText("-Compound name is required field.  All other fields are optional and will be set to 0 if not defined.")
 			if (mode === "Edit"){
 				let compound = scenario.edit_compound()
@@ -91,7 +91,7 @@ WizardDialogForm {
 		  }
 	    console.log("Error : Action dialog component not ready");
 	  } else {
-		  activeWizard = nutritionComponent.createObject(mainDialog.contentItem, {'width' : mainDialog.contentItem.width, 'height' : mainDialog.contentItem.height, 'name' : 'activeWizard'});
+		  activeWizard = nutritionComponent.createObject(mainDialog.contentItem);
 			root.setHelpText("-Nutrition name is required field.  All other fields are optional and will be set to 0 if not defined.")
 			if (mode === "Edit"){
 				let nutrition = scenario.edit_nutrition()

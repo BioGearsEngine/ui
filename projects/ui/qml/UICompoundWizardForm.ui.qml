@@ -13,15 +13,16 @@ Page {
   GridView {
     id: compoundGridView
     clip : true
+    width : parent.width
+    height : targetGridHeight < maxGridHeight ? targetGridHeight : maxGridHeight
     model : compoundDataModel
     anchors.top : parent.top
     anchors.left : parent.left
     anchors.right : parent.right
-    anchors.bottom : addComponentButton.top
-    
-   // anchors.fill : parent
-    cellHeight : parent.height / 10
-    cellWidth : parent.width / 2
+    property var targetGridHeight : (Math.floor(count / 2) + count % 2) * cellHeight
+    property var maxGridHeight : parent.height - addComponentButton.height
+    cellHeight : 60
+    cellWidth : width / 2
     ScrollIndicator.vertical: ScrollIndicator { }
 
     delegate : UIUnitScalarEntry {
@@ -58,9 +59,10 @@ Page {
   Button {
     id : addComponentButton
     width : parent.width / 4
-    height : 60
+    height : 40
     text : "Add Component"
-    anchors.bottom : parent.bottom
+    anchors.top : compoundGridView.bottom
+    anchors.horizontalCenter : parent.horizontalCenter
     onClicked : {
       let newComponent = {name: "Component", unit: "concentration", type: "double", hint: "", valid: true}
       compoundDataModel.append(newComponent)
