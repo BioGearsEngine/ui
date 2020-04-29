@@ -61,6 +61,7 @@ Rectangle {
       property bool validInput : true   //Input will always be valid (even if no option is chosen, most data is optional).  Exception is Gender, but we handle this in PatientWizard
       property var reset : function() {enumInput.currentIndex = -1}
       property var setFromExisting : function (existing) { if(existing[0] != null) {enumInput.currentIndex = existing[0]} }
+      property var enumModel : scalarEntry.units[unit]
       Layout.fillWidth : true
       Layout.fillHeight : true
       spacing : 5
@@ -80,7 +81,7 @@ Rectangle {
         Layout.preferredWidth : prefWidth * 0.5
         Layout.preferredHeight : prefHeight * 0.7 - enumColumn.spacing / 2
         Layout.alignment: Qt.AlignHCenter
-        model : scalarEntry.units[unit]
+        model : enumModel
         flat : true
         font.pointSize : 9
         currentIndex : -1
@@ -97,16 +98,19 @@ Rectangle {
             text : modelData
             verticalAlignment : Text.AlignVCenter;
             horizontalAlignment : Text.AlignHCenter;
-            font.pointSize : 8;
+            leftPadding : 0
+            font.pointSize: 8;
+            font.italic : modelData==='-Clear-'
           }
           height : enumInput.height
-          width : enumInput.width
+          width : enumPopup.width
           highlighted : enumInput.highlightedIndex === index;
         }
         popup: Popup {
-          x: enumInput.indicator.width
+          id : enumPopup
+          x: 2 * enumInput.indicator.width
           y: enumInput.height - 5
-          width: enumInput.width - enumInput.indicator.width
+          width: enumInput.width - enumPopup.x
           implicitHeight: contentItem.implicitHeight
           padding: 1
           contentItem: ListView {
@@ -141,8 +145,19 @@ Rectangle {
               context.fill();
           }
         }
+        Component.onCompleted : {
+          //Add 'Clear' option to combo box that resets it.  Apparently Combobox binding to model is not dynamic(?),
+          // or the way I set up the units prop makes it where the binding does not work.  So we push 'Clear' on to option
+          // array and then reset the model.  This also requires us to reassert currentIndex = -1.  We could also
+          // put 'Clear' at the end of each array in the units prop but I don't like how that looks
+          enumModel.push('-Clear-')
+          enumInput.model = scalarEntry.units[unit]
+          enumInput.currentIndex = -1
+        }
         onActivated : {
-          if (validInput){
+          if (currentText==='-Clear-'){
+            enumColumn.reset()
+          } else if (validInput){
             root.inputAccepted(userInput)
           }
         }
@@ -212,6 +227,7 @@ Rectangle {
       property var reset : function() {scalarInput.clear(); unitInput.currentIndex = -1}
       property var setFromExisting : function (existing) {  if (existing[0]) { scalarInput.text = existing[0];
                                                             unitInput.currentIndex = unitInput.find(existing[1]); } }
+      property var unitModel : scalarEntry.units[unit]
       columns : 2
       rows : 2
       Layout.fillWidth : true
@@ -268,7 +284,7 @@ Rectangle {
         Layout.preferredWidth : prefWidth * 0.25
         Layout.preferredHeight : prefHeight * 0.7 - scalarUnitGrid.columnSpacing / 2
         Layout.alignment: Qt.AlignHCenter
-        model : scalarEntry.units[unit]
+        model : unitModel
         flat : true
         font.pointSize : 7
         currentIndex : -1
@@ -282,18 +298,21 @@ Rectangle {
           //Controls the look of text in the combo box menu.  
           contentItem : Text {
             text : modelData
+            leftPadding: 0
             verticalAlignment : Text.AlignVCenter;
-            horizontalAlignment : Text.AlignLeft;
-            font: unitInput.font;
+            horizontalAlignment : Text.AlignHCenter;
+            font.pointSize: unitInput.font.pointSize;
+            font.italic : modelData==='-Clear-'
           }
           height : unitInput.height
-          width : unitInput.width
+          width : unitPopup.width
           highlighted : unitInput.highlightedIndex === index;
         }
         popup: Popup {
+          id : unitPopup
           x: unitInput.indicator.width
           y: unitInput.height - 5
-          width: unitInput.width - unitInput.indicator.width
+          width: unitInput.width - unitPopup.x
           implicitHeight: contentItem.implicitHeight
           padding: 1
           contentItem: ListView {
@@ -328,8 +347,19 @@ Rectangle {
               context.fill();
           }
         }
+        Component.onCompleted : {
+          //Add 'Clear' option to combo box that resets it.  Apparently Combobox binding to model is not dynamic(?),
+          // or the way I set up the units prop makes it where the binding does not work.  So we push 'Clear' on to option
+          // array and then reset the model.  This also requires us to reassert currentIndex = -1.  We could also
+          // put 'Clear' at the end of each array in the units prop but I don't like how that looks
+          unitModel.push('-Clear-')
+          unitInput.model = scalarEntry.units[unit]
+          unitInput.currentIndex = -1
+        }
         onActivated : {
-          if (validInput){
+          if (currentText==='-Clear-'){
+            scalarUnitGrid.reset()
+          } else if (validInput){
             root.inputAccepted(userInput)
           }
         }
