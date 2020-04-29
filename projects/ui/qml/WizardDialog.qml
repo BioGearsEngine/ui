@@ -49,7 +49,37 @@ WizardDialogForm {
 		console.log(mode)
 	}
 	function launchCompound(mode) {
-		console.log(mode)
+		mainDialog.title = 'Compound Wizard'
+		let compoundComponent = Qt.createComponent("UICompoundWizard.qml");
+		if ( compoundComponent.status != Component.Ready){
+		  if (compoundComponent.status == Component.Error){
+			  console.log("Error : " + compoundComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : Action dialog component not ready");
+	  } else {
+		  activeWizard = compoundComponent.createObject(mainDialog.contentItem, {'width' : mainDialog.contentItem.width, 'height' : mainDialog.contentItem.height, 'name' : 'activeWizard'});
+			root.setHelpText("-Compound name is required field.  All other fields are optional and will be set to 0 if not defined.")
+			if (mode === "Edit"){
+				let compound = scenario.edit_compound()
+				if (Object.keys(compound).length == 0){
+					//We get an empty compound object if the user closed file explorer without selecting a compound
+					activeWizard.destroy()
+					return;
+				} else {
+					activeWizard.mergeCompoundData(compound)
+					activeWizard.editMode = true
+				}
+			}
+			//Connect standard dialog buttons to compound functions
+		  mainDialog.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			mainDialog.onReset.connect(activeWizard.resetConfiguration)
+			//Notify dialog that compound is ready
+			activeWizard.onValidConfiguration.connect(root.saveData)
+			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
+			activeWizard.onNameChanged.connect(root.showNameWarning)
+			mainDialog.open()
+		}
 	}
 	function launchNutrition(mode) {
 		mainDialog.title = 'Nutrition Wizard'

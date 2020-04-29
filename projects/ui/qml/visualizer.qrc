@@ -44,6 +44,10 @@
         <file>PatientMenuForm.ui.qml</file>
         <file>UINutritionWizard.qml</file>
         <file>UINutritionWizardForm.ui.qml</file>
+        <file>UICompoundWizard.qml</file>
+        <file>UICompoundWizardForm.ui.qml</file>
+        <file>UISubstanceEntry.qml</file>
+        <file>UISubstanceEntryForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
