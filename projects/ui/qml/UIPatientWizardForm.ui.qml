@@ -47,8 +47,9 @@ Page {
         }
         //Connect load function of wizard (called when opening an existing patient) to individual entries
         root.onLoadConfiguration.connect(function (patient) { setEntry (patient[model.name]) } )
-        //Connect wizard reset button to entry reset functions
-        root.onResetConfiguration.connect(function () { if ( root.editMode ) { setEntry(root.resetData[model.name]); } else { reset(); } } )
+        //Connect wizard reset button to entry reset functions -- if we are editing an existing patient, then restore
+        //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
+        root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
       }
     }
   }
