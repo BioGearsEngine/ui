@@ -18,34 +18,43 @@ Page {
     cellWidth : parent.width / 2
     ScrollIndicator.vertical: ScrollIndicator { }
 
-    delegate : UIUnitScalarEntry {
-      prefWidth : nutritionGridView.cellWidth * 0.9
-      prefHeight : nutritionGridView.cellHeight * 0.95
-      label : root.displayFormat(model.name)
-      unit : model.unit
-      type : model.type
-      hintText : model.hint
-      entryValidator : root.assignValidator(model.type)
-      onInputAccepted : {
-        root.nutritionData[model.name] = input
-        if (model.name === "Name" && root.editMode && !nameWarningFlagged){
-          root.nameChanged()
-          nameWarningFlagged = true
+    delegate : Item {
+      //Wrapping scalar entry in an item helps us center the rectangle inside the gridview cell.  If we tried to
+      // anchor in center without this, every delegate instance would center itself in the middle of the view (not
+      // the middle of the individual cell)
+      id: delegateWrapper
+      width : nutritionGridView.cellWidth
+      height : nutritionGridView.cellHeight
+      UIUnitScalarEntry {
+        anchors.centerIn : parent
+        prefWidth : nutritionGridView.cellWidth * 0.9
+        prefHeight : nutritionGridView.cellHeight * 0.95
+        label : root.displayFormat(model.name)
+        unit : model.unit
+        type : model.type
+        hintText : model.hint
+        entryValidator : root.assignValidator(model.type)
+        onInputAccepted : {
+          root.nutritionData[model.name] = input
+          if (model.name === "Name" && root.editMode && !nameWarningFlagged){
+            root.nameChanged()
+            nameWarningFlagged = true
+          }
         }
-      }
-      Component.onCompleted : {
-        //Binds the "valid" role of each element with the validInput property of the entry, with the exception of 
-        //"Name".  Since Name is a required input, we need to make sure it is filled.
-        if (model.name === "Name"){
-          model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0].length > 0)})
-        } else { 
-          model.valid = Qt.binding(function() {return entry.validInput}) 
+        Component.onCompleted : {
+          //Binds the "valid" role of each element with the validInput property of the entry, with the exception of 
+          //"Name".  Since Name is a required input, we need to make sure it is filled.
+          if (model.name === "Name"){
+            model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0].length > 0)})
+          } else { 
+            model.valid = Qt.binding(function() {return entry.validInput}) 
+          }
+          //Connect load function of wizard (called when opening an existing nutrition file) to individual entries
+          root.onLoadConfiguration.connect(function (nutrition) { setEntry (nutrition[model.name]) } )
+          //Connect wizard reset button to entry reset functions -- if we are editing an existing nutrition file, then restore
+          //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
+          root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
         }
-        //Connect load function of wizard (called when opening an existing nutrition file) to individual entries
-        root.onLoadConfiguration.connect(function (nutrition) { setEntry (nutrition[model.name]) } )
-        //Connect wizard reset button to entry reset functions -- if we are editing an existing nutrition file, then restore
-        //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-        root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
       }
     }
   }

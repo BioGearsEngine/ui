@@ -8,7 +8,7 @@ UIUnitScalarEntryForm {
 
   signal nameUpdated (string name)
   signal inputAccepted (var input)
- 
+
   function setEntry( fromInput ){
     //Trim decimals down to hundredths place. This is necessary when loading from an existing file, since
     // QML interprets the QVariant [input, unit] as [number, string] when parsing a double.  When setting based off 

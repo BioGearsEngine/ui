@@ -518,9 +518,10 @@ double Scenario::get_simulation_time()
 //---------------------------------------------------------------------------------
 void Scenario::substances_to_lists()
 {
-  _drugs_list.clear();
-  _compounds_list.clear();
-  _transfusions_list.clear();
+  _drugs_list.clear(); //Substances with pharmacokinetic/pharmacodynamic props
+  _compounds_list.clear(); //Consist of a combination of components
+  _transfusions_list.clear(); //Blood products to be transfused
+  _components_list.clear(); //Substances elibigle to be added as components to compounds
 
   QDir subDirectory = QDir("substances");
   std::unique_ptr<CDM::ObjectData> subXmlData;
@@ -543,6 +544,9 @@ void Scenario::substances_to_lists()
         if (subData != nullptr) {
           if (subData->Pharmacodynamics().present() && subData->Pharmacokinetics().present()) {
             _drugs_list.append(QString::fromStdString(subData->Name()));
+          }
+          if (subData->State().present() && subData->State().get() != CDM::enumSubstanceState::Solid) {
+            _components_list.append(QString::fromStdString(subData->Name()));
           }
           continue;
         }
@@ -575,6 +579,11 @@ QVector<QString> Scenario::get_compounds()
 QVector<QString> Scenario::get_transfusion_products()
 {
   return _transfusions_list;
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::get_components()
+{
+  return _components_list;
 }
 //---------------------------------------------------------------------------------
 QtLogForward* Scenario::getLogFoward()

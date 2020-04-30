@@ -1,6 +1,8 @@
 import QtQuick.Controls 2.12
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
+import QtGraphicalEffects 1.12
+import com.biogearsengine.ui.scenario 1.0
 
 Page {
   id : compoundWizard
@@ -10,62 +12,94 @@ Page {
   property alias compoundGridView : compoundGridView
   property alias addComponent : addComponentButton
 
+  UIUnitScalarEntry {
+    id : compoundName
+    prefWidth : parent.width / 2 * 0.9
+    prefHeight : 60 * 0.95
+    anchors.top : parent.top
+    anchors.horizontalCenter : parent.horizontalCenter
+    label : "Compound Name"
+    unit : ""
+    type : "string"
+    hintText : "Required*"
+  }
+
   GridView {
     id: compoundGridView
     clip : true
     width : parent.width
     height : targetGridHeight < maxGridHeight ? targetGridHeight : maxGridHeight
     model : compoundDataModel
-    anchors.top : parent.top
+    anchors.top : compoundName.bottom
+    anchors.topMargin : 10
     anchors.left : parent.left
     anchors.right : parent.right
+    currentIndex: -1
     property var targetGridHeight : (Math.floor(count / 2) + count % 2) * cellHeight
-    property var maxGridHeight : parent.height - addComponentButton.height
+    property var maxGridHeight : parent.height - buttonGroup.height
     cellHeight : 60
     cellWidth : width / 2
     ScrollIndicator.vertical: ScrollIndicator { }
-
-    delegate : UIUnitScalarEntry {
-      prefWidth : compoundGridView.cellWidth * 0.9
-      prefHeight : compoundGridView.cellHeight * 0.95
-      //label : root.displayFormat(model.name)
-      unit : model.unit
-      type : model.type
-      hintText : model.hint
-      //entryValidator : root.assignValidator(model.type)
-      onInputAccepted : {
-        root.compoundData[model.name] = input
-        if (model.name === "Name" && root.editMode && !nameWarningFlagged){
-          root.nameChanged()
-          nameWarningFlagged = true
+    delegate : Item {
+      //Wrapping scalar entry in an item helps us center the rectangle inside the gridview cell.  If we tried to
+      // anchor in center without this, every delegate instance would center itself in the middle of the view (not
+      // the middle of the individual cell)
+      id: delegateWrapper
+      width : compoundGridView.cellWidth
+      height : compoundGridView.cellHeight
+      UISubstanceEntry {
+        id : substanceEntryDelegate
+        anchors.centerIn : parent
+        prefWidth : compoundGridView.cellWidth * 0.875 //Tuned to get the remove icon to fit
+        prefHeight : compoundGridView.cellHeight * 0.85
+        //label : root.displayFormat(model.name)
+        unit : model.unit
+        type : model.type
+        hintText : model.hint
+        //entryValidator : root.assignValidator(model.type)
+        onInputAccepted : {
+          root.compoundData[model.name] = input
+          if (model.name === "Name" && root.editMode && !nameWarningFlagged){
+            root.nameChanged()
+            nameWarningFlagged = true
+          }
         }
       }
-      Component.onCompleted : {
-        //Binds the "valid" role of each element with the validInput property of the entry, with the exception of 
-        //"Name".  Since Name is a required input, we need to make sure it is filled.
-        if (model.name === "Name"){
-          model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0].length > 0)})
-        } else { 
-          model.valid = Qt.binding(function() {return entry.validInput}) 
+      Image {
+        id: removeIcon
+        source : "icons/remove.png"
+        sourceSize.width : 15
+        sourceSize.height: 15
+        MouseArea {
+          anchors.fill : parent
+          cursorShape : Qt.PointingHandCursor
+          acceptedButtons : Qt.LeftButton
+          onClicked: {  
+            compoundDataModel.remove(index)
+          }
         }
-        //Connect load function of wizard (called when opening an existing compound file) to individual entries
-        root.onLoadConfiguration.connect(function (compound) { setEntry (compound[model.name]) } )
-        //Connect wizard reset button to entry reset functions
-        root.onResetConfiguration.connect(function () { if ( root.editMode ) { setEntry(root.resetData[model.name]); } else { reset(); } } )
       }
     }
   }
-
-  Button {
-    id : addComponentButton
-    width : parent.width / 4
+  
+  Rectangle {
+    //Using a transparent rectangle to group buttons instead of a row because row does not play nice with anchors
+    id : buttonGroup
+    width : parent.width
     height : 40
-    text : "Add Component"
     anchors.top : compoundGridView.bottom
-    anchors.horizontalCenter : parent.horizontalCenter
-    onClicked : {
-      let newComponent = {name: "Component", unit: "concentration", type: "double", hint: "", valid: true}
-      compoundDataModel.append(newComponent)
+    color : "transparent"
+    Button {
+      id : addComponentButton
+      width : parent.width / 4
+      height : parent.height
+      text : "Add Component"
+      anchors.horizontalCenter : parent.horizontalCenter
+      anchors.rightMargin : 5
+      onClicked : {
+        let newComponent = {name: "Component", unit: "concentration", type: "double", hint: "", valid: true}
+        compoundDataModel.append(newComponent)
+      }
     }
   }
 
@@ -76,7 +110,6 @@ Page {
 
   ListModel {
     id : compoundDataModel
-    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true}
   }
 }
 /*##^## Designer {

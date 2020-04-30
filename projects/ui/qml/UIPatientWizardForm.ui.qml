@@ -20,36 +20,45 @@ Page {
     cellWidth : parent.width / 2
     ScrollIndicator.vertical: ScrollIndicator { }
 
-    delegate : UIUnitScalarEntry {
-      prefWidth : patientGridView.cellWidth * 0.9
-      prefHeight : patientGridView.cellHeight * 0.95
-      label : root.displayFormat(model.name)
-      unit : model.unit
-      type : model.type
-      hintText : model.hint
-      entryValidator : root.assignValidator(model.type)
-      onInputAccepted : {
-        root.patientData[model.name] = input
-        if (model.name === "Name" && root.editMode && !nameWarningFlagged){
-          root.nameChanged()
-          nameWarningFlagged = true
+    delegate : Item {
+      //Wrapping scalar entry in an item helps us center the rectangle inside the gridview cell.  If we tried to
+      // anchor in center without this, every delegate instance would center itself in the middle of the view (not
+      // the middle of the individual cell)
+      id: delegateWrapper
+      width : patientGridView.cellWidth
+      height : patientGridView.cellHeight
+      UIUnitScalarEntry {
+        anchors.centerIn : parent
+        prefWidth : patientGridView.cellWidth * 0.9
+        prefHeight : patientGridView.cellHeight * 0.95
+        label : root.displayFormat(model.name)
+        unit : model.unit
+        type : model.type
+        hintText : model.hint
+        entryValidator : root.assignValidator(model.type)
+        onInputAccepted : {
+          root.patientData[model.name] = input
+          if (model.name === "Name" && root.editMode && !nameWarningFlagged){
+            root.nameChanged()
+            nameWarningFlagged = true
+          }
         }
-      }
-      Component.onCompleted : {
-        //Binds the "valid" role of each element with the validInput property of the entry, with the exception of 
-        //"Name" and "Gender".  Since they are required inputs, we need to make sure they are filled.
-        if (model.name === "Name"){
-          model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0].length > 0)})
-        } else if (model.name === "Gender"){
-          model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0]!=-1) } )
-        } else { 
-          model.valid = Qt.binding(function() {return entry.validInput}) 
+        Component.onCompleted : {
+          //Binds the "valid" role of each element with the validInput property of the entry, with the exception of 
+          //"Name" and "Gender".  Since they are required inputs, we need to make sure they are filled.
+          if (model.name === "Name"){
+            model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0].length > 0)})
+          } else if (model.name === "Gender"){
+            model.valid = Qt.binding(function() {return (entry.userInput[0]!= null && entry.userInput[0]!=-1) } )
+          } else { 
+            model.valid = Qt.binding(function() {return entry.validInput}) 
+          }
+          //Connect load function of wizard (called when opening an existing patient) to individual entries
+          root.onLoadConfiguration.connect(function (patient) { setEntry (patient[model.name]) } )
+          //Connect wizard reset button to entry reset functions -- if we are editing an existing patient, then restore
+          //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
+          root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
         }
-        //Connect load function of wizard (called when opening an existing patient) to individual entries
-        root.onLoadConfiguration.connect(function (patient) { setEntry (patient[model.name]) } )
-        //Connect wizard reset button to entry reset functions -- if we are editing an existing patient, then restore
-        //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-        root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
       }
     }
   }

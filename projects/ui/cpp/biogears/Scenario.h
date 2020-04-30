@@ -88,6 +88,7 @@ public:
   Q_INVOKABLE QVector<QString> get_drugs();
   Q_INVOKABLE QVector<QString> get_compounds();
   Q_INVOKABLE QVector<QString> get_transfusion_products();
+  Q_INVOKABLE QVector<QString> get_components();
 
   Q_INVOKABLE QtLogForward* getLogFoward();
 
@@ -176,6 +177,7 @@ private:
   QVector<QString> _drugs_list;
   QVector<QString> _compounds_list;
   QVector<QString> _transfusions_list;
+  QVector<QString> _components_list;
 
   BioGearsData* _physiology_model;
 

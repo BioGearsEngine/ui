@@ -151,7 +151,7 @@ Rectangle {
           // array and then reset the model.  This also requires us to reassert currentIndex = -1.  We could also
           // put 'Clear' at the end of each array in the units prop but I don't like how that looks
           enumModel.push('-Clear-')
-          enumInput.model = scalarEntry.units[unit]
+          enumInput.model = enumModel
           enumInput.currentIndex = -1
         }
         onActivated : {
@@ -353,7 +353,7 @@ Rectangle {
           // array and then reset the model.  This also requires us to reassert currentIndex = -1.  We could also
           // put 'Clear' at the end of each array in the units prop but I don't like how that looks
           unitModel.push('-Clear-')
-          unitInput.model = scalarEntry.units[unit]
+          unitInput.model = unitModel
           unitInput.currentIndex = -1
         }
         onActivated : {
@@ -366,6 +366,8 @@ Rectangle {
       }
     }
   }
+
+
   property var units : ({'mass' : ['lb', 'kg', 'g', 'mg','ug'],
                          'massRate' : ['kg/s','g/s','g/min','g/day','mg/s','mg/min','ug/s','ug/min'],
                          'length' : ['in', 'ft', 'm', 'cm','mm','um'],
@@ -377,7 +379,9 @@ Rectangle {
                          'time' : ['yr', 'hr','min','s'],
                          'pressure' : ['mmHg', 'cmH2O'],
                          'area' : ['cm^2', 'm^2'],
-                         'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr']})
+                         'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr'],
+                         'concentration': ['g/L', 'g/dL','g/mL', 'mg/L','mg/dL','ug/L'] 
+                         })
 
 }
 

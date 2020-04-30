@@ -146,23 +146,7 @@ ColumnLayout {
       model : actionSwitchModel  //Defined in Controls.qml
     }
   }
-/*  Component.onCompleted: {
-    patientMenu.loadState("DefaultMale@0s.xml")
-    patientText.text = "Patient: DefaultMale@0s"
-    var list = biogears_scenario.get_nested_patient_state_list();
-    var nlist = []
-    for (var i = 0;i < list.length;++i) {
-      var split_files = list[i].split(",")
-      var patient_name = split_files.shift()
-      var split_objects = []
-      for (var k = 0;k < split_files.length;++k) {
-        split_objects.push({"propName" : split_files[k]})
-      }
-      var menu_entry = {"patientName" : patient_name, "props" : split_objects}
-      patientMenuListModel.append(menu_entry)
-    }
-  }*/
-  }
+}
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}
 }
