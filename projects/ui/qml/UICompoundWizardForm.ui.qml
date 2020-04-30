@@ -10,7 +10,7 @@ Page {
   property alias doubleValidator : doubleValidator
   property alias compoundDataModel : compoundDataModel 
   property alias compoundGridView : compoundGridView
-  property alias addComponent : addComponentButton
+ // property alias addComponent : addComponentButton
 
   UIUnitScalarEntry {
     id : compoundName
@@ -36,7 +36,7 @@ Page {
     anchors.right : parent.right
     currentIndex: -1
     property var targetGridHeight : (Math.floor(count / 2) + count % 2) * cellHeight
-    property var maxGridHeight : parent.height - buttonGroup.height
+    property var maxGridHeight : parent.height - addComponent.height
     cellHeight : 60
     cellWidth : width / 2
     ScrollIndicator.vertical: ScrollIndicator { }
@@ -83,22 +83,36 @@ Page {
   }
   
   Rectangle {
-    //Using a transparent rectangle to group buttons instead of a row because row does not play nice with anchors
-    id : buttonGroup
-    width : parent.width
+    id : addComponent
+    width: parent.width
     height : 40
     anchors.top : compoundGridView.bottom
     color : "transparent"
-    Button {
-      id : addComponentButton
-      width : parent.width / 4
-      height : parent.height
-      text : "Add Component"
-      anchors.horizontalCenter : parent.horizontalCenter
-      anchors.rightMargin : 5
-      onClicked : {
-        let newComponent = {name: "Component", unit: "concentration", type: "double", hint: "", valid: true}
-        compoundDataModel.append(newComponent)
+    Rectangle {
+      id : lineRectangle
+      width : parent.width - 60
+      height : 2
+      anchors.left : parent.left
+      anchors.verticalCenter : parent.verticalCenter
+      border.color : "black"
+      color : "black"
+    }
+    Image {
+      id: addIcon
+      source : "icons/add.png"
+      sourceSize.width : 30
+      sourceSize.height: 30
+      anchors.verticalCenter : parent.verticalCenter
+      anchors.right : parent.right
+      anchors.rightMargin : sourceSize.width / 2
+      MouseArea {
+        anchors.fill : parent
+        cursorShape : Qt.PointingHandCursor
+        acceptedButtons : Qt.LeftButton
+        onClicked: {  
+          let newComponent = {name: "Component", unit: "concentration", type: "double", hint: "", valid: true}
+          compoundDataModel.append(newComponent)
+        }
       }
     }
   }

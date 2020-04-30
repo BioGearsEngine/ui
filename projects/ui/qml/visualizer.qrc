@@ -66,5 +66,6 @@
         <file alias="menu.png">img/menu.png</file>
         <file alias="biogears_logo.png">img/biogears_logo_400_400.png</file>
         <file alias="remove.png">img/remove.png</file>
+        <file alias="add.png">img/add.png</file>
     </qresource>
 </RCC>
