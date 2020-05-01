@@ -6,7 +6,6 @@ import QtQuick.Controls.Material 2.3
 UIUnitScalarEntryForm {
   id: root
 
-  signal nameUpdated (string name)
   signal inputAccepted (var input)
 
   function setEntry( fromInput ){
@@ -18,7 +17,6 @@ UIUnitScalarEntryForm {
       let formattedValue = fromInput[0].toFixed(2)
       fromInput[0] = formattedValue
     }
-    console.log(fromInput)
     root.entry.setFromExisting(fromInput)
   }
 

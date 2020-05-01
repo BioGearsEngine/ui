@@ -28,6 +28,7 @@ WizardDialogForm {
 					activeWizard.destroy()
 					return;
 				} else {
+					activeWizard.patientGridView.forceLayout() //Ensure that all grid view components are completed or else we will not have a place to put the data
 					activeWizard.mergePatientData(patient)
 					activeWizard.editMode = true
 				}
@@ -100,6 +101,7 @@ WizardDialogForm {
 					activeWizard.destroy()
 					return;
 				} else {
+					activeWizard.nutritionGridView.forceLayout() //Ensure that all grid view components are completed or else we will not have a place to put the data
 					activeWizard.mergeNutritionData(nutrition)
 					activeWizard.editMode = true
 				}
