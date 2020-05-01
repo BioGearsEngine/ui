@@ -18,6 +18,7 @@ UIUnitScalarEntryForm {
       let formattedValue = fromInput[0].toFixed(2)
       fromInput[0] = formattedValue
     }
+    console.log(fromInput)
     root.entry.setFromExisting(fromInput)
   }
 

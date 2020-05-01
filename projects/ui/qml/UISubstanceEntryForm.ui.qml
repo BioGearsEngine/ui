@@ -8,6 +8,7 @@ Rectangle {
   id: substanceEntry
   //Property aliases
   //Properties -- used to customize look and functionality of component
+  property var entry : substanceUnitGrid
   property real prefWidth : parent.width
   property real prefHeight : substanceEntry.implicitHeight
   property string label : "Default"
@@ -21,9 +22,9 @@ Rectangle {
   width : prefWidth
   color : "transparent"
   border.width : 2
- // state : "standard"
+  state : "standard"
 
-/*  states : [ 
+  states : [ 
       State {
         name : "standard"; when : !root.entry.editing && root.entry.validInput
         PropertyChanges {target : substanceEntry; border.color : "black"}
@@ -37,24 +38,26 @@ Rectangle {
         PropertyChanges {target : substanceEntry; border.color : "red"}
       }
     ]
-  */
+  
 
   GridLayout {
     id : substanceUnitGrid
-    property var userInput: [scalarInput.text, unitInput.currentText]
-    property bool editing : scalarInput.activeFocus || unitInput.activeFocus
-    property bool validInput : (scalarInput.text.length > 0 && unitInput.currentIndex > -1)
-                                || (scalarInput.text.length == 0 && unitInput.currentIndex == -1)
-    property var reset : function() {scalarInput.clear(); unitInput.currentIndex = -1}
-    property var setFromExisting : function (existing) {  if (existing[0]) { scalarInput.text = existing[0];
-                                                          unitInput.currentIndex = unitInput.find(existing[1]); } }
+    property var userInput: [substanceInput.currentText, scalarInput.text, unitInput.currentText]
+    property bool editing : substanceInput.activeFocus || scalarInput.activeFocus || unitInput.activeFocus
+    property bool validInput : (substanceInput.currentIndex > -1 && scalarInput.text.length > 0 && unitInput.currentIndex > -1)
+                                || (substanceInput.currentIndex == -1 && scalarInput.text.length == 0 && unitInput.currentIndex == -1)
+    property var reset : function() {substanceInput.currentIndex = -1; scalarInput.clear(); unitInput.currentIndex = -1}
+    property var setFromExisting : function (existing) {  if (existing[0]) {
+                                                            substanceInput.currentIndex = substanceInput.find(existing[0])
+                                                            scalarInput.text = existing[1];
+                                                            unitInput.currentIndex = unitInput.find(existing[2]); } }
     property var unitModel : substanceEntry.units[unit]
     columns : 2
     rows : 2
     Layout.fillWidth : true
     Layout.fillHeight : true
-    columnSpacing : 5
-    rowSpacing : 5
+    columnSpacing : 0
+    rowSpacing : 0
    
     ComboBox {
       id: substanceInput
@@ -62,11 +65,11 @@ Rectangle {
       Layout.preferredWidth : prefWidth * 0.8
       Layout.alignment : Qt.AlignHCenter
       Layout.columnSpan : 2
-      Layout.preferredHeight : prefHeight * 0.5 - substanceUnitGrid.columnSpacing / 2
+      Layout.preferredHeight : prefHeight * 0.5
       model : componentListModel
       font.pointSize : 9
       contentItem : Text {
-        text : substanceInput.currentIndex == -1 ? '-Substance-' : substanceInput.displayText
+        text : substanceInput.currentIndex == -1 ? '-Substance-' : substanceInput.editText
         font : substanceInput.font
         verticalAlignment : Text.AlignVCenter
         horizontalAlignment : Text.AlignHCenter
@@ -133,12 +136,20 @@ Rectangle {
           let element = { "component" : components[i] }
           componentListModel.append(element)
         }
-      } 
+        componentListModel.append({"component" : "-Clear-"})
+      }
+      onActivated : {
+        if (currentText==='-Clear-'){
+          currentIndex = -1
+        } else if (substanceUnitGrid.validInput){
+          root.inputAccepted(substanceUnitGrid.userInput)
+        }
+      }
     }
     TextField {
       id : scalarInput
-      Layout.preferredWidth : prefWidth * 0.6 - substanceUnitGrid.rowSpacing / 2
-      Layout.preferredHeight : prefHeight * 0.5 - substanceUnitGrid.columnSpacing / 2
+      Layout.preferredWidth : prefWidth * 0.6
+      Layout.preferredHeight : prefHeight * 0.5
       leftPadding : 10
       topPadding : 0
       bottomPadding : 0
@@ -152,15 +163,15 @@ Rectangle {
         border.width : 0
       }
       onEditingFinished : {
-        if (validInput){
-          root.inputAccepted(userInput)
+        if (substanceUnitGrid.validInput){
+          root.inputAccepted(substanceUnitGrid.userInput)
         }
       }
     }
     ComboBox {
       id : unitInput
       Layout.preferredWidth : prefWidth * 0.3
-      Layout.preferredHeight : prefHeight * 0.5 - substanceUnitGrid.columnSpacing / 2
+      Layout.preferredHeight : prefHeight * 0.5
       Layout.alignment: Qt.AlignHCenter
       model : substanceUnitGrid.unitModel
       flat : true
@@ -236,9 +247,9 @@ Rectangle {
       }
       onActivated : {
         if (currentText==='-Clear-'){
-          substanceUnitGrid.reset()
-        } else if (validInput){
-          root.inputAccepted(userInput)
+          currentIndex = -1
+        } else if (substancdUnitGrid.validInput){
+          root.inputAccepted(substanceUnitGrid.userInput)
         }
       }
     }

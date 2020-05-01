@@ -6,7 +6,6 @@ import QtQuick.Controls.Material 2.3
 UISubstanceEntryForm {
   id: root
 
-  signal nameUpdated (string name)
   signal inputAccepted (var input)
  
   function setEntry( fromInput ){
@@ -14,8 +13,8 @@ UISubstanceEntryForm {
     // QML interprets the QVariant [input, unit] as [number, string] when parsing a double.  When setting based off 
     // values from the editor, we get strings from the text field.  Thus, we check if the input is typeof number
     // before trimming.
-    if (fromInput[0]!=null && typeof fromInput[0]=="number"){
-      let formattedValue = fromInput[0].toFixed(2)
+    if (fromInput[0]!=null && typeof fromInput[1]=="number"){
+      let formattedValue = fromInput[1].toFixed(2)
       fromInput[0] = formattedValue
     }
     root.entry.setFromExisting(fromInput)

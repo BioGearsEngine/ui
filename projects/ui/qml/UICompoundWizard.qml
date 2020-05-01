@@ -9,9 +9,9 @@ UICompoundWizardForm {
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
-	signal nameChanged ()
 
-	property var compoundData : ({})
+	property string name : ""			//Store name separate from list of compounds (easier to loop through compounds in Scenario.cpp)
+	property var compoundList : ({})
 	property var resetData : ({})  //This will be empty strings when "new Compound", but when "edit Compound" it will be file as when first loaded
 	property bool editMode : false
 	property bool nameWarningFlagged : false
@@ -20,13 +20,6 @@ UICompoundWizardForm {
 		console.log('Bye wizard')
 	}
 	
-	
-	Component.onCompleted : {
-		for (let i = 0; i < compoundDataModel.count; ++i){
-			let dataObject = {[compoundDataModel.get(i).name] : [null, null]}
-			Object.assign(compoundData, dataObject)
-		}
-	}
 	function checkConfiguration(){
 		let validConfiguration = true
 		/*for (let i = 0; i < compoundDataModel.count; ++i){

@@ -25,6 +25,7 @@ UIPatientWizardForm {
 	}
 
 	function checkConfiguration(){
+		console.log('check')
 		let validConfiguration = true
 		for (let i = 0; i < patientDataModel.count; ++i){
 			let validEntry = patientDataModel.get(i).valid
@@ -51,7 +52,10 @@ UIPatientWizardForm {
 			patientData[prop] = patient[prop]
 		}
 		resetData = Object.assign({}, patientData)	//Copy data to resetData ( can't do = because this does copy by reference)
-		root.loadConfiguration(patientData)
+				for (let p in patientData){
+			console.log(p + ', ' + patientData[p])
+		}
+		loadConfiguration(patientData)
 	}
 
 	function displayFormat (role) {

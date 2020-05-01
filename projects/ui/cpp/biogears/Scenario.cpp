@@ -780,7 +780,7 @@ QVariantMap Scenario::edit_patient()
   patientField[1] = "";
   patientMap["Name"] = patientField;
   //Gender
-  patientField[0] = patient->GetGender();
+  patientField[0] = patient->GetGender()==CDM::enumSex::Female ? 1 : 0;
   patientField[1] = "";
   patientMap["Gender"] = patientField;
   //Age

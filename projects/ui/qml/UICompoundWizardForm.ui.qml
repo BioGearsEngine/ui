@@ -10,7 +10,6 @@ Page {
   property alias doubleValidator : doubleValidator
   property alias compoundDataModel : compoundDataModel 
   property alias compoundGridView : compoundGridView
- // property alias addComponent : addComponentButton
 
   UIUnitScalarEntry {
     id : compoundName
@@ -37,7 +36,7 @@ Page {
     currentIndex: -1
     property var targetGridHeight : (Math.floor(count / 2) + count % 2) * cellHeight
     property var maxGridHeight : parent.height - addComponent.height
-    cellHeight : 60
+    cellHeight : 70
     cellWidth : width / 2
     ScrollIndicator.vertical: ScrollIndicator { }
     delegate : Item {
