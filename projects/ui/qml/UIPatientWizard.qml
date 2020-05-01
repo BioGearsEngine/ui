@@ -9,7 +9,7 @@ UIPatientWizardForm {
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
-	signal nameChanged ()
+	signal nameEdited ()
 
 	property var patientData : ({})
 	property var resetData : ({})  //This will be empty strings when "new Patient", but when "edit patient" it will be file as when first loaded
@@ -25,7 +25,6 @@ UIPatientWizardForm {
 	}
 
 	function checkConfiguration(){
-		console.log('check')
 		let validConfiguration = true
 		for (let i = 0; i < patientDataModel.count; ++i){
 			let validEntry = patientDataModel.get(i).valid
@@ -74,19 +73,4 @@ UIPatientWizardForm {
 			return null
 		}
 	}
-
-	function setPatientEntry(prop){
-		let value = ''
-		let unit = ''
-		if (prop[0]!=null){
-			value = prop[0]
-		}
-		if(prop[1]!=null){
-			unit = prop[1]
-		}
-		return [value, unit]
-	}
-
-
-
 }

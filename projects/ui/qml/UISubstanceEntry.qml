@@ -7,7 +7,12 @@ UISubstanceEntryForm {
   id: root
 
   signal inputAccepted (var input)
+  signal substanceUpdateRejected(string previousName) //Emitted if we try to set a component that already exists
  
+  onSubstanceUpdateRejected : {
+    root.substanceInput.currentIndex = root.substanceInput.find(previousName)
+  }
+
   function setEntry( fromInput ){
     //Trim decimals down to hundredths place. This is necessary when loading from an existing file, since
     // QML interprets the QVariant [input, unit] as [number, string] when parsing a double.  When setting based off 
@@ -23,7 +28,6 @@ UISubstanceEntryForm {
   function reset(){
     root.entry.reset()
   }
-
 }
 
 

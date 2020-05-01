@@ -62,6 +62,9 @@ public:
   Q_INVOKABLE Scenario& environment_name(QString);
 
   //Load, new, and save functions
+  Q_INVOKABLE void create_compound(QVariantMap compoundData);
+  //Q_INVOKABLE QVariantMap edit_compound();
+  Q_INVOKABLE void export_compound();
   Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
   Q_INVOKABLE QVariantMap edit_nutrition();
   Q_INVOKABLE void export_nutrition();
@@ -157,6 +160,7 @@ protected:
 
   void export_nutrition(const biogears::SENutrition* nutrition);
   void export_patient(const biogears::SEPatient* patient);
+  void export_compound(const biogears::SESubstanceCompound* compound);
 
 private:
   std::thread _thread;

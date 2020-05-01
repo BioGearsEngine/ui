@@ -9,7 +9,7 @@ UINutritionWizardForm {
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
-	signal nameChanged ()
+	signal nameEdited ()
 
 	property var nutritionData : ({})
 	property var resetData : ({})  //This will be empty strings when "new Nutrition", but when "edit Nutrition" it will be file as when first loaded
@@ -69,19 +69,4 @@ UINutritionWizardForm {
 			return null
 		}
 	}
-
-	function setNutritionEntry(prop){
-		let value = ''
-		let unit = ''
-		if (prop[0]!=null){
-			value = prop[0]
-		}
-		if(prop[1]!=null){
-			unit = prop[1]
-		}
-		return [value, unit]
-	}
-
-
-
 }

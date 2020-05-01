@@ -16,6 +16,8 @@ Rectangle {
   property string type : ""
   property string hintText : ""
   property DoubleValidator entryValidator : null
+  property alias substanceInput : substanceInput
+  property var reset : function () { substanceInput.currentIndex = -1; scalarInput.clear(); unitInput.currentIndex = -1}
   
   //Initial view settings
   height : prefHeight
@@ -52,7 +54,7 @@ Rectangle {
                                                             scalarInput.text = existing[1];
                                                             unitInput.currentIndex = unitInput.find(existing[2]); } }
     property var unitModel : substanceEntry.units[unit]
-    columns : 2
+    columns : 5
     rows : 2
     Layout.fillWidth : true
     Layout.fillHeight : true
@@ -64,7 +66,9 @@ Rectangle {
       flat : true
       Layout.preferredWidth : prefWidth * 0.8
       Layout.alignment : Qt.AlignHCenter
-      Layout.columnSpan : 2
+      Layout.row : 1
+      Layout.column : 1
+      Layout.columnSpan : 4
       Layout.preferredHeight : prefHeight * 0.5
       model : componentListModel
       font.pointSize : 9
@@ -73,6 +77,7 @@ Rectangle {
         font : substanceInput.font
         verticalAlignment : Text.AlignVCenter
         horizontalAlignment : Text.AlignHCenter
+        leftPadding : 5
       }
       delegate : ItemDelegate {
         //Controls the look of text in the combo box menu.  
@@ -108,7 +113,7 @@ Rectangle {
       }
       indicator : Canvas {
         id : substanceCanvas
-        x : 0
+        x : 5
         y : 0
         width : 10
         height : substanceInput.height
@@ -146,10 +151,32 @@ Rectangle {
         }
       }
     }
+    Image {
+      id : resetButton
+      Layout.row : 1
+      Layout.column : 5
+      Layout.columnSpan : 1
+      source : "icons/reset.png"
+      sourceSize.width : 15
+      sourceSize.height: 15
+      MouseArea {
+        id : resetMouseArea
+        anchors.fill : parent
+        cursorShape : Qt.PointingHandCursor
+        acceptedButtons : Qt.LeftButton
+        hoverEnabled : true
+        onClicked: {
+          root.reset()
+        }
+      }
+    }
     TextField {
       id : scalarInput
       Layout.preferredWidth : prefWidth * 0.6
       Layout.preferredHeight : prefHeight * 0.5
+      Layout.columnSpan : 3
+      Layout.row : 2
+      Layout.column : 1
       leftPadding : 10
       topPadding : 0
       bottomPadding : 0
@@ -170,8 +197,11 @@ Rectangle {
     }
     ComboBox {
       id : unitInput
-      Layout.preferredWidth : prefWidth * 0.3
+      Layout.preferredWidth : prefWidth * 0.4
       Layout.preferredHeight : prefHeight * 0.5
+      Layout.columnSpan : 2
+      Layout.row : 2
+      Layout.column : 4
       Layout.alignment: Qt.AlignHCenter
       model : substanceUnitGrid.unitModel
       flat : true
@@ -248,7 +278,7 @@ Rectangle {
       onActivated : {
         if (currentText==='-Clear-'){
           currentIndex = -1
-        } else if (substancdUnitGrid.validInput){
+        } else if (substanceUnitGrid.validInput){
           root.inputAccepted(substanceUnitGrid.userInput)
         }
       }

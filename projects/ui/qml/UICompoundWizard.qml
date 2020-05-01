@@ -9,8 +9,9 @@ UICompoundWizardForm {
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
 	signal loadConfiguration(var patient)
+	signal nameEdited()
 
-	property string name : ""			//Store name separate from list of compounds (easier to loop through compounds in Scenario.cpp)
+	property string compoundName : ""			//Store name separate from list of compounds
 	property var compoundList : ({})
 	property var resetData : ({})  //This will be empty strings when "new Compound", but when "edit Compound" it will be file as when first loaded
 	property bool editMode : false
@@ -20,26 +21,34 @@ UICompoundWizardForm {
 		console.log('Bye wizard')
 	}
 	
+	function getCompoundList() {
+		for (let sub in root.compoundList){
+			console.log(sub + " : " + root.compoundList[sub])
+		}
+	}
+
 	function checkConfiguration(){
 		let validConfiguration = true
-		/*for (let i = 0; i < compoundDataModel.count; ++i){
-			let validEntry = compoundDataModel.get(i).valid
-			if (!validEntry){
-				validConfiguration = false
-				let errorStr = ""
-				let invalidField = compoundDataModel.get(i).name
-				if (invalidField === "Name"){
-					errorStr = invalidField + " is a required field."
-				} else {
-					errorStr = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+		if (root.compoundName === ""){
+			validConfiguration = false
+			let errorStr = "Compound name is a required field"
+			root.invalidConfiguration(errorStr)
+		} else {
+			for (let i = 0; i < compoundDataModel.count; ++i){
+				let validEntry = compoundDataModel.get(i).valid
+				if (!validEntry){
+					validConfiguration = false
+					let errorStr = "Each component requires a substance name, concentration, and unit"
+					root.invalidConfiguration(errorStr)
+					break;
 				}
-				root.invalidConfiguration(errorStr)
-				break;
 			}
 		}
 		if (validConfiguration){
-			root.validConfiguration('compound', compoundData)  //'compound' flag tells Wizard manager which type of data to save
-		}*/
+			let nameData = {"Name" : root.compoundName}
+			Object.assign(compoundList, nameData);	//Need to bundle up "name" with component list because WizardDialog::SaveData expects one object
+			root.validConfiguration('Compound', compoundList)  //'Compound' flag tells Wizard manager which type of data to save
+		}
 	}
 
 	function mergeCompoundData(compound){
@@ -48,19 +57,6 @@ UICompoundWizardForm {
 		}
 		resetData = Object.assign({}, compoundData)	//Copy data to resetData ( can't do = because this does copy by reference)
 		root.loadConfiguration(compoundData)*/
-	}
-
-	function displayFormat (role) {
-		let formatted = role.replace(/([a-z])([A-Z])/g, '$1 $2')
-		return formatted
-	}
-
-	function assignValidator (type) {
-		if (type === "double"){
-			return doubleValidator
-		} else {
-			return null
-		}
 	}
 
 	function setCompoundEntry(prop){

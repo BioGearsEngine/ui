@@ -21,6 +21,12 @@ Page {
     unit : ""
     type : "string"
     hintText : "Required*"
+    onInputAccepted : {
+      root.compoundName = input[0]
+    }
+    Component.onCompleted : {
+      root.onResetConfiguration.connect(reset)
+    }
   }
 
   GridView {
@@ -51,17 +57,39 @@ Page {
         anchors.centerIn : parent
         prefWidth : compoundGridView.cellWidth * 0.875 //Tuned to get the remove icon to fit
         prefHeight : compoundGridView.cellHeight * 0.85
-        //label : root.displayFormat(model.name)
         unit : model.unit
         type : model.type
         hintText : model.hint
-        //entryValidator : root.assignValidator(model.type)
+        entryValidator : doubleValidator
+        Component.onCompleted : {
+          root.onResetConfiguration.connect(reset)
+          model.valid = Qt.binding(function() {return entry.validInput})
+        }
         onInputAccepted : {
-          root.compoundData[model.name] = input
-          if (model.name === "Name" && root.editMode && !nameWarningFlagged){
-            root.nameChanged()
-            nameWarningFlagged = true
+          //Returned "input" is an array [substance, concentration, unit]
+          let substance = input[0]
+          //If the name in the list model and the name in the data map are out of sync, we either changed the substance
+          // name (and need to update the map key), or the substance has not been added to the map yet
+          if (model.name!==substance){
+            if (root.compoundList.hasOwnProperty(substance)){
+              //Another component field has already set up this substance.  Do not allow duplicate collisions
+              root.invalidConfiguration("Cannot define multiple components with the same substance name")
+              substanceUpdateRejected(model.name)
+            } else {
+              if (root.compoundList.hasOwnProperty(model.name)){
+                //This component field is mapped to the right place in the data map, but we changed the substance name
+                //Delete map entry and reset to correct name
+                delete root.compoundList[model.name]
+              }
+              let newComponent = {[substance] : input.slice(1,input.length)}
+              Object.assign(root.compoundList, newComponent)
+              compoundDataModel.set(index, {"name" : substance}) //Update List model name to match current substance
+            }
+          } else {
+            //Substance name in data map in sync with list model.  Find sub in map and update values
+            root.compoundList[substance] = input.slice(1, input.length)
           }
+          root.getCompoundList()
         }
       }
       Image {
@@ -73,12 +101,21 @@ Page {
           anchors.fill : parent
           cursorShape : Qt.PointingHandCursor
           acceptedButtons : Qt.LeftButton
-          onClicked: {  
+          onClicked: {
+            //Which substance are we removing?
+            let substanceToRemove = compoundDataModel.get(index).name
+            //If name is not empty, then we have previously added substance to data map and need to remove it
+            if (substanceToRemove !== ""){
+              delete compoundList[substanceToRemove]
+            }
+            //Remove entry from model
             compoundDataModel.remove(index)
+            root.getCompoundList()
           }
         }
       }
     }
+    
   }
   
   Rectangle {
@@ -108,8 +145,9 @@ Page {
         anchors.fill : parent
         cursorShape : Qt.PointingHandCursor
         acceptedButtons : Qt.LeftButton
-        onClicked: {  
-          let newComponent = {name: "Component", unit: "concentration", type: "double", hint: "", valid: true}
+        onClicked: {
+          //Add element to model so that grid view displays it
+          let newComponent = {name: "", unit: "concentration", type: "double", hint: "", valid: true}
           compoundDataModel.append(newComponent)
         }
       }

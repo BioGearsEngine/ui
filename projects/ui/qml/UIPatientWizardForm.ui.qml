@@ -39,7 +39,7 @@ Page {
         onInputAccepted : {
           root.patientData[model.name] = input
           if (model.name === "Name" && root.editMode && !nameWarningFlagged){
-            root.nameChanged()
+            root.nameEdited()
             nameWarningFlagged = true
           }
         }

@@ -19,6 +19,7 @@
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/properties/SEUnitScalar.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
+#include <biogears/cdm/substance/SESubstanceConcentration.h>
 #include <biogears/cdm/system/SESystem.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
@@ -780,7 +781,7 @@ QVariantMap Scenario::edit_patient()
   patientField[1] = "";
   patientMap["Name"] = patientField;
   //Gender
-  patientField[0] = patient->GetGender()==CDM::enumSex::Female ? 1 : 0;
+  patientField[0] = patient->GetGender() == CDM::enumSex::Female ? 1 : 0;
   patientField[1] = "";
   patientMap["Gender"] = patientField;
   //Age
@@ -930,6 +931,55 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   Patient(stream, *pData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved patient " + fullPath);
+  return;
+}
+
+void Scenario::create_compound(QVariantMap compoundData)
+{
+  biogears::SESubstanceCompound* newCompound = new biogears::SESubstanceCompound(_engine->GetLogger());
+  //JS objects are returned from QML as QVariantMap<QString (key), QVariant (item)>
+  //For compound data, one key:value pair is <CompoundName : Name>
+  //The remaining pairs are <SubstanceName : [Concentration, unit]>
+
+  //Name
+  QString compoundName = compoundData["Name"].toString(); //Used to gen file name
+  newCompound->SetName(compoundName.toStdString());
+  compoundData.remove("Name"); //Pop name off map so that we can loop over remaining keys to make component substances
+  //Components
+  biogears::SESubstance* component = nullptr;
+  biogears::SESubstanceConcentration* componentData = nullptr;
+  for (auto key : compoundData.keys()) {
+    component = _engine->GetSubstances().GetSubstance(key.toStdString());
+    componentData = new biogears::SESubstanceConcentration(*component);
+    double concentration = compoundData[key].toList()[0].toDouble();
+    auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(compoundData[key].toList()[1].toString().toStdString());
+    componentData->GetConcentration().SetValue(concentration, cUnit);
+    newCompound->GetComponents().push_back(componentData);
+  }
+
+  export_compound(newCompound);
+}
+
+// QVariantMap Scenario::edit_compound()
+//{
+//}
+
+void Scenario::export_compound()
+{
+}
+void Scenario::export_compound(const biogears::SESubstanceCompound* compound)
+{
+  std::string fileLoc = "./substances/" + compound->GetName() + ".xml";
+  std::string fullPath = biogears::ResolvePath(fileLoc);
+  biogears::CreateFilePath(fullPath);
+  std::ofstream stream(fullPath);
+  xml_schema::namespace_infomap info;
+  info[""].name = "uri:/mil/tatrc/physiology/datamodel";
+
+  std::unique_ptr<CDM::SubstanceCompoundData> compoundData(compound->Unload());
+  SubstanceCompound(stream, *compoundData, info);
+  stream.close();
+  _engine->GetLogger()->Info("Saved compound: " + fullPath);
   return;
 }
 

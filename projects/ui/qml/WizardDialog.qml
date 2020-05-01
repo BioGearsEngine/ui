@@ -39,7 +39,7 @@ WizardDialogForm {
 			//Notifications from patient editor to main dialog
 			activeWizard.onValidConfiguration.connect(root.saveData)
 			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
-			activeWizard.onNameChanged.connect(root.showNameWarning)
+			activeWizard.onNameEdited.connect(root.showNameWarning)
 			mainDialog.open()
 		}
 	}
@@ -78,7 +78,7 @@ WizardDialogForm {
 			//Notify dialog that compound is ready
 			activeWizard.onValidConfiguration.connect(root.saveData)
 			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
-			activeWizard.onNameChanged.connect(root.showNameWarning)
+			activeWizard.onNameEdited.connect(root.showNameWarning)
 			mainDialog.open()
 		}
 	}
@@ -112,7 +112,7 @@ WizardDialogForm {
 			//Notify dialog that nutrition is ready
 			activeWizard.onValidConfiguration.connect(root.saveData)
 			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
-			activeWizard.onNameChanged.connect(root.showNameWarning)
+			activeWizard.onNameEdited.connect(root.showNameWarning)
 			mainDialog.open()
 		}
 	}
@@ -127,6 +127,9 @@ WizardDialogForm {
 				break;
 			case 'Nutrition':
 				scenario.create_nutrition(dataMap)
+				break;
+			case 'Compound':
+				scenario.create_compound(dataMap)
 				break;
 			}
 		mainDialog.accept()
@@ -148,7 +151,7 @@ WizardDialogForm {
 		mainDialog.onReset.disconnect(activeWizard.resetConfiguration)
 		activeWizard.onValidConfiguration.disconnect(root.saveData)
 		activeWizard.onInvalidConfiguration.disconnect(root.showConfigWarning)
-		activeWizard.onNameChanged.disconnect(root.showNameWarning)
+		activeWizard.onNameEdited.disconnect(root.showNameWarning)
 		activeWizard.destroy()
 		activeWizard = null
 	}
