@@ -52,12 +52,6 @@ UICompoundWizardForm {
 		}
 	}
 
-	function getCompoundList() {
-		for (let sub in root.compoundList){
-			console.log(sub + " : " + root.compoundList[sub])
-		}
-	}
-
 	function checkConfiguration(){
 		let validConfiguration = true
 		if (root.compoundName === ""){

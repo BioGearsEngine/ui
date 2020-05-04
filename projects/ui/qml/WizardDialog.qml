@@ -28,9 +28,9 @@ WizardDialogForm {
 					activeWizard.destroy()
 					return;
 				} else {
+					activeWizard.editMode = true
 					activeWizard.patientGridView.forceLayout() //Ensure that all grid view components are completed or else we will not have a place to put the data
 					activeWizard.mergePatientData(patient)
-					activeWizard.editMode = true
 				}
 			}
 			//Connect standard dialog buttons to patient functions
@@ -44,8 +44,40 @@ WizardDialogForm {
 		}
 	}
 	function launchEnvironment(mode){
-		console.log(mode)
+		mainDialog.title = 'Environment Wizard'
+		let environmentComponent = Qt.createComponent("UIEnvironmentWizard.qml");
+		if ( environmentComponent.status != Component.Ready){
+		  if (environmentComponent.status == Component.Error){
+			  console.log("Error : " + environmentComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : Action dialog component not ready");
+	  } else {
+		  activeWizard = environmentComponent.createObject(mainDialog.contentItem);
+			root.setHelpText("-Use the '+' button to add components to the environment and specify their concentrations")
+			if (mode === "Edit"){
+				let environment = scenario.edit_environment()
+				if (Object.keys(environment).length == 0){
+					//We get an empty environment object if the user closed file explorer without selecting a environment
+					activeWizard.destroy()
+					return;
+				} else {
+					activeWizard.editMode = true
+					activeWizard.mergeEnvironmentData(environment)
+					activeWizard.environmentGridView.forceLayout()  //Ensure that all grid view components are completed or else we will not have a place to put the data	
+				}
+			}
+			//Connect standard dialog buttons to environment functions
+		  mainDialog.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			mainDialog.onReset.connect(activeWizard.resetConfiguration)
+			//Notify dialog that environment is ready
+			activeWizard.onValidConfiguration.connect(root.saveData)
+			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
+			activeWizard.onNameEdited.connect(root.showNameWarning)
+			mainDialog.open()
+		}
 	}
+
 	function launchSubstance(mode) {
 		console.log(mode)
 	}
@@ -102,9 +134,10 @@ WizardDialogForm {
 					activeWizard.destroy()
 					return;
 				} else {
+					activeWizard.editMode = true
 					activeWizard.nutritionGridView.forceLayout() //Ensure that all grid view components are completed or else we will not have a place to put the data
 					activeWizard.mergeNutritionData(nutrition)
-					activeWizard.editMode = true
+					
 				}
 			}
 			//Connect standard dialog buttons to nutrition functions
@@ -125,6 +158,9 @@ WizardDialogForm {
 		switch (type) {
 			case 'Patient' : 
 				scenario.create_patient(dataMap)
+				break;
+			case 'Environment' : 
+				//scenario.create_environment(dataMap)
 				break;
 			case 'Nutrition':
 				scenario.create_nutrition(dataMap)

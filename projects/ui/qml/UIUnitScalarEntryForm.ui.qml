@@ -380,7 +380,11 @@ Rectangle {
                          'pressure' : ['mmHg', 'cmH2O'],
                          'area' : ['cm^2', 'm^2'],
                          'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr'],
-                         'concentration': ['g/L', 'g/dL','g/mL', 'mg/L','mg/dL','ug/L'] 
+                         'concentration': ['g/L', 'g/dL','g/mL', 'mg/L','mg/dL','ug/L'],
+                         'medium' : ['Air', 'Water'],
+                         'temperature' : ['C','F', 'K'],
+                         'velocity' : ['m/s','cm/s','ft/s','ft/min'],
+                         'clothing' : ['clo','rsi']
                          })
 
 }

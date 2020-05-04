@@ -102,7 +102,6 @@ Page {
             //Substance name in data map in sync with list model.  Find sub in map and update values
             root.compoundList[substance] = input.slice(1, input.length)
           }
-          root.getCompoundList()
         }
       }
       Image {
@@ -123,7 +122,6 @@ Page {
             }
             //Remove entry from model
             compoundDataModel.remove(index)
-            root.getCompoundList()
           }
         }
       }

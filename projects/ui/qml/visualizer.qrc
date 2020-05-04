@@ -48,6 +48,8 @@
         <file>UICompoundWizardForm.ui.qml</file>
         <file>UISubstanceEntry.qml</file>
         <file>UISubstanceEntryForm.ui.qml</file>
+        <file>UIEnvironmentWizard.qml</file>
+        <file>UIEnvironmentWizardForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

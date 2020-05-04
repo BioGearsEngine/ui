@@ -44,29 +44,4 @@ MenuAreaForm {
         break;
     }
   }
-
-  function exportData(type){
-    let simTime = Math.ceil(scenario.get_simulation_time())
-    let patient = scenario.patient_name().replace(/\s+/g,'')        //Get rid of white space (not common for patient files)
-    let enviro = scenario.environment_name().replace(/\s+/g,'')     //Get rid of white space (e.g. "Unknown Environment")
-    switch (type) {
-      case 0:
-        //Export patient
-        scenario.export_patient()
-        break;
-      case 1:
-        //Export environment
-        let enviroFile =  enviro + "@" + simTime + "s.xml"
-        scenario.export_environment(enviroFile)
-        break;
-      case 2:
-        //Substance
-        break;
-      default :
-        //Export state
-        let stateFile =  patient + "@" + simTime + "s.xml"
-        scenario.export_state(stateFile)
-        break;
-    }
-  }
 }
