@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.3
+import com.biogearsengine.ui.scenario 1.0
 
 UISubstanceEntryForm {
   id: root
@@ -14,15 +15,21 @@ UISubstanceEntryForm {
   }
 
   function setEntry( fromInput ){
-    //Trim decimals down to hundredths place. This is necessary when loading from an existing file, since
-    // QML interprets the QVariant [input, unit] as [number, string] when parsing a double.  When setting based off 
-    // values from the editor, we get strings from the text field.  Thus, we check if the input is typeof number
-    // before trimming.
+    //Component input is [substance, concentration, unit].  Trim concentration down to 2 decimal place.  When setting 
+    // based off values loaded from file, we get strings from the text field.  Thus, we check typeof input before trimming.
     if (fromInput[0]!=null && typeof fromInput[1]=="number"){
       let formattedValue = fromInput[1].toFixed(2)
-      fromInput[0] = formattedValue
+      fromInput[1] = formattedValue
     }
     root.entry.setFromExisting(fromInput)
+  }
+
+  function setComponentList() { 
+   let components = scenario.get_components()
+    for (let i = 0; i < components.length; ++i){
+      let element = { "component" : components[i] }
+      componentListModel.append(element)
+    }
   }
 
   function reset(){

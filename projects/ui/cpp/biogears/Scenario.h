@@ -63,7 +63,7 @@ public:
 
   //Load, new, and save functions
   Q_INVOKABLE void create_compound(QVariantMap compoundData);
-  //Q_INVOKABLE QVariantMap edit_compound();
+  Q_INVOKABLE QVariantMap edit_compound();
   Q_INVOKABLE void export_compound();
   Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
   Q_INVOKABLE QVariantMap edit_nutrition();

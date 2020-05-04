@@ -2,7 +2,6 @@ import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.3
-import com.biogearsengine.ui.scenario 1.0
 
 Rectangle {
   id: substanceEntry
@@ -17,7 +16,8 @@ Rectangle {
   property string hintText : ""
   property DoubleValidator entryValidator : null
   property alias substanceInput : substanceInput
-  property var reset : function () { substanceInput.currentIndex = -1; scalarInput.clear(); unitInput.currentIndex = -1}
+  property alias componentListModel : componentListModel
+  //property var reset : function () { substanceInput.currentIndex = -1; scalarInput.clear(); unitInput.currentIndex = -1}
   
   //Initial view settings
   height : prefHeight
@@ -87,7 +87,6 @@ Rectangle {
           verticalAlignment : Text.AlignVCenter;
           horizontalAlignment : Text.AlignHCenter;
           font.pointSize: substanceInput.font.pointSize;
-          font.italic : modelData==='-Clear-'
         }
         height : substanceInput.height
         width : substancePopup.width
@@ -119,34 +118,31 @@ Rectangle {
         height : substanceInput.height
         contextType : "2d"
         Connections {
-            target: substanceInput
-            onPressedChanged: substanceCanvas.requestPaint()
+          target: substanceInput
+          onPressedChanged: substanceCanvas.requestPaint()
         }
         onPaint: {
-            context.reset();
-            context.moveTo(0, height / 2);
-            context.lineTo(width, height / 2);
-            context.lineTo(width / 2, 2 * height / 3);
-            context.closePath();
-            context.fillStyle = "black";
-            context.fill();
+          context.reset();
+          context.moveTo(0, height / 2);
+          context.lineTo(width, height / 2);
+          context.lineTo(width / 2, 2 * height / 3);
+          context.closePath();
+          context.fillStyle = "black";
+          context.fill();
         }
       }
       ListModel {
       id : componentListModel
       }
-      Component.onCompleted : {
+    /*  Component.onCompleted : {
         let components = scenario.get_components()
         for (let i = 0; i < components.length; ++i){
           let element = { "component" : components[i] }
           componentListModel.append(element)
         }
-        componentListModel.append({"component" : "-Clear-"})
-      }
+      }*/
       onActivated : {
-        if (currentText==='-Clear-'){
-          currentIndex = -1
-        } else if (substanceUnitGrid.validInput){
+        if (substanceUnitGrid.validInput){
           root.inputAccepted(substanceUnitGrid.userInput)
         }
       }
@@ -221,7 +217,6 @@ Rectangle {
           verticalAlignment : Text.AlignVCenter;
           horizontalAlignment : Text.AlignHCenter;
           font.pointSize: unitInput.font.pointSize;
-          font.italic : modelData==='-Clear-'
         }
         height : unitInput.height
         width : unitPopup.width
@@ -253,32 +248,21 @@ Rectangle {
         height : unitInput.height
         contextType : "2d"
         Connections {
-            target: unitInput
-            onPressedChanged: unitCanvas.requestPaint()
+          target: unitInput
+          onPressedChanged: unitCanvas.requestPaint()
         }
         onPaint: {
-            context.reset();
-            context.moveTo(0, height / 2);
-            context.lineTo(width, height / 2);
-            context.lineTo(width / 2, 2 * height / 3);
-            context.closePath();
-            context.fillStyle = "black";
-            context.fill();
+          context.reset();
+          context.moveTo(0, height / 2);
+          context.lineTo(width, height / 2);
+          context.lineTo(width / 2, 2 * height / 3);
+          context.closePath();
+          context.fillStyle = "black";
+          context.fill();
         }
       }
-      Component.onCompleted : {
-        //Add 'Clear' option to combo box that resets it.  Apparently Combobox binding to model is not dynamic(?),
-        // or the way I set up the units prop makes it where the binding does not work.  So we push 'Clear' on to option
-        // array and then reset the model.  This also requires us to reassert currentIndex = -1.  We could also
-        // put 'Clear' at the end of each array in the units prop but I don't like how that looks
-        substanceUnitGrid.unitModel.push('-Clear-')
-        unitInput.model = substanceUnitGrid.unitModel
-        unitInput.currentIndex = -1
-      }
       onActivated : {
-        if (currentText==='-Clear-'){
-          currentIndex = -1
-        } else if (substanceUnitGrid.validInput){
+        if (substanceUnitGrid.validInput){
           root.inputAccepted(substanceUnitGrid.userInput)
         }
       }

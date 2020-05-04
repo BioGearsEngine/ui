@@ -68,8 +68,9 @@ WizardDialogForm {
 					activeWizard.destroy()
 					return;
 				} else {
-					activeWizard.mergeCompoundData(compound)
 					activeWizard.editMode = true
+					activeWizard.mergeCompoundData(compound)
+					activeWizard.compoundGridView.forceLayout()  //Ensure that all grid view components are completed or else we will not have a place to put the data	
 				}
 			}
 			//Connect standard dialog buttons to compound functions

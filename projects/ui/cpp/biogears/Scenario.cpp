@@ -960,9 +960,44 @@ void Scenario::create_compound(QVariantMap compoundData)
   export_compound(newCompound);
 }
 
-// QVariantMap Scenario::edit_compound()
-//{
-//}
+QVariantMap Scenario::edit_compound()
+{
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  //Qml interpets QVariantMaps as Javascript objects, which we can index by prop name
+  QVariantMap compoundMap;
+
+  //Open file dialog in compound folder
+  QString compoundFile = QFileDialog::getOpenFileName(nullptr, "Edit Compound", "./substances", "Compound (*.xml)");
+  if (compoundFile.isNull()) {
+    //File returns null string if user cancels without selecting a compound file.  Return empty map (Qml side will check for this)
+    return compoundMap;
+  }
+  //Load file and create and SESubstanceCompound object from it using serializer
+  if (!QFileInfo::exists(compoundFile)) {
+    throw std::runtime_error("Unable to locate " + compoundFile.toStdString());
+  }
+  std::unique_ptr<CDM::ObjectData> compoundXmlData = biogears::Serializer::ReadFile(compoundFile.toStdString(), _engine->GetLogger());
+  CDM::SubstanceCompoundData* compoundData = dynamic_cast<CDM::SubstanceCompoundData*>(compoundXmlData.get());
+  biogears::SESubstanceCompound* compound = new biogears::SESubstanceCompound(_engine->GetLogger());
+  compound->Load(*compoundData, _engine->GetSubstanceManager());
+
+  //Each map entry is a list of two items.  compoundField[0] = value, compoundField[1] = unit
+  QList<QVariant> componentField{ "", "" };
+
+  //Loop over all components in the compound and put them in map with component name as key and [value, unit] pair as entry
+  for (auto sub : compound->GetComponents()) {
+    QString subName = QString::fromStdString(sub->GetSubstance().GetName());
+    componentField[0] = sub->GetConcentration(biogears::MassPerVolumeUnit::mg_Per_L);
+    componentField[1] = "mg/L";
+    compoundMap[subName] = componentField;
+  }
+  //Add compound name to map
+  componentField[0] = QString::fromStdString(compound->GetName());
+  componentField[1] = "";
+  compoundMap["Name"] = componentField;
+
+  return compoundMap;
+}
 
 void Scenario::export_compound()
 {
@@ -1075,7 +1110,7 @@ QVariantMap Scenario::edit_nutrition()
     //File returns null string if user cancels without selecting a nutrition file.  Return empty map (Qml side will check for this)
     return nutritionMap;
   }
-  //Load file and create and SEPatient object from it using serializer
+  //Load file and create and SENutrition object from it using serializer
   if (!QFileInfo::exists(nutritionFile)) {
     throw std::runtime_error("Unable to locate " + nutritionFile.toStdString());
   }
@@ -1084,7 +1119,7 @@ QVariantMap Scenario::edit_nutrition()
   biogears::SENutrition* nutrition = new biogears::SENutrition(_engine->GetLogger());
   nutrition->Load(*nutritionData);
 
-  //Each map entry is a list of two items.  nutritionField[0] = value, nutritionField[1] = unit (or enum selection)
+  //Each map entry is a list of two items.  nutritionField[0] = value, nutritionField[1] = unit
   QList<QVariant> nutritionField{ "", "" };
 
   //Name

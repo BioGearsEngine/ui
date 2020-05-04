@@ -8,7 +8,7 @@ UINutritionWizardForm {
 	signal validConfiguration (string type, var data)
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
-	signal loadConfiguration(var patient)
+	signal loadConfiguration(var nutrition)
 	signal nameEdited ()
 
 	property var nutritionData : ({})

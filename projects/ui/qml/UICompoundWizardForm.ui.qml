@@ -23,9 +23,14 @@ Page {
     hintText : "Required*"
     onInputAccepted : {
       root.compoundName = input[0]
+      if (root.editMode && !nameWarningFlagged){
+        root.nameEdited()
+        nameWarningFlagged = true
+      }
     }
     Component.onCompleted : {
-      root.onResetConfiguration.connect(reset)
+      root.onResetConfiguration.connect(function () { if (root.editMode) { setEntry ([root.resetName, ""]) } else { reset() } })
+      root.onLoadConfiguration.connect(function () { setEntry([root.compoundName, ""]) } ) //Scalar Entry expects a value:unit combo, so pass as array
     }
   }
 
@@ -62,8 +67,16 @@ Page {
         hintText : model.hint
         entryValidator : doubleValidator
         Component.onCompleted : {
-          root.onResetConfiguration.connect(reset)
+          setComponentList()    //Make sure the list of substances is populated
+          root.onResetConfiguration.connect( function() { if (!root.editMode) { reset() } } )   //If "new" compound (!edit), then reset wipes out all data
           model.valid = Qt.binding(function() {return entry.validInput})
+          if (root.editMode && model.name !== ""){
+            let sub = model.name //Name is set to substance name when loading from file
+            console.log(sub)
+            let concentration = compoundList[sub][0]
+            let unit = compoundList[sub][1]
+            setEntry([sub, concentration, unit])
+          }
         }
         onInputAccepted : {
           //Returned "input" is an array [substance, concentration, unit]
@@ -114,8 +127,7 @@ Page {
           }
         }
       }
-    }
-    
+    }  
   }
   
   Rectangle {
