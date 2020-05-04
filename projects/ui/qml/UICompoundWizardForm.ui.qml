@@ -108,8 +108,8 @@ Page {
       Image {
         id: removeIcon
         source : "icons/remove.png"
-        sourceSize.width : 15
-        sourceSize.height: 15
+        sourceSize.width : 10
+        sourceSize.height: 10
         MouseArea {
           anchors.fill : parent
           cursorShape : Qt.PointingHandCursor

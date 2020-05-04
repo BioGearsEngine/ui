@@ -60,7 +60,7 @@ WizardDialogForm {
 	    console.log("Error : Action dialog component not ready");
 	  } else {
 		  activeWizard = compoundComponent.createObject(mainDialog.contentItem);
-			root.setHelpText("-Compound name is required field.  All other fields are optional and will be set to 0 if not defined.")
+			root.setHelpText("-Use the '+' button to add components to the compound and specify their concentrations")
 			if (mode === "Edit"){
 				let compound = scenario.edit_compound()
 				if (Object.keys(compound).length == 0){
