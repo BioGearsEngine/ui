@@ -1358,7 +1358,126 @@ void Scenario::create_environment(QVariantMap environmentData)
 
 QVariantMap Scenario::edit_environment()
 {
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  //Qml interpets QVariantMaps as Javascript objects, which we can index by prop name
   QVariantMap environmentMap;
+
+  //Open file dialog in nutrition folder
+  QString environmentFile = QFileDialog::getOpenFileName(nullptr, "Edit Environment", "./environment", "Environment (*.xml)");
+  if (environmentFile.isNull()) {
+    //File returns null string if user cancels without selecting a nutrition file.  Return empty map (Qml side will check for this)
+    return environmentMap;
+  }
+  //Load file and create and SENutrition object from it using serializer
+  if (!QFileInfo::exists(environmentFile)) {
+    throw std::runtime_error("Unable to locate " + environmentFile.toStdString());
+  }
+  std::unique_ptr<CDM::ObjectData> environmentXmlData = biogears::Serializer::ReadFile(environmentFile.toStdString(), _engine->GetLogger());
+  CDM::EnvironmentalConditionsData* environmentData = dynamic_cast<CDM::EnvironmentalConditionsData*>(environmentXmlData.get());
+  biogears::SEEnvironmentalConditions* environment = new biogears::SEEnvironmentalConditions(_engine->GetSubstanceManager());
+  environment->Load(*environmentData);
+
+  //Each map entry is a list of two items.  environmentField[0] = value, environmentField[1] = unit
+  QList<QVariant> environmentField{ "", "" };
+
+  //Name
+  environmentField[0] = QString::fromStdString(environment->GetName());
+  environmentField[1] = "";
+  environmentMap["Name"] = environmentField;
+  //Surrounding Type
+  if (environment->HasSurroundingType()) {
+    int type = environment->GetSurroundingType();
+    environmentField[0] = type;
+    environmentField[1] = "";
+    environmentMap["SurroundingType"] = environmentField;
+  }
+  //Air Density
+  if (environment->HasAirDensity()) {
+    environmentField[0] = environment->GetAirDensity(biogears::MassPerVolumeUnit::g_Per_mL);
+    environmentField[1] = "g/mL";
+    environmentMap["AirDensity"] = environmentField;
+  }
+  //Air Velocity
+  if (environment->HasAirVelocity()) {
+    environmentField[0] = environment->GetAirVelocity(biogears::LengthPerTimeUnit::m_Per_s);
+    environmentField[1] = "m/s";
+    environmentMap["AirVelocity"] = environmentField;
+  }
+  //Ambient Temperature
+  if (environment->HasAmbientTemperature()) {
+    environmentField[0] = environment->GetAmbientTemperature(biogears::TemperatureUnit::C);
+    environmentField[1] = "C";
+    environmentMap["AmbientTemperature"] = environmentField;
+  }
+  //Atmospheric Pressure
+  if (environment->HasAtmosphericPressure()) {
+    environmentField[0] = environment->GetAtmosphericPressure(biogears::PressureUnit::atm);
+    environmentField[1] = "atm";
+    environmentMap["AtmosphericPressure"] = environmentField;
+  }
+  //Clothing Resistance
+  if (environment->HasClothingResistance()) {
+    environmentField[0] = environment->GetClothingResistance(biogears::HeatResistanceAreaUnit::rsi);
+    environmentField[1] = "rsi";
+    environmentMap["ClothingResistance"] = environmentField;
+  }
+  //Emissivity
+  if (environment->HasEmissivity()) {
+    environmentField[0] = environment->GetEmissivity().GetValue();
+    environmentField[1] = "";
+    environmentMap["Emissivity"] = environmentField;
+  }
+  //Mean Radiant Temperature
+  if (environment->HasMeanRadiantTemperature()) {
+    environmentField[0] = environment->GetMeanRadiantTemperature(biogears::TemperatureUnit::C);
+    environmentField[1] = "C";
+    environmentMap["MeanRadiantTemperature"] = environmentField;
+  }
+  //Relative Humidity
+  if (environment->HasRelativeHumidity()) {
+    environmentField[0] = environment->GetRelativeHumidity().GetValue();
+    environmentField[1] = "";
+    environmentMap["RelativeHumidity"] = environmentField;
+  }
+  //Respiration Ambient Temperature
+  if (environment->HasRespirationAmbientTemperature()) {
+    environmentField[0] = environment->GetRespirationAmbientTemperature(biogears::TemperatureUnit::C);
+    environmentField[1] = "C";
+    environmentMap["RespirationAmbientTemperature"] = environmentField;
+  }
+  //Oxygen
+  if (environment->HasAmbientGas(_engine->GetSubstances().GetO2())) {
+    environmentField[0] = environment->GetAmbientGas(_engine->GetSubstances().GetO2()).GetFractionAmount().GetValue();
+    environmentField[1] = "";
+    environmentMap["Oxygen"] = environmentField;
+  }
+  //Carbon Dioxide
+  if (environment->HasAmbientGas(_engine->GetSubstances().GetCO2())) {
+    environmentField[0] = environment->GetAmbientGas(_engine->GetSubstances().GetCO2()).GetFractionAmount().GetValue();
+    environmentField[1] = "";
+    environmentMap["CarbonDioxide"] = environmentField;
+  }
+  //Nitrogen
+  if (environment->HasAmbientGas(_engine->GetSubstances().GetN2())) {
+    environmentField[0] = environment->GetAmbientGas(_engine->GetSubstances().GetN2()).GetFractionAmount().GetValue();
+    environmentField[1] = "";
+    environmentMap["Nitrogen"] = environmentField;
+  }
+  //Carbon Monoxide
+  if (environment->HasAmbientGas(_engine->GetSubstances().GetCO())) {
+    environmentField[0] = environment->GetAmbientGas(_engine->GetSubstances().GetCO()).GetFractionAmount().GetValue();
+    environmentField[1] = "";
+    environmentMap["CarbonMonoxide"] = environmentField;
+  }
+
+  //Loop over all aerosols and use aerosol name as key and [value, unit] pair as entry
+  for (auto aerosol : environment->GetAmbientAerosols()) {
+    QString subName = QString::fromStdString(aerosol->GetSubstance().GetName());
+    environmentField[0] = aerosol->GetConcentration(biogears::MassPerVolumeUnit::mg_Per_m3);
+    environmentField[1] = "mg/m^3";
+    environmentMap[subName] = environmentField;
+  }
+
   return environmentMap;
 }
 

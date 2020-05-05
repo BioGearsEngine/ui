@@ -439,7 +439,7 @@ Rectangle {
                          'frequency' : ['1/s', '1/min', 'Hz', '1/hr'],
                          'density' : ['g/mL','kg/m^3'],
                          'time' : ['yr', 'hr','min','s'],
-                         'pressure' : ['mmHg', 'cmH2O'],
+                         'pressure' : ['mmHg','atm','cmH2O'],
                          'area' : ['cm^2', 'm^2'],
                          'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr'],
                          'concentration': ['g/L', 'g/dL','g/mL', 'mg/L','mg/dL','ug/L'] 
