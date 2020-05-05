@@ -20,6 +20,7 @@
 #include <biogears/cdm/properties/SEUnitScalar.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/substance/SESubstanceConcentration.h>
+#include <biogears/cdm/substance/SESubstanceFraction.h>
 #include <biogears/cdm/system/SESystem.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
@@ -1207,19 +1208,178 @@ void Scenario::export_nutrition(const biogears::SENutrition* nutrition)
   return;
 }
 
-void Scenario::export_environment(QString environmentFileName)
+void Scenario::create_environment(QVariantMap environmentData)
 {
-  std::string fileLoc = "./environments/" + environmentFileName.toStdString();
+  biogears::SEEnvironmentalConditions* newEnvironment = new biogears::SEEnvironmentalConditions(_engine->GetSubstanceManager());
+  //JS objects are returned from QML as QVariantMap<QString (key), QVariant (item)>
+  //The key will be the field in the patient CDM (e.g. Name, Age, Gender...)
+  //The item is a pair (value, unit), which is returned by QML as QList<QVariant>
+  //We first convert the QVariantList to a QList, which allows us to index the value and unit
+  //We then access values and convert them from QVariant to the appropriate type (string, double, int, etc)
+
+  //Name
+  QList<QVariant> eMetric = environmentData["Name"].toList();
+  QString environmentName = eMetric[0].toString(); //Used to gen file name
+  newEnvironment->SetName(environmentName.toStdString());
+  environmentData.remove("Name");
+  //SurroundingType
+  eMetric = environmentData["SurroundingType"].toList();
+  if (!eMetric[0].isNull()) {
+    int type = eMetric[0].toInt();
+    newEnvironment->SetSurroundingType((CDM::enumSurroundingType::value)type);
+  }
+  environmentData.remove("SurroundingType");
+  //Air Density
+  eMetric = environmentData["AirDensity"].toList();
+  if (!eMetric[0].isNull()) {
+    double density = eMetric[0].toDouble();
+    auto& densityUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(eMetric[1].toString().toStdString());
+    newEnvironment->GetAirDensity().SetValue(density, densityUnit);
+  }
+  environmentData.remove("AirDensity");
+  //Air Velocity
+  eMetric = environmentData["AirVelocity"].toList();
+  if (!eMetric[0].isNull()) {
+    double velocity = eMetric[0].toDouble();
+    auto& velocityUnit = biogears::LengthPerTimeUnit::GetCompoundUnit(eMetric[1].toString().toStdString());
+    newEnvironment->GetAirVelocity().SetValue(velocity, velocityUnit);
+  }
+  environmentData.remove("AirVelocity");
+  //Ambient Temperature
+  eMetric = environmentData["AmbientTemperature"].toList();
+  if (!eMetric[0].isNull()) {
+    double ambientTemp = eMetric[0].toDouble();
+    auto& tempUnit = biogears::TemperatureUnit::GetCompoundUnit("deg" + eMetric[1].toString().toStdString());
+    newEnvironment->GetAmbientTemperature().SetValue(ambientTemp, tempUnit);
+  }
+  environmentData.remove("AmbientTemperature");
+  //Atmospheric Pressure
+  eMetric = environmentData["AtmosphericPressure"].toList();
+  if (!eMetric[0].isNull()) {
+    double pressure = eMetric[0].toDouble();
+    auto& pressureUnit = biogears::PressureUnit::GetCompoundUnit(eMetric[1].toString().toStdString());
+    newEnvironment->GetAtmosphericPressure().SetValue(pressure, pressureUnit);
+  }
+  environmentData.remove("AtmosphericPressure");
+  //Clothing Resistance
+  eMetric = environmentData["ClothingResistance"].toList();
+  if (!eMetric[0].isNull()) {
+    double clothing = eMetric[0].toDouble();
+    auto& resistanceUnit = biogears::HeatResistanceAreaUnit::GetCompoundUnit(eMetric[1].toString().toStdString());
+    newEnvironment->GetClothingResistance().SetValue(clothing, resistanceUnit);
+  }
+  environmentData.remove("ClothingResistance");
+  //Emissivity
+  eMetric = environmentData["Emissivity"].toList();
+  if (!eMetric[0].isNull()) {
+    double emissivity = eMetric[0].toDouble();
+    newEnvironment->GetEmissivity().SetValue(emissivity);
+  }
+  environmentData.remove("Emissivity");
+  //Mean Radiant Temperature
+  eMetric = environmentData["MeanRadiantTemperature"].toList();
+  if (!eMetric[0].isNull()) {
+    double meanRT = eMetric[0].toDouble();
+    auto& tempUnit = biogears::TemperatureUnit::GetCompoundUnit("deg" + eMetric[1].toString().toStdString());
+    newEnvironment->GetMeanRadiantTemperature().SetValue(meanRT, tempUnit);
+  }
+  environmentData.remove("MeanRadiantTemperature");
+  //Relative Humidity
+  eMetric = environmentData["RelativeHumidity"].toList();
+  if (!eMetric[0].isNull()) {
+    double humidity = eMetric[0].toDouble();
+    newEnvironment->GetRelativeHumidity().SetValue(humidity);
+  }
+  environmentData.remove("RelativeHumidity");
+  //Respiration Ambient Temperature
+  eMetric = environmentData["RespirationAmbientTemperature"].toList();
+  if (!eMetric[0].isNull()) {
+    double respirationAT = eMetric[0].toDouble();
+    auto& tempUnit = biogears::TemperatureUnit::GetCompoundUnit("deg" + eMetric[1].toString().toStdString());
+    newEnvironment->GetRespirationAmbientTemperature().SetValue(respirationAT, tempUnit);
+  }
+  environmentData.remove("RespirationAmbientTemperature");
+  //Ambient Gases
+  biogears::SESubstance* ambientGas = nullptr;
+  biogears::SESubstanceFraction* gasFraction = nullptr;
+  //Oxygen
+  eMetric = environmentData["Oxygen"].toList();
+  if (!eMetric[0].isNull()) {
+    ambientGas = &_engine->GetSubstances().GetO2();
+    gasFraction = &newEnvironment->GetAmbientGas(*ambientGas);    //If ambient gas is not found, SEEnvironmentConditions creates a new SubtanceFraction, adds it to ambient gases list, and returns a ptr to the fraction
+    gasFraction->GetFractionAmount().SetValue(eMetric[0].toDouble());
+  }
+  environmentData.remove("Oxygen");
+  //Nitrogen
+  eMetric = environmentData["Nitrogen"].toList();
+  if (!eMetric[0].isNull()) {
+    if (!eMetric[0].isNull()) {
+      ambientGas = &_engine->GetSubstances().GetN2();
+      gasFraction = &newEnvironment->GetAmbientGas(*ambientGas); //If ambient gas is not found, SEEnvironmentConditions creates a new SubtanceFraction, adds it to ambient gases list, and returns a ptr to the fraction
+      gasFraction->GetFractionAmount().SetValue(eMetric[0].toDouble());
+    }
+  }
+  environmentData.remove("Nitrogen");
+  //Carbon Dioxide
+  eMetric = environmentData["CarbonDioxide"].toList();
+  if (!eMetric[0].isNull()) {
+    if (!eMetric[0].isNull()) {
+      ambientGas = &_engine->GetSubstances().GetCO2();
+      gasFraction = &newEnvironment->GetAmbientGas(*ambientGas); //If ambient gas is not found, SEEnvironmentConditions creates a new SubtanceFraction, adds it to ambient gases list, and returns a ptr to the fraction
+      gasFraction->GetFractionAmount().SetValue(eMetric[0].toDouble());
+    }
+  }
+  environmentData.remove("CarbonDioxide");
+  //Carbon Monoxide
+  eMetric = environmentData["CarbonMonoxide"].toList();
+  if (!eMetric[0].isNull()) {
+    if (!eMetric[0].isNull()) {
+      ambientGas = &_engine->GetSubstances().GetCO();
+      gasFraction = &newEnvironment->GetAmbientGas(*ambientGas); //If ambient gas is not found, SEEnvironmentConditions creates a new SubtanceFraction, adds it to ambient gases list, and returns a ptr to the fraction
+      gasFraction->GetFractionAmount().SetValue(eMetric[0].toDouble());
+    }
+  }
+  environmentData.remove("CarbonMonoxide");
+
+  //Now that we have removed all used keys from environmentData, the only thing left over should be aerosols (if any)
+  //Loop over aerosols and add them to environment.
+  biogears::SESubstance* aerosol = nullptr;
+  biogears::SESubstanceConcentration* aerosolConcentration = nullptr;
+  for (auto key : environmentData.keys()) {
+    aerosol = _engine->GetSubstances().GetSubstance(key.toStdString());
+    aerosolConcentration = &newEnvironment->GetAmbientAerosol(*aerosol);  //If ambient aerosol is not found, SEEnvironmentConditions creates a new SubtanceConcentration, adds it to ambient gases list, and returns a ptr to the concentration
+    double concentration = environmentData[key].toList()[0].toDouble();
+    auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(environmentData[key].toList()[1].toString().toStdString());
+    aerosolConcentration->GetConcentration().SetValue(concentration, cUnit);
+  }
+
+  export_environment(newEnvironment);
+}
+
+QVariantMap Scenario::edit_environment()
+{
+  QVariantMap environmentMap;
+  return environmentMap;
+}
+
+void Scenario::export_environment()
+{
+  export_environment(_engine->GetEnvironment()->GetConditions());
+}
+
+void Scenario::export_environment(const biogears::SEEnvironmentalConditions* environment)
+{
+  std::string fileLoc = "./environments/" + environment->GetName() + ".xml";
   std::string fullPath = biogears::ResolvePath(fileLoc);
   biogears::CreateFilePath(fullPath);
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
 
-  std::unique_ptr<CDM::EnvironmentData> eData(_engine->GetEnvironment()->Unload());
-  Environment(stream, *eData, info);
+  std::unique_ptr<CDM::EnvironmentalConditionsData> eData(environment->Unload());
+  EnvironmentalConditions(stream, *eData, info);
   stream.close();
-  _engine->GetLogger()->Info("Saved environemnt: " + fullPath);
+  _engine->GetLogger()->Info("Saved environmental conditions: " + fullPath);
   return;
 }
 

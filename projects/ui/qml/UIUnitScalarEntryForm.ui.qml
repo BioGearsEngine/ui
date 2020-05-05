@@ -195,7 +195,7 @@ Rectangle {
         id : scalarInput
         Layout.fillWidth : true
         Layout.preferredHeight : prefHeight * 0.7 - scalarStringColumn.spacing / 2
-        leftPadding : 10
+        leftPadding : 20
         topPadding : 0
         bottomPadding : 0
         placeholderText: root.hintText

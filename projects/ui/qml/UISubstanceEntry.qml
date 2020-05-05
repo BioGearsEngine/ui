@@ -11,12 +11,12 @@ UISubstanceEntryForm {
   signal substanceUpdateRejected(string previousName) //Emitted if we try to set a component that already exists
  
   onSubstanceUpdateRejected : {
-    root.substanceInput.currentIndex = root.substanceInput.find(previousName)
+    entry.substanceInput.currentIndex = entry.substanceInput.find(previousName)
   }
 
   function setEntry( fromInput ){
-    //Component input is [substance, concentration, unit].  Trim concentration down to 2 decimal place.  When setting 
-    // based off values loaded from file, we get strings from the text field.  Thus, we check typeof input before trimming.
+    //Component input is [substance, value, unit].  Trim value down to 2 decimal place.  When setting 
+    // based off data loaded from file, we get strings from the text field.  Thus, we check typeof input before trimming.
     if (fromInput[0]!=null && typeof fromInput[1]=="number"){
       let formattedValue = fromInput[1].toFixed(2)
       fromInput[1] = formattedValue
@@ -24,11 +24,17 @@ UISubstanceEntryForm {
     root.entry.setFromExisting(fromInput)
   }
 
-  function setComponentList() { 
-   let components = scenario.get_components()
+  function setComponentList(filter) {
+    let components = []
+    if (filter === 'All'){
+      components = scenario.get_components()
+    }
+    if (filter === 'Aerosol'){
+      components = ['Sarin','ForestFireParticulate']
+    }
     for (let i = 0; i < components.length; ++i){
       let element = { "component" : components[i] }
-      componentListModel.append(element)
+      entry.componentListModel.append(element)
     }
   }
 

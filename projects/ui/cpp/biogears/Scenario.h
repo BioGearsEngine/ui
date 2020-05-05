@@ -65,6 +65,9 @@ public:
   Q_INVOKABLE void create_compound(QVariantMap compoundData);
   Q_INVOKABLE QVariantMap edit_compound();
   Q_INVOKABLE void export_compound();
+  Q_INVOKABLE void create_environment(QVariantMap environmentData);
+  Q_INVOKABLE QVariantMap edit_environment();
+  Q_INVOKABLE void export_environment();
   Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
   Q_INVOKABLE QVariantMap edit_nutrition();
   Q_INVOKABLE void export_nutrition();
@@ -74,10 +77,7 @@ public:
   Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE void export_state(bool saveAs);
   Q_INVOKABLE void load_state();
-  Q_INVOKABLE void export_environment(QString environmentFileName);
   
-
-
   Q_INVOKABLE double get_simulation_time();
 
   Q_INVOKABLE void restart(QString patient_file);
@@ -158,9 +158,11 @@ protected:
   void physiology_thread_main();
   void physiology_thread_step();
 
+  void export_environment(const biogears::SEEnvironmentalConditions* environment);
+  void export_compound(const biogears::SESubstanceCompound* compound);
   void export_nutrition(const biogears::SENutrition* nutrition);
   void export_patient(const biogears::SEPatient* patient);
-  void export_compound(const biogears::SESubstanceCompound* compound);
+  
 
 private:
   std::thread _thread;
@@ -178,10 +180,12 @@ private:
   std::atomic<bool> _paused;
   std::atomic<bool> _throttle;
 
-  QVector<QString> _drugs_list;
-  QVector<QString> _compounds_list;
-  QVector<QString> _transfusions_list;
-  QVector<QString> _components_list;
+  QVector<QString> _drugs_list;             //Subs with PK/PD data
+  QVector<QString> _compounds_list;         //Compounds
+  QVector<QString> _transfusions_list;      //Blood products
+  QVector<QString> _components_list;        //Subs that can be components of compounds
+  QVector<QString> _ambient_gas_list;       //Gases that can be added to environment
+  QVector<QString> _ambient_aerosol_list;   //Aerosolized liquids that can be added to environment
 
   BioGearsData* _physiology_model;
 

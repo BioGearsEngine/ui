@@ -160,7 +160,7 @@ WizardDialogForm {
 				scenario.create_patient(dataMap)
 				break;
 			case 'Environment' : 
-				//scenario.create_environment(dataMap)
+				scenario.create_environment(dataMap)
 				break;
 			case 'Nutrition':
 				scenario.create_nutrition(dataMap)

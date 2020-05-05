@@ -67,12 +67,11 @@ Page {
         hintText : model.hint
         entryValidator : doubleValidator
         Component.onCompleted : {
-          setComponentList()    //Make sure the list of substances is populated
+          setComponentList('All')    //Make sure the list of substances is populated
           root.onResetConfiguration.connect( function() { if (!root.editMode) { reset() } } )   //If "new" compound (!edit), then reset wipes out all data
           model.valid = Qt.binding(function() {return entry.validInput})
           if (root.editMode && model.name !== ""){
             let sub = model.name //Name is set to substance name when loading from file
-            console.log(sub)
             let concentration = compoundList[sub][0]
             let unit = compoundList[sub][1]
             setEntry([sub, concentration, unit])
