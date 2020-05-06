@@ -8,44 +8,66 @@ Page {
   anchors.fill : parent
   property alias doubleValidator : doubleValidator
   property alias fractionValidator : fractionValidator
-  property alias environmentDataModel : environmentDataModel
-  property alias ambientGasListModel : ambientGasListModel 
+  property alias neg1To1Validator : neg1To1Validator
+  property alias substanceListModel : substanceListModel
   property alias aerosolListModel : aerosolListModel
   property alias environmentGridView : environmentGridView
   property alias ambientGasGridView : ambientGasGridView
+ // property alias aerosolGridView : aerosolGridView
 
   TabBar {
-    id : environmentTabBar
+    id : substanceTabBar
     width : parent.width
     height : 40
     TabButton {
       id : baseDataButton
-      text : "Base Data"
+      text : "Physical Data"
       onClicked : {
-        environmentStackLayout.currentIndex = TabBar.index
+        substanceStackLayout.currentIndex = TabBar.index
       }
     }
     TabButton {
       id : gasDataButton
-      text : "Substances"
+      text : "Clearance"
       onClicked : {
-        environmentStackLayout.currentIndex = TabBar.index
+        substanceStackLayout.currentIndex = TabBar.index
+      }
+    }
+    TabButton {
+      id : gasDataButton
+      text : "Pharmacokinetics"
+      onClicked : {
+        substanceStackLayout.currentIndex = TabBar.index
+      }
+    }
+    TabButton {
+      id : gasDataButton
+      text : "Pharmacodynamics"
+      onClicked : {
+        substanceStackLayout.currentIndex = TabBar.index
+      }
+    }
+    TabButton {
+      id : gasDataButton
+      text : "Aerosolization"
+      onClicked : {
+        substanceStackLayout.currentIndex = TabBar.index
       }
     }
   }
 
   StackLayout {
-    id : environmentStackLayout
+    id : substanceStackLayout
     width : parent.width
-    height : parent.height - environmentTabBar.height
-    anchors.top : environmentTabBar.bottom
+    height : parent.height - substanceTabBar.height
+    anchors.top : substanceTabBar.bottom
     currentIndex : 0
     Item {
-      id : baseDataTab
+      id : physicalDataTab
       Layout.fillWidth : true
       Layout.fillHeight : true
       GridView {
-        id: environmentGridView
+        id: physicalDataGridView
         clip : true
         model : environmentDataModel
         anchors.top : parent.top
@@ -239,6 +261,7 @@ Page {
                 //Substance name in data map in sync with list model.  Find sub in map and update values
                 root.aerosolData[aerosol] = input.slice(1, input.length)
               }
+              root.getGasList()
             }
           }
           Image {
@@ -259,6 +282,7 @@ Page {
                 }
                 //Remove entry from model
                 aerosolListModel.remove(index)
+                root.getGasList()
               }
             }
           }
@@ -314,31 +338,44 @@ Page {
     decimals : 4
   }
 
-  ListModel {
-    id : environmentDataModel
-    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true}
-    ListElement {name : "SurroundingType"; unit : "medium"; type : "enum"; hint : ""; valid : true}
-    ListElement {name : "AirDensity";  unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true }
-    ListElement {name : "AirVelocity"; unit : "velocity"; type : "double"; hint : "Enter a value"; valid : true}
-    ListElement {name : "AmbientTemperature";  unit : "temperature"; type : "double"; hint : "Enter a value"; valid : true }
-    ListElement {name : "MeanRadiantTemperature";  unit : "temperature"; type : "double"; hint : "Enter a value"; valid : true }
-    ListElement {name : "RespirationAmbientTemperature";  unit : "temperature"; type : "double"; hint : "Enter a value"; valid : true}
-    ListElement {name : "AtmosphericPressure"; unit : "pressure"; type : "double"; hint : "Enter a value"; valid : true}
-    ListElement {name : "RelativeHumidity";  unit : ""; type : "0To1"; hint : "Enter a value in range [0,1]"; valid : true}
-    ListElement {name : "Emissivity";  unit : ""; type : "0To1"; hint : "Enter a value in range [0,1]"; valid : true}
-    ListElement {name : "ClothingResistance";  unit : "clothing"; type : "double"; hint : "Enter a value"; valid : true }
+  DoubleValidator {
+    id : neg1To1Validator
+    bottom : -1.0
+    top : 1.0
+    decimals : 3
   }
 
   ListModel {
-    id : ambientGasListModel
-    ListElement {name : "Oxygen";  unit : ""; type : "0To1"; hint : "Fraction [0,1]"; valid : true}
-    ListElement {name : "CarbonDioxide";  unit : ""; type : "0To1"; hint : "Fraction [0,1]"; valid : true}
-    ListElement {name : "Nitrogen";  unit : ""; type : "0To1"; hint : "Fraction [0,1]"; valid : true}
-    ListElement {name : "CarbonMonoxide";  unit : ""; type : "0To1"; hint : "Fraction [0,1]"; valid : true}
+    id : substanceListModel
+    ListElement { category : "physicalData"; 
+                  valid: true;
+                  data : [
+                    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true},
+                    ListElement {name : "Classification"; unit : "substanceClass"; type : "enum"; hint : ""; valid : true},
+                    ListElement {name : "MolarMass";  unit : "molar"; type : "double"; hint : "Enter a value"; valid : true},
+                    ListElement {name : "Density";  unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true },
+                    ListElement {name : "MaximumDiffusionFlux"; unit : "massPerAreaRate"; type : "double"; hint : "Enter a value"; valid : true},
+                    ListElement {name : "MichaelisCoefficient";  unit : ""; type : "double"; hint : "Enter a value"; valid : true },
+                    ListElement {name : "MembraneResistance";  unit : "electricalResistance"; type : "double"; hint : "Enter a value"; valid : true },
+                    ListElement {name : "RelativeDiffusionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true},
+                    ListElement {name : "SolubilityCoefficient";  unit : "inversePressure"; type : "double"; hint : "Enter a value"; valid : true}
+                  ]}
+    ListElement { category : "clearanceData"; 
+                  valid : true;
+                  data : [
+                    ListElement {name : "IntrinsicClearance"; unit : "massRatePerWeight"; type : "double"; hint : "Enter a value "; valid : true},
+                    ListElement {name : "RenalClearance"; unit : "massRatePerWeight"; type : "double"; hint : "Enter a value "; valid : true},
+                    ListElement {name : "SystemicClearance"; unit : "massRatePerWeight"; type : "double"; hint : "Enter a value "; valid : true},
+                    ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true},
+                    ListElement {name : "FractionExcretedInFeces"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true}     
+                  ]}
+    ListElement { category : "pharmacokineticsData"; 
+                  valid : true;
+                  data : [
+                  ]}
+
   }
-  ListModel {
-    id : aerosolListModel
-  }
+
 }
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

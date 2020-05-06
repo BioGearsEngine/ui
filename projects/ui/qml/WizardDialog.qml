@@ -77,7 +77,36 @@ WizardDialogForm {
 	}
 
 	function launchSubstance(mode) {
-		console.log(mode)
+		mainDialog.title = 'Substance Wizard'
+		let environmentComponent = Qt.createComponent("UISubstanceWizard.qml");
+		if ( substanceComponent.status != Component.Ready){
+		  if (substanceComponent.status == Component.Error){
+			  console.log("Error : " + substanceComponent.errorString() );
+			  return;
+		  }
+	    console.log("Error : Action dialog component not ready");
+	  } else {
+		  activeWizard = substanceComponent.createObject(mainDialog.contentItem);
+			root.setHelpText("-")
+			if (mode === "Edit"){
+				let substance = scenario.edit_substance()
+				if (Object.keys(substance).length == 0){
+					//We get an empty environment object if the user closed file explorer without selecting a environment
+					activeWizard.destroy()
+					return;
+				} else {
+					activeWizard.editMode = true
+					activeWizard.mergeSubstanceData(substance)
+				}
+			}
+			//Connect standard dialog buttons to environment functions
+		  mainDialog.saveButton.onClicked.connect(activeWizard.checkConfiguration)
+			mainDialog.onReset.connect(activeWizard.resetConfiguration)
+			//Notify dialog that environment is ready
+			activeWizard.onValidConfiguration.connect(root.saveData)
+			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
+			activeWizard.onNameEdited.connect(root.showNameWarning)
+			mainDialog.open()
 	}
 	function launchCompound(mode) {
 		mainDialog.title = 'Compound Wizard'

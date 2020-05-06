@@ -65,12 +65,6 @@ UIEnvironmentWizardForm {
 		}
 	}
 
-	function getGasList() {
-		for (let sub in root.aerosolData){
-			console.log(sub + " : " + root.aerosolData[sub])
-		}
-	}
-
 	function checkConfiguration(){
 		let validConfiguration = true
 		let errorStr = "*"
