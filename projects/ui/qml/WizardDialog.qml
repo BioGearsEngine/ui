@@ -29,7 +29,6 @@ WizardDialogForm {
 					return;
 				} else {
 					activeWizard.editMode = true
-					activeWizard.patientGridView.forceLayout() //Ensure that all grid view components are completed or else we will not have a place to put the data
 					activeWizard.mergePatientData(patient)
 				}
 			}
@@ -64,7 +63,6 @@ WizardDialogForm {
 				} else {
 					activeWizard.editMode = true
 					activeWizard.mergeEnvironmentData(environment)
-					activeWizard.environmentGridView.forceLayout()  //Ensure that all grid view components are completed or else we will not have a place to put the data	
 				}
 			}
 			//Connect standard dialog buttons to environment functions
@@ -102,7 +100,6 @@ WizardDialogForm {
 				} else {
 					activeWizard.editMode = true
 					activeWizard.mergeCompoundData(compound)
-					activeWizard.compoundGridView.forceLayout()  //Ensure that all grid view components are completed or else we will not have a place to put the data	
 				}
 			}
 			//Connect standard dialog buttons to compound functions
@@ -135,9 +132,7 @@ WizardDialogForm {
 					return;
 				} else {
 					activeWizard.editMode = true
-					activeWizard.nutritionGridView.forceLayout() //Ensure that all grid view components are completed or else we will not have a place to put the data
 					activeWizard.mergeNutritionData(nutrition)
-					
 				}
 			}
 			//Connect standard dialog buttons to nutrition functions

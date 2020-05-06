@@ -21,6 +21,7 @@ UINutritionWizardForm {
 			let dataObject = {[nutritionDataModel.get(i).name] : [null, null]}
 			Object.assign(nutritionData, dataObject)
 		}
+		nutritionGridView.forceLayout()	//Make sure that all fields are drawn so that when we load data from file there are complete view items to map them to
 	}
 
 	Component.onDestruction : {
@@ -29,23 +30,26 @@ UINutritionWizardForm {
 	
 	function checkConfiguration(){
 		let validConfiguration = true
+		let errorStr = "*"
 		for (let i = 0; i < nutritionDataModel.count; ++i){
 			let validEntry = nutritionDataModel.get(i).valid
 			if (!validEntry){
 				validConfiguration = false
-				let errorStr = ""
 				let invalidField = nutritionDataModel.get(i).name
 				if (invalidField === "Name"){
-					errorStr = invalidField + " is a required field."
+					errorStr += invalidField + " is a required field.\n*"
 				} else {
-					errorStr = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+					errorStr += root.displayFormat(invalidField) + " requires both value and unit (or neither to use engine defaults)\n*";
 				}
-				root.invalidConfiguration(errorStr)
-				break;
 			}
 		}
 		if (validConfiguration){
 			root.validConfiguration('Nutrition', nutritionData)  //'nutrition' flag tells Wizard manager which type of data to save
+		} else {
+			if (errorStr.charAt(errorStr.length-1)==='*'){
+				errorStr = errorStr.slice(0, errorStr.length-1)
+			}
+			root.invalidConfiguration(errorStr)
 		}
 	}
 

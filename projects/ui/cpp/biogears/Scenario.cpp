@@ -1363,7 +1363,7 @@ QVariantMap Scenario::edit_environment()
   QVariantMap environmentMap;
 
   //Open file dialog in nutrition folder
-  QString environmentFile = QFileDialog::getOpenFileName(nullptr, "Edit Environment", "./environment", "Environment (*.xml)");
+  QString environmentFile = QFileDialog::getOpenFileName(nullptr, "Edit Environment", "./environments", "Environment (*.xml)");
   if (environmentFile.isNull()) {
     //File returns null string if user cancels without selecting a nutrition file.  Return empty map (Qml side will check for this)
     return environmentMap;
@@ -1472,7 +1472,7 @@ QVariantMap Scenario::edit_environment()
 
   //Loop over all aerosols and use aerosol name as key and [value, unit] pair as entry
   for (auto aerosol : environment->GetAmbientAerosols()) {
-    QString subName = QString::fromStdString(aerosol->GetSubstance().GetName());
+    QString subName = "Aerosol-" + QString::fromStdString(aerosol->GetSubstance().GetName());
     environmentField[0] = aerosol->GetConcentration(biogears::MassPerVolumeUnit::mg_Per_m3);
     environmentField[1] = "mg/m^3";
     environmentMap[subName] = environmentField;

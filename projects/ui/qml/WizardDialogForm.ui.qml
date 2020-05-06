@@ -161,14 +161,14 @@ Item {
     id : invalidConfigDialog
     modal : true
     closePolicy : Popup.NoAutoClose
-    width : parent.width / 2
-    height : parent.height / 5
+    width : parent.width / 1.5
+    height : parent.height / 2
     anchors.centerIn : parent
     property string warningText : ""
     header : Rectangle {
       id : invalidPatientHeader
       width : parent.width
-      height : parent.height * 0.2
+      height : parent.height * 0.1
       color: "#1A5276"
       Text {
         id: invalidPatientHeaderText

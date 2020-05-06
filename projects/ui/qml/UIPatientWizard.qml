@@ -22,27 +22,31 @@ UIPatientWizardForm {
 			let dataObject = {[patientDataModel.get(i).name] : [null, null]}
 			Object.assign(patientData, dataObject)
 		}
+		patientGridView.forceLayout()	//Make sure that all fields are drawn so that when we load data from file there are complete view items to map them to
 	}
 
 	function checkConfiguration(){
 		let validConfiguration = true
+		let errorStr = "*"
 		for (let i = 0; i < patientDataModel.count; ++i){
 			let validEntry = patientDataModel.get(i).valid
 			if (!validEntry){
 				validConfiguration = false
-				let errorStr = ""
 				let invalidField = patientDataModel.get(i).name
 				if (invalidField === "Name" || invalidField === "Gender"){
-					errorStr = invalidField + " is a required field."
+					errorStr += invalidField + " is a required field.\n*"
 				} else {
-					errorStr = invalidPatientWarning.warningText = root.displayFormat(invalidField) + " requires both a value and a unit to be set (leave both blank to use engine defaults)";
+					errorStr += root.displayFormat(invalidField) + " requires both value and unit (or neither to use engine defaults)\n*";
 				}
-				invalidConfiguration(errorStr)
-				break;
 			}
 		}
 		if (validConfiguration){
 			root.validConfiguration('Patient', patientData)  //'Patient' flag tells Wizard manager which type of data to save
+		} else {
+			if (errorStr.charAt(errorStr.length-1)==='*'){
+				errorStr = errorStr.slice(0, errorStr.length-1)
+			}
+			root.invalidConfiguration(errorStr)
 		}
 	}
 
@@ -51,9 +55,6 @@ UIPatientWizardForm {
 			patientData[prop] = patient[prop]
 		}
 		resetData = Object.assign({}, patientData)	//Copy data to resetData ( can't do = because this does copy by reference)
-				for (let p in patientData){
-			console.log(p + ', ' + patientData[p])
-		}
 		loadConfiguration(patientData)
 	}
 

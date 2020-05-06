@@ -14,7 +14,8 @@ UIUnitScalarEntryForm {
     // values from the editor, we get strings from the text field.  Thus, we check if the input is typeof number
     // before trimming.
     if (fromInput[0]!=null && typeof fromInput[0]=="number"){
-      let formattedValue = fromInput[0].toFixed(2)
+      let decimals = root.entryValidator ? root.entryValidator.decimals : 2
+      let formattedValue = fromInput[0].toFixed(decimals)
       fromInput[0] = formattedValue
     }
     root.entry.setFromExisting(fromInput)

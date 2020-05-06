@@ -442,7 +442,7 @@ Rectangle {
                          'pressure' : ['mmHg','atm','cmH2O'],
                          'area' : ['cm^2', 'm^2'],
                          'power': ['W','kcal/s','kcal/min','kcal/hr','BTU/hr'],
-                         'concentration': ['g/L', 'g/dL','g/mL', 'mg/L','mg/dL','ug/L'] 
+                         'concentration': ['g/L', 'g/dL','g/mL', 'mg/L','mg/dL','ug/L', 'mg/m^3'] 
                          })
 
 }

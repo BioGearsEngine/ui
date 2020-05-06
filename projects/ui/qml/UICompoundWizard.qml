@@ -18,6 +18,10 @@ UICompoundWizardForm {
 	property bool editMode : false
 	property bool nameWarningFlagged : false
 
+	Component.onCompleted : {
+		compoundGridView.forceLayout()	//Make sure that all fields are drawn so that when we load data from file there are complete view items to map them to
+	}
+
 	onLoadConfiguration : {
 		//Component fields do not exist yet when loading compound from file, so we have to add them to ListModel as we encounter them
 		for (let sub in compoundList){
@@ -31,7 +35,6 @@ UICompoundWizardForm {
 		// element by element basis
 		if (root.editMode) {
 			let numNewElements = compoundDataModel.count - Object.keys(root.resetData).length		//How many elements were added in addition to the data from the file?
-			console.log(numNewElements)
 			compoundDataModel.clear()  //Clear out list model
 			for (let key in compoundList){  //Clear out data list -- would be nice if there were a "clear" function for JS arrays
 				delete compoundList[key]
@@ -40,7 +43,6 @@ UICompoundWizardForm {
 			compoundList = Object.assign({}, resetData);
 			//Repopulate list model
 			for (let sub in root.compoundList){
-				console.log(sub)
 				let newComponent = {name: sub, unit: "concentration", type: "double", hint: "", valid: true}
 				compoundDataModel.append(newComponent)
 			}
@@ -54,25 +56,29 @@ UICompoundWizardForm {
 
 	function checkConfiguration(){
 		let validConfiguration = true
+		let errorStr = "*"
+		//Check name
 		if (root.compoundName === ""){
 			validConfiguration = false
-			let errorStr = "Compound name is a required field"
-			root.invalidConfiguration(errorStr)
-		} else {
-			for (let i = 0; i < compoundDataModel.count; ++i){
-				let validEntry = compoundDataModel.get(i).valid
-				if (!validEntry){
-					validConfiguration = false
-					let errorStr = "Each component requires a substance name, concentration, and unit"
-					root.invalidConfiguration(errorStr)
-					break;
-				}
+			errorStr += "Compound name is a required field\n*"
+		}
+		//Check components
+		for (let i = 0; i < compoundDataModel.count; ++i){
+			let validEntry = compoundDataModel.get(i).valid
+			if (!validEntry){
+				validConfiguration = false
+				errorStr += "Component " + (i+1) + " requires a substance name, concentration, and unit\n*"
 			}
 		}
 		if (validConfiguration){
 			let nameData = {"Name" : root.compoundName}
 			Object.assign(compoundList, nameData);	//Need to bundle up "name" with component list because WizardDialog::SaveData expects one object
 			root.validConfiguration('Compound', compoundList)  //'Compound' flag tells Wizard manager which type of data to save
+		} else {
+			if (errorStr.charAt(errorStr.length-1)==='*'){
+				errorStr = errorStr.slice(0, errorStr.length-1)
+			}
+			root.invalidConfiguration(errorStr)
 		}
 	}
 

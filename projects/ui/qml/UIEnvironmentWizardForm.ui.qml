@@ -93,7 +93,7 @@ Page {
               root.onLoadConfiguration.connect(function (environment) { setEntry (environment[model.name]) } )
               //Connect wizard reset button to entry reset functions -- if we are editing an existing environment, then restore
               //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-              root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
+              root.onResetConfiguration.connect(function () { if ( root.editMode && resetEnvironmentData[model.name][0]!=null) { setEntry(resetEnvironmentData[model.name]); } else { reset(); } } )
             }
           }
         }
@@ -152,7 +152,7 @@ Page {
               root.onLoadConfiguration.connect(function (environment) { setEntry (environment[model.name]) } )
               //Connect wizard reset button to entry reset functions -- if we are editing an existing environment, then restore
               //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-              root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
+              root.onResetConfiguration.connect(function () { if ( root.editMode && resetEnvironmentData[model.name][0]!=null) { setEntry(resetEnvironmentData[model.name]); } else { reset(); } } )
             }
             onInputAccepted : {
               root.environmentData[model.name] = input
@@ -208,6 +208,13 @@ Page {
               setComponentList('Aerosol')    //Make sure the list of substances is populated
               root.onResetConfiguration.connect( function() { if (!root.editMode) { reset() } } )   //If "new" compound (!edit), then reset wipes out all data
               model.valid = Qt.binding(function() {return entry.validInput})
+              if (root.editMode && model.name !== ""){
+                //This function populates field when loading from file, if the sub has been defined
+                let aerosol = model.name //Name is set to substance name when loading from file
+                let concentration = aerosolData[aerosol][0]
+                let unit = aerosolData[aerosol][1]
+                setEntry([aerosol, concentration, unit])
+              }
             }
             onInputAccepted : {
               //Returned "input" is an array [substance, concentration, unit]
@@ -300,13 +307,14 @@ Page {
   DoubleValidator {
     id : doubleValidator
     bottom : 0
+    decimals : 2
   }
 
   DoubleValidator {
     id : fractionValidator
     bottom : 0
     top : 1.0
-    decimals : 3
+    decimals : 4
   }
 
   ListModel {

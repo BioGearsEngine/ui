@@ -66,6 +66,7 @@ Page {
   DoubleValidator {
     id : doubleValidator
     bottom : 0
+    decimals : 2
   }
   DoubleValidator {
     id : fractionValidator
