@@ -15,31 +15,29 @@ MenuAreaForm {
     }
     switch (dataType){
       case biogearsTypes.PATIENT :
-        //Patient
         if (mode === "Export"){
           scenario.export_patient()
         } else {
           wizardDialog.launchPatient(mode)
         }
         break;
-      case biogearsTypes.ENVIRONMENT : 
-        //Environment
-        wizardDialog.launchEnvironment(mode)
+      case biogearsTypes.ENVIRONMENT :
+        if (mode === "Export"){
+          scenario.export_environment()
+        } else {
+          wizardDialog.launchEnvironment(mode)
+        }
         break;
       case biogearsTypes.SUBSTANCE : 
-        //Substance
         wizardDialog.launchSubstance(mode)
         break;
       case biogearsTypes.COMPOUND :
-        //Compound
         wizardDialog.launchCompound(mode)
         break;
       case biogearsTypes.NUTRITION : 
-        //Nutrient
         wizardDialog.launchNutrition(mode)
         break;
       case biogearsTypes.ECG : 
-        //ECG
         wizardDialog.launchECG(mode)
         break;
     }
