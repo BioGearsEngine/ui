@@ -1706,7 +1706,7 @@ void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W 
   if (intensity > 0.0) {
     action->GetIntensity().SetValue(intensity);
   } else if (workRate_W > 0.0) {
-    action->GetDesiredWorkRate().SetValue(workRate_W);
+    action->GetDesiredWorkRate().SetValue(workRate_W, biogears::PowerUnit::W);
   } else {
     //Reach this block if both inputs are 0, meaning we turn off action)
     action->GetIntensity().SetValue(0.0);
