@@ -237,8 +237,8 @@ Rectangle {
    
       Label {
         id: scalarLabel
-        Layout.preferredWidth : prefWidth * 0.7 - scalarUnitGrid.rowSpacing / 2
-        Layout.preferredHeight : prefHeight * 0.3 - scalarUnitGrid.columnSpacing/ 2
+        Layout.preferredWidth : prefWidth * 0.7 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredHeight : prefHeight * 0.3 - scalarUnitGrid.rowSpacing/ 2
         text : scalarEntry.label
         color : "black"
         font.pointSize : 8
@@ -248,8 +248,8 @@ Rectangle {
       }
       Label {
         id: unitLabel
-        Layout.preferredWidth : prefWidth * 0.3 - scalarUnitGrid.rowSpacing / 2
-        Layout.preferredHeight : prefHeight * 0.3 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredWidth : prefWidth * 0.3 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredHeight : prefHeight * 0.3 - scalarUnitGrid.rowSpacing / 2
         text : "Unit"
         color : "black"
         font.pointSize : 8
@@ -259,8 +259,8 @@ Rectangle {
       }
       TextField {
         id : scalarInput
-        Layout.preferredWidth : prefWidth * 0.7 - scalarUnitGrid.rowSpacing / 2
-        Layout.preferredHeight : prefHeight * 0.7 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredWidth : prefWidth * 0.7 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredHeight : prefHeight * 0.7 - scalarUnitGrid.rowSpacing / 2
         leftPadding : 10
         topPadding : 0
         bottomPadding : 0
@@ -281,8 +281,8 @@ Rectangle {
       }
       ComboBox {
         id : unitInput
-        Layout.preferredWidth : prefWidth * 0.25
-        Layout.preferredHeight : prefHeight * 0.7 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredWidth : prefWidth * 0.3 - scalarUnitGrid.columnSpacing / 2
+        Layout.preferredHeight : prefHeight * 0.7 - scalarUnitGrid.rowSpacing / 2
         Layout.alignment: Qt.AlignHCenter
         model : unitModel
         flat : true
@@ -384,7 +384,13 @@ Rectangle {
                          'medium' : ['Air', 'Water'],
                          'temperature' : ['C','F', 'K'],
                          'velocity' : ['m/s','cm/s','ft/s','ft/min'],
-                         'clothing' : ['clo','rsi']
+                         'clothing' : ['clo','rsi'],
+                         'molar' : ['g/mol'],
+                         'massFlux' : ['g/cm^2 s'],
+                         'volumetricFlowNorm' : ['mL/min kg'],
+                         'inversePressure' : ['1/atm'],
+                         'electricalResistance' : ['ohms'],
+                         'substanceClass' : ['Anesthetic', 'Ion','Sedative']
                          })
 
 }

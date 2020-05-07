@@ -20,7 +20,7 @@ UISubstanceWizardForm {
 		//Stand up object with keys corresponding to all properties (aerosol tracked separately until data processed)
 		for (let i = 0; i < substanceListModel.count; ++i){
 			let dataObject = {[substanceListModel.get(i).name] : [null, null]}
-			Object.assign(environmentData, dataObject)
+			Object.assign(substanceData, dataObject)
 		}
 		//Force layout functions here
 	}
@@ -65,5 +65,24 @@ UISubstanceWizardForm {
 			return null
 		}
 	}
+
+	function setDelegateFilter(currentTab){
+		let filter = ""
+		switch(currentTab){
+			case 0 : 
+				filter = "physical"
+				break;
+			case 1 : 
+				filter = "clearance"
+				break;
+			case 2 : 
+				filter = "pharmacokinetics"
+				break;
+			case 3 : 
+				filter = "pharmacodynamics"
+				break;
+			}
+			return filter
+		}
 
 }

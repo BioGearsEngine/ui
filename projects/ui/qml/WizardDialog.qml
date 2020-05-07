@@ -78,7 +78,7 @@ WizardDialogForm {
 
 	function launchSubstance(mode) {
 		mainDialog.title = 'Substance Wizard'
-		let environmentComponent = Qt.createComponent("UISubstanceWizard.qml");
+		let substanceComponent = Qt.createComponent("UISubstanceWizard.qml");
 		if ( substanceComponent.status != Component.Ready){
 		  if (substanceComponent.status == Component.Error){
 			  console.log("Error : " + substanceComponent.errorString() );
@@ -107,6 +107,7 @@ WizardDialogForm {
 			activeWizard.onInvalidConfiguration.connect(root.showConfigWarning)
 			activeWizard.onNameEdited.connect(root.showNameWarning)
 			mainDialog.open()
+		}
 	}
 	function launchCompound(mode) {
 		mainDialog.title = 'Compound Wizard'
