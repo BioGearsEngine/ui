@@ -241,7 +241,7 @@ Page {
 
   DelegateModel {
     id : substanceDelegateModel
-    model : substanceListModel
+    model : substanceListModel      
     delegate : substanceDelegate
     groups :  [
                 DelegateModelGroup {name : "physical"; includeByDefault : false},
@@ -250,16 +250,7 @@ Page {
                 DelegateModelGroup {name : "pkTissueKinetics"; includeByDefault : false},
                 DelegateModelGroup {name : "pharmacodynamics"; includeByDefault : false}
               ]
-    Component.onCompleted : {
-      items.addGroups(0, 9, "physical")
-      items.addGroups(9, 5, "clearance")
-      items.addGroups(15, 8, "pkPhysicochemical")
-      items.addGroups(23, 13, "pkTissueKinetics")
-      items.addGroups(36, 18, "pharmacodynamics")
-      items.addGroups(0, items.count-1, "persistedItems")
-    }
-    filterOnGroup : root.setDelegateFilter(substanceStackLayout.currentIndex, substanceStackLayout.subIndex)
-    
+    filterOnGroup : root.setDelegateFilter(substanceStackLayout.currentIndex, substanceStackLayout.subIndex)  
   }
 
   Component {
@@ -278,6 +269,11 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
+            physicalData[model.name] = input
+            if (model.name === "Name" && root.editMode && !nameWarningFlagged){
+              root.nameEdited()
+              nameWarningFlagged = true
+            }
           }
         }
         Package.name : "physical"
@@ -295,9 +291,7 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
-          }
-          Component.onCompleted : {
-          console.log(unit)
+            clearanceData[model.name] = input
           }
         }
         Package.name : "clearance"
@@ -315,6 +309,7 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
+            pkData.physicochemical[model.name] = input
           }
         }
         Package.name : "pkPhysicochemical"
@@ -332,6 +327,7 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
+            pkData.tissueKinetics[model.name] = input
           }
         }
         Package.name : "pkTissueKinetics"
@@ -349,6 +345,7 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
+            pdData[model.name] = input
           }
         }
         Package.name : "pharmacodynamics"

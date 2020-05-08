@@ -11,18 +11,68 @@ UISubstanceWizardForm {
 	signal loadConfiguration(var environmentData)
 	signal nameEdited()
 
-	property var substanceData : ({})		//String and unit scalar entries (including ambient gases)nvironment
+	property var substanceData : ({})		//Object holding all substance-related data (key maps to one of the tab objects)
+	property var physicalData : ({})		//Object holding all info from the "physical" tab
+	property var clearanceData : ({})		//Object holding all info from "clearance" tab
+	property var pkData : ({"physicochemical" : ({}), "tissueKinetics" : ({}) })					//Object holding all info from "pharmacokinetics" tab
+	property var pdData : ({})					//Object holding all info from "pharmacodynamics" tab
 	property var resetData : ({})  //Store data loaded in "edit" mode so that during reset we can revert to data in file
 	property bool editMode : false
 	property bool nameWarningFlagged : false
 
 	Component.onCompleted : {
-		//Stand up object with keys corresponding to all properties (aerosol tracked separately until data processed)
-		for (let i = 0; i < substanceListModel.count; ++i){
-			let dataObject = {[substanceListModel.get(i).name] : [null, null]}
-			Object.assign(substanceData, dataObject)
+		//Delegate models have a pre-defined group called "items" that all objects are added to by default
+		// Objects must manually be added to the other groups we have defined in SubstanceDelegateModel
+		// The addGroups(a, b, otherGroup) function copies b objects starting at index a of the calling group to
+		// otherGroup (seems like this should be called "addToGroups"?).  Note that each object will then belong
+		// to two groups: items and the new group (e.g. "clearance").  This is desirable behavior because it helps 
+		// us maintain a "master" list in items.  (There is another function called setGroups that appears to remove
+		// objects from one group and place them in another--which is not what we want).
+		// If we ever add/remove cdm elements to substance, we will need to hardcode the new index ranges here unless
+		// we figure out a way to track that info automatically.
+		let delegateItems = substanceDelegateModel.items
+		delegateItems.addGroups(0, 9, "physical")
+    delegateItems.addGroups(9, 6, "clearance")
+    delegateItems.addGroups(15, 8, "pkPhysicochemical")
+    delegateItems.addGroups(23, 13, "pkTissueKinetics")
+    delegateItems.addGroups(36, 18, "pharmacodynamics")
+    delegateItems.addGroups(0, delegateItems.count-1, "persistedItems")
+
+		//Each object in a DelegateModel is assigned "inGroup" bool properties that return whether an object is
+		// in a given group or not.  In SubstanceDelegateModel, each object will have the following props: inItems (default),
+		// inPhysical, inClearance, inPKPhysicochemical, inPkTissueKinetics, inPharmacodynamics.  Use these props
+		// to loop over all objects in sort them into the correct data bin.  We will use these bins to track user
+		// input and eventually report it to Scenario.create_substance
+		for (let i = 0; i < delegateItems.count; ++i){
+			let item = delegateItems.get(i)
+			let dataObject = {[item.model.name] : [null, null]}
+			if (item.inPhysical){
+				Object.assign(physicalData, dataObject)
+				continue
+			}
+			if (item.inClearance){
+				Object.assign(clearanceData, dataObject)
+				continue
+			}
+			if (item.inPkPhysicochemical){
+				Object.assign(pkData.physicochemical, dataObject)
+				continue
+			}
+			if (item.inPkTissueKinetics){
+				Object.assign(pkData.tissueKinetics, dataObject)
+				continue
+			}
+			if (item.inPharmacodynamics){
+				Object.assign(pdData, dataObject)
+			}
 		}
 		//Force layout functions here
+	}
+
+	function debugObjects(obj) {
+		for (let prop in obj){
+			console.log("\t" + prop + " : " + obj[prop])
+		}
 	}
 
 	onLoadConfiguration : {
@@ -68,7 +118,6 @@ UISubstanceWizardForm {
 
 	function setDelegateFilter(mainTab, subIndex){
 		let filter = ""
-		console.log(mainTab, subIndex)
 		switch(mainTab){
 			case 0 : 
 				filter = "physical"
@@ -87,8 +136,8 @@ UISubstanceWizardForm {
 				filter = "pharmacodynamics"
 				break;
 			}
-			console.log(filter)
 			return filter
 		}
+
 
 }
