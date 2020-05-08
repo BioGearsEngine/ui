@@ -66,9 +66,10 @@ UISubstanceWizardForm {
 		}
 	}
 
-	function setDelegateFilter(currentTab){
+	function setDelegateFilter(mainTab, subIndex){
 		let filter = ""
-		switch(currentTab){
+		console.log(mainTab, subIndex)
+		switch(mainTab){
 			case 0 : 
 				filter = "physical"
 				break;
@@ -76,12 +77,17 @@ UISubstanceWizardForm {
 				filter = "clearance"
 				break;
 			case 2 : 
-				filter = "pharmacokinetics"
+				if (subIndex == 0) {
+					filter = "pkPhysicochemical"
+				} else {
+					filter = "pkTissueKinetics"
+				}
 				break;
 			case 3 : 
 				filter = "pharmacodynamics"
 				break;
 			}
+			console.log(filter)
 			return filter
 		}
 

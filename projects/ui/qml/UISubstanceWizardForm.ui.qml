@@ -13,6 +13,8 @@ Page {
   property alias substanceListModel : substanceListModel
   property alias substanceDelegateModel : substanceDelegateModel
   property alias substanceTabBar : substanceTabBar
+  property alias substanceStackLayout : substanceStackLayout
+  property alias pkStackLayout : pkStackLayout
 
 
   DoubleValidator {
@@ -82,13 +84,13 @@ Page {
     height : parent.height - substanceTabBar.height
     anchors.top : substanceTabBar.bottom
     currentIndex : 0
-    Item {
+    property var subIndex : children[currentIndex].subIndex ? children[currentIndex].subIndex : 0
+    Pane {
       id : physicalDataTab
       Layout.fillWidth : true
       Layout.fillHeight : true
       GridView {
         id: physicalDataGridView
-        property var tab : 0
         clip : true
         model : substanceDelegateModel.parts.physical
         anchors.top : parent.top
@@ -101,7 +103,7 @@ Page {
         cellWidth : parent.width / 2
       }
     }
-    Item {
+    Pane {
       id : clearanceTab
       Layout.fillWidth : true
       Layout.fillHeight : true
@@ -109,7 +111,7 @@ Page {
         id : clearanceLabel
         width : parent.width
         height : implicitHeight
-        anchors.top : clearanceTab.top
+        anchors.top : parent.top
         anchors.topMargin : 15
         anchors.left : parent.left
         anchors.right : parent.right
@@ -132,15 +134,16 @@ Page {
         currentIndex: -1
       }
     }
-    Item {
+    Pane {
       id : pkTab
       Layout.fillWidth : true
       Layout.fillHeight : true
+      property var subIndex : pkStackLayout.currentIndex
       Label {
         id : pkLabel
         width : parent.width
         height : implicitHeight
-        anchors.top : pkTab.top
+        anchors.top : parent.top
         anchors.topMargin : 15
         anchors.left : parent.left
         anchors.right : parent.right
@@ -148,22 +151,61 @@ Page {
         font.pointSize : 10
         horizontalAlignment : Text.AlignHCenter
       }
-      GridView {
-        id: pkGridView
-        clip : true
+      RowLayout {
+        id : switchItem
         width : parent.width
-        height : parent.height
-        cellHeight : 60
-        cellWidth : parent.width / 2
-        model : substanceDelegateModel.parts.pharmacokinetics
+        height : implicitHeight
         anchors.top : pkLabel.bottom
         anchors.topMargin : 10
         anchors.left : parent.left
         anchors.right : parent.right
-        currentIndex: -1
+        Label {
+          text : "Physicochemical Input"
+          font.pointSize : 9
+          Layout.alignment : Qt.AlignRight
+        }
+        Switch {
+          text : "Partition Coefficients"
+          font.pointSize : 9
+          onClicked : {
+            pkStackLayout.currentIndex = position 
+          }
+        }
       }
+      StackLayout {
+        id : pkStackLayout
+        anchors.top : switchItem.bottom
+        anchors.topMargin : 10
+        width : parent.width
+        height : parent.height - switchItem.height
+        currentIndex : 0
+        Item {
+          GridView {
+            id: pkGridView1
+            clip : true
+            width : parent.width
+            height : parent.height
+            cellHeight : 60
+            cellWidth : parent.width / 2
+            model : substanceDelegateModel.parts.pkPhysicochemical
+            currentIndex: -1
+          }
+        }
+        Item {
+          GridView {
+            id: pkGridView2
+            clip : true
+            width : parent.width
+            height : parent.height
+            cellHeight : 60
+            cellWidth : parent.width / 2
+            model : substanceDelegateModel.parts.pkTissueKinetics
+            currentIndex: -1
+          }
+        }
+      }   
     }
-    Item {
+    Pane {
       id : pdTab
       Layout.fillWidth : true
       Layout.fillHeight : true
@@ -171,7 +213,7 @@ Page {
         id : pdLabel
         width : parent.width
         height : implicitHeight
-        anchors.top : pdTab.top
+        anchors.top : parent.top
         anchors.topMargin : 15
         anchors.left : parent.left
         anchors.right : parent.right
@@ -204,90 +246,113 @@ Page {
     groups :  [
                 DelegateModelGroup {name : "physical"; includeByDefault : false},
                 DelegateModelGroup {name : "clearance"; includeByDefault : false},
-                DelegateModelGroup {name : "pharmacokinetics"; includeByDefault : false},
+                DelegateModelGroup {name : "pkPhysicochemical"; includeByDefault : false},
+                DelegateModelGroup {name : "pkTissueKinetics"; includeByDefault : false},
                 DelegateModelGroup {name : "pharmacodynamics"; includeByDefault : false}
               ]
     Component.onCompleted : {
       items.addGroups(0, 9, "physical")
       items.addGroups(9, 5, "clearance")
-      items.addGroups(15, 8, "pharmacokinetics")
+      items.addGroups(15, 8, "pkPhysicochemical")
+      items.addGroups(23, 13, "pkTissueKinetics")
       items.addGroups(36, 18, "pharmacodynamics")
       items.addGroups(0, items.count-1, "persistedItems")
     }
-    filterOnGroup : root.setDelegateFilter(substanceTabBar.currentIndex)
+    filterOnGroup : root.setDelegateFilter(substanceStackLayout.currentIndex, substanceStackLayout.subIndex)
     
   }
 
   Component {
     id : substanceDelegate  
     Package {
-      UIUnitScalarEntry {
-        prefWidth : GridView.view.cellWidth * 0.9
-        prefHeight : GridView.view.cellHeight * 0.95
-        label : root.displayFormat(model.name)
-        unit : model.unit
-        type : model.type
-        hintText : model.hint
-        entryValidator : root.assignValidator(model.type)
-        onInputAccepted : {
+      Item {
+        width : GridView.view.cellWidth
+        height : GridView.view.cellHeight
+        UIUnitScalarEntry {
+          anchors.centerIn : parent
+          prefWidth : parent.width * 0.9
+          prefHeight : parent.height * 0.95
+          label : root.displayFormat(model.name)
+          unit : model.unit
+          type : model.type
+          hintText : model.hint
+          entryValidator : root.assignValidator(model.type)
+          onInputAccepted : {
+          }
         }
         Package.name : "physical"
       }
-      UIUnitScalarEntry {
-        prefWidth : GridView.view.cellWidth * 0.9
-        prefHeight : GridView.view.cellHeight * 0.95
-        label : root.displayFormat(model.name)
-        unit : model.unit
-        type : model.type
-        hintText : model.hint
-        entryValidator : root.assignValidator(model.type)
-        onInputAccepted : {
+     Item {
+        width : GridView.view.cellWidth
+        height : GridView.view.cellHeight
+        UIUnitScalarEntry {
+          anchors.centerIn : parent
+          prefWidth : parent.width * 0.9
+          prefHeight : parent.height * 0.95
+          label : root.displayFormat(model.name)
+          unit : model.unit
+          type : model.type
+          hintText : model.hint
+          entryValidator : root.assignValidator(model.type)
+          onInputAccepted : {
+          }
+          Component.onCompleted : {
+          console.log(unit)
+          }
         }
         Package.name : "clearance"
       }
-      UIUnitScalarEntry {
-        prefWidth : GridView.view.cellWidth * 0.9
-        prefHeight : GridView.view.cellHeight * 0.95
-        label : root.displayFormat(model.name)
-        unit : model.unit
-        type : model.type
-        hintText : model.hint
-        entryValidator : root.assignValidator(model.type)
-        onInputAccepted : {
+      Item {
+        width : GridView.view.cellWidth
+        height : GridView.view.cellHeight
+        UIUnitScalarEntry {
+          anchors.centerIn : parent
+          prefWidth : parent.width * 0.9
+          prefHeight : parent.height * 0.95
+          label : root.displayFormat(model.name)
+          unit : model.unit
+          type : model.type
+          hintText : model.hint
+          entryValidator : root.assignValidator(model.type)
+          onInputAccepted : {
+          }
         }
-        Package.name : "pharmacokinetics"
+        Package.name : "pkPhysicochemical"
       }
-      UIUnitScalarEntry {
-        prefWidth : GridView.view.cellWidth * 0.9
-        prefHeight : GridView.view.cellHeight * 0.95
-        label : root.displayFormat(model.name)
-        unit : model.unit
-        type : model.type
-        hintText : model.hint
-        entryValidator : root.assignValidator(model.type)
-        onInputAccepted : {
+      Item {
+        width : GridView.view.cellWidth
+        height : GridView.view.cellHeight
+        UIUnitScalarEntry {
+          anchors.centerIn : parent
+          prefWidth : parent.width * 0.9
+          prefHeight : parent.height * 0.95
+          label : root.displayFormat(model.name)
+          unit : model.unit
+          type : model.type
+          hintText : model.hint
+          entryValidator : root.assignValidator(model.type)
+          onInputAccepted : {
+          }
+        }
+        Package.name : "pkTissueKinetics"
+      }
+      Item {
+        width : GridView.view.cellWidth
+        height : GridView.view.cellHeight
+        UIUnitScalarEntry {
+          anchors.centerIn : parent
+          prefWidth : parent.width * 0.9
+          prefHeight : parent.height * 0.95
+          label : root.displayFormat(model.name)
+          unit : model.unit
+          type : model.type
+          hintText : model.hint
+          entryValidator : root.assignValidator(model.type)
+          onInputAccepted : {
+          }
         }
         Package.name : "pharmacodynamics"
       }
-    }
-  }
-
-  Component {
-    id : unitScalarEntryDelegate
-    UIUnitScalarEntry {
-      prefWidth : GridView.view.cellWidth * 0.9
-      prefHeight : GridView.view.cellHeight * 0.95
-      label : root.displayFormat(model.name)
-      unit : model.unit
-      type : model.type
-      hintText : model.hint
-      entryValidator : root.assignValidator(model.type)
-      onInputAccepted : {
-      }
-      Component.onCompleted : {
-        console.log(unit)
-      }
-      Package.name : name
     }
   }
 
@@ -307,7 +372,7 @@ Page {
       ListElement {name : "SystemicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true}
       ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true}
       ListElement {name : "ChargeInBlood"; unit : "charge"; type : "enum"; hint : ""; valid : true}
-      ListElement {name : "ReabsorptionRate"; unit : ""; type : "double"; hint : "Enter a value"; valid : true}     
+      ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true}     
     ListElement {name : "AcidDissociationConstant"; unit : ""; type : "double"; hint : "Enter a value"; valid : true}     
       ListElement {name : "BindingProtein"; unit : "protein"; type : "enum"; hint : ""; valid : true}     
       ListElement {name : "BloodPlasmaRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true}     
@@ -331,7 +396,7 @@ Page {
       ListElement {name : "SpleenPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true}
     ListElement {name : "EC50"; unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true}
       ListElement {name : "ShapeParameter"; unit : ""; type : "double"; hint : "Enter a value"; valid : true}
-      ListElement {name : "EffectSiteRateConstant"; unit : "inverseTime"; type : "double"; hint : "Enter a value"; valid : true}
+      ListElement {name : "EffectSiteRateConstant"; unit : "frequency"; type : "double"; hint : "Enter a value"; valid : true}
       ListElement {name : "BronchodilationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true}
       ListElement {name : "DiastolicPressureModifier"; unit : ""; type : "-1to1"; hint : "Enter a value [-1-1]"; valid : true}
       ListElement {name : "SystolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true}

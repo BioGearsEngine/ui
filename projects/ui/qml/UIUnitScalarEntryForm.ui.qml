@@ -40,7 +40,7 @@ Rectangle {
   
   Loader {
     id : entryLoader
-    sourceComponent : root.type === "double" ? scalarWithUnitComponent : (root.type === "enum" ? enumComponent : scalarStringComponent)
+    sourceComponent : (root.type === "double" && root.unit!=="") ? scalarWithUnitComponent : (root.type === "enum" ? enumComponent : scalarStringComponent)
   }
 
   //The loader will instantiate ONE of the components defined below, depending on the input type (scalar w/ unit,
@@ -390,7 +390,10 @@ Rectangle {
                          'volumetricFlowNorm' : ['mL/min kg'],
                          'inversePressure' : ['1/atm'],
                          'electricalResistance' : ['ohms'],
-                         'substanceClass' : ['Anesthetic', 'Ion','Sedative']
+                         'substanceClass' : ['Anesthetic', 'Ion','Sedative'],
+                         'charge' : ['Positive','Neutral','Negative'],
+                         'protein' : ['Albumin','Lipoprotein','AAG'],
+                         'ionicState' : ['Acid', 'Strong Base','Weak Base','Neutral','Zwitterion']
                          })
 
 }
