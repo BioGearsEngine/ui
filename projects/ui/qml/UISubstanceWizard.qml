@@ -27,24 +27,29 @@ UISubstanceWizardForm {
 		// otherGroup (seems like this should be called "addToGroups"?).  Note that each object will then belong
 		// to two groups: items and the new group (e.g. "clearance").  This is desirable behavior because it helps 
 		// us maintain a "master" list in items.  (There is another function called setGroups that appears to remove
-		// objects from one group and place them in another--which is not what we want).
-		// If we ever add/remove cdm elements to substance, we will need to hardcode the new index ranges here unless
-		// we figure out a way to track that info automatically.
-		let delegateItems = substanceDelegateModel.items
-		delegateItems.addGroups(0, 9, "physical")
-    delegateItems.addGroups(9, 6, "clearance")
-    delegateItems.addGroups(15, 8, "pkPhysicochemical")
-    delegateItems.addGroups(23, 13, "pkTissueKinetics")
-    delegateItems.addGroups(36, 18, "pharmacodynamics")
-    delegateItems.addGroups(0, delegateItems.count-1, "persistedItems")
+		// objects from one group and place them in another--which is not what we want).  We also add all objects to the 
+		// "persistent items" group (another built-in delegate model group).  This passes ownership of the objects to the 
+		// delegate model, which maintains their existence even when the view containing the object goes out of focus (normal
+		// behavior for views is to destroy their objects when view goes out of focus, then re-make them when focus is regained).
+		// In practice, this means that if we write data in the "Physical" tab, then click over to the PK tab, the "physical"
+		// data will still be saved and re-displayed when we move back to the "Physical" tab.  
+		
+		//To initialize, loop over all items (will be 1:1 match with substance list model), and assign them to delegate
+		// model groups according to their "group" role if "active" role is true.  Most list model elements are active,
+		// but some of the renal clearance options are not. Each object in a DelegateModel is automaticall assigned "inGroup" 
+		// bool properties that return whether an object is in a given group or not.  In SubstanceDelegateModel, each object 
+		// will have the following props: inItems (default), inPhysical, inClearance, inPKPhysicochemical, inPkTissueKinetics, 
+		// inPharmacodynamics.  Use these props to loop over all objects in sort them into the correct data bin.  We will use 
+		// these bins to track user input and eventually report it to Scenario.create_substance  
 
-		//Each object in a DelegateModel is assigned "inGroup" bool properties that return whether an object is
-		// in a given group or not.  In SubstanceDelegateModel, each object will have the following props: inItems (default),
-		// inPhysical, inClearance, inPKPhysicochemical, inPkTissueKinetics, inPharmacodynamics.  Use these props
-		// to loop over all objects in sort them into the correct data bin.  We will use these bins to track user
-		// input and eventually report it to Scenario.create_substance
-		for (let i = 0; i < delegateItems.count; ++i){
-			let item = delegateItems.get(i)
+		let delegateItems = substanceDelegateModel.items
+		while (delegateItems.count > 0){
+			let item = delegateItems.get(0)
+			if (item.model.active){
+				delegateItems.setGroups(0, 1, [item.model.group, "persistedItems"])
+			} else {
+				delegateItems.setGroups(0, 1, ["persistedItems"])
+			}
 			let dataObject = {[item.model.name] : [null, null]}
 			if (item.inPhysical){
 				Object.assign(physicalData, dataObject)
@@ -66,7 +71,6 @@ UISubstanceWizardForm {
 				Object.assign(pdData, dataObject)
 			}
 		}
-		//Force layout functions here
 	}
 
 	function debugObjects(obj) {
@@ -139,5 +143,15 @@ UISubstanceWizardForm {
 			return filter
 		}
 
+		substanceListModel.onDataChanged : {
+			let dataIndex = topLeft.row
+			let group = substanceListModel.get(dataIndex).group
+			let active = substanceListModel.get(dataIndex).active
+      if (active){
+				substanceDelegateModel.persistedItems.addGroups(dataIndex, 1, [group, "items"])
+			} else {
+				substanceDelegateModel.persistedItems.removeGroups(dataIndex, 1, [group, "items"])
+			}
+		}
 
 }
