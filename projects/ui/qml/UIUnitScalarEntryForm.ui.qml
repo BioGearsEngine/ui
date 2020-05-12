@@ -207,6 +207,15 @@ Rectangle {
           color : "transparent"
           border.width : 0
         }
+        onTextChanged : {
+          //We need to explicitly handle the case where we had entered text and then deleted it.  It seems that
+          //the validator not only blocks the editingFinished signal (because an emtpy string is not a double), but
+          //also prevents the userInput property binding from updating when text.length changes (testing showed that
+          //clearing unit and deleting text and logging "userInput" returned the previous value, not a blank input).
+          if (scalarInput.text.length === 0){
+            root.inputAccepted(["",""])
+          }
+        }
         onEditingFinished : {
           if (validInput){
             root.inputAccepted(userInput)
@@ -223,7 +232,7 @@ Rectangle {
       property var userInput: [scalarInput.text, unitInput.currentText]
       property bool editing : scalarInput.activeFocus || unitInput.activeFocus
       property bool validInput : (scalarInput.text.length > 0 && unitInput.currentIndex > -1)
-                                  || (scalarInput.text.length == 0 && unitInput.currentIndex == -1)
+                                  || (scalarInput.text.length === 0 && unitInput.currentIndex === -1)
       property var reset : function() {scalarInput.clear(); unitInput.currentIndex = -1}
       property var setFromExisting : function (existing) {  if (existing[0]) { scalarInput.text = existing[0];
                                                             unitInput.currentIndex = unitInput.find(existing[1]); } }
@@ -272,6 +281,15 @@ Rectangle {
           anchors.fill : parent
           color : "transparent"
           border.width : 0
+        }
+        onTextChanged : {
+          //We need to explicitly handle the case where we had entered text and then deleted it.  It seems that
+          //the validator not only blocks the editingFinished signal (because an emtpy string is not a double), but
+          //also prevents the userInput property binding from updating when text.length changes (testing showed that
+          //clearing unit and deleting text and logging "userInput" returned the previous value, not a blank input).
+          if (scalarInput.text.length === 0 && unitInput.currentIndex === -1){
+            root.inputAccepted(["",""])
+          }
         }
         onEditingFinished : {
           if (validInput){
@@ -358,8 +376,9 @@ Rectangle {
         }
         onActivated : {
           if (currentText==='-Clear-'){
-            scalarUnitGrid.reset()
-          } else if (validInput){
+            unitInput.currentIndex = -1
+          }
+          if (validInput){
             root.inputAccepted(userInput)
           }
         }

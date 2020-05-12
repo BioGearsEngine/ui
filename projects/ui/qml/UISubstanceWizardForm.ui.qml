@@ -27,7 +27,7 @@ Page {
     id : fractionValidator
     bottom : 0
     top : 1.0
-    decimals : 4
+    decimals : 3
   }
 
   DoubleValidator {
@@ -134,30 +134,28 @@ Page {
         currentIndex: -1
       }
       CheckBox {
-        id : dynamicClearanceCheck
+        id : renalRegulationCheck
         anchors.top : clearanceGridView.bottom
         anchors.horizontalCenter : parent.horizontalCenter
         anchors.topMargin : 10
         width : implicitWidth
         height : implicitHeight
-        text : "Show Advanced Clearance Parameters"
+        text : "Show Advanced Renal Regulation Parameters"
         font.pointSize : 9
         checked : false
         onClicked : {
           if (checked){
-            let dynamicRenalData = ({})
+            let regulationData = ({})
             for (let i = 0; i < substanceListModel.count; ++i){
               let element = substanceListModel.get(i)
               if (element.group === "clearance" && !element.active){
                 substanceListModel.set(i, {"active" : true})
                 let dataObject = {[element.name] : [null, null]}
-                Object.assign(dynamicRenalData, dataObject)
+                Object.assign(regulationData, dataObject)
               }
             }
-            let dynamicData = {"DynamicRenalData" : dynamicRenalData}
-            Object.assign(clearanceData, dynamicData)
-            console.log(Object.keys(clearanceData))
-            console.log(Object.keys(clearanceData.DynamicRenalData))
+            let regulationRole = {"Regulation" : regulationData}
+            Object.assign(clearanceData, regulationRole)
           } else {
             for (let i = 0; i < substanceDelegateModel.persistedItems.count; ++i){
               let item = substanceDelegateModel.persistedItems.get(i)
@@ -165,7 +163,7 @@ Page {
                 substanceListModel.set(item.persistedItemsIndex, {"active" : false})
               }
             }
-            delete clearanceData.DynamicRenalData
+            delete clearanceData.Regulation
           }
         }
       }
@@ -311,6 +309,9 @@ Page {
               nameWarningFlagged = true
             }
           }
+          Component.onCompleted : {
+            model.valid = Qt.binding(function() {return entry.validInput})
+          }
         }
         Package.name : "physical"
       }
@@ -328,6 +329,9 @@ Page {
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
             clearanceData[model.name] = input
+          }
+          Component.onCompleted : {
+            model.valid = Qt.binding(function() {return entry.validInput})
           }
         }
         Package.name : "clearance"
@@ -347,6 +351,9 @@ Page {
           onInputAccepted : {
             pkData.physicochemical[model.name] = input
           }
+          Component.onCompleted : {
+            model.valid = Qt.binding(function() {return entry.validInput})
+          }
         }
         Package.name : "pkPhysicochemical"
       }
@@ -365,6 +372,9 @@ Page {
           onInputAccepted : {
             pkData.tissueKinetics[model.name] = input
           }
+          Component.onCompleted : {
+            model.valid = Qt.binding(function() {return entry.validInput})
+          }
         }
         Package.name : "pkTissueKinetics"
       }
@@ -381,7 +391,14 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
-            pdData[model.name] = input
+            if (input[0] === ""){
+              pdData[model.name] = [null, null]
+            } else {
+              pdData[model.name] = input
+            }
+          }
+          Component.onCompleted : {
+            model.valid = Qt.binding(function() {return entry.validInput})
           }
         }
         Package.name : "pharmacodynamics"
@@ -391,7 +408,7 @@ Page {
 
   ListModel {
     id : substanceListModel
-    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true; group : "physical"}
+    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true; group : "physical"; active : true}
       ListElement {name : "Classification"; unit : "substanceClass"; type : "enum"; hint : ""; valid : true; group : "physical"; active : true}
       ListElement {name : "MolarMass";  unit : "molar"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"; active : true}
       ListElement {name : "Density";  unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"; active : true}
@@ -432,13 +449,13 @@ Page {
       ListElement {name : "ShapeParameter"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "EffectSiteRateConstant"; unit : "frequency"; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "BronchodilationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
-      ListElement {name : "DiastolicPressureModifier"; unit : ""; type : "-1to1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
+      ListElement {name : "DiastolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "SystolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "FeverModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
-      ListElement {name : "HeartRateModifier"; unit : ""; type : "-1to1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
+      ListElement {name : "HeartRateModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "HemorrhageModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "NeuromuscularBlockModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
-      ListElement {name : "PainModifier"; unit : ""; type : "-1to1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
+      ListElement {name : "PainModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "RespirationRateModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "TidalVolumeModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
       ListElement {name : "SedationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"; active : true}
