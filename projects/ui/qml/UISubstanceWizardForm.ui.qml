@@ -509,6 +509,7 @@ Page {
   ListModel {
     id : substanceListModel
     ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true; group : "physical";dynamic : false}
+      ListElement {name : "State"; unit: "substanceState"; type : "enum"; hint : "*"; valid : true; group : "physical";dynamic : false}
       ListElement {name : "Classification"; unit : "substanceClass"; type : "enum"; hint : ""; valid : true; group : "physical";dynamic : false}
       ListElement {name : "MolarMass";  unit : "molar"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
       ListElement {name : "Density";  unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}

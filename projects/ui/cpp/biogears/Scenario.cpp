@@ -14,6 +14,7 @@
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/properties/SEScalar.h>
+#include <biogears/cdm/properties/SEScalarInversePressure.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
@@ -935,6 +936,88 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   return;
 }
 
+void Scenario::create_substance(QVariantMap substanceData)
+{
+  biogears::SESubstance* newSubstance = new biogears::SESubstance(_engine->GetLogger());
+  //JS objects are returned from QML as QVariantMap<QString (key), QVariant (item)>
+  //The key will be the field in the patient CDM (e.g. Name, State, MolarMass...)
+  //The item is a pair (value, unit), which is returned by QML as QList<QVariant>
+  //We first convert the QVariantList to a QList, which allows us to index the value and unit
+  //We then access values and convert them from QVariant to the appropriate type (string, double, int, etc)
+
+  QVariantMap physicalData = substanceData["Physical"].toMap();
+
+  //Name
+  QList<QVariant> subMetric = physicalData["Name"].toList();
+  QString subName = subMetric[0].toString(); //Used to gen file name
+  newSubstance->SetName(subName.toStdString());
+  //State
+  subMetric = physicalData["State"].toList();
+  int state = subMetric[0].toInt();
+  newSubstance->SetState((CDM::enumSubstanceState::value)state);
+  //Classification
+  subMetric = physicalData["Classification"].toList();
+  if (!subMetric[0].isNull()) {
+    int subClass = subMetric[0].toInt();
+    newSubstance->SetClassification((CDM::enumSubstanceClass::value)subClass);
+  }
+  //Density
+  subMetric = physicalData["Density"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    auto& unit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    newSubstance->GetDensity().SetValue(value, unit);
+  }
+  //Maximum Diffusion Flux
+  subMetric = physicalData["MaximumDiffusionFlux"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    auto& unit = biogears::MassPerAreaTimeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    newSubstance->GetMaximumDiffusionFlux().SetValue(value, unit);
+  }
+  //Michaelis Coefficient
+  subMetric = physicalData["MichaelisCoefficient"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    newSubstance->GetMichaelisCoefficient().SetValue(value);
+  }
+  //Membrane Resistance
+  subMetric = physicalData["MembraneResistance"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    auto& unit = biogears::ElectricResistanceUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    newSubstance->GetMembraneResistance().SetValue(value, unit);
+  }
+  //Molar Mass
+  subMetric = physicalData["MolarMass"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    auto& unit = biogears::MassPerAmountUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    newSubstance->GetMolarMass().SetValue(value, unit);
+  }
+  //Relative Diffusion Coefficient
+  subMetric = physicalData["RelativeDiffusionCoefficient"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    newSubstance->GetRelativeDiffusionCoefficient().SetValue(value);
+  }
+  //Solubility Coefficient
+  subMetric = physicalData["SolubilityCoefficient"].toList();
+  if (!subMetric[0].isNull()) {
+    double value = subMetric[0].toDouble();
+    auto& unit = biogears::InversePressureUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    newSubstance->GetSolubilityCoefficient().SetValue(value, unit);
+  }
+}
+
+void Scenario::export_substance()
+{
+}
+
+void Scenario::export_substance(const biogears::SESubstance* substance)
+{
+}
+
 void Scenario::create_compound(QVariantMap compoundData)
 {
   biogears::SESubstanceCompound* newCompound = new biogears::SESubstanceCompound(_engine->GetLogger());
@@ -1306,7 +1389,7 @@ void Scenario::create_environment(QVariantMap environmentData)
   eMetric = environmentData["Oxygen"].toList();
   if (!eMetric[0].isNull()) {
     ambientGas = &_engine->GetSubstances().GetO2();
-    gasFraction = &newEnvironment->GetAmbientGas(*ambientGas);    //If ambient gas is not found, SEEnvironmentConditions creates a new SubtanceFraction, adds it to ambient gases list, and returns a ptr to the fraction
+    gasFraction = &newEnvironment->GetAmbientGas(*ambientGas); //If ambient gas is not found, SEEnvironmentConditions creates a new SubtanceFraction, adds it to ambient gases list, and returns a ptr to the fraction
     gasFraction->GetFractionAmount().SetValue(eMetric[0].toDouble());
   }
   environmentData.remove("Oxygen");
@@ -1347,7 +1430,7 @@ void Scenario::create_environment(QVariantMap environmentData)
   biogears::SESubstanceConcentration* aerosolConcentration = nullptr;
   for (auto key : environmentData.keys()) {
     aerosol = _engine->GetSubstances().GetSubstance(key.toStdString());
-    aerosolConcentration = &newEnvironment->GetAmbientAerosol(*aerosol);  //If ambient aerosol is not found, SEEnvironmentConditions creates a new SubtanceConcentration, adds it to ambient gases list, and returns a ptr to the concentration
+    aerosolConcentration = &newEnvironment->GetAmbientAerosol(*aerosol); //If ambient aerosol is not found, SEEnvironmentConditions creates a new SubtanceConcentration, adds it to ambient gases list, and returns a ptr to the concentration
     double concentration = environmentData[key].toList()[0].toDouble();
     auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(environmentData[key].toList()[1].toString().toStdString());
     aerosolConcentration->GetConcentration().SetValue(concentration, cUnit);

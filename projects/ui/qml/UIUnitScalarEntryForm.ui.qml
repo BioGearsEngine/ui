@@ -412,7 +412,8 @@ Rectangle {
                          'substanceClass' : ['Anesthetic', 'Ion','Sedative'],
                          'charge' : ['Positive','Neutral','Negative'],
                          'protein' : ['Albumin','Lipoprotein','AAG'],
-                         'ionicState' : ['Acid', 'Strong Base','Weak Base','Neutral','Zwitterion']
+                         'ionicState' : ['Acid', 'Strong Base','Weak Base','Neutral','Zwitterion'],
+                         'substanceState' : ['Solid','Liquid','Gas', 'Molecular']
                          })
 
 }

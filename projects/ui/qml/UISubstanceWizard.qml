@@ -105,6 +105,8 @@ UISubstanceWizardForm {
 			valid = false
 			errorStr += "Clearance: \n\t All fields are required to set up substance clearance (or none to indicate no data).\n"
 		}
+		let report = valid ? "" : errorStr
+		return [valid, report]
 	}
 
 	function verifyPkData() {
