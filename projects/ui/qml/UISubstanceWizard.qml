@@ -20,59 +20,6 @@ UISubstanceWizardForm {
 	property bool editMode : false
 	property bool nameWarningFlagged : false
 
-	Component.onCompleted : {
-		//Delegate models have a pre-defined group called "items" that all objects are added to by default
-		// Objects must manually be added to the other groups we have defined in SubstanceDelegateModel
-		// The addGroups(a, b, otherGroup) function copies b objects starting at index a of the calling group to
-		// otherGroup (seems like this should be called "addToGroups"?).  Note that each object will then belong
-		// to two groups: items and the new group (e.g. "clearance").  This is desirable behavior because it helps 
-		// us maintain a "master" list in items.  (There is another function called setGroups that appears to remove
-		// objects from one group and place them in another--which is not what we want).  We also add all objects to the 
-		// "persistent items" group (another built-in delegate model group).  This passes ownership of the objects to the 
-		// delegate model, which maintains their existence even when the view containing the object goes out of focus (normal
-		// behavior for views is to destroy their objects when view goes out of focus, then re-make them when focus is regained).
-		// In practice, this means that if we write data in the "Physical" tab, then click over to the PK tab, the "physical"
-		// data will still be saved and re-displayed when we move back to the "Physical" tab.  
-		
-		//To initialize, loop over all items (will be 1:1 match with substance list model), and assign them to delegate
-		// model groups according to their "group" role if "active" role is true.  Most list model elements are active,
-		// but some of the renal clearance options are not. Each object in a DelegateModel is automaticall assigned "inGroup" 
-		// bool properties that return whether an object is in a given group or not.  In SubstanceDelegateModel, each object 
-		// will have the following props: inItems (default), inPhysical, inClearance, inPKPhysicochemical, inPkTissueKinetics, 
-		// inPharmacodynamics.  Use these props to loop over all objects in sort them into the correct data bin.  We will use 
-		// these bins to track user input and eventually report it to Scenario.create_substance  
-
-		let delegateItems = substanceDelegateModel.items
-		while (delegateItems.count > 0){
-			let item = delegateItems.get(0)
-			if (item.model.active){
-				delegateItems.setGroups(0, 1, [item.model.group, "persistedItems"])
-			} else {
-				delegateItems.setGroups(0, 1, ["persistedItems"])
-			}
-			let dataObject = {[item.model.name] : [null, null]}
-			if (item.inPhysical){
-				Object.assign(physicalData, dataObject)
-				continue
-			}
-			if (item.inClearance){
-				Object.assign(clearanceData, dataObject)
-				continue
-			}
-			if (item.inPkPhysicochemical){
-				Object.assign(pkData.physicochemical, dataObject)
-				continue
-			}
-			if (item.inPkTissueKinetics){
-				Object.assign(pkData.tissueKinetics, dataObject)
-				continue
-			}
-			if (item.inPharmacodynamics){
-				Object.assign(pdData, dataObject)
-			}
-		}
-	}
-
 	function debugObjects(obj) {
 		for (let prop in obj){
 			console.log("\t" + prop + " : " + obj[prop])
@@ -90,20 +37,19 @@ UISubstanceWizardForm {
 	onResetConfiguration : {
 	}
 
-	substanceListModel.onDataChanged : {
-		let dataIndex = topLeft.row
-		let group = substanceListModel.get(dataIndex).group
-		let active = substanceListModel.get(dataIndex).active
-    if (active){
-			substanceDelegateModel.persistedItems.addGroups(dataIndex, 1, [group, "items"])
-		} else {
-			substanceDelegateModel.persistedItems.removeGroups(dataIndex, 1, [group, "items"])
-		}
-	}
-
 	function checkConfiguration(){
 		let validConfiguration = true
 		let errorStr = "*"
+		//Check for required fields.
+		if (physicalData.Name[0] === null){
+			validConfiguration = false
+			errorStr += "Name is a required field\n*"
+		}
+		if (physicalData.State[0] === null){
+			validConfiguraration = false
+			errorStr += "State is a required field\n*"
+		}
+		//Loop over all elements to make sure that they do not have incomplete input (e.g. value with no unit)
 		for (let i = 0; i < substanceListModel.count; ++i){
 			let substanceElement = substanceListModel.get(i)
 			if (!substanceElement.valid){
@@ -111,7 +57,15 @@ UISubstanceWizardForm {
 				validConfiguration = false
 			}
 		}
+		//Verify data from each tab.  Each "verify" function returns a pair [bool valid, string msg].
+		//Thus, if first element is false, the configuration is invalid and we append msg to our error message
+		//Physical tab does not require extra verification because all fields accept Name and State (handled above)
+		//are optional.
 		let clearanceVerify = verifyClearanceData()
+		if(!clearanceVerify[0]){
+			validConfiguration = false
+			errorStr += clearanceVerify[1]
+		}
 		let pkVerify = verifyPkData()
 		if (!pkVerify[0]){
 			validConfiguration = false
@@ -122,16 +76,18 @@ UISubstanceWizardForm {
 			validConfiguration = false
 			errorStr += pdVerify[1]
 		}
+		//If everything looks good, add data from each tab to a single substanceData object to pass to scenario.create_substance()
 		if (validConfiguration){
 			Object.assign(substanceData, {"Physical" : physicalData})
 			Object.assign(substanceData, {"Clearance" : clearanceData})
+			//Send data from whichever PK option is currently active
 			if (pkStackLayout.currentIndex == 0){
 				Object.assign(substanceData, {"Physicochemicals" : pkData.physicochemical})
 			} else {
 				Object.assign(substanceData, {"TissueKinetics" : pkData.tissueKinetics})
 			}
 			Object.assign(substanceData, {"Pharmacodynamics" : pdData})
-			//root.validConfiguration('Substance', substanceData)  //'Substance' flag tells Wizard manager which type of data to save
+			root.validConfiguration('Substance', substanceData)  //'Substance' flag tells Wizard manager which type of data to save
 		}
 		else {
 			if (errorStr.charAt(errorStr.length-1)==='*'){
@@ -145,18 +101,10 @@ UISubstanceWizardForm {
 		let valid = true
 		let errorStr = ""
 		//Clearance is all or nothing.  If Regulation is specified, then all Regulation fields must be given as well
-		let fieldsDefined = false
 		if (!checkAllOrNothingData( clearanceData )){
 			valid = false
 			errorStr += "Clearance: \n\t All fields are required to set up substance clearance (or none to indicate no data).\n"
 		}
-		if ('Regulation' in clearanceData){
-			if(!checkAllOrNothingData ( clearanceData.Regulation)){
-				valid = false
-				errorStr += "Clearance: \n\t If using advanced regulation, all additional fields must be specified.\n"
-			}
-		}
-		console.log(valid, errorStr)
 	}
 
 	function verifyPkData() {
@@ -195,7 +143,7 @@ UISubstanceWizardForm {
 				}
 			}	
 		}
-		//There are two required fields.  If we have both, then input is valid (any modifiers
+		//There are two required PD fields.  If we have both, then input is valid (any modifiers
 		// not specified will be assigned 0).  If we have no required fields, then we are valid if there are 
 		// no modifiers (meaning substance has no PD, which is fine), but invalid if we try to give modifiers
 		// (incomplete PD type).  Any other configuration is invalid.
@@ -217,7 +165,6 @@ UISubstanceWizardForm {
 	function checkAllOrNothingData( data ) {
 		let fieldsDefined = false
 		for (let key in data){
-			console.log(key + " : " + data[key][0])
 			if (data[key][0]===null && fieldsDefined){
 				return false	//invalid data because at least 1 field is empty while another is defined
 			} else {	
@@ -234,6 +181,14 @@ UISubstanceWizardForm {
 
 	}
 
+	function resetEntry(entry){
+		if ( root.editMode && resetData[model.name][0]!=null) { 
+			entry.setEntry(resetData[entry.model.name]); 
+		} else { 
+			entry.reset(); 
+		}	
+	}
+
 	function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])/g, '$1 $2')
 		return formatted
@@ -248,6 +203,17 @@ UISubstanceWizardForm {
 			return neg1To1Validator
 		} else {
 			return null
+		}
+	}
+
+	function updateDelegateItems(items){
+		while (items.count > 0){
+			let item = items.get(0)
+			if (item.model.dynamic){
+				items.setGroups(0, 1, ["dynamic"])
+			} else {
+				items.setGroups(0, 1, [item.model.group, "persistedItems"])
+			}
 		}
 	}
 
