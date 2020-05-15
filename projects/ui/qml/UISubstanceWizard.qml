@@ -13,12 +13,13 @@ UISubstanceWizardForm {
 
 	property var substanceData : ({})		//Object holding all substance-related data (key maps to one of the tab objects)
 	property var physicalData : ({})		//Object holding all info from the "physical" tab
-	property var clearanceData : ({})		//Object holding all info from "clearance" tab
+	property var clearanceData : ({"systemic" : ({}), "renalDynamics" : ({}) })		//Object holding all info from "clearance" tab
 	property var pkData : ({"physicochemical" : ({}), "tissueKinetics" : ({}) })					//Object holding all info from "pharmacokinetics" tab
 	property var pdData : ({})					//Object holding all info from "pharmacodynamics" tab
 	property var resetData : ({})  //Store data loaded in "edit" mode so that during reset we can revert to data in file
 	property bool editMode : false
 	property bool nameWarningFlagged : false
+	property string errorString : "*"
 
 	function debugObjects(obj) {
 		for (let prop in obj){
@@ -39,94 +40,118 @@ UISubstanceWizardForm {
 
 	function checkConfiguration(){
 		let validConfiguration = true
-		let errorStr = "*"
 		//Check for required fields.
 		if (physicalData.Name[0] === null){
 			validConfiguration = false
-			errorStr += "Name is a required field\n*"
+			errorString += "Name is a required field\n*"
 		}
 		if (physicalData.State[0] === null){
-			validConfiguraration = false
-			errorStr += "State is a required field\n*"
+			validConfiguration = false
+			errorString += "State is a required field\n*"
 		}
 		//Loop over all elements to make sure that they do not have incomplete input (e.g. value with no unit)
 		for (let i = 0; i < substanceListModel.count; ++i){
 			let substanceElement = substanceListModel.get(i)
 			if (!substanceElement.valid){
-				errorStr += substanceElement.name + " is not valid.\n*"
+				errorString += substanceElement.name + " is not valid.\n*"
 				validConfiguration = false
 			}
 		}
-		//Verify data from each tab.  Each "verify" function returns a pair [bool valid, string msg].
-		//Thus, if first element is false, the configuration is invalid and we append msg to our error message
+		//Verify data from each tab.  Each "verify" function returns a pair [bool valid, bool dataPresent].
+		//Thus, if first element is false, the configuration is invalid.  We use the dataPresent element if
+		//the full confifuration is valid to determine if we should append this group's data to the substance map or not.
 		//Physical tab does not require extra verification because all fields accept Name and State (handled above)
 		//are optional.
 		let clearanceVerify = verifyClearanceData()
 		if(!clearanceVerify[0]){
 			validConfiguration = false
-			errorStr += clearanceVerify[1]
 		}
 		let pkVerify = verifyPkData()
 		if (!pkVerify[0]){
 			validConfiguration = false
-			errorStr += pkVerify[1]
 		}
 		let pdVerify = verifyPdData()
 		if (!pdVerify[0]){
 			validConfiguration = false
-			errorStr += pdVerify[1]
 		}
 		//If everything looks good, add data from each tab to a single substanceData object to pass to scenario.create_substance()
 		if (validConfiguration){
 			Object.assign(substanceData, {"Physical" : physicalData})
-			Object.assign(substanceData, {"Clearance" : clearanceData})
+			//Only pass clearance data if dataPresent.
+			if (clearanceVerify[1]){
+				//Reconfigure clearance data to account for nesting of 'Regulation' type
+				let regulationObject = {}
+				let clearanceModelGroup = substanceDelegateModel.groupIndexMap["clearance"]
+				for (let i = 0; i<clearanceModelGroup.count; ++i){
+					let item = clearanceModelGroup.get(i)
+					if (item.model.group ==='clearance-regulation'){
+						Object.assign(regulationObject, {[item.model.name] : clearanceData[item.model.name]})
+						delete clearanceData[item.model.name]
+					}
+				}
+				if (Object.keys(regulationObject).length > 0){
+					Object.assign(clearanceData, {"Regulation" : regulationObject})
+				}
+				Object.assign(substanceData, {"Clearance" : clearanceData})
+				debugObjects(clearanceData)
+			}
 			//Send data from whichever PK option is currently active
-			if (pkStackLayout.currentIndex == 0){
+			if (pkStackLayout.currentIndex === 0 && pkVerify[1]){
 				Object.assign(substanceData, {"Physicochemicals" : pkData.physicochemical})
-			} else {
+			} else if (pkStackLayout.currentIndex === 1 && pkVerify[1]) {
 				Object.assign(substanceData, {"TissueKinetics" : pkData.tissueKinetics})
 			}
-			Object.assign(substanceData, {"Pharmacodynamics" : pdData})
+			if (pdVerify[1]){
+				Object.assign(substanceData, {"Pharmacodynamics" : pdData})
+			}
 			root.validConfiguration('Substance', substanceData)  //'Substance' flag tells Wizard manager which type of data to save
 		}
 		else {
-			if (errorStr.charAt(errorStr.length-1)==='*'){
-				errorStr = errorStr.slice(0, errorStr.length-1)
+			if (errorString.charAt(errorString.length-1)==='*'){
+				errorString = errorString.slice(0, errorString.length-1)
 			}
-			root.invalidConfiguration(errorStr)
+			root.invalidConfiguration(errorString)
 		}
 	}
 
 	function verifyClearanceData(){
 		let valid = true
-		let errorStr = ""
+		let dataPresent = true
 		//Clearance is all or nothing.  If Regulation is specified, then all Regulation fields must be given as well
-		if (!checkAllOrNothingData( clearanceData )){
+		let checkData = checkAllOrNothingData( clearanceData )
+		if (!checkData[0]){
 			valid = false
-			errorStr += "Clearance: \n\t All fields are required to set up substance clearance (or none to indicate no data).\n"
+			errorString += "Clearance: \n\t All fields are required to set up substance clearance (or none to indicate no data).\n*"
+		} else {
+			dataPresent = checkData[1]
 		}
-		let report = valid ? "" : errorStr
-		return [valid, report]
+		return [valid, dataPresent]
 	}
 
 	function verifyPkData() {
 		let valid = true
-		let errorStr = ""
+		let dataPresent = true
 		let pkEntry = ({})
 		//First determine which input method we are using (physicochemical data or tissue kinetics)
 		if (pkStackLayout.currentIndex===0){
-			if (!checkAllOrNothingData(pkData.physicochemical)){
+			let checkData = checkAllOrNothingData(pkData.physicochemical)
+			if (!checkData[0]){
 				valid = false
-				errorStr += "Pharmacokinetics: \n\t All fields are required to set up substance physicochemical data (or none to indicate no PK).\n"
+				errorString += "Pharmacokinetics: \n\t All fields are required to set up substance physicochemical data (or none to indicate no PK).\n*"
+			} else {
+				dataPresent = checkData[1]
 			}
 		} else {
-			if (!checkAllOrNothingData(pkData.tissueKinetics)){
+			let checkData = checkAllOrNothingData(pkData.tissueKinetics)
+			if (!checkData[0]){
 				valid = false
-				errorStr += "Pharmacokinetics: \n\t All fields are required to set up substance partition coefficients data (or none to indicate no PK).\n"
+				errorString += "Pharmacokinetics: \n\t All fields are required to set up substance partition coefficients data (or none to indicate no PK).\n*"
+			} else {
+				dataPresent = checkData[1]
 			}
 		}
-		let report = valid ? "" : errorStr
-		return [valid, report]
+
+		return [valid, dataPresent]
 	}
 
 	function verifyPdData() {
@@ -152,30 +177,33 @@ UISubstanceWizardForm {
 		if (requiredCount === 1){
 			//Only one of two required inputs given
 			valid = false
-			errorStr += "Both EC50 and Shape Parameter must be defined to set up substance PD.\n"
+			errorString += "Pharmacodynamics: \n\tBoth EC50 and Shape Parameter must be defined to set up substance PD.\n*"
 		} else {
 			if (requiredCount === 0 && numModifiers > 0){
 				//Optional fields given but not required
 				valid = false
-				errorStr += "Both EC50 and Shape Parameter must be defined to set up substance PD.\n"
+				errorString += "Pharmacodynamics: \n\tBoth EC50 and Shape Parameter must be defined to set up substance PD.\n*"
 			}
 		}
-		let report = valid ? "" : "Pharmacodynamics : \n\t" + errorStr
-		return [valid, report]
+		return [valid, numModifiers > 0]
 	}
 
 	function checkAllOrNothingData( data ) {
 		let fieldsDefined = false
+		let valid = true
 		for (let key in data){
 			if (data[key][0]===null && fieldsDefined){
-				return false	//invalid data because at least 1 field is empty while another is defined
+				valid = false
+				return [valid, fieldsDefined]	    //invalid data because at least 1 field is empty while another is defined
 			} else {	
 				if (data[key][0]!==null && !fieldsDefined){
 					fieldsDefined = true
 				}
 			}
 		}
-		return true	//if we made it through the loop then either all fields are defined or all fields are empty
+		//If we made it through the loop then either all fields are defined or all fields are empty (valid either way)
+		//Pass fieldDefined bool so that we know whether data object is empty of not (if empty, don't need to add to substanceData)
+		return [valid, fieldsDefined]	
 	}
 
 
@@ -221,11 +249,12 @@ UISubstanceWizardForm {
 
 	function setDelegateFilter(mainTab, subIndex){
 		let filter = ""
+		console.log(mainTab, subIndex)
 		switch(mainTab){
 			case 0 : 
 				filter = "physical"
 				break;
-			case 1 : 
+			case 1 :
 				filter = "clearance"
 				break;
 			case 2 : 

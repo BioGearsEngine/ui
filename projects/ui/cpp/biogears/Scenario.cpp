@@ -18,7 +18,9 @@
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
+#include <biogears/cdm/properties/SEScalarVolumePerTimeMass.h>
 #include <biogears/cdm/properties/SEUnitScalar.h>
+#include <biogears/cdm/substance/SESubstanceClearance.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/substance/SESubstanceConcentration.h>
 #include <biogears/cdm/substance/SESubstanceFraction.h>
@@ -1008,8 +1010,218 @@ void Scenario::create_substance(QVariantMap substanceData)
     auto& unit = biogears::InversePressureUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
     newSubstance->GetSolubilityCoefficient().SetValue(value, unit);
   }
-}
 
+  //--Clearance (only present if defined by user, otherwise skip)
+  if (substanceData.find("Clearance") != substanceData.end()) {
+    QVariantMap clearanceData = substanceData["Clearance"].toMap();
+
+    //Get Clearance creates a new SESubstanceClearance and assigns it to substance if clearance does not yet exist
+    auto& subClearance = newSubstance->GetClearance();
+
+    //Fraction Excreted in Feces
+    subMetric = clearanceData["FractionExcretedInFeces"].toList();
+    if (!subMetric[0].isNull()) {
+      double value = subMetric[0].toDouble();
+      subClearance.GetFractionExcretedInFeces().SetValue(value);
+    }
+    //Fraction Unbound in Plasma
+    subMetric = clearanceData["FractionUnboundInPlasma"].toList();
+    if (!subMetric[0].isNull()) {
+      double value = subMetric[0].toDouble();
+      subClearance.GetFractionUnboundInPlasma().SetValue(value);
+    }
+    //Intrinsic clearance
+    subMetric = clearanceData["IntrinsicClearance"].toList();
+    if (!subMetric[0].isNull()) {
+      double value = subMetric[0].toDouble();
+      auto& unit = biogears::VolumePerTimeMassUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subClearance.GetIntrinsicClearance().SetValue(value, unit);
+    }
+    //Renal clearance
+    subMetric = clearanceData["RenalClearance"].toList();
+    if (!subMetric[0].isNull()) {
+      double value = subMetric[0].toDouble();
+      auto& unit = biogears::VolumePerTimeMassUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subClearance.GetRenalClearance().SetValue(value, unit);
+    }
+    //Systemic clearance
+    subMetric = clearanceData["SystemicClearance"].toList();
+    if (!subMetric[0].isNull()) {
+      double value = subMetric[0].toDouble();
+      auto& unit = biogears::VolumePerTimeMassUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subClearance.GetSystemicClearance().SetValue(value, unit);
+    }
+
+    //Renal Dynamics: Clearance or Regulation choice
+    if (clearanceData.find("Regulation") != clearanceData.end()) {
+      //We have Regulation defined
+      subClearance.SetRenalDynamic(biogears::RenalDynamic::Regulation);
+      QVariantMap regulationData = clearanceData["Regulation"].toMap();
+
+      //If this section defined, substance editor will send all fields (no need to check for nulls)
+      //Charge in Blood
+      subMetric = regulationData["ChargeInBlood"].toList();
+      subClearance.SetChargeInBlood((CDM::enumCharge::value)subMetric[0].toInt());
+      //Reabsorption Ratio
+      subMetric = regulationData["ReabsorptionRatio"].toList();
+      subClearance.GetRenalReabsorptionRatio().SetValue(subMetric[0].toDouble());
+      //Transport Maximum
+      subMetric = regulationData["TransportMaximum"].toList();
+      auto& unit = biogears::MassPerTimeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subClearance.GetRenalTransportMaximum().SetValue(subMetric[0].toDouble(), unit);
+      //Fraction Unbound In Plasma
+
+    } else {
+      subClearance.SetRenalDynamic(biogears::RenalDynamic::Regulation);
+    }
+  }
+  //--Pharmacokinetics--
+  // Substance editor will send EITHER physicochemical data or tissueKinetics data (it cannot send both)
+  // Set up PK depending on which one is provided.  If neither is given, then substance has no PK
+  if (substanceData.find("Physicochemicals") != substanceData.end()) {
+    QVariantMap pkData = substanceData["Physicochemicals"].toMap();
+
+    auto& physChem = newSubstance->GetPK().GetPhysicochemicals(); //Creates SESubstancePharmacokinetics and SESubstancePhysicochemical props
+
+    //If this section defined, substance editor will send all fields (no need to check for nulls)
+
+    //Acid Dissociation Constant
+    subMetric = pkData["AcidDissociationConstant"].toList();
+    physChem.GetPrimaryPKA().SetValue(subMetric[0].toDouble());
+    //Binding Protein
+    subMetric = pkData["BindingProtein"].toList();
+    physChem.SetBindingProtein((CDM::enumSubstanceBindingProtein::value)subMetric[0].toInt());
+    //Blood Plasma Ratio
+    subMetric = pkData["BloodPlasmaRatio"].toList();
+    physChem.GetBloodPlasmaRatio().SetValue(subMetric[0].toDouble());
+    //Fraction Unbound In Plasma
+    subMetric = pkData["FractionUnboundInPlasma"].toList();
+    physChem.GetFractionUnboundInPlasma().SetValue(subMetric[0].toDouble());
+    //Ionic State
+    subMetric = pkData["IonicState"].toList();
+    physChem.SetIonicState((CDM::enumSubstanceIonicState::value)subMetric[0].toInt());
+    //Log P
+    subMetric = pkData["LogP"].toList();
+    physChem.GetLogP().SetValue(subMetric[0].toDouble());
+    //Hydrogen Bond Count
+    subMetric = pkData["HydrogenBondCount"].toList();
+    physChem.GetHydrogenBondCount().SetValue(subMetric[0].toDouble());
+    //Polar Surface Area
+    subMetric = pkData["PolarSurfaceArea"].toList();
+    physChem.GetPolarSurfaceArea().SetValue(subMetric[0].toDouble());
+
+  } else if (substanceData.find("TissueKinetics") != substanceData.end()) {
+    QVariantMap pkData = substanceData["TissueKinetics"].toMap();
+
+    auto& subPK = newSubstance->GetPK(); //Creates SESubstancePharmacokinetics
+
+    //If this section defined, substance editor will send all fields (no need to check for nulls)
+    //Need to add partition coefficients one by one
+    //Bone
+    subMetric = pkData["BonePartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("BoneTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Brain
+    subMetric = pkData["BrainPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("BrainTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Fat
+    subMetric = pkData["FatPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("FatTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Gut
+    subMetric = pkData["GutPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("GutTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //LeftKidney
+    subMetric = pkData["LeftKidneyPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("LeftKidneyTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //LeftLung
+    subMetric = pkData["LeftLungPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("LeftLungTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Liver
+    subMetric = pkData["LiverPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("LiverTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Muscle
+    subMetric = pkData["MusclePartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("MuscleTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Myocardium
+    subMetric = pkData["MyocardiumPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("MyocardiumTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //RightKidney
+    subMetric = pkData["RightKidneyPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("RightKidneyTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //RightLung
+    subMetric = pkData["RightLungPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("RightLungTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Skin
+    subMetric = pkData["SkinPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("SkinTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+    //Spleen
+    subMetric = pkData["SpleenPartitionCoefficient"].toList();
+    subPK.GetTissueKinetics("SpleenTissue").GetPartitionCoefficient().SetValue(subMetric[0].toDouble());
+  }
+
+  //--Pharmacodynamics--(only present if defined by user, otherwise skip)
+  if (substanceData.find("Pharmacodynamics") != substanceData.end()) {
+    QVariantMap pdData = substanceData["Pharmacodynamics"].toMap();
+
+    auto& subPD = newSubstance->GetPD(); //Creates SESubstancePharmacodynamics
+
+    //If this section defined, substance editor will send all fields (no need to check for nulls)
+    //EC50
+    subMetric = pdData["EC50"].toList();
+    auto& ecUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    subPD.GetEC50().SetValue(subMetric[0].toDouble(), ecUnit);
+    //Shape Parameter
+    subMetric = pdData["ShapeParameter"].toList();
+    subPD.GetEMaxShapeParameter().SetValue(subMetric[0].toDouble());
+    //Effect Site Rate Constant
+    subMetric = pdData["EffectSiteRateConstant"].toList();
+    auto& rateUnit = biogears::FrequencyUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    subPD.GetEffectSiteRateConstant().SetValue(subMetric[0].toDouble(), rateUnit);
+    //Bronchodilation
+    subMetric = pdData["BronchodilationModifier"].toList();
+    subPD.GetBronchodilation().SetValue(subMetric[0].toDouble());
+    //Diastolic Pressure
+    subMetric = pdData["DiastolicPressureModifier"].toList();
+    subPD.GetDiastolicPressureModifier().SetValue(subMetric[0].toDouble());
+    //Systolic Pressure
+    subMetric = pdData["SystolicPressureModifier"].toList();
+    subPD.GetSystolicPressureModifier().SetValue(subMetric[0].toDouble());
+    //Fever
+    subMetric = pdData["FeverModifier"].toList();
+    subPD.GetFeverModifier().SetValue(subMetric[0].toDouble());
+    //Heart Rate
+    subMetric = pdData["HeartRateModifier"].toList();
+    subPD.GetHeartRateModifier().SetValue(subMetric[0].toDouble());
+    //Hemorrhage
+    subMetric = pdData["HemorrhageModifier"].toList();
+    subPD.GetHemorrhageModifier().SetValue(subMetric[0].toDouble());
+    //Respiration Rate
+    subMetric = pdData["RespirationRateModifier"].toList();
+    subPD.GetRespirationRateModifier().SetValue(subMetric[0].toDouble());
+    //Sedation
+    subMetric = pdData["SedationModifier"].toList();
+    subPD.GetSedation().SetValue(subMetric[0].toDouble());
+    //Tidal Volume
+    subMetric = pdData["TidalVolumeModifier"].toList();
+    subPD.GetTidalVolumeModifier().SetValue(subMetric[0].toDouble());
+    //Tubular Permeability
+    subMetric = pdData["TubularPermeabilityModifier"].toList();
+    subPD.GetTubularPermeabilityModifier().SetValue(subMetric[0].toDouble());
+    //Central Nervous
+    subMetric = pdData["CentralNervousModifier"].toList();
+    subPD.GetCentralNervousModifier().SetValue(subMetric[0].toDouble());
+    //Pain
+    subMetric = pdData["PainModifier"].toList();
+    subPD.GetPainModifier().SetValue(subMetric[0].toDouble());
+    //Antibacterial Effect
+    subMetric = pdData["AntibacterialEffectModifier"].toList();
+    auto& effectRateUnit = biogears::FrequencyUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+    subPD.GetAntibacterialEffect().SetValue(subMetric[0].toDouble(), effectRateUnit);
+    //Neuromuscular Block
+    subMetric = pdData["NeuromuscularBlocktModifier"].toList();
+    subPD.GetNeuromuscularBlock().SetValue(subMetric[0].toDouble());
+  }
+
+}
 void Scenario::export_substance()
 {
 }
@@ -1670,7 +1882,6 @@ void Scenario::export_state(bool saveAs)
   //Notify QML PatientMenu that a new state has been added to directory.
   emit newStateAdded();
 }
-
 }
 #include <biogears/cdm/patient/actions/SEAcuteStress.h>
 #include <biogears/cdm/patient/actions/SEAirwayObstruction.h>

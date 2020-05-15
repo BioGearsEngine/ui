@@ -16,7 +16,6 @@ Page {
   property alias substanceStackLayout : substanceStackLayout
   property alias pkStackLayout : pkStackLayout
 
-
   DoubleValidator {
     id : doubleValidator
     bottom : 0
@@ -84,11 +83,12 @@ Page {
     height : parent.height - substanceTabBar.height
     anchors.top : substanceTabBar.bottom
     currentIndex : 0
-    property var subIndex : children[currentIndex].subIndex ? children[currentIndex].subIndex : 0
+    property real subIndex : children[currentIndex].subIndex
     Pane {
       id : physicalDataTab
       Layout.fillWidth : true
       Layout.fillHeight : true
+      property real subIndex : 0
       GridView {
         id: physicalDataGridView
         clip : true
@@ -107,6 +107,7 @@ Page {
       id : clearanceTab
       Layout.fillWidth : true
       Layout.fillHeight : true
+      property real subIndex : 0
       Label {
         id : clearanceLabel
         width : parent.width
@@ -126,57 +127,71 @@ Page {
         height : (Math.floor(count / 2) + count % 2) * cellHeight
         cellHeight : 60
         cellWidth : parent.width / 2
-        model : substanceDelegateModel.parts.clearance
+        model : substanceDelegateModel.parts.clearanceSystemic
         anchors.top : clearanceLabel.bottom
         anchors.topMargin : 10
         anchors.left : parent.left
         anchors.right : parent.right
         currentIndex: -1
       }
-      CheckBox {
-        id : renalRegulationCheck
+      ButtonGroup {
+        id : renalOptionsButtonGroup
+        onClicked : {
+          console.log('clicked')
+          if (button.choice === "regulation"){
+            console.log('regulation')
+            //clearanceTab.subIndex = 1
+            //regulationViewLoader.sourceComponent = clearanceRegulationComponent
+          }
+        }
+      }
+      RowLayout {
+        id : renalOptionsRow
         anchors.top : clearanceGridView.bottom
         anchors.horizontalCenter : parent.horizontalCenter
-        anchors.topMargin : 10
         width : implicitWidth
         height : implicitHeight
-        text : "Show Advanced Renal Regulation Parameters"
-        font.pointSize : 9
-        checked : false
-        onClicked : {
-          if (checked){
-            //We want to add dynamic elements whose group role = "clearance"
-            let dynamicGroup = substanceDelegateModel.groupIndexMap["dynamic"]
-            for (let i = 0; i < dynamicGroup.count; ++i){
-              let element = dynamicGroup.get(i)
-              if (element.model.group === "clearance"){
-                let clearanceGroup = substanceDelegateModel.groupIndexMap["clearance"]
-                //"addGroups" function adds the element to the list of new groups WITHOUT
-                // removing it from the calling group (meaning, in this case, that the items
-                // will be in "dynamic", "clearance", and "persistedItems")
-                dynamicGroup.addGroups(i, 1, [clearanceGroup.name, "persistedItems"])   
-              }
-            }
-          } else {
-            //We want to remove clearance objects that are dynamic
-            let clearanceGroup = substanceDelegateModel.groupIndexMap["clearance"]
-            for (let i = 0; i < clearanceGroup.count; ++i){
-              let item = clearanceGroup.get(i)
-              if (item.inDynamic){
-                clearanceGroup.removeGroups(i, 1, [clearanceGroup.name, "persistedItems"])
-                --i //Decrement index because clearanceGroup.count will decrease by 1 when we remove element
-              }
-            }
-          }
-          debugObjects(clearanceData)
+        RadioButton {
+          id : systemicOption
+          checked : true
+          property string choice : "clearance"
+          text : "Use systemic"
+          ButtonGroup.group : renalOptionsButtonGroup
         }
+        RadioButton {
+          id : regulationOption
+          checked : false
+          property string choice : "regulation"
+          text : "Use renal regulation"
+          ButtonGroup.group : renalOptionsButtonGroup
+        }
+      }
+      
+      Loader {
+        id : regulationViewLoader
+
+      }
+      
+      GridView {
+        id: regulationGridView
+        clip : true
+        width : parent.width
+        height : (Math.floor(count / 2) + count % 2) * cellHeight
+        cellHeight : 60
+        cellWidth : parent.width / 2
+        model : substanceDelegateModel.parts.clearanceRegulation
+        anchors.topMargin : 10
+        anchors.top : renalOptionsRow.bottom
+        anchors.left : parent.left
+        anchors.right : parent.right
+        currentIndex: -1
       }
     }
     Pane {
       id : pkTab
       Layout.fillWidth : true
       Layout.fillHeight : true
-      property var subIndex : pkStackLayout.currentIndex
+      property real subIndex : pkStackLayout.currentIndex
       Label {
         id : pkLabel
         width : parent.width
@@ -247,6 +262,7 @@ Page {
       id : pdTab
       Layout.fillWidth : true
       Layout.fillHeight : true
+      property real subIndex : 0
       Label {
         id : pdLabel
         width : parent.width
@@ -321,14 +337,16 @@ Page {
     property var groupIndexMap : ({})
     groups :  [
                 DelegateModelGroup {name : "physical"; includeByDefault : false; property var data : physicalData; onChanged : substanceDelegateModel.updateGroup(this) },
-                DelegateModelGroup {name : "clearance"; includeByDefault : false; property var data : clearanceData; onChanged : substanceDelegateModel.updateGroup(this) },
+                DelegateModelGroup {name : "clearance"; includeByDefault : false; property var children : ['clearance_systemic','clearance_regulation'] },
+                DelegateModelGroup {name : "clearance_systemic"; includeByDefault : false; property string parent : 'clearance'; property var data : clearanceData.systemic; onChanged : substanceDelegateModel.updateGroup(this) },
+                DelegateModelGroup {name : "clearance_regulation"; includeByDefault : false; property string parent : 'clearance'; property var data : clearanceData.renalDynamics; onChanged : substanceDelegateModel.updateGroup(this) },
                 DelegateModelGroup {name : "pkPhysicochemical"; includeByDefault : false; property var data : pkData.physicochemical; onChanged : substanceDelegateModel.updateGroup(this)},
                 DelegateModelGroup {name : "pkTissueKinetics"; includeByDefault : false; property var data : pkData.tissueKinetics; onChanged : substanceDelegateModel.updateGroup(this)},
                 DelegateModelGroup {name : "pharmacodynamics"; includeByDefault : false; property var data : pdData; onChanged : substanceDelegateModel.updateGroup(this)},
                 DelegateModelGroup {name : "dynamic"; includeByDefault : false}
               ]
-    filterOnGroup : root.setDelegateFilter(substanceStackLayout.currentIndex, substanceStackLayout.subIndex) 
     items.onChanged : updateDelegateItems (items)
+    filterOnGroup : setDelegateFilter(substanceStackLayout.currentIndex, substanceStackLayout.subIndex)
     Component.onCompleted : {
       //Set up the groupIndexMap
       for (let i = 0; i < groups.length; ++i){
@@ -344,6 +362,16 @@ Page {
           }
         }
       }
+      if (group.parent){
+        let parentGroupName = group.parent
+        let inParentString = "in" + parentGroupName.charAt(0).toUpperCase() + parentGroupName.slice(1)
+        for (let i = 0; i < group.count; ++i){
+          let item = group.get(i)
+          if (!item[inParentString]){
+            group.addGroups(i, 1, parentGroupName)
+          }
+        }
+	    } 
       //If group.data has more elements than the group, then we must have removed some dynamic elements from the view.
       //Search "dynamic" group for elements whose substanceListModel "group" role match the calling group and remove
       //them from group.data.
@@ -359,14 +387,32 @@ Page {
       }
     }
   }
-
   Component {
     id : substanceDelegate  
     Package {
-      Item {
-        width : GridView.view.cellWidth
-        height : GridView.view.cellHeight
+      Item { id : idPhysical; Package.name : "physical"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idClearanceSystemic; Package.name : "clearanceSystemic"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idClearanceRegulation; Package.name : "clearanceRegulation"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idPkPhysicochemical; Package.name : "pkPhysicochemical"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idPkTissueKinetics; Package.name : "pkTissueKinetics"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idPharmacodynamics; Package.name : "pharmacodynamics"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+
+      Item { 
+        id : wrapper
+        width : parent.width
+        height : parent.height
+        property var groupData
+        state : model.group
+        states : [
+          State { name : "physical"; changes : [ParentChange { target : wrapper; parent : idPhysical}, PropertyChanges { target : wrapper; groupData : physicalData} ] },
+          State { name : "clearance_systemic"; changes : [ParentChange { target : wrapper; parent : idClearanceSystemic}, PropertyChanges{target : wrapper; groupData : clearanceData.systemic} ] },
+          State { name : "clearance_regulation"; changes : [ParentChange { target : wrapper; parent : idClearanceRegulation}, PropertyChanges{target : wrapper; groupData : clearanceData.regulation} ] },
+          State { name : "pkPhysicochemical"; changes : [ParentChange { target : wrapper; parent : idPkPhysicochemical}, PropertyChanges{target : wrapper; groupData : pkData.physicochemical} ] },
+          State { name : "pkTissueKinetics"; changes : [ParentChange { target : wrapper; parent : idPkTissueKinetics}, PropertyChanges{target : wrapper; groupData : pkData.tissueKinetics} ] },
+          State { name : "pharmacodynamics"; changes : [ParentChange { target : wrapper; parent : idPharmacodynamics}, PropertyChanges{target : wrapper; groupData : pdData} ] }
+        ]
         UIUnitScalarEntry {
+          id : unitScalarEntry
           anchors.centerIn : parent
           prefWidth : parent.width * 0.9
           prefHeight : parent.height * 0.95
@@ -375,129 +421,23 @@ Page {
           type : model.type
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
-          onInputAccepted : {
-            if (input[0] === ""){
-              physicalData[model.name] = [null, null]
-            } else {
-              if (model.name === "Name" && root.editMode && !nameWarningFlagged){
-                root.nameEdited()
-                nameWarningFlagged = true
-              }
-              physicalData[model.name] = input
-            }
-          }
           Component.onCompleted : {
+            console.log(model.name, model.group)
             model.valid = Qt.binding(function() {return entry.validInput})
             root.onResetConfiguration.connect(function () { resetEntry(entry) } )
           }
-        }
-        Package.name : "physical"
-      }
-     Item {
-        width : GridView.view.cellWidth
-        height : GridView.view.cellHeight
-        UIUnitScalarEntry {
-          anchors.centerIn : parent
-          prefWidth : parent.width * 0.9
-          prefHeight : parent.height * 0.95
-          label : root.displayFormat(model.name)
-          unit : model.unit
-          type : model.type
-          hintText : model.hint
-          entryValidator : root.assignValidator(model.type)
           onInputAccepted : {
             if (input[0] === ""){
-              clearanceData[model.name] = [null, null]
+              parent.groupData[model.name] = [null, null]
             } else {
-              clearanceData[model.name] = input
+              parent.groupData[model.name] = input
             }
-          }
-          Component.onCompleted : {
-            model.valid = Qt.binding(function() {return entry.validInput})
-            root.onResetConfiguration.connect(function () { resetEntry(entry) } )
+            debugObjects(parent.groupData)
           }
         }
-        Package.name : "clearance"
       }
-      Item {
-        width : GridView.view.cellWidth
-        height : GridView.view.cellHeight
-        UIUnitScalarEntry {
-          anchors.centerIn : parent
-          prefWidth : parent.width * 0.9
-          prefHeight : parent.height * 0.95
-          label : root.displayFormat(model.name)
-          unit : model.unit
-          type : model.type
-          hintText : model.hint
-          entryValidator : root.assignValidator(model.type)
-          onInputAccepted : {
-            if (input[0] === ""){
-              pkData.physicochemical[model.name] = [null, null]
-            } else {
-              pkData.physicochemical[model.name] = input
-            }
-          }
-          Component.onCompleted : {
-            model.valid = Qt.binding(function() {return entry.validInput})
-            root.onResetConfiguration.connect(function () { resetEntry(entry) } )
-          }
-        }
-        Package.name : "pkPhysicochemical"
-      }
-      Item {
-        width : GridView.view.cellWidth
-        height : GridView.view.cellHeight
-        UIUnitScalarEntry {
-          anchors.centerIn : parent
-          prefWidth : parent.width * 0.9
-          prefHeight : parent.height * 0.95
-          label : root.displayFormat(model.name)
-          unit : model.unit
-          type : model.type
-          hintText : model.hint
-          entryValidator : root.assignValidator(model.type)
-          onInputAccepted : {
-            if (input[0] === ""){
-              pkData.tissueKinetics[model.name] = [null, null]
-            } else {
-              pkData.tissueKinetics[model.name] = input
-            }
-          }
-          Component.onCompleted : {
-            model.valid = Qt.binding(function() {return entry.validInput})
-            root.onResetConfiguration.connect(function () { resetEntry(entry) } )
-          }
-        }
-        Package.name : "pkTissueKinetics"
-      }
-      Item {
-        width : GridView.view.cellWidth
-        height : GridView.view.cellHeight
-        UIUnitScalarEntry {
-          anchors.centerIn : parent
-          prefWidth : parent.width * 0.9
-          prefHeight : parent.height * 0.95
-          label : root.displayFormat(model.name)
-          unit : model.unit
-          type : model.type
-          hintText : model.hint
-          entryValidator : root.assignValidator(model.type)
-          onInputAccepted : {
-            if (input[0] === ""){
-              pdData[model.name] = [null, null]
-            } else {
-              pdData[model.name] = input
-            }
-          }
-          Component.onCompleted : {
-            model.valid = Qt.binding(function() {return entry.validInput})
-            root.onResetConfiguration.connect(function () { resetEntry(entry) } )
-          }
-        }
-        Package.name : "pharmacodynamics"
-      }
-    }
+      
+    } 
   }
 
   //List model roles name, unit, type, and hint set properties in the delegate created from an element.  The valid role
@@ -518,13 +458,14 @@ Page {
       ListElement {name : "MembraneResistance";  unit : "electricalResistance"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
       ListElement {name : "RelativeDiffusionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
       ListElement {name : "SolubilityCoefficient";  unit : "inversePressure"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-    ListElement {name : "IntrinsicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance";dynamic : false}
-      ListElement {name : "RenalClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance";dynamic : false}
-      ListElement {name : "SystemicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance";dynamic : false}
-      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance";dynamic : false}
-      ListElement {name : "ChargeInBlood"; unit : "charge"; type : "enum"; hint : ""; valid : true; group : "clearance";dynamic : true}
-      ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "clearance";dynamic : true}  
-      ListElement {name : "TransportMaximum"; unit : "massRate"; type : "double"; hint : "Enter a value"; valid : true; group : "clearance";dynamic : true} 
+    ListElement {name : "IntrinsicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic";dynamic : false}
+      ListElement {name : "RenalClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic";dynamic : false}
+      ListElement {name : "SystemicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic";dynamic : false}
+      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_systemic";dynamic : false}
+      ListElement {name : "ChargeInBlood"; unit : "charge"; type : "enum"; hint : ""; valid : true; group : "clearance_regulation";dynamic : false}
+      ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation";dynamic : false}  
+      ListElement {name : "TransportMaximum"; unit : "massRate"; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation";dynamic : false} 
+      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_regulation";dynamic : false}
     ListElement {name : "AcidDissociationConstant"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}     
       ListElement {name : "BindingProtein"; unit : "protein"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical";dynamic : false}     
       ListElement {name : "BloodPlasmaRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}     
@@ -562,7 +503,7 @@ Page {
       ListElement {name : "SedationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
       ListElement {name : "TubularPermeabilityModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
       ListElement {name : "CentralNervousModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "AntibacterialEffect"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
+      ListElement {name : "AntibacterialEffect"; unit : "frequency"; type : "double"; hint : ""; valid : true; group : "pharmacodynamics";dynamic : false}
       ListElement {name : "PupillaryResponse"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
   }
 
