@@ -124,7 +124,8 @@ Page {
         id: clearanceGridView
         clip : true
         width : parent.width
-        height : (Math.floor(count / 2) + count % 2) * cellHeight
+        height : cellHeight * 2 + 10 //(Math.floor(count / 2) + count % 2) * cellHeight
+        interactive : false
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.clearanceSystemic
@@ -176,7 +177,9 @@ Page {
         id: regulationGridView
         clip : true
         width : parent.width
-        height : (Math.floor(count / 2) + count % 2) * cellHeight
+        height : cellHeight * 2 + 10 //(Math.floor(count / 2) + count % 2) * cellHeight
+        verticalLayoutDirection : GridView.BottomToTop
+        interactive : false
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.clearanceRegulation
@@ -184,7 +187,7 @@ Page {
         anchors.top : renalOptionsRow.bottom
         anchors.left : parent.left
         anchors.right : parent.right
-        currentIndex: -1
+        currentIndex: 5
       }
     }
     Pane {
@@ -391,16 +394,16 @@ Page {
     id : substanceDelegate  
     Package {
       Item { id : idPhysical; Package.name : "physical"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idClearanceSystemic; Package.name : "clearanceSystemic"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idClearanceRegulation; Package.name : "clearanceRegulation"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idClearanceSystemic; Package.name : "clearanceSystemic";  width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idClearanceRegulation; Package.name : "clearanceRegulation";  width : GridView.view.cellWidth; height : GridView.view.cellHeight}
       Item { id : idPkPhysicochemical; Package.name : "pkPhysicochemical"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
       Item { id : idPkTissueKinetics; Package.name : "pkTissueKinetics"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
       Item { id : idPharmacodynamics; Package.name : "pharmacodynamics"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
 
       Item { 
         id : wrapper
-        width : parent.width
-        height : parent.height
+        width : parent.visible ? parent.width : 0
+        height : parent.visible ? parent.height : 0
         property var groupData
         state : model.group
         states : [
@@ -411,6 +414,10 @@ Page {
           State { name : "pkTissueKinetics"; changes : [ParentChange { target : wrapper; parent : idPkTissueKinetics}, PropertyChanges{target : wrapper; groupData : pkData.tissueKinetics} ] },
           State { name : "pharmacodynamics"; changes : [ParentChange { target : wrapper; parent : idPharmacodynamics}, PropertyChanges{target : wrapper; groupData : pdData} ] }
         ]
+        onStateChanged : {
+          //console.log('change')
+          //substanceDelegateModel.refilter(model.group)
+        }
         UIUnitScalarEntry {
           id : unitScalarEntry
           anchors.centerIn : parent
@@ -422,7 +429,6 @@ Page {
           hintText : model.hint
           entryValidator : root.assignValidator(model.type)
           Component.onCompleted : {
-            console.log(model.name, model.group)
             model.valid = Qt.binding(function() {return entry.validInput})
             root.onResetConfiguration.connect(function () { resetEntry(entry) } )
           }
@@ -432,7 +438,6 @@ Page {
             } else {
               parent.groupData[model.name] = input
             }
-            debugObjects(parent.groupData)
           }
         }
       }
