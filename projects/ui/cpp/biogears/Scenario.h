@@ -76,7 +76,7 @@ public:
   Q_INVOKABLE void export_patient(); //Export current patient (uses save_patient)
   Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE void create_substance(QVariantMap substanceData);
-  //Q_INVOKABLE QVariantMap edit_substance();
+  Q_INVOKABLE QVariantMap edit_substance();
   Q_INVOKABLE void export_substance();
   Q_INVOKABLE void export_state(bool saveAs);
   Q_INVOKABLE void load_state();

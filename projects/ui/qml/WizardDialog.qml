@@ -96,7 +96,7 @@ WizardDialogForm {
 					return;
 				} else {
 					activeWizard.editMode = true
-					activeWizard.mergeSubstanceData(substance)
+					//activeWizard.mergeSubstanceData(substance)
 				}
 			}
 			//Connect standard dialog buttons to environment functions

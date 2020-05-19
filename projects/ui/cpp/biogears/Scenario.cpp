@@ -1244,6 +1244,155 @@ void Scenario::create_substance(QVariantMap substanceData)
 
   export_substance(newSubstance);
 }
+
+QVariantMap Scenario::edit_substance()
+{
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  //Qml interpets QVariantMaps as Javascript objects, which we can index by prop name
+  QVariantMap substanceMap;
+
+  //Open file dialog in substance folder
+  QString substanceFile = QFileDialog::getOpenFileName(nullptr, "Edit Substance", "./substances", "Substance (*.xml)");
+  if (substanceFile.isNull()) {
+    //File returns null string if user cancels without selecting a compound file.  Return empty map (Qml side will check for this)
+    return substanceMap;
+  }
+  //Load file and create and SESubstance object from it using serializer
+  if (!QFileInfo::exists(substanceFile)) {
+    throw std::runtime_error("Unable to locate " + substanceFile.toStdString());
+  }
+  std::unique_ptr<CDM::ObjectData> substanceXmlData = biogears::Serializer::ReadFile(substanceFile.toStdString(), _engine->GetLogger());
+  CDM::SubstanceData* substanceData = dynamic_cast<CDM::SubstanceData*>(substanceXmlData.get());
+  biogears::SESubstance* sub = new biogears::SESubstance(_engine->GetLogger());
+  sub->Load(*substanceData);
+
+  //Each map entry is a list of two items.  subField[0] = value, subField[1] = unit
+  QList<QVariant> subField{ "", "" };
+
+  //Name (required)
+  subField[0] = QString::fromStdString(sub->GetName());
+  subField[1] = "";
+  substanceMap["Name"] = subField;
+  //State (required)
+  subField[0] = (int)sub->GetState();
+  subField[1] = "";
+  substanceMap["State"] = subField;
+
+  //----Optional physical data
+  //Classification
+  if (sub->HasClassification()) {
+    subField[0] = (int)sub->GetClassification();
+    subField[1] = "";
+    substanceMap["Classification"] = subField;
+  }
+  //Molar Mass
+  if (sub->HasMolarMass()) {
+    subField[0] = sub->GetMolarMass(biogears::MassPerAmountUnit::g_Per_mol);
+    subField[1] = "g/mol";
+    substanceMap["MolarMass"] = subField;
+  }
+  //Density
+  if (sub->HasDensity()) {
+    subField[0] = sub->GetDensity(biogears::MassPerVolumeUnit::g_Per_mL);
+    subField[1] = "g/mL";
+    substanceMap["Density"] = subField;
+  }
+  //Maximum Diffusion Flux
+  if (sub->HasMaximumDiffusionFlux()) {
+    subField[0] = sub->GetMaximumDiffusionFlux(biogears::MassPerAreaTimeUnit::g_Per_cm2_s);
+    subField[1] = "g/cm^2 s";
+    substanceMap["MaximumDiffusionFlux"] = subField;
+  }
+  //Michaelis Coefficient
+  if (sub->HasMichaelisCoefficient()) {
+    subField[0] = sub->GetMichaelisCoefficient().GetValue();
+    subField[1] = "";
+    substanceMap["MichaelisCoefficient"] = subField;
+  }
+  //Membrane Resistance
+  if (sub->HasMembraneResistance()) {
+    subField[0] = sub->GetMembraneResistance().GetValue(biogears::ElectricResistanceUnit::Ohm);
+    subField[1] = "Ohm";
+    substanceMap["MembraneResistance"] = subField;
+  }
+  //Relative Diffusion Coefficient
+  if (sub->HasRelativeDiffusionCoefficient()) {
+    subField[0] = sub->GetRelativeDiffusionCoefficient().GetValue();
+    subField[1] = "";
+    substanceMap["RelativeDiffusionCoefficient"] = subField;
+  }
+  //Solubility Coefficient
+  if (sub->HasSolubilityCoefficient()) {
+    subField[0] = sub->GetSolubilityCoefficient().GetValue(biogears::InversePressureUnit::Inverse_atm);
+    subField[1] = "1/atm";
+    substanceMap["SolubilityCoefficient"] = subField;
+  }
+  if (sub->HasClearance()) {
+    auto& clearanceData = sub->GetClearance();
+    QVariantMap clearanceMap;
+
+    //--Check for systemic clearance data.  If present, all sub-fields will be defined
+    if (clearanceData.HasSystemic()) {
+      QVariantMap systemicMap;
+      //Intrinsic Clearance
+      subField[0] = clearanceData.GetIntrinsicClearance(biogears::VolumePerTimeMassUnit::mL_Per_min_kg);
+      subField[1] = "mL/min kg";
+      systemicMap["IntrinsicClearance"] = subField;
+      //Renal Clearance
+      subField[0] = clearanceData.GetRenalClearance(biogears::VolumePerTimeMassUnit::mL_Per_min_kg);
+      subField[1] = "mL/min kg";
+      systemicMap["RenalClearance"] = subField;
+      //Systemic Clearance
+      subField[0] = clearanceData.GetSystemicClearance(biogears::VolumePerTimeMassUnit::mL_Per_min_kg);
+      subField[1] = "mL/min kg";
+      systemicMap["SystemicClearance"] = subField;
+      //Fraction unbound in plasma
+      subField[0] = clearanceData.GetFractionUnboundInPlasma().GetValue();
+      subField[1] = "";
+      systemicMap["FractionUnboundInPlasma"] = subField;
+      //Fraction excreted in feces
+      subField[0] = clearanceData.GetFractionExcretedInFeces().GetValue();
+      subField[1] = "";
+      systemicMap["FractionExcretedInFeces"] = subField;
+
+      //Add systemic map as submap to clearance map
+      clearanceMap["systemic"] = systemicMap;
+    }
+    //--Check for renal dynamics
+    if (clearanceData.HasRenalDynamic()) {
+      if (clearanceData.GetRenalDynamic() == biogears::RenalDynamic::Clearance) {
+        clearanceMap["dynamicsChoice"] = "clearance";
+      } else if (clearanceData.GetRenalDynamic() == biogears::RenalDynamic::Regulation) {
+        clearanceMap["dynamicsChoice"] = "regulation";
+        QVariantMap regulationMap;
+        //Charge in blood
+        subField[0] = (int)clearanceData.GetChargeInBlood();
+        subField[1] = "";
+        regulationMap["ChargeInBlood"] = subField;
+        //Reabsorption ratio
+        subField[0] = clearanceData.GetRenalReabsorptionRatio().GetValue();
+        subField[1] = "";
+        regulationMap["ReabsorptionRatio"] = subField;
+        //Transport maximum
+        subField[0] = clearanceData.GetRenalTransportMaximum().GetValue(biogears::MassPerTimeUnit::mg_Per_min);
+        subField[1] = "mg/min";
+        regulationMap["TransportMaximum"] = subField;
+        //Fraction unbound in plasma
+        subField[0] = clearanceData.GetFractionUnboundInPlasma().GetValue();
+        subField[1] = "";
+        regulationMap["FractionUnboundInPlasma"] = subField;
+      
+        //Add regulation map to clearance map
+        clearanceMap["regulation"] = regulationMap;
+      }
+    }
+    //Add clearance map to substance map
+    substanceMap["Clearance"] = clearanceMap; 
+  }
+
+  //
+}
+
 void Scenario::export_substance()
 {
 }
