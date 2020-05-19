@@ -13,7 +13,7 @@ UISubstanceWizardForm {
 
 	property var substanceData : ({})		//Object holding all substance-related data (key maps to one of the tab objects)
 	property var physicalData : ({})		//Object holding all info from the "physical" tab
-	property var clearanceData : ({"systemic" : ({}), "renalDynamics" : ({}) })		//Object holding all info from "clearance" tab
+	property var clearanceData : ({"systemic" : ({}), "regulation" : ({}), "dynamicsChoice" : "" })		//Object holding all info from "clearance" tab
 	property var pkData : ({"physicochemical" : ({}), "tissueKinetics" : ({}) })					//Object holding all info from "pharmacokinetics" tab
 	property var pdData : ({})					//Object holding all info from "pharmacodynamics" tab
 	property var resetData : ({})  //Store data loaded in "edit" mode so that during reset we can revert to data in file
@@ -24,13 +24,14 @@ UISubstanceWizardForm {
 	function debugObjects(obj) {
 		for (let prop in obj){
 			console.log("\t" + prop + " : " + obj[prop])
-			if (Object.keys(obj[prop]).length > 0){
-				for (let subProp in obj[prop]){
-					console.log("\t\t" + subProp + " : " + obj[prop][subProp])
-				}
-			}
+		//	if (Object.keys(obj[prop]).length > 0){
+			//	for (let subProp in obj[prop]){
+			//		console.log("\t\t" + subProp + " : " + obj[prop][subProp])
+			//	}
+		//	}
 		}
 	}
+
 
 	onLoadConfiguration : {
 	}
@@ -59,7 +60,7 @@ UISubstanceWizardForm {
 		}
 		//Verify data from each tab.  Each "verify" function returns a pair [bool valid, bool dataPresent].
 		//Thus, if first element is false, the configuration is invalid.  We use the dataPresent element if
-		//the full confifuration is valid to determine if we should append this group's data to the substance map or not.
+		//the full configuration is valid to determine if we should append this group's data to the substance map or not.
 		//Physical tab does not require extra verification because all fields accept Name and State (handled above)
 		//are optional.
 		let clearanceVerify = verifyClearanceData()
@@ -79,21 +80,22 @@ UISubstanceWizardForm {
 			Object.assign(substanceData, {"Physical" : physicalData})
 			//Only pass clearance data if dataPresent.
 			if (clearanceVerify[1]){
-				//Reconfigure clearance data to account for nesting of 'Regulation' type
-				let regulationObject = {}
-				let clearanceModelGroup = substanceDelegateModel.groupIndexMap["clearance"]
-				for (let i = 0; i<clearanceModelGroup.count; ++i){
-					let item = clearanceModelGroup.get(i)
-					if (item.model.group ==='clearance-regulation'){
-						Object.assign(regulationObject, {[item.model.name] : clearanceData[item.model.name]})
-						delete clearanceData[item.model.name]
+				clearanceData.dynamicsChoice = renalOptions.checkedButton.choice
+				//Remove "regulation" data if not needed (easier to process downstream)
+				if (clearanceData.dynamicsChoice === 'clearance'){
+					for (let key in clearanceData.regulation){
+						delete clearanceData.regulation[key]
 					}
+					delete clearanceData.regulation
 				}
-				if (Object.keys(regulationObject).length > 0){
-					Object.assign(clearanceData, {"Regulation" : regulationObject})
+				//Remove "systemic" data if not needed (happens when we choose "regulation" dynamics and any entry of "systemic" is empty
+				if (clearanceData.dynamicsChoice === 'regulation' && clearanceData.systemic.IntrinsicClearance[0]===null){
+					for (let key in clearanceData.systemic){
+						delete clearanceData.systemic[key]
+					}
+					delete clearanceData.systemic
 				}
 				Object.assign(substanceData, {"Clearance" : clearanceData})
-				debugObjects(clearanceData)
 			}
 			//Send data from whichever PK option is currently active
 			if (pkStackLayout.currentIndex === 0 && pkVerify[1]){
@@ -111,20 +113,30 @@ UISubstanceWizardForm {
 				errorString = errorString.slice(0, errorString.length-1)
 			}
 			root.invalidConfiguration(errorString)
+			errorString = "*" //Reset error string for future warnings (if needed)
 		}
 	}
 
 	function verifyClearanceData(){
 		let valid = true
 		let dataPresent = true
-		//Clearance is all or nothing.  If Regulation is specified, then all Regulation fields must be given as well
-		let checkData = checkAllOrNothingData( clearanceData )
-		if (!checkData[0]){
+		//Clearance has two groups of data (Systemic & Regulation).  Each one is all or nothing
+		let systemicDataCheck = checkAllOrNothingData( clearanceData.systemic )
+		let regulationDataCheck = checkAllOrNothingData( clearanceData.regulation )
+		if (!systemicDataCheck[0]){
 			valid = false
-			errorString += "Clearance: \n\t All fields are required to set up substance clearance (or none to indicate no data).\n*"
+			errorString += "Systemic Clearance: \n\t All fields are required to set up systemic clearance (or none to indicate no data).\n*"
 		} else {
-			dataPresent = checkData[1]
+			dataPresent = systemicDataCheck[1]
+			if (!regulationDataCheck[0] && renalOptions.checkedButton.choice === "regulation"){
+				debugObjects( clearanceData.regulation )
+				//We selected renal regulation for dynamics but did not provide all data
+				valid = false
+				errorString += "Renal Dynamics: \n\t If using Renal Regulation Options, all fields are required\n*"
+			}
 		}
+		dataPresent = systemicDataCheck[1] || (regulationDataCheck[1] && renalOptions.checkedButton.choice === 'regulation')
+		console.log(valid, dataPresent)
 		return [valid, dataPresent]
 	}
 
@@ -185,7 +197,7 @@ UISubstanceWizardForm {
 				errorString += "Pharmacodynamics: \n\tBoth EC50 and Shape Parameter must be defined to set up substance PD.\n*"
 			}
 		}
-		return [valid, numModifiers > 0]
+		return [valid, requiredCount + numModifiers > 0]
 	}
 
 	function checkAllOrNothingData( data ) {
@@ -239,8 +251,8 @@ UISubstanceWizardForm {
 	function updateDelegateItems(items){
 		while (items.count > 0){
 			let item = items.get(0)
-			if (item.model.dynamic){
-				items.setGroups(0, 1, ["dynamic"])
+			if (item.model.name==="Placeholder"){
+				items.setGroups(0, 1, [item.model.group])
 			} else {
 				items.setGroups(0, 1, [item.model.group, "persistedItems"])
 			}
@@ -249,7 +261,6 @@ UISubstanceWizardForm {
 
 	function setDelegateFilter(mainTab, subIndex){
 		let filter = ""
-		console.log(mainTab, subIndex)
 		switch(mainTab){
 			case 0 : 
 				filter = "physical"
@@ -269,5 +280,13 @@ UISubstanceWizardForm {
 				break;
 			}
 			return filter
+		}
+
+		function setupGroupMap(groups){
+			let map = {}
+			for (let i = 0; i < groups.length; ++i){
+        Object.assign(map, {[groups[i].name] : groups[i]})
+      }
+			return map
 		}
 }

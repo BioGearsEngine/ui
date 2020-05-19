@@ -15,6 +15,7 @@ Page {
   property alias substanceTabBar : substanceTabBar
   property alias substanceStackLayout : substanceStackLayout
   property alias pkStackLayout : pkStackLayout
+  property alias renalOptions : renalOptionsButtonGroup
 
   DoubleValidator {
     id : doubleValidator
@@ -120,35 +121,67 @@ Page {
         font.pointSize : 10
         horizontalAlignment : Text.AlignHCenter
       }
+      Rectangle {
+        id : clearanceDivider
+        height : 1
+        width : parent.width
+        color : "black"
+        anchors.top : clearanceLabel.bottom
+        anchors.topMargin : 5
+      }
+      Label {
+        id : systemicLabel
+        width : parent.width
+        height : implicitHeight
+        anchors.top : clearanceDivider.bottom
+        anchors.topMargin : 20
+        anchors.left : parent.left
+        anchors.right : parent.right
+        text : "Systemic Clearance"
+        font.pointSize : 9
+        horizontalAlignment : Text.AlignHCenter
+      }
       GridView {
         id: clearanceGridView
         clip : true
         width : parent.width
-        height : cellHeight * 2 + 10 //(Math.floor(count / 2) + count % 2) * cellHeight
+        height : cellHeight * 3
         interactive : false
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.clearanceSystemic
-        anchors.top : clearanceLabel.bottom
+        anchors.top : systemicLabel.bottom
         anchors.topMargin : 10
         anchors.left : parent.left
         anchors.right : parent.right
         currentIndex: -1
       }
+      Label {
+        id : dynamicsLabel
+        width : parent.width
+        height : implicitHeight
+        anchors.top : clearanceGridView.bottom
+        anchors.topMargin : 25
+        anchors.left : parent.left
+        anchors.right : parent.right
+        text : "Renal Dynamics"
+        font.pointSize : 9
+        horizontalAlignment : Text.AlignHCenter
+      }
       ButtonGroup {
         id : renalOptionsButtonGroup
+        exclusive : true
         onClicked : {
-          console.log('clicked')
           if (button.choice === "regulation"){
-            console.log('regulation')
-            //clearanceTab.subIndex = 1
-            //regulationViewLoader.sourceComponent = clearanceRegulationComponent
+            regulationGridView.visible = true
+          } else {
+            regulationGridView.visible = false
           }
         }
       }
       RowLayout {
         id : renalOptionsRow
-        anchors.top : clearanceGridView.bottom
+        anchors.top : dynamicsLabel.bottom
         anchors.horizontalCenter : parent.horizontalCenter
         width : implicitWidth
         height : implicitHeight
@@ -156,38 +189,34 @@ Page {
           id : systemicOption
           checked : true
           property string choice : "clearance"
-          text : "Use systemic"
+          text : "Use Systemic: Renal Clearance (Default)"
+          font.pointSize : 8
           ButtonGroup.group : renalOptionsButtonGroup
         }
         RadioButton {
           id : regulationOption
           checked : false
           property string choice : "regulation"
-          text : "Use renal regulation"
+          text : "Open Renal Regulation Options"
+          font.pointSize : 8
           ButtonGroup.group : renalOptionsButtonGroup
         }
       }
-      
-      Loader {
-        id : regulationViewLoader
-
-      }
-      
       GridView {
         id: regulationGridView
         clip : true
-        width : parent.width
-        height : cellHeight * 2 + 10 //(Math.floor(count / 2) + count % 2) * cellHeight
-        verticalLayoutDirection : GridView.BottomToTop
-        interactive : false
-        cellHeight : 60
-        cellWidth : parent.width / 2
-        model : substanceDelegateModel.parts.clearanceRegulation
         anchors.topMargin : 10
         anchors.top : renalOptionsRow.bottom
         anchors.left : parent.left
         anchors.right : parent.right
-        currentIndex: 5
+        width : parent.width
+        height : cellHeight * 2
+        interactive : false
+        visible : false
+        currentIndex : 6
+        cellHeight : 60
+        cellWidth : parent.width / 2
+        model : substanceDelegateModel.parts.clearanceRegulation
       }
     }
     Pane {
@@ -337,25 +366,19 @@ Page {
     id : substanceDelegateModel
     model : substanceListModel      
     delegate : substanceDelegate
-    property var groupIndexMap : ({})
+    property var groupIndexMap : setupGroupMap(groups)
     groups :  [
                 DelegateModelGroup {name : "physical"; includeByDefault : false; property var data : physicalData; onChanged : substanceDelegateModel.updateGroup(this) },
-                DelegateModelGroup {name : "clearance"; includeByDefault : false; property var children : ['clearance_systemic','clearance_regulation'] },
-                DelegateModelGroup {name : "clearance_systemic"; includeByDefault : false; property string parent : 'clearance'; property var data : clearanceData.systemic; onChanged : substanceDelegateModel.updateGroup(this) },
-                DelegateModelGroup {name : "clearance_regulation"; includeByDefault : false; property string parent : 'clearance'; property var data : clearanceData.renalDynamics; onChanged : substanceDelegateModel.updateGroup(this) },
+                DelegateModelGroup {name : "clearance"; includeByDefault : false; property var childrenGroups : ['clearance_systemic','clearance_regulation'] },
+                DelegateModelGroup {name : "clearance_systemic"; includeByDefault : false; property string parentGroup : 'clearance'; property var data : clearanceData.systemic; onChanged : substanceDelegateModel.updateGroup(this) },
+                DelegateModelGroup {name : "clearance_regulation"; includeByDefault : false; property string parentGroup : 'clearance'; property var data : clearanceData.regulation; onChanged : substanceDelegateModel.updateGroup(this) },
                 DelegateModelGroup {name : "pkPhysicochemical"; includeByDefault : false; property var data : pkData.physicochemical; onChanged : substanceDelegateModel.updateGroup(this)},
                 DelegateModelGroup {name : "pkTissueKinetics"; includeByDefault : false; property var data : pkData.tissueKinetics; onChanged : substanceDelegateModel.updateGroup(this)},
-                DelegateModelGroup {name : "pharmacodynamics"; includeByDefault : false; property var data : pdData; onChanged : substanceDelegateModel.updateGroup(this)},
-                DelegateModelGroup {name : "dynamic"; includeByDefault : false}
+                DelegateModelGroup {name : "pharmacodynamics"; includeByDefault : false; property var data : pdData; onChanged : substanceDelegateModel.updateGroup(this)}
               ]
     items.onChanged : updateDelegateItems (items)
     filterOnGroup : setDelegateFilter(substanceStackLayout.currentIndex, substanceStackLayout.subIndex)
-    Component.onCompleted : {
-      //Set up the groupIndexMap
-      for (let i = 0; i < groups.length; ++i){
-        Object.assign(groupIndexMap, {[groups[i].name] : groups[i]})
-      }
-    }
+
     function updateGroup(group){
       //If group.data has fewer elements than the group, then we need to add entries for the deficient elements to group.data
       if (Object.keys(group.data).length < group.count){
@@ -365,8 +388,8 @@ Page {
           }
         }
       }
-      if (group.parent){
-        let parentGroupName = group.parent
+      if (group.parentGroup){
+        let parentGroupName = group.parentGroup
         let inParentString = "in" + parentGroupName.charAt(0).toUpperCase() + parentGroupName.slice(1)
         for (let i = 0; i < group.count; ++i){
           let item = group.get(i)
@@ -375,37 +398,26 @@ Page {
           }
         }
 	    } 
-      //If group.data has more elements than the group, then we must have removed some dynamic elements from the view.
-      //Search "dynamic" group for elements whose substanceListModel "group" role match the calling group and remove
-      //them from group.data.
-      if (group.count < Object.keys(group.data).length){
-        let dynamicItems = groupIndexMap["dynamic"]
-        for (let i = 0; i < dynamicItems.count; ++i){
-          let listedGroup = dynamicItems.get(i).model.group
-          let elementName = dynamicItems.get(i).model.name
-          if (listedGroup === group.name){
-            delete group.data[elementName]
-          }
-        }
-      }
     }
   }
+
   Component {
     id : substanceDelegate  
     Package {
-      Item { id : idPhysical; Package.name : "physical"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idClearanceSystemic; Package.name : "clearanceSystemic";  width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idClearanceRegulation; Package.name : "clearanceRegulation";  width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idPkPhysicochemical; Package.name : "pkPhysicochemical"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idPkTissueKinetics; Package.name : "pkTissueKinetics"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
-      Item { id : idPharmacodynamics; Package.name : "pharmacodynamics"; width : GridView.view.cellWidth; height : GridView.view.cellHeight}
+      Item { id : idPhysical; Package.name : "physical"}
+      Item { id : idClearanceSystemic; Package.name : "clearanceSystemic"}
+      Item { id : idClearanceRegulation; Package.name : "clearanceRegulation"}
+      Item { id : idPkPhysicochemical; Package.name : "pkPhysicochemical"}
+      Item { id : idPkTissueKinetics; Package.name : "pkTissueKinetics"}
+      Item { id : idPharmacodynamics; Package.name : "pharmacodynamics"}
 
       Item { 
         id : wrapper
-        width : parent.visible ? parent.width : 0
-        height : parent.visible ? parent.height : 0
+        width : parent ? parent.GridView.view.cellWidth : 0
+        height :  parent ?  parent.GridView.view.cellHeight : 0
         property var groupData
         state : model.group
+                                    
         states : [
           State { name : "physical"; changes : [ParentChange { target : wrapper; parent : idPhysical}, PropertyChanges { target : wrapper; groupData : physicalData} ] },
           State { name : "clearance_systemic"; changes : [ParentChange { target : wrapper; parent : idClearanceSystemic}, PropertyChanges{target : wrapper; groupData : clearanceData.systemic} ] },
@@ -414,19 +426,15 @@ Page {
           State { name : "pkTissueKinetics"; changes : [ParentChange { target : wrapper; parent : idPkTissueKinetics}, PropertyChanges{target : wrapper; groupData : pkData.tissueKinetics} ] },
           State { name : "pharmacodynamics"; changes : [ParentChange { target : wrapper; parent : idPharmacodynamics}, PropertyChanges{target : wrapper; groupData : pdData} ] }
         ]
-        onStateChanged : {
-          //console.log('change')
-          //substanceDelegateModel.refilter(model.group)
-        }
         UIUnitScalarEntry {
           id : unitScalarEntry
           anchors.centerIn : parent
           prefWidth : parent.width * 0.9
           prefHeight : parent.height * 0.95
           label : root.displayFormat(model.name)
-          unit : model.unit
-          type : model.type
-          hintText : model.hint
+          unit : wrapper.parent ? model.unit : ""
+          type : wrapper.parent ? model.type : ""
+          hintText : wrapper.parent ? model.hint : ""
           entryValidator : root.assignValidator(model.type)
           Component.onCompleted : {
             model.valid = Qt.binding(function() {return entry.validInput})
@@ -440,76 +448,75 @@ Page {
             }
           }
         }
-      }
-      
+      }   
     } 
   }
 
   //List model roles name, unit, type, and hint set properties in the delegate created from an element.  The valid role
   // is bound to the delegate valid property, which we use to determine whether data is ready to be passed to create_substance().
   // The group role helps us sort the element into the appropriate DelegateModelGroup in substanceDelegateModel.
-  // The dynamic role determines whether an object corresponding to the element can be added/removed from a view during
-  // runtime.  If false, the element is assumed to always be visible.  If true, the element can be added or removed
-  // from a view while the substance editor is open (see Clearance Grid View).
   ListModel {
     id : substanceListModel
-    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "State"; unit: "substanceState"; type : "enum"; hint : "*"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "Classification"; unit : "substanceClass"; type : "enum"; hint : ""; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "MolarMass";  unit : "molar"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "Density";  unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "MaximumDiffusionFlux"; unit : "massFlux"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "MichaelisCoefficient";  unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "MembraneResistance";  unit : "electricalResistance"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "RelativeDiffusionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-      ListElement {name : "SolubilityCoefficient";  unit : "inversePressure"; type : "double"; hint : "Enter a value"; valid : true; group : "physical";dynamic : false}
-    ListElement {name : "IntrinsicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic";dynamic : false}
-      ListElement {name : "RenalClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic";dynamic : false}
-      ListElement {name : "SystemicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic";dynamic : false}
-      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_systemic";dynamic : false}
-      ListElement {name : "ChargeInBlood"; unit : "charge"; type : "enum"; hint : ""; valid : true; group : "clearance_regulation";dynamic : false}
-      ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation";dynamic : false}  
-      ListElement {name : "TransportMaximum"; unit : "massRate"; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation";dynamic : false} 
-      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_regulation";dynamic : false}
-    ListElement {name : "AcidDissociationConstant"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}     
-      ListElement {name : "BindingProtein"; unit : "protein"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical";dynamic : false}     
-      ListElement {name : "BloodPlasmaRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}     
-      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "pkPhysicochemical";dynamic : false} 
-      ListElement {name : "IonicState"; unit : "ionicState"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical";dynamic : false} 
-      ListElement {name : "LogP"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}
-      ListElement {name : "HydrogenBoundCount"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}
-      ListElement {name : "PolarSurfaceArea"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical";dynamic : false}
-    ListElement {name : "BonePartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "BrainPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "FatPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "GutPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "LeftKidneyPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "LeftLungPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "LiverPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "MusclePartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "MyocardiumPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "RightKidneyPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "RightLungPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "SkinPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-      ListElement {name : "SpleenPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics";dynamic : false}
-    ListElement {name : "EC50"; unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "ShapeParameter"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "EffectSiteRateConstant"; unit : "frequency"; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "BronchodilationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "DiastolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "SystolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "FeverModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "HeartRateModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "HemorrhageModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "NeuromuscularBlockModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "PainModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "RespirationRateModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "TidalVolumeModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "SedationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "TubularPermeabilityModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "CentralNervousModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "AntibacterialEffect"; unit : "frequency"; type : "double"; hint : ""; valid : true; group : "pharmacodynamics";dynamic : false}
-      ListElement {name : "PupillaryResponse"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics";dynamic : false}
+    ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true; group : "physical"}
+      ListElement {name : "State"; unit: "substanceState"; type : "enum"; hint : "*"; valid : true; group : "physical"}
+      ListElement {name : "Classification"; unit : "substanceClass"; type : "enum"; hint : ""; valid : true; group : "physical"}
+      ListElement {name : "MolarMass";  unit : "molar"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+      ListElement {name : "Density";  unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+      ListElement {name : "MaximumDiffusionFlux"; unit : "massFlux"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+      ListElement {name : "MichaelisCoefficient";  unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+      ListElement {name : "MembraneResistance";  unit : "electricalResistance"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+      ListElement {name : "RelativeDiffusionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+      ListElement {name : "SolubilityCoefficient";  unit : "inversePressure"; type : "double"; hint : "Enter a value"; valid : true; group : "physical"}
+    ListElement {name : "IntrinsicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic"}
+      ListElement {name : "RenalClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic"}
+      ListElement {name : "SystemicClearance"; unit : "volumetricFlowNorm"; type : "double"; hint : "Enter a value "; valid : true; group : "clearance_systemic"}
+      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_systemic"}
+      ListElement {name : "FractionExcretedInFeces"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_systemic"}
+      ListElement {name : "Placeholder"; group : "clearance"; valid : true} //This is needed to get an even number of items in "clearance" so that the two clearance views aren't staggered
+      ListElement {name : "ChargeInBlood"; unit : "charge"; type : "enum"; hint : ""; valid : true; group : "clearance_regulation"}
+      ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation"}  
+      ListElement {name : "TransportMaximum"; unit : "massRate"; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation"} 
+      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_regulation"}
+    ListElement {name : "AcidDissociationConstant"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
+      ListElement {name : "BindingProtein"; unit : "protein"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical"}     
+      ListElement {name : "BloodPlasmaRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
+      ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "pkPhysicochemical"} 
+      ListElement {name : "IonicState"; unit : "ionicState"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical"} 
+      ListElement {name : "LogP"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}
+      ListElement {name : "HydrogenBondCount"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}
+      ListElement {name : "PolarSurfaceArea"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}
+    ListElement {name : "BonePartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "BrainPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "FatPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "GutPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "LeftKidneyPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "LeftLungPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "LiverPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "MusclePartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "MyocardiumPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "RightKidneyPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "RightLungPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "SkinPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+      ListElement {name : "SpleenPartitionCoefficient"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkTissueKinetics"}
+    ListElement {name : "EC50"; unit : "concentration"; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "ShapeParameter"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "EffectSiteRateConstant"; unit : "frequency"; type : "double"; hint : "Enter a value"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "BronchodilationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "DiastolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "SystolicPressureModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "FeverModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "HeartRateModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "HemorrhageModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "NeuromuscularBlockModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "PainModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "RespirationRateModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "TidalVolumeModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "SedationModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "TubularPermeabilityModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "CentralNervousModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "AntibacterialEffect"; unit : "frequency"; type : "double"; hint : ""; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "Pupil-SizeModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
+      ListElement {name : "Pupil-ReactivityModifier"; unit : ""; type : "-1To1"; hint : "Enter a value [-1-1]"; valid : true; group : "pharmacodynamics"}
   }
 
 

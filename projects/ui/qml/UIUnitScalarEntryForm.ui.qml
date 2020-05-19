@@ -408,11 +408,11 @@ Rectangle {
                          'massFlux' : ['g/cm^2 s'],
                          'volumetricFlowNorm' : ['mL/min kg'],
                          'inversePressure' : ['1/atm'],
-                         'electricalResistance' : ['ohms'],
-                         'substanceClass' : ['Anesthetic', 'Ion','Sedative'],
+                         'electricalResistance' : ['ohm'],
+                         'substanceClass' : ['Anesthetic','Antibiotic','WholeBlood','Ion','Opioid','ReversalAgent', 'Ion','Sedative'],
                          'charge' : ['Positive','Neutral','Negative'],
                          'protein' : ['Albumin','Lipoprotein','AAG'],
-                         'ionicState' : ['Acid', 'Strong Base','Weak Base','Neutral','Zwitterion'],
+                         'ionicState' : ['WeakBase','Base','Acid','Neutral','Zwitterion'],
                          'substanceState' : ['Solid','Liquid','Gas', 'Molecular']
                          })
 
