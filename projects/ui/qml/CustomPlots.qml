@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtCharts 2.3
+import QtQuick.Controls 2.12
 
 import com.biogearsengine.ui.scenario 1.0
 
@@ -95,5 +96,4 @@ CustomPlotsForm {
     root.width = newWidth
     root.height = newHeight
   }
-
 }
