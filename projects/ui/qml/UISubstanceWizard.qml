@@ -8,7 +8,7 @@ UISubstanceWizardForm {
 	signal validConfiguration (string type, var data)
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
-	signal loadConfiguration(var environmentData)
+	signal loadConfiguration()
 	signal nameEdited()
 
 	property var substanceData : ({})		//Object holding all substance-related data (key maps to one of the tab objects)
@@ -24,14 +24,20 @@ UISubstanceWizardForm {
 	function debugObjects(obj) {
 		for (let prop in obj){
 			console.log("\t" + prop + " : " + obj[prop])
-		//	if (Object.keys(obj[prop]).length > 0){
-			//	for (let subProp in obj[prop]){
-			//		console.log("\t\t" + subProp + " : " + obj[prop][subProp])
-			//	}
-		//	}
 		}
 	}
 
+	Component.onCompleted : {
+		while (substanceStackLayout.currentIndex < substanceStackLayout.count){
+			let currentTab = substanceStackLayout.children[substanceStackLayout.currentIndex]
+			//substanceStackLayout.children[substanceStackLayout.currentIndex].dataView.forceLayout()
+			for (let i = 0; i < currentTab.childViews.length; ++i){
+				currentTab.childViews[i].forceLayout();
+			}
+			substanceStackLayout.currentIndex = substanceStackLayout.currentIndex + 1
+		}
+		substanceStackLayout.currentIndex = 0
+	}
 
 	onLoadConfiguration : {
 	}
@@ -220,7 +226,62 @@ UISubstanceWizardForm {
 
 
 	function mergeSubstanceData(substance){
-
+		for (let prop in substance){
+			switch (prop) {
+				case "Clearance" :
+					let clearance = substance["Clearance"]
+					if (clearance.hasOwnProperty("systemic")){
+						for (let sysProp in clearance["systemic"]){
+							clearanceData.systemic[sysProp] = clearance["systemic"][sysProp]
+						}
+					}
+					if (clearance.hasOwnProperty("regulation")){
+						renalOptions.forceRegulationVisible()
+						for (let regProp in clearance["regulation"]){
+							clearanceData.regulation[regProp] = clearance["regulation"][regProp]
+						}
+					}
+					clearanceData.dynamicsChoice = clearance.dynamicsChoice
+					break;
+				case "Physicochemicals" :
+					let physChem = substance["Physicochemicals"]
+					pkStackLayout.currentIndex = 0				//Make sure the correct PK input option is displayed
+					for (let physProp in physChem){
+						pkData.physicochemical[physProp] = physChem[physProp]
+					}
+					break;
+				case "TissueKinetics" :
+					let tisKinetics = substance["TissueKinetics"]
+					pkStackLayout.currentIndex = 1				//Make sure the correct PK input option is displayed
+					for (let tisProp in tisKinetics){
+						pkData.tissueKinetics[tisProp] = tisKinetics[tisProp]
+					}
+					break;
+				case "Pharmacodynamics" :
+					let pd = substance["Pharmacodynamics"]
+					for (let pdProp in pd){
+						pdData[pdProp] = pd[pdProp]
+					}
+					break;
+				default :
+					physicalData[prop] = substance[prop]
+			}
+		}
+	/*	console.log("Physical")
+		debugObjects(physicalData)
+		console.log("Clearance")
+		debugObjects(clearanceData)
+		console.log("Clearance-Systemic")
+		debugObjects(clearanceData.systemic)
+		console.log("Clearance-Regulation")
+		debugObjects(clearanceData.regulation)
+		console.log("PK-Phys")
+		debugObjects(pkData.physicochemical)
+		console.log("PK-Tis")
+		debugObjects(pkData.tissueKinetics)
+		console.log("PD")
+		debugObjects(pdData)*/
+		loadConfiguration()
 	}
 
 	function resetEntry(entry){

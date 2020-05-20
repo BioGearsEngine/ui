@@ -69,13 +69,6 @@ Page {
         substanceStackLayout.currentIndex = TabBar.index
       }
     }
-   /* TabButton {
-      id : aerosolButton
-      text : "Aerosolization"
-      onClicked : {
-        substanceStackLayout.currentIndex = TabBar.index
-      }
-    }*/
   }
 
   StackLayout {
@@ -90,8 +83,9 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : 0
+      property var childViews : [physicalGridView]
       GridView {
-        id: physicalDataGridView
+        id: physicalGridView
         clip : true
         model : substanceDelegateModel.parts.physical
         anchors.top : parent.top
@@ -109,6 +103,7 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : 0
+      property var childViews : [clearanceGridView, regulationGridView]
       Label {
         id : clearanceLabel
         width : parent.width
@@ -171,8 +166,10 @@ Page {
       ButtonGroup {
         id : renalOptionsButtonGroup
         exclusive : true
+        property var forceRegulationVisible : function() { buttons[0].checked = true; buttons[1].checked = false; regulationGridView.visible = true; regulationGridView.positionViewAtIndex(6, GridView.Beginning) }
         onClicked : {
           if (button.choice === "regulation"){
+            regulationGridView.positionViewAtIndex(6, GridView.Beginning)
             regulationGridView.visible = true
           } else {
             regulationGridView.visible = false
@@ -187,6 +184,7 @@ Page {
         height : implicitHeight
         RadioButton {
           id : systemicOption
+          //Note:  This button has index "1" in renalOptionsButtonGroup.buttons (I assume because buttons are pushed on to front of buttons array when added)
           checked : true
           property string choice : "clearance"
           text : "Use Systemic: Renal Clearance (Default)"
@@ -195,6 +193,7 @@ Page {
         }
         RadioButton {
           id : regulationOption
+          //Note:  This button has index "0" in renalOptionsButtonGroup.buttons (I assume because buttons are pushed on to front of buttons array when added)
           checked : false
           property string choice : "regulation"
           text : "Open Renal Regulation Options"
@@ -211,9 +210,9 @@ Page {
         anchors.right : parent.right
         width : parent.width
         height : cellHeight * 2
-        interactive : false
+        interactive : true
         visible : false
-        currentIndex : 6
+        currentIndex : 0
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.clearanceRegulation
@@ -224,6 +223,7 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : pkStackLayout.currentIndex
+      property var childViews : [pkGridView1, pkGridView2]
       Label {
         id : pkLabel
         width : parent.width
@@ -264,6 +264,7 @@ Page {
         width : parent.width
         height : parent.height - switchItem.height
         currentIndex : 0
+        property var dataView : currentIndex === 0 ? pkGridView1 : pkGridView2
         Item {
           GridView {
             id: pkGridView1
@@ -295,6 +296,7 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : 0
+      property var childViews : [pdGridView]
       Label {
         id : pdLabel
         width : parent.width
@@ -311,7 +313,7 @@ Page {
         id: pdGridView
         clip : true
         width : parent.width
-        height : parent.height
+        height : parent.height - pdLabel.height
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.pharmacodynamics
@@ -367,6 +369,7 @@ Page {
     model : substanceListModel      
     delegate : substanceDelegate
     property var groupIndexMap : setupGroupMap(groups)
+    property var getGroup : function(group) { return groupIndexMap[group] }
     groups :  [
                 DelegateModelGroup {name : "physical"; includeByDefault : false; property var data : physicalData; onChanged : substanceDelegateModel.updateGroup(this) },
                 DelegateModelGroup {name : "clearance"; includeByDefault : false; property var childrenGroups : ['clearance_systemic','clearance_regulation'] },
@@ -437,14 +440,20 @@ Page {
           hintText : wrapper.parent ? model.hint : ""
           entryValidator : root.assignValidator(model.type)
           Component.onCompleted : {
-            model.valid = Qt.binding(function() {return entry.validInput})
-            root.onResetConfiguration.connect(function () { resetEntry(entry) } )
+            if (wrapper.parent){
+              model.valid = Qt.binding(function() {return entry.validInput})
+              root.onResetConfiguration.connect(function () { resetEntry(entry) } )
+              root.onLoadConfiguration.connect(function () { setEntry(parent.groupData[model.name]) })
+            }
+           // console.log(model.name)
           }
           onInputAccepted : {
-            if (input[0] === ""){
-              parent.groupData[model.name] = [null, null]
-            } else {
-              parent.groupData[model.name] = input
+            if (wrapper.parent){
+              if (input[0] === ""){
+                parent.groupData[model.name] = [null, null]
+              } else {
+                parent.groupData[model.name] = input
+              }
             }
           }
         }

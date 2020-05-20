@@ -1312,7 +1312,7 @@ QVariantMap Scenario::edit_substance()
   //Membrane Resistance
   if (sub->HasMembraneResistance()) {
     subField[0] = sub->GetMembraneResistance().GetValue(biogears::ElectricResistanceUnit::Ohm);
-    subField[1] = "Ohm";
+    subField[1] = "ohm";
     substanceMap["MembraneResistance"] = subField;
   }
   //Relative Diffusion Coefficient
@@ -1381,16 +1381,173 @@ QVariantMap Scenario::edit_substance()
         subField[0] = clearanceData.GetFractionUnboundInPlasma().GetValue();
         subField[1] = "";
         regulationMap["FractionUnboundInPlasma"] = subField;
-      
+
         //Add regulation map to clearance map
         clearanceMap["regulation"] = regulationMap;
       }
     }
     //Add clearance map to substance map
-    substanceMap["Clearance"] = clearanceMap; 
+    substanceMap["Clearance"] = clearanceMap;
   }
 
-  //
+  //---Pharmacokinetics------
+  if (sub->HasPK()) {
+    auto& subPK = sub->GetPK();
+    QVariantMap pkMap;
+
+    //Option 1: Physicochemicals
+    if (subPK.HasPhysicochemicals()) {
+      auto& physChem = subPK.GetPhysicochemicals();
+      subField[1] = ""; //None of these entries have units, so just set "unit" place to empty ahead of time
+      //Acid Dissociation Constant
+      subField[0] = physChem.GetPrimaryPKA().GetValue();
+      pkMap["AcidDissociationConstant"] = subField;
+      //Binding Protein
+      subField[0] = (int)physChem.GetBindingProtein();
+      pkMap["BindingProtein"] = subField;
+      //Blood Plasma Ratio
+      subField[0] = physChem.GetBloodPlasmaRatio().GetValue();
+      pkMap["BloodPlasmaRatio"] = subField;
+      //Fraction Unbound in Plasma
+      subField[0] = physChem.GetFractionUnboundInPlasma().GetValue();
+      pkMap["FractionUnboundInPlasma"] = subField;
+      //Ionic State
+      subField[0] = (int)physChem.GetIonicState();
+      pkMap["IonicState"] = subField;
+      //Log P
+      subField[0] = physChem.GetLogP().GetValue();
+      pkMap["LogP"] = subField;
+      //Hydrogen bond count
+      subField[0] = physChem.GetHydrogenBondCount().GetValue();
+      pkMap["HydrogenBondCount"] = subField;
+      //Polar Surface Area
+      subField[0] = physChem.GetPolarSurfaceArea().GetValue();
+      pkMap["PolarSurfaceArea"] = subField;
+
+      //Set "Physicochemical" field of substance map
+      substanceMap["Physicochemicals"] = pkMap;
+    }
+
+    //Option 2 : Tissue Kinetics
+    if (subPK.HasTissueKinetics()) {
+      subField[1] = ""; //No units for any partition coefficient so set unit place to empty now
+      //Bone Tissue
+      subField[0] = subPK.GetTissueKinetics("BoneTissue").GetPartitionCoefficient().GetValue();
+      pkMap["BonePartitionCoefficient"] = subField;
+      //Brain Tissue
+      subField[0] = subPK.GetTissueKinetics("BrainTissue").GetPartitionCoefficient().GetValue();
+      pkMap["BrainPartitionCoefficient"] = subField;
+      //Fat Tissue
+      subField[0] = subPK.GetTissueKinetics("FatTissue").GetPartitionCoefficient().GetValue();
+      pkMap["FatPartitionCoefficient"] = subField;
+      //Gut Tissue
+      subField[0] = subPK.GetTissueKinetics("GutTissue").GetPartitionCoefficient().GetValue();
+      pkMap["GutPartitionCoefficient"] = subField;
+      //LeftKidney Tissue
+      subField[0] = subPK.GetTissueKinetics("LeftKidneyTissue").GetPartitionCoefficient().GetValue();
+      pkMap["LeftKidneyPartitionCoefficient"] = subField;
+      //LeftLung Tissue
+      subField[0] = subPK.GetTissueKinetics("LeftLungTissue").GetPartitionCoefficient().GetValue();
+      pkMap["LeftLungPartitionCoefficient"] = subField;
+      //Liver Tissue
+      subField[0] = subPK.GetTissueKinetics("LiverTissue").GetPartitionCoefficient().GetValue();
+      pkMap["LiverPartitionCoefficient"] = subField;
+      //Muscle Tissue
+      subField[0] = subPK.GetTissueKinetics("MuscleTissue").GetPartitionCoefficient().GetValue();
+      pkMap["MusclePartitionCoefficient"] = subField;
+      //Myocardium Tissue
+      subField[0] = subPK.GetTissueKinetics("MyocardiumTissue").GetPartitionCoefficient().GetValue();
+      pkMap["MyocardiumPartitionCoefficient"] = subField;
+      //RightKidney Tissue
+      subField[0] = subPK.GetTissueKinetics("RightKidneyTissue").GetPartitionCoefficient().GetValue();
+      pkMap["RightKidneyPartitionCoefficient"] = subField;
+      //RightLung Tissue
+      subField[0] = subPK.GetTissueKinetics("RightLungTissue").GetPartitionCoefficient().GetValue();
+      pkMap["RightLungPartitionCoefficient"] = subField;
+      //Skin Tissue
+      subField[0] = subPK.GetTissueKinetics("SkinTissue").GetPartitionCoefficient().GetValue();
+      pkMap["SkinPartitionCoefficient"] = subField;
+      //Spleen Tissue
+      subField[0] = subPK.GetTissueKinetics("SpleenTissue").GetPartitionCoefficient().GetValue();
+      pkMap["SpleenPartitionCoefficient"] = subField;
+
+      //Add map to Tissue Kinetics key of Substance Map
+      substanceMap["TissueKinetics"] = pkMap;
+    }
+  }
+  //----Pharmacodynamics
+  if (sub->HasPD()) {
+    auto& subPD = sub->GetPD();
+    QVariantMap pdMap;
+    //EC50
+    subField[0] = subPD.GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["EC50"] = subField;
+    //Shape parameter
+    subField[0] = subPD.GetEMaxShapeParameter().GetValue();
+    subField[1] = "";
+    pdMap["ShapeParameter"] = subField;
+    //Effect site rate constant
+    subField[0] = subPD.GetEffectSiteRateConstant().GetValue(biogears::FrequencyUnit::Per_s);
+    subField[1] = "1/s";
+    pdMap["EffectSiteRateConstant"] = subField;
+    //Antibacterial effect
+    subField[0] = subPD.GetAntibacterialEffect().GetValue(biogears::FrequencyUnit::Per_s);
+    subField[1] = "1/s";
+    pdMap["AntibacterialEffect"] = subField;
+
+    subField[1] = ""; //Remainin modifiers have no unit, set units place to empty ahead of time
+    //Bronchodilation Modifier
+    subField[0] = subPD.GetBronchodilation().GetValue();
+    pdMap["BronchodilationModifier"] = subField;
+    //Diastolic pressure Modifier
+    subField[0] = subPD.GetDiastolicPressureModifier().GetValue();
+    pdMap["DiastolicPressureModifier"] = subField;
+    //Systolic pressure Modifier
+    subField[0] = subPD.GetSystolicPressureModifier().GetValue();
+    pdMap["SystolicPressureModifier"] = subField;
+    //Fever Modifier
+    subField[0] = subPD.GetFeverModifier().GetValue();
+    pdMap["FeverModifier"] = subField;
+    //Heart Rate Modifier
+    subField[0] = subPD.GetHeartRateModifier().GetValue();
+    pdMap["HeartRateModifier"] = subField;
+    //Hemorrhage Modifier
+    subField[0] = subPD.GetHemorrhageModifier().GetValue();
+    pdMap["HemorrhageModifier"] = subField;
+    //Neuromuscular Modifier
+    subField[0] = subPD.GetNeuromuscularBlock().GetValue();
+    pdMap["NeuromuscularBlockModifier"] = subField;
+    //Pain Modifier
+    subField[0] = subPD.GetPainModifier().GetValue();
+    pdMap["PainModifier"] = subField;
+    //Respiration Rate Modifier
+    subField[0] = subPD.GetRespirationRateModifier().GetValue();
+    pdMap["PainModifier"] = subField;
+    //Tidal Volume Modifier
+    subField[0] = subPD.GetTidalVolumeModifier().GetValue();
+    pdMap["TidalVolumeModifier"] = subField;
+    //Sedation Modifier
+    subField[0] = subPD.GetSedation().GetValue();
+    pdMap["SedationModifier"] = subField;
+    //Tubular Permeability Modifier
+    subField[0] = subPD.GetTubularPermeabilityModifier().GetValue();
+    pdMap["TubularPermeabilityModifier"] = subField;
+    //Central Nervous Modifier
+    subField[0] = subPD.GetCentralNervousModifier().GetValue();
+    pdMap["CentralNervousModifier"] = subField;
+    //Pupil-Size Modifier
+    subField[0] = subPD.GetPupillaryResponse().GetSizeModifier().GetValue();
+    pdMap["Pupil-SizeModifier"] = subField;
+    //Pupil-Reactivity Modifier
+    subField[0] = subPD.GetPupillaryResponse().GetReactivityModifier().GetValue();
+    pdMap["Pupil-ReactivityModifier"] = subField;
+    
+    //Add PD map to Substance Map
+    substanceMap["Pharmacodynamics"] = pdMap;
+  }
+
+  return substanceMap;
 }
 
 void Scenario::export_substance()
