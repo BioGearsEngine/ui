@@ -78,6 +78,7 @@ Page {
     anchors.top : substanceTabBar.bottom
     currentIndex : 0
     property real subIndex : children[currentIndex].subIndex
+    //---Physical Data Tab Layout----------------------------------------------
     Pane {
       id : physicalDataTab
       Layout.fillWidth : true
@@ -102,6 +103,17 @@ Page {
         cellWidth : parent.width / 2
       }
     }
+    //---Clearance Data Tab Layout----------------------------------------------
+    // This pane has two views that can be active at the same time.  The Delegate Model filter can't have two different
+    // values simultaneously in the same active area (at least, I could not find a way), so we set the delegate model to
+    // filter on "clearance", which includes both the "clearance_systemic" and "clearance_regulation" groups.  Each view,
+    // though, is assigned a distinct part (systemic or regulation).  This means that there will be items allowed through
+    // the filter that each view will not supply information to, resulting in a blank cell.  We address this by
+    // making the views non-interactive (no scrolling to blank cells) and setting their heights so that only the visible
+    // cells are shown.  This is easy for clearanceGridView because it's first visible item is index 0 in the clearance group.
+    // For regulationGridView, the first 6 items are invisible (corresponding to the 6 clearance_systemic items), so we need to
+    // make sure that it's current index is always reset to 6 (when the view is active) and that the view is positioned so
+    // that the item at index 6 is in the top left of the grid.
     Pane {
       id : clearanceTab
       Layout.fillWidth : true
@@ -238,6 +250,11 @@ Page {
         }
       }
     }
+    //---Pharmacokinetics Data Tab Layout----------------------------------------------
+    // This tab also has two views, but the implementation is easier because only one can be visible at a time
+    // (whereas clearance could potentially have two visible simultaneously). The two views are assigned to a pane
+    // in another stack layout, and when the index of the stack layout is changed, the delegate model filter is updated
+    // to be either physicochemical or tissue kinetics.
     Pane {
       id : pkTab
       Layout.fillWidth : true
@@ -323,6 +340,7 @@ Page {
         }
       }   
     }
+    //---Pharmacodynamics Data Tab Layout----------------------------------------------
     Pane {
       id : pdTab
       Layout.fillWidth : true
@@ -469,7 +487,7 @@ Page {
           Component.onCompleted : {
             if (wrapper.parent){
               model.valid = Qt.binding(function() {return entry.validInput})
-              root.onResetConfiguration.connect(function () { resetEntry(unitScalarEntry, model.name) } )
+              root.onResetConfiguration.connect(function () { resetEntry(unitScalarEntry, model.group + "-" + model.name) } )
               root.onLoadConfiguration.connect(function () { setEntry(parent.groupData[model.name]) })
             }
           }

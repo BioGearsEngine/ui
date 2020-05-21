@@ -17,6 +17,12 @@ UIUnitScalarEntryForm {
       let decimals = root.entryValidator ? root.entryValidator.decimals : 2
       let formattedValue = fromInput[0].toFixed(decimals)
       fromInput[0] = formattedValue
+      if(fromInput[0] ==="Infinity"){
+        //We only support "inf" values for transport maximum in renal dynamics.  Validator doesn't like the inifinity string
+        // so we just set to a really high number.
+        console.log('inf')
+        fromInput[0] = 1e10
+      }
     }
     root.entry.setFromExisting(fromInput)
   }

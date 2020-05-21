@@ -21,13 +21,16 @@ UISubstanceWizardForm {
 	property bool nameWarningFlagged : false
 	property string errorString : "*"
 
-	function debugObjects(obj) {
-		for (let prop in obj){
-			console.log("\t" + prop + " : " + obj[prop])
-		}
-	}
-
 	Component.onCompleted : {
+		//Normally, only the active page in a stack layout is fully loaded when parent component is created.
+		//This means that only the items in the grid view of the current stack layout index will get set up at first,
+		//and the remainder will be created as the user tabs over to the them.  This is not ideal behavior when it
+		//comes to loading an existing substance on component initialization, becuase the majority of the data fields
+		//will not be setup and will not be able to receive data.  We solve this by iterating across all of the pages
+		//in the stack layout and again across each state in a given page.  Each page's states are set up to update
+		//the active view.  We then get the currently active grid view of a page and use the GridView.forceLayout()
+		//function to force it to create all of its delegate items.  We then return the pages state to its initial
+		//value and, when completely finished, reset the layout index to 0 (first tab).
 		while (substanceStackLayout.currentIndex < substanceStackLayout.count){
 			let currentTab = substanceStackLayout.children[substanceStackLayout.currentIndex]
 			for (let i = 0; i < currentTab.states.length; ++i){
@@ -38,12 +41,6 @@ UISubstanceWizardForm {
 			substanceStackLayout.currentIndex = substanceStackLayout.currentIndex + 1
 		}
 		substanceStackLayout.currentIndex = 0
-	}
-
-	onLoadConfiguration : {
-	}
-
-	onResetConfiguration : {
 	}
 
 	function checkConfiguration(){
@@ -225,7 +222,11 @@ UISubstanceWizardForm {
 		return [valid, fieldsDefined]	
 	}
 
-
+	//This function parcels out data loaded from an existing substance xml file to the appropriate data objects.
+	//The loadConfiguration signal notifies each data field to set its value to these new values.  It also appends
+	//each loaded value to the "resetData" object, which is a cache to fall back on when we reset.  The group name
+	//(e.g. clearance_systemic) is tacked on to the property name in the reset data object to prevent confusion between
+	//props that can appear in more than one tab (fraction unbound in plasma is the serial offender here).
 	function mergeSubstanceData(substance){
 		for (let prop in substance){
 			switch (prop) {
@@ -234,14 +235,14 @@ UISubstanceWizardForm {
 					if (clearance.hasOwnProperty("systemic")){
 						for (let sysProp in clearance["systemic"]){
 							clearanceData.systemic[sysProp] = clearance["systemic"][sysProp]
-							Object.assign(resetData, {[sysProp] : clearance["systemic"][sysProp]}) 
+							Object.assign(resetData, {["clearance_systemic-" + [sysProp]] : clearance["systemic"][sysProp]}) 
 						}
 					}
 					if (clearance.hasOwnProperty("regulation")){
 						substanceStackLayout.children[1].state = "clearanceAndRegulation"
 						for (let regProp in clearance["regulation"]){
 							clearanceData.regulation[regProp] = clearance["regulation"][regProp]
-							Object.assign(resetData, {[regProp] : clearance["regulation"][regProp]}) 
+							Object.assign(resetData, {["clearance_regulation-" + [regProp]] : clearance["regulation"][regProp]}) 
 						}
 					}
 					clearanceData.dynamicsChoice = clearance.dynamicsChoice
@@ -251,7 +252,7 @@ UISubstanceWizardForm {
 					substanceStackLayout.children[2].state = "physchem"				//Make sure the correct PK input option is displayed
 					for (let physProp in physChem){
 						pkData.physicochemical[physProp] = physChem[physProp]
-						Object.assign(resetData, {[physProp] : physChem[physProp]}) 
+						Object.assign(resetData, {["pkPhysicochemical-"+[physProp]] : physChem[physProp]}) 
 					}
 					break;
 				case "TissueKinetics" :
@@ -259,19 +260,19 @@ UISubstanceWizardForm {
 					substanceStackLayout.children[2].state = "partition"				//Make sure the correct PK input option is displayed
 					for (let tisProp in tisKinetics){
 						pkData.tissueKinetics[tisProp] = tisKinetics[tisProp]
-						Object.assign(resetData, {[tisProp] : tisKinetics[tisProp]}) 
+						Object.assign(resetData, {["pkTissueKinetics-" + [tisProp]] : tisKinetics[tisProp]}) 
 					}
 					break;
 				case "Pharmacodynamics" :
 					let pd = substance["Pharmacodynamics"]
 					for (let pdProp in pd){
 						pdData[pdProp] = pd[pdProp]
-						Object.assign(resetData, {[pdProp] : pd[pdProp]}) 
+						Object.assign(resetData, {["pharmacodynamics-" + [pdProp]] : pd[pdProp]}) 
 					}
 					break;
 				default :
 					physicalData[prop] = substance[prop]
-					Object.assign(resetData, {[prop] : substance[prop]}) 
+					Object.assign(resetData, {["physical-" + [prop]] : substance[prop]}) 
 			}
 		}
 		loadConfiguration()
