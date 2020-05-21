@@ -36,20 +36,10 @@ ChartView {
         if (mouse.source === Qt.MouseEventNotSynthesized)
             contextMenu.popup()
     }
-  Rectangle{
-   anchors.centerIn : root
-   anchors.fill :parent
-      color: 'transparent'
-   border.color: 'yellow'
-  }
-    Menu {
-        id: contextMenu
-        MenuItem { text: "Cut" }
-        MenuItem { text: "Copy" }
-        MenuItem { text: "Paste" }
-    }
-  Component.onCompleted: {
-   console.log("Made a Mouse Area")
+  Menu {
+      id: contextMenu
+      Label { text: "Refresh Rate"; font.pixelSize: 16;    font.bold: true}
+      Row{RadioButton{ id:range_1; text: "Low"; checked: true} RadioButton{id:range_2; text: "Normal"} RadioButton{id:range_3; text: "High"}}
   }
  }
 }

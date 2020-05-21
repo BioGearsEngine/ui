@@ -160,7 +160,7 @@ ControlsForm {
 
   playback.onRestartClicked: {
     playback.simulationTime = "%1:%2:%3".arg("0").arg("00").arg("00")
-    patientMenu.loadState(patientMenu.patientMenuButtonText.split(" ")[1]+".xml");
+    patientMenu.loadState(patientMenu.patientText.text.split(" ")[1]+".xml");
     root.restartClicked()
   } 
   playback.onPauseClicked: {
