@@ -83,7 +83,11 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : 0
-      property var childViews : [physicalGridView]
+      property var dataView
+      state : "default"
+      states : [
+         State { name : "default"; PropertyChanges { target : physicalDataTab; dataView : physicalGridView}}
+      ]
       GridView {
         id: physicalGridView
         clip : true
@@ -103,7 +107,20 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : 0
-      property var childViews : [clearanceGridView, regulationGridView]
+      property var dataView
+      property bool isCurrentTab : substanceStackLayout.currentIndex === 1
+      state : "clearanceOnly"
+      states : [
+         State { name : "clearanceOnly";  changes : [PropertyChanges { target : regulationGridView; currentIndex : 0}, PropertyChanges { target : clearanceTab; dataView : clearanceGridView} ]},
+         State { name : "clearanceAndRegulation";  changes : [PropertyChanges{target : regulationGridView; currentIndex : 6}, PropertyChanges {target : clearanceTab; dataView: regulationGridView} ]}
+      ]
+      onIsCurrentTabChanged : {
+        if (isCurrentTab && state === "clearanceAndRegulation"){
+          //When we switch tabs, the current index of the grid views gets reset to 0. Since the first visible
+          // item of the regulation grid view is at index = 6, we reset it here when focus is regained (and when state calls for it).
+          regulationGridView.currentIndex = 6
+        }
+      }
       Label {
         id : clearanceLabel
         width : parent.width
@@ -166,13 +183,11 @@ Page {
       ButtonGroup {
         id : renalOptionsButtonGroup
         exclusive : true
-        property var forceRegulationVisible : function() { buttons[0].checked = true; buttons[1].checked = false; regulationGridView.visible = true; regulationGridView.positionViewAtIndex(6, GridView.Beginning) }
         onClicked : {
           if (button.choice === "regulation"){
-            regulationGridView.positionViewAtIndex(6, GridView.Beginning)
-            regulationGridView.visible = true
+            clearanceTab.state = "clearanceAndRegulation"
           } else {
-            regulationGridView.visible = false
+            clearanceTab.state = "clearanceOnly"
           }
         }
       }
@@ -210,12 +225,17 @@ Page {
         anchors.right : parent.right
         width : parent.width
         height : cellHeight * 2
-        interactive : true
-        visible : false
-        currentIndex : 0
+        interactive : false
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.clearanceRegulation
+        onCurrentIndexChanged : {
+          positionViewAtIndex(currentIndex, GridView.beginning)
+          if (clearanceTab.state === "clearanceAndRegulation" && renalOptionsButtonGroup.checkedButton.choice === "clearance"){
+            //Update button selection if out of phase with state.  This happens when we load in an existing substance that uses regulation
+            renalOptionsButtonGroup.checkedButton = renalOptionsButtonGroup.buttons[0]
+          }
+        }
       }
     }
     Pane {
@@ -223,7 +243,19 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : pkStackLayout.currentIndex
-      property var childViews : [pkGridView1, pkGridView2]
+      property var dataView
+      state : "physchem"
+      states : [
+         State { name : "physchem"; changes : [ PropertyChanges { target : pkStackLayout; currentIndex : 0}, PropertyChanges {target : pkTab; dataView : pkGridView1} ]},
+         State { name : "partition"; changes :  [ PropertyChanges { target : pkStackLayout; currentIndex : 1}, PropertyChanges{target : pkTab; dataView : pkGridView2} ] }
+      ]
+      onSubIndexChanged : {
+        //When we manually adjust the state, the position of the switch might go out of phase with the current layout index
+        // Toggle switch if this happens (should only occur when we load a substance that uses tissue kinetics instead of physicochemicals)
+        if (pkSwitch.visualPosition !== subIndex){
+          pkSwitch.toggle()
+        }
+      }
       Label {
         id : pkLabel
         width : parent.width
@@ -250,10 +282,11 @@ Page {
           Layout.alignment : Qt.AlignRight
         }
         Switch {
+          id : pkSwitch
           text : "Partition Coefficients"
           font.pointSize : 9
-          onClicked : {
-            pkStackLayout.currentIndex = position 
+          onToggled : {
+            pkTab.state = pkTab.states[position].name
           }
         }
       }
@@ -264,7 +297,6 @@ Page {
         width : parent.width
         height : parent.height - switchItem.height
         currentIndex : 0
-        property var dataView : currentIndex === 0 ? pkGridView1 : pkGridView2
         Item {
           GridView {
             id: pkGridView1
@@ -296,7 +328,11 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       property real subIndex : 0
-      property var childViews : [pdGridView]
+      property var dataView
+      state : "default"
+      states : [
+         State { name : "default"; PropertyChanges { target : pdTab; dataView : pdGridView}}
+      ]
       Label {
         id : pdLabel
         width : parent.width
@@ -313,7 +349,7 @@ Page {
         id: pdGridView
         clip : true
         width : parent.width
-        height : parent.height - pdLabel.height
+        height : parent.height - pdLabel.height - 15        //15 accounts for margin between label and view
         cellHeight : 60
         cellWidth : parent.width / 2
         model : substanceDelegateModel.parts.pharmacodynamics
@@ -351,13 +387,6 @@ Page {
     // listModel of all substance elements but refrain from convoluted nesting and sub-indexing to parcel out specific
     // elements to specific tabs.
 
-		//We create a property called groupIndexMap that keys the group name string to its DelegateModelGroup.  This is 
-    // useful because the "groups" property is a simple list, meaning we can only index numerically.  The indexing can
-    // be an issue because the "items" and "persistedItems" groups occupy groups[0] and groups[1], which is not intuitive
-    // looking at the list of groups that we added.  With groupIndexMap, we can get a DelegateModelGroup by calling
-    // substanceDelegateModel.groupIndexMap["groupName"].  We can then get any items in that groups using the get()
-    // function of DelegateModelGroup.  
-
 		// Within each DelegateModelGroup, we create a data property and bind it to the javascript object that will track
     // the values that users enter.  We also take advantage of each groups "onChanged" signal to add or remove entries
     // from group.data as needed.  It should be mentioned that each item in a DelegateModelGroup has many attached properties,
@@ -368,8 +397,6 @@ Page {
     id : substanceDelegateModel
     model : substanceListModel      
     delegate : substanceDelegate
-    property var groupIndexMap : setupGroupMap(groups)
-    property var getGroup : function(group) { return groupIndexMap[group] }
     groups :  [
                 DelegateModelGroup {name : "physical"; includeByDefault : false; property var data : physicalData; onChanged : substanceDelegateModel.updateGroup(this) },
                 DelegateModelGroup {name : "clearance"; includeByDefault : false; property var childrenGroups : ['clearance_systemic','clearance_regulation'] },
@@ -442,10 +469,9 @@ Page {
           Component.onCompleted : {
             if (wrapper.parent){
               model.valid = Qt.binding(function() {return entry.validInput})
-              root.onResetConfiguration.connect(function () { resetEntry(entry) } )
+              root.onResetConfiguration.connect(function () { resetEntry(unitScalarEntry, model.name) } )
               root.onLoadConfiguration.connect(function () { setEntry(parent.groupData[model.name]) })
             }
-           // console.log(model.name)
           }
           onInputAccepted : {
             if (wrapper.parent){
