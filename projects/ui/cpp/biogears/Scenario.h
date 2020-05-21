@@ -40,7 +40,7 @@ namespace bio {
 class Scenario : public QObject, public biogears::Runnable {
 
   Q_OBJECT
-  Q_PROPERTY(double time READ get_simulation_time NOTIFY timeAdvance)
+  Q_PROPERTY(double time_s READ get_simulation_time NOTIFY timeAdvance)
   Q_PROPERTY(double isRunning READ is_running NOTIFY runningToggled)
   Q_PROPERTY(double isPaused READ is_paused NOTIFY pausedToggled)
   Q_PROPERTY(double isThrottled READ is_throttled NOTIFY throttledToggled)
@@ -139,9 +139,9 @@ signals:
   void patientStateChanged(PatientState patientState);
   void patientConditionsChanged(PatientConditions conditions);
 
-  void substanceDataChanged(double time, QVariantMap subData);
+  void substanceDataChanged(double time_s, QVariantMap subData);
   void activeSubstanceAdded(Substance* sub);
-  void timeAdvance(double SimulationTime_s);
+  void timeAdvance(double time_s);
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);
   void newStateAdded();

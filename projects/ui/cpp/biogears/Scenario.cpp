@@ -154,7 +154,8 @@ void Scenario::restart(QString patient_file)
 {
   _paused = true;
   emit pausedToggled(_paused);
-  _throttle = true;
+  _throttle = true; 
+  emit throttledToggled(_throttle);
 
   load_patient(patient_file);
   _logger.SetForward(_consoleLog);
@@ -371,6 +372,7 @@ Scenario& Scenario::load_patient(QString file)
       customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
     }
 
+    _physiology_model->setSimulationTime(_engine->GetSimulationTime(biogears::TimeUnit::s));
     //Create file info and extract base name (e.g. Patient@0s or Patient).  We go through this process rather
     // than just taking file name because sometimes we pass only a name to LoadPatient (DefaultMale@0s.xml) and
     // sometimes we pass an absolute file path.
@@ -422,11 +424,9 @@ inline void Scenario::physiology_thread_step()
     _engine->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
 
-    auto test = _engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale);
-    if (test)
-      std::cout << test << "\n";
-
     _new_respiratory_cycle->SetValue(_engine->GetPatient().IsEventActive(CDM::enumPatientEvent::StartOfInhale));
+
+    _physiology_model->setSimulationTime(_engine->GetSimulationTime(biogears::TimeUnit::s));
 
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientStateChanged(get_physiology_state());

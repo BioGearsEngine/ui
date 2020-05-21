@@ -13,6 +13,7 @@
 class BioGearsData : public QAbstractItemModel {
   Q_OBJECT
 
+  Q_PROPERTY(double simulation_time  READ getSimulationTime NOTIFY timeAdvanced )
 public:
   enum Categories {
     VITALS = 0,
@@ -66,6 +67,10 @@ public:
 
   QModelIndex index(QAbstractItemModel const* model) const;
 
+
+  double getSimulationTime();
+  void setSimulationTime(double time_s);
+
   QHash<int, QByteArray> roleNames() const
   {
     QHash<int, QByteArray> roles;
@@ -89,8 +94,13 @@ public:
   PhysiologyRequest const* child(int row) const;
   PhysiologyRequest* child(int row);
 
+signals:
+  void timeAdvanced(double time_s);
+
 private:
   QString _name;
+
+  double _simulation_time_s = 0.;
 
   BioGearsData* _rootModel = nullptr;
   PhysiologyRequest _rootRequest;

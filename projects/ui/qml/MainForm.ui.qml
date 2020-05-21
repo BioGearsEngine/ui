@@ -50,13 +50,10 @@ GridLayout {
       onActiveSubstanceAdded : {
         graphArea.newActiveSubstance(sub)
       }
-        onPatientPhysiologyChanged : {
+      onPatientPhysiologyChanged : {
           console.log ("physiology changed %1".arg(model))
           graphArea.newPhysiologyModel(model)
-        }
-        onSimulationTimeAdvance : {
-          graphArea.timeAdvance(time)
-        }
+      }
     }
 
     GraphArea {

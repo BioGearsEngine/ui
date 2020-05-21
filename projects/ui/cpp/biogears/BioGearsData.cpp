@@ -1,5 +1,7 @@
 #include "BioGearsData.h"
-#include "biogears/engine/Controller/BioGearsSubstances.h"
+
+#include <biogears/engine/Controller/BioGearsSubstances.h>
+#include <biogears/cdm/properties/SEScalarTime.h>
 
 /// BioGearsData Model
 ///
@@ -375,6 +377,18 @@ QModelIndex BioGearsData::index(QAbstractItemModel const* model) const
   } else {
     return QModelIndex();
   }
+}
+//------------------------------------------------------------------------------------
+double BioGearsData::getSimulationTime()
+{
+  return _simulation_time_s;
+}
+//------------------------------------------------------------------------------------
+void BioGearsData::setSimulationTime(double time_s)
+{
+    _simulation_time_s = time_s;
+  emit timeAdvanced(_simulation_time_s);
+
 }
 //------------------------------------------------------------------------------------
 PhysiologyRequest* BioGearsData::

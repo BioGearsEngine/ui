@@ -43,13 +43,13 @@ UIPlotSeriesForm {
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
   function update(time_s){
-    let time = time_s / 60;
+    let time_m = time_s / 60;
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
         let subRequest = requestNames[i]
         let subIndex = model.index(i,0,index)
         let prop = root.model.data(subIndex,PhysiologyModel.ValueRole)
-        root.series(subRequest).append(time,prop)
+        root.series(subRequest).append(time_m,prop)
 
         if (!yAxis.visible){
           yAxis.visible = true
@@ -58,7 +58,7 @@ UIPlotSeriesForm {
       }
     } else {
       let prop = root.model.data(index, PhysiologyModel.ValueRole);
-      root.series(root.requestNames[0]).append(time,prop)
+      root.series(root.requestNames[0]).append(time_m,prop)
 
       if (!yAxis.visible){
         yAxis.visible = true
@@ -69,14 +69,14 @@ UIPlotSeriesForm {
   }
 
   //Gets simulation time and substance data request from substance metrics, appending new point to each series
-  function updateSubstanceSeries(time, subData){
+  function updateSubstanceSeries(time_s, subData){
     //Substance request names stored as (e.g.) Sodium-BloodConcentration.  Split at '-' to get substance (key) and property (object)
     let requestComponents = root.requestNames[0].split('-')
     let substance = requestComponents[0]
     let propName = requestComponents[1]
     let prop = subData[substance][propName]
-    root.series(root.requestNames[0]).append(time/60.0, prop)
-    updateDomainAndRange(time);
+    root.series(root.requestNames[0]).append(time_s/60.0, prop)
+    updateDomainAndRange(time_s);
     if (!yAxis.visible){
       yAxis.visible = true
     }
@@ -87,7 +87,7 @@ UIPlotSeriesForm {
   function clear(){
     if (root.count>1){
       for (let i = 0; i < root.count; ++i){
-        let series = root.series(formatRequest(root.requestNames[i]))
+        let series = root.series(root.requestNames[i])
         series.removePoints(0, series.count)
       }
     } else {
@@ -95,7 +95,7 @@ UIPlotSeriesForm {
       series.removePoints(0, series.count)
     }
 
-    updateDomainAndRange(0)
+    //updateDomainAndRange(0)
   }
 
   //Moves x-axis range if new data point is out of specified windowWidth and removes points no longer in visible range.  Update yAxis range according to min/max y-values
@@ -107,10 +107,10 @@ UIPlotSeriesForm {
       xAxis.max = time_s / 60
     } else {
       xAxis.min = 0
-      xAxis.max=interval_s / 60
+      xAxis.max= root.windowWidth_min
     }
     //Range -- loop over series in the event that there are multiple defined for a chart
-    for (let i = 0; i < root.count; ++i){
+    for (let i = 0; i < root.count; ++i) {
       let newY = root.series(i).at(root.series(i).count-1).y
       if (newY >= 0){
         yAxis.min = yAxis.min == 0 ? 0.9 * newY : Math.min(yAxis.min, 0.9 * newY)

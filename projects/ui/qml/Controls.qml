@@ -8,7 +8,7 @@ import com.biogearsengine.ui.scenario 1.0
 
 ControlsForm {
   id: root
-  signal restartClicked()
+  signal restartClicked(int simulation_time_s)
   signal pauseClicked(bool paused)
   signal playClicked()
   signal speedToggled(int speed)
@@ -18,17 +18,26 @@ ControlsForm {
   // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
-  signal simulationTimeAdvance(double time)
 
   signal activeSubstanceAdded(Substance sub)
-  signal substanceDataChanged(real time, var subData)
+  signal substanceDataChanged(real time_s, var subData)
 
   signal openActionDrawer()
 
   property PhysiologyModel bgData
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
-  
+
+  function seconds_to_clock_time(SimulationTime_s) {
+        var v_seconds = SimulationTime_s % 60
+        var v_minutes = Math.floor(SimulationTime_s / 60) % 60
+        var v_hours   = Math.floor(SimulationTime_s / 3600)
+
+        v_seconds = (v_seconds<10) ? "0%1".arg(v_seconds) : "%1".arg(v_seconds)
+        v_minutes = (v_minutes<10) ? "0%1".arg(v_minutes) : "%1".arg(v_minutes)
+
+        return "%1:%2:%3".arg(v_hours).arg(v_minutes).arg(v_seconds)
+  }
   Scenario {
     id: biogears_scenario
 
@@ -57,24 +66,23 @@ ControlsForm {
     onPhysiologyChanged:  {
       bgData = model
       root.patientPhysiologyChanged(model)
-      root.restartClicked();
-    }  
-                
+      root.restartClicked(scenario.time_s);
+    }
+
     onStateLoad: {
-      root.restartClicked()
       //Check if the patient base name (format : :"patient@xs") is substring of the text displayed in the patient menu
       // (format : "Patient: patient@xs").  If it is, then we are up to date.  If not, we need to search patient file map 
       // to find the right name and set it as the current text in the patient button.
       if (!patientMenu.patientText.text.includes(stateBaseName)){
-        let menu = patientMenu.patientMenuListModel
-        for (let index = 0; index < menu.count; ++index){
-          let patient = menu.get(index).patientName
+        let l_menu = patientMenu.patientMenuListModel
+        for (let l_index = 0; l_index < l_menu.count; ++l_index){
+          let patient = l_menu.get(l_index).patientName
           if (stateBaseName.includes(patient)){
             //Found the right patient, now search for the specific file associated with patient state
-            let patientSubMenu = menu.get(index).props
-            for (let subIndex = 0; subIndex < patientSubMenu.count; ++subIndex){
-              let patientFile = patientSubMenu.get(subIndex).propName
-              if (patientFile.includes(stateBaseName)){
+            let l_patientSubMenu = l_menu.get(l_index).props
+            for (let l_subIndex = 0; l_subIndex < l_patientSubMenu.count; ++l_subIndex){
+              let l_patientFile = l_patientSubMenu.get(l_subIndex).propName
+              if (l_patientFile.includes(stateBaseName)){
                 patientMenu.patientText.text = "Patient: " + stateBaseName
                 break;
               }
@@ -83,6 +91,7 @@ ControlsForm {
           }
         }
       }
+      root.restartClicked(scenario.get_simulation_time)
     }
 
     onNewStateAdded : {
@@ -90,19 +99,11 @@ ControlsForm {
     }
 
     onTimeAdvance: {
-        var seconds = SimulationTime_s % 60
-        var minutes = Math.floor(SimulationTime_s / 60) % 60
-        var hours   = Math.floor(SimulationTime_s / 3600)
-
-        seconds = (seconds<10) ? "0%1".arg(seconds) : "%1".arg(seconds)
-        minutes = (minutes<10) ? "0%1".arg(minutes) : "%1".arg(minutes)
-
-        playback.simulationTime = "%1:%2:%3".arg(hours).arg(minutes).arg(seconds)
-        root.simulationTimeAdvance(SimulationTime_s)
+      playback.simulationTime = seconds_to_clock_time(time_s)
     }
-                
+
     onSubstanceDataChanged : {
-      root.substanceDataChanged(time, subData);
+      root.substanceDataChanged(time_s, subData);
     }
 
     onActiveSubstanceAdded : {
@@ -138,30 +139,31 @@ ControlsForm {
   ObjectModel {
     id : actionSwitchModel
     function addSwitch(actionData, onFunc, offFunc) {
-      var actionComponent = Qt.createComponent("UIActionSwitch.qml");
-	    if ( actionComponent.status != Component.Ready){
-		    if (actionComponent.status == Component.Error){
-			    console.log("Error : " + actionComponent.errorString() );
+      var v_actionComponent = Qt.createComponent("UIActionSwitch.qml");
+	    if ( v_actionComponent.status != Component.Ready){
+		    if (v_actionComponent.status == Component.Error){
+			    console.log("Error : " + v_actionComponent.errorString() );
 			    return;
 		    }
 	      console.log("Error : Action switch component not ready");
 	    } else {
-		    var actionSwitch = actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0], "width" : actionSwitchView.width, "height" : 50});
-        actionSwitch.toggleActionOn.connect(onFunc);
+		    var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0], "width" : actionSwitchView.width, "height" : 50});
+        v_actionSwitch.toggleActionOn.connect(onFunc);
         if (offFunc){
-          actionSwitch.toggleActionOff.connect(offFunc);
+          v_actionSwitch.toggleActionOff.connect(offFunc);
         } else {
-          actionSwitch.supportDeactivate = false
+          v_actionSwitch.supportDeactivate = false
         }
-		    actionSwitchModel.append(actionSwitch);
+		    actionSwitchModel.append(v_actionSwitch);
 	    }
     }
   }
 
   playback.onRestartClicked: {
-    playback.simulationTime = "%1:%2:%3".arg("0").arg("00").arg("00")
     patientMenu.loadState(patientMenu.patientText.text.split(" ")[1]+".xml");
-    root.restartClicked()
+    let l_simulation_time_s = scenario.time_s
+    playback.simulationTime = seconds_to_clock_time(l_simulation_time_s)
+    root.restartClicked(l_simulation_time_s)
   } 
   playback.onPauseClicked: {
     biogears_scenario.pause_play()

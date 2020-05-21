@@ -19,7 +19,6 @@ GraphAreaForm {
   signal newActiveSubstance(Substance sub)
 
   signal newPhysiologyModel(PhysiologyModel model)
-  signal timeAdvance(double time)
 
   property double count_1 : 0.0
   property double count_2 : 0.0
@@ -76,9 +75,6 @@ GraphAreaForm {
     physiologyRequestModel = model;
   }
 
-  onTimeAdvance : {
-    currentTime_s = time
-  }
   onStart : {
     oneHzPlotTimer.start()
     tenHzPlotTimer.start()
@@ -88,7 +84,6 @@ GraphAreaForm {
   onRestart : {
     oneHzPlotTimer.stop()
     tenHzPlotTimer.stop()
-    console.log("Resetting GraphArea Plots")
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
@@ -504,7 +499,7 @@ GraphAreaForm {
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 1){
-          plot.update(currentTime_s)
+          plot.update(physiologyRequestModel.simulation_time)
         }
       }
     }
