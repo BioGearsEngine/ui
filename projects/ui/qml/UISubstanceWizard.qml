@@ -79,6 +79,25 @@ UISubstanceWizardForm {
 		if (!pdVerify[0]){
 			validConfiguration = false
 		}
+
+		//Final check:  Make sure that if PK and Clearance are defined they don't specify different fractions unbount in plasma
+		if ((pkStackLayout.currentIndex===0 && pkVerify[1]) && clearanceVerify[1]){
+			//Clearance verify function checks the two possible clearance fractions unbounds against each other, so 
+			//we can compare PK fraction unbound to just one of the clearance fraction unbounds, depending on the renal
+			//dynamics choice.
+			if (renalOptions.checkedButton.choice === "clearance"){
+				if (pkData.physicochemical.FractionUnboundInPlasma[0]!==clearanceData.systemic.FractionUnboundInPlasma[0]){
+					validConfiguration = false
+					errorString += "Pharmacokinetics and Clearance must specify same value for fraction unbound in plasma\n*"
+				}
+			} else {
+				if (pkData.physicochemical.FractionUnboundInPlasma[0]!==clearanceData.regulation.FractionUnboundInPlasma[0]){
+					validConfiguration = false
+					errorString += "Pharmacokinetics and Clearance must specify same value for fraction unbound in plasma\n*"
+				}
+			}
+		}
+
 		//If everything looks good, add data from each tab to a single substanceData object to pass to scenario.create_substance()
 		if (validConfiguration){
 			Object.assign(substanceData, {"Physical" : physicalData})
@@ -131,16 +150,24 @@ UISubstanceWizardForm {
 			valid = false
 			errorString += "Systemic Clearance: \n\t All fields are required to set up systemic clearance (or none to indicate no data).\n*"
 		} else {
-			dataPresent = systemicDataCheck[1]
-			if (!regulationDataCheck[0] && renalOptions.checkedButton.choice === "regulation"){
-				debugObjects( clearanceData.regulation )
-				//We selected renal regulation for dynamics but did not provide all data
-				valid = false
-				errorString += "Renal Dynamics: \n\t If using Renal Regulation Options, all fields are required\n*"
+			if (renalOptions.checkedButton.choice === "regulation"){
+				//If we select renal regulation, then we need to provide all data
+				if (!(regulationDataCheck[0] && regulationDataCheck[1])){
+					valid = false
+					errorString += "Renal Dynamics: \n\t If using Renal Regulation Options, all fields are required\n*"
+				} else {
+						//Regulation data is good, but we need to make sure that, if both sections are filled in, we didn't put
+						//in different fraction unbound values
+						if (systemicDataCheck[1]){
+							if (clearanceData.systemic.FractionUnboundInPlasma[0] !== clearanceData.regulation.FractionUnboundInPlasma[0]){
+								valid = false
+								errorString += "Clearance:  Fraction unbound in plasma values must be consistent\n*"
+							}
+						}
+					}
+				}
 			}
-		}
 		dataPresent = systemicDataCheck[1] || (regulationDataCheck[1] && renalOptions.checkedButton.choice === 'regulation')
-		console.log(valid, dataPresent)
 		return [valid, dataPresent]
 	}
 
@@ -240,6 +267,7 @@ UISubstanceWizardForm {
 					}
 					if (clearance.hasOwnProperty("regulation")){
 						substanceStackLayout.children[1].state = "clearanceAndRegulation"
+						renalOptions.manualButtonSet("regulation")
 						for (let regProp in clearance["regulation"]){
 							clearanceData.regulation[regProp] = clearance["regulation"][regProp]
 							Object.assign(resetData, {["clearance_regulation-" + [regProp]] : clearance["regulation"][regProp]}) 

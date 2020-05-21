@@ -20,7 +20,6 @@ UIUnitScalarEntryForm {
       if(fromInput[0] ==="Infinity"){
         //We only support "inf" values for transport maximum in renal dynamics.  Validator doesn't like the inifinity string
         // so we just set to a really high number.
-        console.log('inf')
         fromInput[0] = 1e10
       }
     }

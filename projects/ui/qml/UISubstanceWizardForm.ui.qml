@@ -195,6 +195,7 @@ Page {
       ButtonGroup {
         id : renalOptionsButtonGroup
         exclusive : true
+        property var manualButtonSet : function(choice) { for (let i = 0; i < buttons.length; ++i){buttons[i].checked = (buttons[i].choice===choice) } } 
         onClicked : {
           if (button.choice === "regulation"){
             clearanceTab.state = "clearanceAndRegulation"
@@ -243,10 +244,6 @@ Page {
         model : substanceDelegateModel.parts.clearanceRegulation
         onCurrentIndexChanged : {
           positionViewAtIndex(currentIndex, GridView.beginning)
-          if (clearanceTab.state === "clearanceAndRegulation" && renalOptionsButtonGroup.checkedButton.choice === "clearance"){
-            //Update button selection if out of phase with state.  This happens when we load in an existing substance that uses regulation
-            renalOptionsButtonGroup.checkedButton = renalOptionsButtonGroup.buttons[0]
-          }
         }
       }
     }
