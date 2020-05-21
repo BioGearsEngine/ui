@@ -123,7 +123,6 @@ Page {
                 color : "transparent"
             }
             Menu {
-                id : filterMenu
                 x : -200
                 y : 50
                 closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside

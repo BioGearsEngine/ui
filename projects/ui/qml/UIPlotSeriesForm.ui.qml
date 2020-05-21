@@ -40,19 +40,26 @@ ChartView {
     }
     Menu {
         id: contextMenu
+
+        property int timeRange :  (range_1.checked) ? 1 : (range_5.checked) ? 5 : (range_10.checked) ? 3 : 10
+        property int rate :  (speed_l.checked) ? 1 : (speed_n.checked) ? 2 : (speed_h.checked) ? 3 : 1
+        property alias autoScaleEnabled : autoEnabled.checked
+        property double userSpecifiedMin : yAxis.min
+        property double userSpecifiedMax : yAxis.max
+
         Label { text: "Refresh Rate"; font.pixelSize: 16;    font.bold: true}
-        Row{RadioButton{ id:speed_l; text: "Low"; checked: true} RadioButton{id:speed_n; text: "Normal"} RadioButton{id:speed_m; text: "High"}}
+        Row{RadioButton{ id:speed_l; text: "Low"; checked: true} RadioButton{id:speed_n; text: "Normal"} RadioButton{id:speed_h; text: "High"}}
         Label { text: "Time Scale"; font.pixelSize: 16;    font.bold: true}
-        Row{RadioButton{ id:range_1; text: "1  min"} RadioButton{id:range_2; text: "5 min"} RadioButton{id:range_3; text: "10 min"; checked: true}}
+        Row{RadioButton{ id:range_1; text: "1  min"} RadioButton{id:range_5; text: "5 min"} RadioButton{id:range_10; text: "10 min"; checked: true}}
         MenuSeparator {}
         Label { text : "Scaling"; font.pixelSize: 16;    font.bold: true }
-        CheckBox { text: "Automatic"; checked: true}
+        CheckBox { id: autoEnabled; text: "Automatic"; checked: true}
         RowLayout{ spacing: 15; anchors.left : parent.left ; anchors.right: parent.right; 
           Label{  font.pixelSize: 14;  font.italic: true; text: "Max"; Layout.preferredWidth: 15}  
-          TextField{  text: "%1".arg(yAxis.max); width: 15;  horizontalAlignment  : TextInput.AlignHCenter}}
+          TextField{  text: (autoScaledEnabled) ? "%1".arg(yAxis.max) : userSpecficiedMin; width: 15;  horizontalAlignment  : TextInput.AlignHCenter}}
         RowLayout{ spacing: 15; anchors.left : parent.left ; anchors.right: parent.right; 
           Label{  font.pixelSize: 14;  font.italic: true; text: "Min"; Layout.preferredWidth: 15}  
-          TextField{  text: "%1".arg(yAxis.min); width: 15;  horizontalAlignment  : TextInput.AlignHCenter}}
+          TextField{  text: (autoScaledEnabled) ? "%1".arg(yAxis.min) : userSpecficiedMin; width: 15;  horizontalAlignment  : TextInput.AlignHCenter}}
     }
   }
 }
