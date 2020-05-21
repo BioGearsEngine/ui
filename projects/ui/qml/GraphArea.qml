@@ -89,7 +89,6 @@ GraphAreaForm {
     tenHzPlotTimer.stop();
     everyFiveSecondsPlotTimer.stop();
     everyTenSecondsPlotTimer.stop();
-
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
@@ -562,7 +561,6 @@ GraphAreaForm {
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 1){
-          
           plot.update(physiologyRequestModel.simulation_time)
         }
       }
