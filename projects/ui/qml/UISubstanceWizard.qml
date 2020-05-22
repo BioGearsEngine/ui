@@ -49,6 +49,12 @@ UISubstanceWizardForm {
 		substanceStackLayout.currentIndex = 0
 	}
 
+	onResetConfiguration : {
+		if (resetData.hasOwnProperty("pkPhysicochemical-SecondaryPKA") && (!pkData.physicochemical.hasOwnProperty("SecondaryPKA"))){
+			checkIonicState(4)
+		}
+	}
+
 	function checkConfiguration(){
 		let validConfiguration = true
 		//Check for required fields.
@@ -268,7 +274,7 @@ UISubstanceWizardForm {
 					if (clearance.hasOwnProperty("systemic")){
 						for (let sysProp in clearance["systemic"]){
 							clearanceData.systemic[sysProp] = clearance["systemic"][sysProp]
-							Object.assign(resetData, {["clearance_systemic-" + [sysProp]] : clearance["systemic"][sysProp]}) 
+							Object.assign(resetData, {["clearance_systemic-" + sysProp] : clearance["systemic"][sysProp]}) 
 						}
 					}
 					if (clearance.hasOwnProperty("regulation")){
@@ -276,7 +282,7 @@ UISubstanceWizardForm {
 						renalOptions.manualButtonSet("regulation")
 						for (let regProp in clearance["regulation"]){
 							clearanceData.regulation[regProp] = clearance["regulation"][regProp]
-							Object.assign(resetData, {["clearance_regulation-" + [regProp]] : clearance["regulation"][regProp]}) 
+							Object.assign(resetData, {["clearance_regulation-" + regProp] : clearance["regulation"][regProp]}) 
 						}
 					}
 					clearanceData.dynamicsChoice = clearance.dynamicsChoice
@@ -285,8 +291,14 @@ UISubstanceWizardForm {
 					let physChem = substance["Physicochemicals"]
 					substanceStackLayout.children[2].state = "physchem"				//Make sure the correct PK input option is displayed
 					for (let physProp in physChem){
+						if( physProp==="SecondaryPKA"){
+								substanceStackLayout.currentIndex = 2				//This makes Physicochemial the "active" tab and causes delegate filter to be set to "pkPhysicochemical" 
+								checkIonicState(4)													//Zwitterion has index 4 in list of ionic states
+								substanceStackLayout.children[2].dataView.forceLayout()		//Get the grid view of the physicochemical page and force it to respond to addition of zwitterion field
+								substanceStackLayout.currentIndex = 0				//Reset stack layout to be on first tab
+							}
 						pkData.physicochemical[physProp] = physChem[physProp]
-						Object.assign(resetData, {["pkPhysicochemical-"+[physProp]] : physChem[physProp]}) 
+						Object.assign(resetData, {["pkPhysicochemical-"+physProp] : physChem[physProp]})
 					}
 					break;
 				case "TissueKinetics" :
@@ -294,19 +306,19 @@ UISubstanceWizardForm {
 					substanceStackLayout.children[2].state = "partition"				//Make sure the correct PK input option is displayed
 					for (let tisProp in tisKinetics){
 						pkData.tissueKinetics[tisProp] = tisKinetics[tisProp]
-						Object.assign(resetData, {["pkTissueKinetics-" + [tisProp]] : tisKinetics[tisProp]}) 
+						Object.assign(resetData, {["pkTissueKinetics-" + tisProp] : tisKinetics[tisProp]}) 
 					}
 					break;
 				case "Pharmacodynamics" :
 					let pd = substance["Pharmacodynamics"]
 					for (let pdProp in pd){
 						pdData[pdProp] = pd[pdProp]
-						Object.assign(resetData, {["pharmacodynamics-" + [pdProp]] : pd[pdProp]}) 
+						Object.assign(resetData, {["pharmacodynamics-" + pdProp] : pd[pdProp]}) 
 					}
 					break;
 				default :
 					physicalData[prop] = substance[prop]
-					Object.assign(resetData, {["physical-" + [prop]] : substance[prop]}) 
+					Object.assign(resetData, {["physical-" + prop] : substance[prop]}) 
 			}
 		}
 		loadConfiguration()
@@ -367,20 +379,20 @@ UISubstanceWizardForm {
 		return filter
 	}
 
-	function checkIonicState(state, index){
+	function checkIonicState(state){
 		//Zwitterion has index = 4 in list of ionic states
 		if (state === 4){
 			let physicochemGroup = substanceDelegateModel.groups[6]
 			let newData = {"name" : "SecondaryPKA", "unit" : "", "type" : "double", "hint" : "Enter a value", "valid" : true, "group" : "pkPhysicochemical"}
 			let insertIndex = physicochemGroup.get(0).persistedItemsIndex + 1
 			substanceListModel.insert(insertIndex, newData)
-			console.log(substanceDelegateModel.persistedItems.get(insertIndex).model.name)
 		} else if (pkData.physicochemical.hasOwnProperty("SecondaryPKA")){
 			let physicochemGroup = substanceDelegateModel.groups[6]
 			let itemToRemoveIndex = physicochemGroup.get(1).persistedItemsIndex
 			substanceListModel.remove(itemToRemoveIndex, 1)
+			physicochemGroup.removeGroups(1, 1, ["persistedItems", "pkPhysicochemical"])
+			console.log(substanceListModel.count, substanceDelegateModel.persistedItems.count)
 			delete pkData.physicochemical["SecondaryPKA"]
-			debugObjects(pkData.physicochemical)
 		}
 	}
 

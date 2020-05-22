@@ -485,19 +485,18 @@ Page {
           Component.onCompleted : {
             if (wrapper.parent){
               model.valid = Qt.binding(function() {return entry.validInput})
-              root.onResetConfiguration.connect(function () { resetEntry(unitScalarEntry, model.group + "-" + model.name) } )
+              root.onResetConfiguration.connect(function () { console.log(model.name); resetEntry(unitScalarEntry, model.group + "-" + model.name) } )
               root.onLoadConfiguration.connect(function () { setEntry(parent.groupData[model.name]) })
             }
           }
           onInputAccepted : {
             if (wrapper.parent){
-              console.log(input)
               if (input[0] === "" || (input[0] == "-1" && model.type==="enum")){
                 parent.groupData[model.name] = [null, null]
               } else {
                 parent.groupData[model.name] = input
                 if (model.name === "IonicState"){
-                  checkIonicState(input[0], index)   //Functionality for handling zwitterions
+                  checkIonicState(input[0])   //Functionality for handling zwitterions
                 }
               }
             }
