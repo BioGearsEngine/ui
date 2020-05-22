@@ -202,7 +202,7 @@ void PhysiologyRequest::modify(int row, int refreshRate)
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::modify(int row, bool enabled)
 {
-  if (0 <= row && row < _children.size()) {
+  if (  0 <= row && row < _children.size()) {
     _children[row]._active = enabled;
   }
 }
@@ -230,7 +230,7 @@ QVariant PhysiologyRequest::data(int role) const
     if (_custom) {
       return _customUnitFunc();
     } else {
-      return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : (_value) ? QVariant("") : QVariant("");
+      return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : QVariant("");
     }
   case BioGearsData::EnabledRole:
     return _active;

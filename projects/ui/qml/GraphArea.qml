@@ -76,14 +76,20 @@ GraphAreaForm {
   }
 
   onStart : {
-    oneHzPlotTimer.start()
-    tenHzPlotTimer.start()
-    console.log("start")
+    oneHzPlotTimer.start();
+    fiveHzPlotTimer.start();
+    tenHzPlotTimer.start();
+    everyFiveSecondsPlotTimer.start();
+    everyTenSecondsPlotTimer.start();
   }
 
   onRestart : {
-    oneHzPlotTimer.stop()
-    tenHzPlotTimer.stop()
+    oneHzPlotTimer.stop();
+    fiveHzPlotTimer.stop();
+    tenHzPlotTimer.stop();
+    everyFiveSecondsPlotTimer.stop();
+    everyTenSecondsPlotTimer.stop();
+
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
@@ -96,10 +102,16 @@ GraphAreaForm {
   onPause: {
     if (paused){
       oneHzPlotTimer.stop();
+      fiveHzPlotTimer.stop();
       tenHzPlotTimer.stop();
+      everyFiveSecondsPlotTimer.stop();
+      everyTenSecondsPlotTimer.stop();
     } else {
       oneHzPlotTimer.start();
+      fiveHzPlotTimer.start();
       tenHzPlotTimer.start();
+      everyFiveSecondsPlotTimer.start();
+      everyTenSecondsPlotTimer.start();
     }
   }
 
@@ -453,12 +465,58 @@ GraphAreaForm {
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 10){
-          plot.update(currentTime_s)
+          
+          plot.update(physiologyRequestModel.simulation_time)
         }
       }
     }
    }
   
+  fiveHzPlotTimer.onTriggered : {
+    let currentCategory = null
+    let currentModel = null
+    for (var i = 0 ; i < PhysiologyModel.TOTAL_CATEGORIES; ++i){
+      switch (i){
+        case PhysiologyModel.VITALS:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
+          currentModel = vitalsObjectModel
+        break;
+        case PhysiologyModel.CARDIOPULMONARY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
+          currentModel = cardiopulmonaryObjectModel
+        break;
+        case PhysiologyModel.BLOOD_CHEMISTRY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
+          currentModel = bloodChemistryObjectModel
+        break;
+        case PhysiologyModel.ENERGY_AND_METABOLISM:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
+          currentModel = energyMetabolismObjectModel
+        break;
+        case PhysiologyModel.RENAL_FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+          currentModel = renalFluidBalanceObjectModel
+        break;
+        case PhysiologyModel.SUBSTANCES:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
+          currentModel = substanceModel
+        break;
+        case PhysiologyModel.CUSTOM:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
+          currentModel = customObjectModel
+        break;
+        default:
+          continue;
+      }
+      for ( var j = 0; j < currentModel.count; ++j){
+        var plot = currentModel.get(j)
+        if (plot.model && plot.rate == 5){
+          
+          plot.update(physiologyRequestModel.simulation_time)
+        }
+      }
+    }
+   }
 
   oneHzPlotTimer.onTriggered : {
     let currentCategory = null
@@ -499,9 +557,101 @@ GraphAreaForm {
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 1){
+          
           plot.update(physiologyRequestModel.simulation_time)
         }
       }
     }
   }
+
+    everyFiveSecondsPlotTimer.onTriggered : {
+    let currentCategory = null
+    let currentModel = null
+    for (var i = 0 ; i < PhysiologyModel.TOTAL_CATEGORIES; ++i){
+      switch (i){
+        case PhysiologyModel.VITALS:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
+          currentModel = vitalsObjectModel
+        break;
+        case PhysiologyModel.CARDIOPULMONARY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
+          currentModel = cardiopulmonaryObjectModel
+        break;
+        case PhysiologyModel.BLOOD_CHEMISTRY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
+          currentModel = bloodChemistryObjectModel
+        break;
+        case PhysiologyModel.ENERGY_AND_METABOLISM:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
+          currentModel = energyMetabolismObjectModel
+        break;
+        case PhysiologyModel.RENAL_FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+          currentModel = renalFluidBalanceObjectModel
+        break;
+        case PhysiologyModel.SUBSTANCES:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
+          currentModel = substanceModel
+        break;
+        case PhysiologyModel.CUSTOM:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
+          currentModel = customObjectModel
+        break;
+        default:
+          continue;
+      }
+      for ( var j = 0; j < currentModel.count; ++j){
+        var plot = currentModel.get(j)
+        if (plot.model && plot.rate == -5){
+          
+          plot.update(physiologyRequestModel.simulation_time)
+        }
+      }
+    }
+   }
+
+  everyTenSecondsPlotTimer.onTriggered : {
+    let currentCategory = null
+    let currentModel = null
+    for (var i = 0 ; i < PhysiologyModel.TOTAL_CATEGORIES; ++i){
+      switch (i){
+        case PhysiologyModel.VITALS:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
+          currentModel = vitalsObjectModel
+        break;
+        case PhysiologyModel.CARDIOPULMONARY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
+          currentModel = cardiopulmonaryObjectModel
+        break;
+        case PhysiologyModel.BLOOD_CHEMISTRY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
+          currentModel = bloodChemistryObjectModel
+        break;
+        case PhysiologyModel.ENERGY_AND_METABOLISM:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
+          currentModel = energyMetabolismObjectModel
+        break;
+        case PhysiologyModel.RENAL_FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+          currentModel = renalFluidBalanceObjectModel
+        break;
+        case PhysiologyModel.SUBSTANCES:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
+          currentModel = substanceModel
+        break;
+        case PhysiologyModel.CUSTOM:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CUSTOM)
+          currentModel = customObjectModel
+        break;
+        default:
+          continue;
+      }
+      for ( var j = 0; j < currentModel.count; ++j){
+        var plot = currentModel.get(j)
+        if (plot.model && plot.rate == -10){
+          plot.update(physiologyRequestModel.simulation_time)
+        }
+      }
+    }
+   }
 }

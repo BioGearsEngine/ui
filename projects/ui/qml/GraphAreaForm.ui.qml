@@ -11,6 +11,7 @@ Page {
     z : 0 // Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
 
     property bool initialized : false
+
     property PhysiologyModel physiologyRequestModel
     property alias vitalsGridView : vitalsGridView
     property alias cardiopulmonaryGridView : cardiopulmonaryGridView
@@ -21,7 +22,10 @@ Page {
     property alias customGridView : customGridView
 
     property alias tenHzPlotTimer : tenHzPlotTimer
+    property alias fiveHzPlotTimer : fiveHzPlotTimer
     property alias oneHzPlotTimer : oneHzPlotTimer
+    property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
+    property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer
 
     state : "realTime"
 
@@ -123,6 +127,7 @@ Page {
                 color : "transparent"
             }
             Menu {
+                id: filterMenu
                 x : -200
                 y : 50
                 closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
@@ -426,8 +431,32 @@ Page {
     }
 
     Timer {
+        id : fiveHzPlotTimer
+        interval : 200
+        running : false
+        repeat : true
+        triggeredOnStart : true
+    }
+
+    Timer {
         id : oneHzPlotTimer
         interval : 1000
+        running : false
+        repeat : true
+        triggeredOnStart : true
+    }
+
+    Timer {
+        id : everyFiveSecondsPlotTimer
+        interval : 5000
+        running : false
+        repeat : true
+        triggeredOnStart : true
+    }
+
+    Timer {
+        id : everyTenSecondsPlotTimer
+        interval : 10000
         running : false
         repeat : true
         triggeredOnStart : true

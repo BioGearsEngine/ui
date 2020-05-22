@@ -5,20 +5,41 @@ import com.biogearsengine.ui.scenario 1.0
 UIPlotSeriesForm {
   id: root
 
-  property int windowWidth_min : 10
   property var requestNames : []
   property var model : null
   property var index : null
-  property int rate  : 1
+  property alias rate  : root.refresh_rate
+  property int refreshOffset : 0
 
   //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
   //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
   function initializeChart (biogearsData, physiologyRequest, title) {
      model = biogearsData
      index = physiologyRequest
-     var name = title
+     var v_name = title
     
-     root.rate = model.data(index, PhysiologyModel.RateRole)
+    root.refreshOffset = Math.floor(Math.random() * 10);  
+
+    switch(model.data(index, PhysiologyModel.RateRole)) {
+      case 1:
+        speed_1hz.checked = true
+      break;
+      case 5:
+        speed_5hz.checked = true
+      break;
+      case 10:
+        speed_10hz.checked = true
+      break;
+      case -5:
+        speed_5s.checked = true
+      break;
+      case -10:
+        speed_10s.checked = true
+      break;
+      default:
+      // code block
+    } 
+
      if(model.rowCount(index)){
        if( model.data(index, PhysiologyModel.NestedRole) ){
          //NOTE: We should not ever get here as GraphAreaForm.ui should have
@@ -26,19 +47,19 @@ UIPlotSeriesForm {
        } else {
           requestNames = []
           for (let i = 0; i < model.rowCount(index); ++i){
-            let subIndex = biogearsData.index(i,0,physiologyRequest)
-            requestNames.push(biogearsData.data(subIndex,Qt.DisplayRole))
-            let series = root.createSeries(ChartView.SeriesTypeLine, biogearsData.data(subIndex,Qt.DisplayRole), xAxis, yAxis);
+            let l_subIndex = biogearsData.index(i,0,physiologyRequest)
+            requestNames.push(biogearsData.data(l_subIndex,Qt.DisplayRole))
+            let l_series = root.createSeries(ChartView.SeriesTypeLine, biogearsData.data(l_subIndex,Qt.DisplayRole), xAxis, yAxis);
           }
           root.legend.visible = true
        }
      } else  {
       //Common single line plot
-      let series = root.createSeries(ChartView.SeriesTypeLine, name, xAxis, yAxis);
-      root.requestNames.push(name);
+      let l_series = root.createSeries(ChartView.SeriesTypeLine, v_name, xAxis, yAxis);
+      root.requestNames.push(v_name);
     }
     yAxis.visible = false
-    root.title = name;
+    root.title = v_name;
   }
 
   //Gets simulation time and physiology data request from patient metrics, appending new point to each series
@@ -65,7 +86,16 @@ UIPlotSeriesForm {
         yAxis.titleText = root.model.data(index, PhysiologyModel.UnitRole)
       }
     }
-    updateDomainAndRange(time_s)
+    updateXInterval(time_s)
+    
+    if(  Math.floor(time_s + refreshOffset) % 5 == 0 ){
+        updateYInterval(time_s)
+    }
+
+    if ( Math.floor(time_s + refreshOffset) % 10 == 0){
+      pruneHistory(time_s)
+    }
+
   }
 
   //Gets simulation time and substance data request from substance metrics, appending new point to each series
@@ -94,37 +124,62 @@ UIPlotSeriesForm {
       let series = root.series(root.requestNames[0])
       series.removePoints(0, series.count)
     }
-
-    //updateDomainAndRange(0)
   }
 
-  //Moves x-axis range if new data point is out of specified windowWidth and removes points no longer in visible range.  Update yAxis range according to min/max y-values
-  function updateDomainAndRange(time_s){
-    const interval_s = 60 * root.windowWidth_min
-    //Domain
+  function updateXInterval(time_s){
+    const interval_s = 60 * timeInterval_m
     if(time_s > interval_s){
       xAxis.min = (time_s - interval_s) / 60;
       xAxis.max = time_s / 60
     } else {
       xAxis.min = 0
-      xAxis.max= root.windowWidth_min
+      xAxis.max= timeInterval_m
     }
-    //Range -- loop over series in the event that there are multiple defined for a chart
+  }
+
+  function updateYInterval(time_s){
+    if( root.autoScaleEnabled) {
+      yAxis.min = root.series(0).at(0).y
+      yAxis.max = root.series(0).at(root.series(0).count-1).y
+      calculateScale = false
+      //TODO: To do this right we 
+      for (let i = 0; i < root.count; ++i) {
+        for (let j = 0 ; j < root.series(i).count; ++j){
+          let curY = root.series(i).at(j).y
+            yAxis.min = yAxis.min > curY ? curY : yAxis.min
+            yAxis.max = yAxis.max < curY ? curY : yAxis.max
+        }
+        yAxis.min = yAxis.min - (yAxis.max - yAxis.min) * .5
+        yAxis.max = yAxis.max + (yAxis.max - yAxis.min) * .5
+      }
+    } else {
+       yAxis.min = userSpecifiedMin
+       yAxis.max = userSpecifiedMax
+       calculateScale = true
+    }
+  }
+
+  function pruneHistory(time_s){
+    const time_m = time_s / 60;
     for (let i = 0; i < root.count; ++i) {
-      let newY = root.series(i).at(root.series(i).count-1).y
-      if (newY >= 0){
-        yAxis.min = yAxis.min == 0 ? 0.9 * newY : Math.min(yAxis.min, 0.9 * newY)
-        yAxis.max = yAxis.max == 1 ? 1.1 * newY : Math.max(yAxis.max, 1.1 * newY)
-      } else {
-        yAxis.min = yAxis.min == 0 ? 1.1 * newY : Math.min(yAxis.min, 1.1 * newY)
-        yAxis.max = yAxis.max == 1 ? 0.9 * newY : Math.max(yAxis.max, 0.9 * newY)
+      var trim_count = 0;
+
+      //Currently, the maximum timescale is 10 minutes we need to remove any points outside of that scale
+      //We assumed well ordered time data. 
+      for (let j = 0; j < root.series(i).count; ++j){
+      if (root.series(i).at(j).x < (time_m - 10 )){
+        trim_count = j;
+        continue;
+      } break;
       }
-      //If the number of points in the series is greater than the number of points visible in the viewing window (assuming 1 pt per second), then remove the first point, which will always
-      //be the one just outside the viewing area.  Note that we can't use tickCount for this or else we graphs that start later in simulation would have points removed almost immediately
-      if (root.series(i).count > interval_s){
-        root.series(i).remove(0)
-      }
+      root.series(i).removePoints(0,trim_count)
     }
+  }
+
+  function updateDomainAndRange(time_s){
+      updateYInterval(time_s)
+      updateXInterval(time_s)
+      pruneHistory(time_s)
   }
 
   //Updates plot size when the application window size changes
