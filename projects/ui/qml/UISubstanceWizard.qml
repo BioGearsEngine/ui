@@ -21,6 +21,12 @@ UISubstanceWizardForm {
 	property bool nameWarningFlagged : false
 	property string errorString : "*"
 
+	function debugObjects(obj) {
+		for (let prop in obj){
+			console.log("\t" + prop + " : " + obj[prop])
+		}
+	}
+
 	Component.onCompleted : {
 		//Normally, only the active page in a stack layout is fully loaded when parent component is created.
 		//This means that only the items in the grid view of the current stack layout index will get set up at first,
@@ -334,11 +340,7 @@ UISubstanceWizardForm {
 	function updateDelegateItems(items){
 		while (items.count > 0){
 			let item = items.get(0)
-			if (item.model.name==="Placeholder"){
-				items.setGroups(0, 1, [item.model.group])
-			} else {
-				items.setGroups(0, 1, [item.model.group, "persistedItems"])
-			}
+			items.setGroups(0, 1, [item.model.group, "persistedItems"])
 		}
 	}
 
@@ -361,8 +363,25 @@ UISubstanceWizardForm {
 			case 3 : 
 				filter = "pharmacodynamics"
 				break;
-			}
-			return filter
 		}
+		return filter
+	}
 
-}
+	function checkIonicState(state, index){
+		//Zwitterion has index = 4 in list of ionic states
+		if (state === 4){
+			let physicochemGroup = substanceDelegateModel.groups[6]
+			let newData = {"name" : "SecondaryPKA", "unit" : "", "type" : "double", "hint" : "Enter a value", "valid" : true, "group" : "pkPhysicochemical"}
+			let insertIndex = physicochemGroup.get(0).persistedItemsIndex + 1
+			substanceListModel.insert(insertIndex, newData)
+			console.log(substanceDelegateModel.persistedItems.get(insertIndex).model.name)
+		} else if (pkData.physicochemical.hasOwnProperty("SecondaryPKA")){
+			let physicochemGroup = substanceDelegateModel.groups[6]
+			let itemToRemoveIndex = physicochemGroup.get(1).persistedItemsIndex
+			substanceListModel.remove(itemToRemoveIndex, 1)
+			delete pkData.physicochemical["SecondaryPKA"]
+			debugObjects(pkData.physicochemical)
+		}
+	}
+
+	}

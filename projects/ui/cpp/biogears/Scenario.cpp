@@ -1074,11 +1074,16 @@ void Scenario::create_substance(QVariantMap substanceData)
 
     auto& physChem = newSubstance->GetPK().GetPhysicochemicals(); //Creates SESubstancePharmacokinetics and SESubstancePhysicochemical props
 
-    //If this section defined, substance editor will send all fields (no need to check for nulls)
+    //If this section defined, substance editor will send all fields (no need to check for nulls --except for second PKA, which only zwitterions use)
 
-    //Acid Dissociation Constant
-    subMetric = pkData["AcidDissociationConstant"].toList();
+    //Primary PKA
+    subMetric = pkData["PrimaryPKA"].toList();
     physChem.GetPrimaryPKA().SetValue(subMetric[0].toDouble());
+    //Secondary PKA
+    subMetric = pkData["SecondaryPKA"].toList();
+    if (!subMetric[0].isNull()) {
+      physChem.GetSecondaryPKA().SetValue(subMetric[0].toDouble());
+    }
     //Binding Protein
     subMetric = pkData["BindingProtein"].toList();
     physChem.SetBindingProtein((CDM::enumSubstanceBindingProtein::value)subMetric[0].toInt());
@@ -1399,9 +1404,14 @@ QVariantMap Scenario::edit_substance()
     if (subPK.HasPhysicochemicals()) {
       auto& physChem = subPK.GetPhysicochemicals();
       subField[1] = ""; //None of these entries have units, so just set "unit" place to empty ahead of time
-      //Acid Dissociation Constant
+      //Primary PKA
       subField[0] = physChem.GetPrimaryPKA().GetValue();
-      pkMap["AcidDissociationConstant"] = subField;
+      pkMap["PrimaryPKA"] = subField;
+      //Secondary PKA -- only zwitterions will have this
+      if (physChem.HasSecondaryPKA()) {
+        subField[0] = physChem.GetSecondaryPKA().GetValue();
+        pkMap["SecondaryPKA"] = subField;
+      }
       //Binding Protein
       subField[0] = (int)physChem.GetBindingProtein();
       pkMap["BindingProtein"] = subField;
@@ -1542,7 +1552,7 @@ QVariantMap Scenario::edit_substance()
     //Pupil-Reactivity Modifier
     subField[0] = subPD.GetPupillaryResponse().GetReactivityModifier().GetValue();
     pdMap["Pupil-ReactivityModifier"] = subField;
-    
+
     //Add PD map to Substance Map
     substanceMap["Pharmacodynamics"] = pdMap;
   }

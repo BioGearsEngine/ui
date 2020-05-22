@@ -413,6 +413,7 @@ Page {
     model : substanceListModel      
     delegate : substanceDelegate
     groups :  [
+                //Note: Default groups "items" and "persistedItems" are indexed 0 and 1 in groups list, so "physical" = groups[2], etc
                 DelegateModelGroup {name : "physical"; includeByDefault : false; property var data : physicalData; onChanged : substanceDelegateModel.updateGroup(this) },
                 DelegateModelGroup {name : "clearance"; includeByDefault : false; property var childrenGroups : ['clearance_systemic','clearance_regulation'] },
                 DelegateModelGroup {name : "clearance_systemic"; includeByDefault : false; property string parentGroup : 'clearance'; property var data : clearanceData.systemic; onChanged : substanceDelegateModel.updateGroup(this) },
@@ -490,10 +491,14 @@ Page {
           }
           onInputAccepted : {
             if (wrapper.parent){
-              if (input[0] === ""){
+              console.log(input)
+              if (input[0] === "" || (input[0] == "-1" && model.type==="enum")){
                 parent.groupData[model.name] = [null, null]
               } else {
                 parent.groupData[model.name] = input
+                if (model.name === "IonicState"){
+                  checkIonicState(input[0], index)   //Functionality for handling zwitterions
+                }
               }
             }
           }
@@ -527,7 +532,7 @@ Page {
       ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation"}  
       ListElement {name : "TransportMaximum"; unit : "massRate"; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation"} 
       ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_regulation"}
-    ListElement {name : "AcidDissociationConstant"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
+    ListElement {name : "PrimaryPKA"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
       ListElement {name : "BindingProtein"; unit : "protein"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical"}     
       ListElement {name : "BloodPlasmaRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
       ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "pkPhysicochemical"} 

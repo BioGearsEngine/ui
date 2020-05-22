@@ -157,6 +157,7 @@ Rectangle {
         onActivated : {
           if (currentText==='-Clear-'){
             enumColumn.reset()
+            root.inputAccepted(userInput)
           } else if (validInput){
             root.inputAccepted(userInput)
           }
