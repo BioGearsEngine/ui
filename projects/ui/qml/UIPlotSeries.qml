@@ -149,8 +149,15 @@ UIPlotSeriesForm {
             yAxis.min = yAxis.min > curY ? curY : yAxis.min
             yAxis.max = yAxis.max < curY ? curY : yAxis.max
         }
-        yAxis.min = yAxis.min - (yAxis.max - yAxis.min) * .5
-        yAxis.max = yAxis.max + (yAxis.max - yAxis.min) * .5
+        if( Math.floor(yAxisMin) != Math.floor(xAxisMin) ){
+          yAxis.min = yAxis.min - (yAxis.max - yAxis.min) * .5
+          yAxis.max = yAxis.max + (yAxis.max - yAxis.min) * .5
+        } else {
+          yAxis.min = yAxis.min - 1
+          yAxis.max = yAxis.max + 1
+        }
+
+
       }
     } else {
        yAxis.min = userSpecifiedMin
