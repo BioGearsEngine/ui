@@ -11,8 +11,8 @@ UIPlotSeriesForm {
   property alias rate  : root.refresh_rate
   property int refreshOffset : 0
 
-  //Sets tickCount equal to global value (so that plot always knows time at which it started) and initializes request name that will be used to pull data from metrics object
-  //Each requestElement is {request: "requestName" ; active: "true"; subRequests: []}.  If subRequests exists, we add a series for each subRequest.  Otherwise, we use the request name
+  //Initilaizes chart based on input pulling existing data from the model.
+  //TODO: Put AutoScaling On/Off in Model
   function initializeChart (biogearsData, physiologyRequest, title) {
      model = biogearsData
      index = physiologyRequest

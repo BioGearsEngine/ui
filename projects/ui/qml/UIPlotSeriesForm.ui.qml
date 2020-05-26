@@ -31,7 +31,7 @@ ChartView {
   localizeNumbers: true
   ValueAxis {
     id: xAxis
-    property int tickCount : 0
+    property int tickCount : 2
     titleText: "Simulation Time (min)"
     min: 0
     max: timeInterval_m
@@ -40,6 +40,7 @@ ChartView {
     id: yAxis
     //d, e, E, f, g, G, 
     labelFormat: (max < 1.)? '%.3f' : (max < 10.)? '%.2f' : (max < 100.) ?  '%.1f' : (max < 10000.) ?  '%.0f' : '%.2e'
+    tickCount : 3
   }
   MouseArea {
     anchors.fill : parent
