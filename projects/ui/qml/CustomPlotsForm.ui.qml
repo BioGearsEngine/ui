@@ -14,23 +14,28 @@ ChartView {
  property alias xAxis : xAxis
  property alias yAxis : yAxis
 
+ property alias speed_1hz : speed_lhz 
+ property alias speed_5hz : speed_5hz 
+ property alias speed_10hz : speed_10hz 
+ property alias speed_5s : speed_5s
+ property alias speed_10s : speed_10s 
+
+property alias  refresh_rate   : contextMenu.refresh_rate
  ValueAxis {
   id: xAxis
  }
  ValueAxis {
   id: yAxis
-  labelFormat: (max < 1.)? '%0.2f' : (max < 10.)? '%0.1f' : (max < 100.) ?  '%3d' : '%0.2e'
+  labelFormat: (max < 1.)? '%.3f' : (max < 10.)? '%.2f' : (max < 100.) ?  '%.1f' : (max < 10000.) ?  '%.0f' : '%.2e'
+  tickCount : 3
  }
   MouseArea {
   anchors.fill : parent
   acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: {
-     console.log("CustomPLotsForm.clicked")
         if (mouse.button === Qt.RightButton){
-           console.log("CustomPLotsForm.popup")
-       contextMenu.popup()
-
-    }
+           contextMenu.popup()
+        }
     }
     onPressAndHold: {
         if (mouse.source === Qt.MouseEventNotSynthesized)
@@ -38,8 +43,23 @@ ChartView {
     }
   Menu {
       id: contextMenu
+
+       property int refresh_rate :  (speed_lhz.checked) ? 1 : (speed_5hz.checked) ? 5 : (speed_10hz.checked) ? 
+                              10 : (speed_5s.checked) ? -5 : (speed_10s.checked) ? -10 : 1
+
       Label { text: "Refresh Rate"; font.pixelSize: 16;    font.bold: true}
-      Row{RadioButton{ id:range_1; text: "Low"; checked: true} RadioButton{id:range_2; text: "Normal"} RadioButton{id:range_3; text: "High"}}
+      ButtonGroup { id: rateGroup }
+      Row{ 
+        id: rateRow1; 
+        RadioButton{id:speed_lhz; text: "1hz"; checked: true; ButtonGroup.group:rateGroup} 
+        RadioButton{id:speed_5hz; text: "5hz"; ButtonGroup.group:rateGroup} 
+        RadioButton{id:speed_10hz; text: "10hz"; ButtonGroup.group:rateGroup}
+      }
+      Row{
+        id: rateRow2;  
+        RadioButton{id:speed_5s; text: "5s"; ButtonGroup.group:rateGroup} 
+        RadioButton{id:speed_10s; text: "10s"; ButtonGroup.group:rateGroup}
+      }
   }
  }
 }

@@ -124,12 +124,12 @@ void BioGearsData::initialize()
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("IntracellularFluidVolume"));
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
 
-  _customs->append(QString("Plots"), QString("Respiratory PV Cycle"));
+  _customs->append(QString("Plots"), QString("Pressure-Volume Curve"));
   auto custom = _customs->child(0);
   {
-    custom->append(QString("Respiratory PV Cycle"), QString("Lung Pressure"));
-    custom->append(QString("Respiratory PV Cycle"), QString("Lung Volume"));
-    custom->append(QString("Respiratory PV Cycle"), QString("Cycle Start"));
+    custom->append(QString("Pressure-Volume Curve"), QString("Lung Pressure"));
+    custom->append(QString("Pressure-Volume Curve"), QString("Lung Volume"));
+    custom->append(QString("Pressure-Volume Curve"), QString("Cycle Start"));
     custom->rate(10);
   }
 

@@ -340,7 +340,7 @@ GraphAreaForm {
         console.log("Error : Chart component not ready");
       } else {
         switch (title) {
-          case "Respiratory PV Cycle" :
+          case "Pressure-Volume Curve" :
             var chartObject = chartComponent.createObject(customGridView,{"width" : customGridView.cellWidth, "height" : customGridView.cellHeight });
             chartObject.initializeRespiratoryPVSeries(model,request,title);
             customObjectModel.append(chartObject);
@@ -421,8 +421,14 @@ GraphAreaForm {
       }
       for ( var i = 0; i < model.count; ++i ){
         var plot = model.get(i)
+                  console.log("Remove Custom Plot")
+          console.log(category, menuIndex, request, plot.title)
         if(plot.title == request)
+        {
           model.remove(i,1)
+          
+
+        }
     }
   }
 
@@ -511,7 +517,6 @@ GraphAreaForm {
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 5){
-          
           plot.update(physiologyRequestModel.simulation_time)
         }
       }

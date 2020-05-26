@@ -12,7 +12,8 @@ CustomPlotsForm {
 
   property var model : null
   property var index : null
-  property int rate  : 1
+  property alias rate  : root.refresh_rate
+  property int refreshOffset : 0
 
   function initializeRespiratoryPVSeries(biogearsData, physiologyRequest, title) {
     root.model = biogearsData
@@ -25,6 +26,27 @@ CustomPlotsForm {
     xAxis.titleText = "Pleural Pressure (cmH2O)";
     yAxis.titleText = "Lung Volume (L)";
 
+    root.refreshOffset = Math.floor(Math.random() * 10);  
+
+    switch(model.data(index, PhysiologyModel.RateRole)) {
+      case 1:
+        speed_1hz.checked = true
+      break;
+      case 5:
+        speed_5hz.checked = true
+      break;
+      case 10:
+        speed_10hz.checked = true
+      break;
+      case -5:
+        speed_5s.checked = true
+      break;
+      case -10:
+        speed_10s.checked = true
+      break;
+      default:
+      // code block
+    } 
   }
  
    function update(currentTime_s){
