@@ -110,7 +110,7 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
       metric->unit_scalar(_activeSub->HasEffectSiteConcentration() ? &_activeSub->GetEffectSiteConcentration() : nullptr);
       metric = substance->append(substance->name(), "PlasmaConcentration");
       metric->unit_scalar(_activeSub->HasPlasmaConcentration() ? &_activeSub->GetPlasmaConcentration() : nullptr);
-      metric = substance->append(substance->name(), "AreaUnderCurv");
+      metric = substance->append(substance->name(), "AreaUnderCurve");
       metric->unit_scalar(_activeSub->HasAreaUnderCurve() ? &_activeSub->GetAreaUnderCurve() : nullptr);
     }
     //Assign clearances, if applicable

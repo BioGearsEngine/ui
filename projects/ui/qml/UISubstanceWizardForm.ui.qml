@@ -483,7 +483,14 @@ Page {
           hintText : wrapper.parent ? model.hint : ""
           entryValidator : root.assignValidator(model.type)
           function resetComponent(){
-            resetEntry(unitScalarEntry, model.group + '-' + model.name)
+            let resetProp = model.group + '-' + model.name
+            if ( editMode && resetData.hasOwnProperty(resetProp)) {
+			        setEntry(resetData[resetProp]);
+              parent.groupData[model.name] = resetData[resetProp]
+		        } else { 
+			        reset();
+              parent.groupData[model.name] = [null, null]
+		        }
           }
           function loadComponentData(){
             setEntry(parent.groupData[model.name])
@@ -493,7 +500,6 @@ Page {
               model.valid = Qt.binding(function() {return entry.validInput})
               root.onResetConfiguration.connect(resetComponent)
               root.onLoadConfiguration.connect(loadComponentData)
-              console.log(index + ': ' + model.name + ' = Complete')
             }
           }
           onInputAccepted : {

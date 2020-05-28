@@ -8,7 +8,7 @@ UIEnvironmentWizardForm {
 	signal validConfiguration (string type, var data)
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
-	signal loadConfiguration(var environmentData)
+	signal loadConfiguration()
 	signal nameEdited()
 
 	property var environmentData : ({})		//String and unit scalar entries (including ambient gases)
@@ -131,7 +131,7 @@ UIEnvironmentWizardForm {
 		}
 		resetEnvironmentData = Object.assign({}, environmentData)	//Copy data to resetData ( can't do = because this does copy by reference)
 		resetAerosolData = Object.assign({}, aerosolData)
-		root.loadConfiguration(environmentData)
+		root.loadConfiguration()
 	}
 
 	function verifyGasFractions(){

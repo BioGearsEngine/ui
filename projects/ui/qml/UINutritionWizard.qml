@@ -8,7 +8,7 @@ UINutritionWizardForm {
 	signal validConfiguration (string type, var data)
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
-	signal loadConfiguration(var nutrition)
+	signal loadConfiguration()
 	signal nameEdited ()
 
 	property var nutritionData : ({})
@@ -24,10 +24,6 @@ UINutritionWizardForm {
 		nutritionGridView.forceLayout()	//Make sure that all fields are drawn so that when we load data from file there are complete view items to map them to
 	}
 
-	Component.onDestruction : {
-		console.log('Bye wizard')
-	}
-	
 	function checkConfiguration(){
 		let validConfiguration = true
 		let errorStr = "*"

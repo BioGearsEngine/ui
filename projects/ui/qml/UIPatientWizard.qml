@@ -8,7 +8,7 @@ UIPatientWizardForm {
 	signal validConfiguration (string type, var data)
 	signal invalidConfiguration(string errorStr)
 	signal resetConfiguration()
-	signal loadConfiguration(var patient)
+	signal loadConfiguration()
 	signal nameEdited ()
 
 	property var patientData : ({})

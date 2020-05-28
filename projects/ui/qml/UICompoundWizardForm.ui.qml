@@ -21,6 +21,18 @@ Page {
     unit : ""
     type : "string"
     hintText : "Required*"
+    function resetComponent(){
+      if (editMode){
+        setEntry ([resetName, ""])
+        root.compoundName = resetName
+      } else {
+        reset()
+        root.compoundName = ""
+      }
+    }
+    function loadComponentData(){
+      setEntry([root.compoundName, ""])
+    }
     onInputAccepted : {
       root.compoundName = input[0]
       if (root.editMode && !nameWarningFlagged){
@@ -29,8 +41,8 @@ Page {
       }
     }
     Component.onCompleted : {
-      root.onResetConfiguration.connect(function () { if (root.editMode) { setEntry ([root.resetName, ""]) } else { reset() } })
-      root.onLoadConfiguration.connect(function () { setEntry([root.compoundName, ""]) } ) //Scalar Entry expects a value:unit combo, so pass as array
+      root.onResetConfiguration.connect(resetComponent)
+      root.onLoadConfiguration.connect(loadComponentData ) //Scalar Entry expects a value:unit combo, so pass as array
     }
   }
 
@@ -66,9 +78,15 @@ Page {
         type : model.type
         hintText : model.hint
         entryValidator : doubleValidator
+        function resetComponent(){
+          if (!root.editMode) { 
+            reset() 
+            compoundList[model.name] = [null, null]
+          }
+        }
         Component.onCompleted : {
           setComponentList('All')    //Make sure the list of substances is populated
-          root.onResetConfiguration.connect( function() { if (!root.editMode) { reset() } } )   //If "new" compound (!edit), then reset wipes out all data
+          root.onResetConfiguration.connect(resetComponent)   //If "new" compound (!edit), then reset wipes out all data
           model.valid = Qt.binding(function() {return entry.validInput})
           if (root.editMode && model.name !== ""){
             let sub = model.name //Name is set to substance name when loading from file

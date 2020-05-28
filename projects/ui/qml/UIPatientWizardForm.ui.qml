@@ -36,6 +36,18 @@ Page {
         type : model.type
         hintText : model.hint
         entryValidator : root.assignValidator(model.type)
+        function resetComponent(){
+          if (root.editMode && resetData[model.name][0]!=null){
+            setEntry(resetData[model.name])
+            patientData[model.name] = resetData[model.name]
+          } else {
+            reset()
+            patientData[model.name] = [null, null]
+          }
+        }
+        function loadComponentData(){
+          setEntry(patientData[model.name])
+        }
         onInputAccepted : {
           root.patientData[model.name] = input
           if (model.name === "Name" && root.editMode && !nameWarningFlagged){
@@ -54,10 +66,10 @@ Page {
             model.valid = Qt.binding(function() {return entry.validInput}) 
           }
           //Connect load function of wizard (called when opening an existing patient) to individual entries
-          root.onLoadConfiguration.connect(function (patient) { setEntry (patient[model.name]) } )
+          root.onLoadConfiguration.connect(loadComponentData)
           //Connect wizard reset button to entry reset functions -- if we are editing an existing patient, then restore
           //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-          root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
+          root.onResetConfiguration.connect(resetComponent)
         }
       }
     }

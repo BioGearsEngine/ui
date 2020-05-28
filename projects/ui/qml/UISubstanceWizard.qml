@@ -17,6 +17,7 @@ UISubstanceWizardForm {
 	property var pkData : ({"physicochemical" : ({}), "tissueKinetics" : ({}) })					//Object holding all info from "pharmacokinetics" tab
 	property var pdData : ({})					//Object holding all info from "pharmacodynamics" tab
 	property var resetData : ({})  //Store data loaded in "edit" mode so that during reset we can revert to data in file
+	property real cachedPkaTwo : -1		//Second PkA field can have visibility toggled and be removed from pkData.  Cache when removing so that we can re-add it to data if made visible again
 	property bool editMode : false
 	property bool nameWarningFlagged : false
 	property string errorString : "*"
@@ -50,6 +51,8 @@ UISubstanceWizardForm {
 	}
 
 	onResetConfiguration : {
+		//When resetting, we need to check if we loaded a zwitterion.  If we did, then secondary pka will be present in reset data and we need to make
+		// sure that this field is visible (possible it could have been hidden while editing).
 		if (resetData.hasOwnProperty("pkPhysicochemical-SecondaryPKA")){
 			checkZwitterion(4)
 		} else {
@@ -57,6 +60,8 @@ UISubstanceWizardForm {
 		}
 	}
 
+	//--When "save" clicked, this function checks whether all required data has been provided.  If so, it return a map of data to be parsed in Scenario.cpp
+	// If not valid config, it logs a warning to dialog.
 	function checkConfiguration(){
 		let validConfiguration = true
 		//Check for required fields.
@@ -154,6 +159,7 @@ UISubstanceWizardForm {
 		}
 	}
 
+	//--Function to check clearance specific data
 	function verifyClearanceData(){
 		let valid = true
 		let dataPresent = true
@@ -185,6 +191,7 @@ UISubstanceWizardForm {
 		return [valid, dataPresent]
 	}
 
+	//--Function to check PK specific data
 	function verifyPkData() {
 		let valid = true
 		let dataPresent = true
@@ -211,6 +218,7 @@ UISubstanceWizardForm {
 		return [valid, dataPresent]
 	}
 
+	//--Function to check PD specific data
 	function verifyPdData() {
 		let requiredCount = 0
 		let numModifiers = 0
@@ -245,6 +253,8 @@ UISubstanceWizardForm {
 		return [valid, requiredCount + numModifiers > 0]
 	}
 
+	//--Helper function that determines validity of all or nothing data (like Clearance, PK Physiochemicals, Tissue Kinetics, etc)
+	// Returns a pair [bool valid, bool fieldDefined] because a valid config could have all (fieldDefined = true) or no fields (fieldsDefined = false) set
 	function checkAllOrNothingData( data ) {
 		let fieldsDefined = false
 		let valid = true
@@ -263,7 +273,7 @@ UISubstanceWizardForm {
 		return [valid, fieldsDefined]	
 	}
 
-	//This function parcels out data loaded from an existing substance xml file to the appropriate data objects.
+	//--This function parcels out data loaded from an existing substance xml file to the appropriate data objects.
 	//The loadConfiguration signal notifies each data field to set its value to these new values.  It also appends
 	//each loaded value to the "resetData" object, which is a cache to fall back on when we reset.  The group name
 	//(e.g. clearance_systemic) is tacked on to the property name in the reset data object to prevent confusion between
@@ -326,19 +336,13 @@ UISubstanceWizardForm {
 		loadConfiguration()
 	}
 
-	function resetEntry(entry, prop){
-		if ( editMode && resetData.hasOwnProperty(prop)) {
-			entry.setEntry(resetData[prop]); 
-		} else { 
-			entry.reset(); 
-		}	
-	}
-
+	//--Formats data field name for viewing in wizard
 	function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])/g, '$1 $2')
 		return formatted
 	}
 
+	//--Set the validator on each delegate depending on the type of data that the field holds
 	function assignValidator (type) {
 		if (type === "double"){
 			return doubleValidator
@@ -351,16 +355,29 @@ UISubstanceWizardForm {
 		}
 	}
 
+	//--This function responds to model elements (in SubstanceListModel) being added to the substance delegate model.  By default, new model elements
+	// are placed in the "items" group.  When the items group changes, we sort the new items into the appropraite bins ("physical", "clearance", etc) so
+	// that they will appear in the appropriate view.  Please note that the only time we directly add elements to "items" is when the editor is opened
+	// (all list elements are already present in SubstanceListModel--we don't add new ones, just control their visibilty).  Changing this functionality by
+	// adding list elements dynamically could have unintended consequences, as this function will be triggered and we may unintentionally hide items that
+	// are not initially visible (currently just SecondaryPKA).  
 	function updateDelegateItems(items){
 		while (items.count > 0){
+			//The "setGroups" function pops the object from the front of "items" and adds it to the listed groups.  Thus, we keep moving the first element
+			//in the items group until there are no more items left.
 			let item = items.get(0)
 			items.setGroups(0, 1, [item.model.group, "persistedItems"])
+			//We remove SecondaryPKA from PkPhysicochemical group so that it is not initially visible.  Changing ionic state to "Zwitterion" will
+			// cause it to be re-added to this group and become visible.  SecondaryPKA will still always be in persistedItems group, meaning that
+			// any data written to it will be saved even if the field is hidden again.
 			if (item.model.name === 'SecondaryPKA'){
 				item.inPkPhysicochemical = false
 			}
 		}
 	}
 
+	//--Update the filter currently in use by the Substance Delegate Model.  The filter changes as we tab to a different view.  The pharmacokinetics
+	// tab has two possible views, but they are exclusive (can't view both simultaneously), so we call whichever one is currently in view.
 	function setDelegateFilter(mainTab, subIndex){
 		let filter = ""
 		switch(mainTab){
@@ -384,21 +401,28 @@ UISubstanceWizardForm {
 		return filter
 	}
 
+	//--Zwitterions require a second PkA (for calculating percent ionized in GI if given orally).  This function moves the PKA Two field out of and into the
+	// pkPhysicochemical delegate model group.  When in the group, it is automatically added to the pk gridview by way of the pkPhysicochemical part of the
+	// substance delegate package.  Because PKA Two also belongs to the persistedItems group, its state will be saved even if it leaves the view.
 	function checkZwitterion(state){
-	//Zwitterion has index = 4 in list of ionic states
-		let pkaTwo = substanceDelegateModel.persistedItems.get(21)
-		if (state === 4){
-			pkaTwo.inPkPhysicochemical = true
-			if (!editMode && resetData.hasOwnProperty("pkPhysicochemical-SecondaryPKA")){
-				pkData.physicochemical.SecondaryPKA = resetData["pkPhysicochemical-SecondaryPKA"]
-				delete resetData["pkPhysicochemical-SecondaryPKA"]
+		let pkaTwo = substanceDelegateModel.persistedItems.get(21)	//Second pka is 22nd item in the substance list model (which persistedItems group mirrors)
+		if (state === 4){																						//Zwitterions have index 4 in the list of possible states
+			pkaTwo.inPkPhysicochemical = true													//Setting this property moves pkaTwo item in to pkPhysicochemical group
+			//If we didn't load a substance (i.e. not edit mode), but have a cached value for pka 2, then we must have activated it, entered data, and then removed it
+			// Upon reactivation, load the cached data into the pkData object so that its available when saving.
+			if (cachedPkaTwo !== -1 ){
+				pkData.physicochemical.SecondaryPKA[0] = cachedPkaTwo
+				cachedPkaTwo = -1
 			}
-		} else if (pkaTwo.inPkPhysicochemical){
-			if (!editMode) {
-				Object.assign(resetData, {"pkPhysicochemical-SecondaryPKA" : pkData.physicochemical.SecondaryPKA})
+			debugObjects(pkData.physicochemical)
+		} else if (pkaTwo.inPkPhysicochemical){										//If ionic state is anything else and pka 2 is active, we need to remove it.
+			if (pkData.physicochemical.SecondaryPKA[0]!==null) {
+				//Cache any data that was stored in the pka 2 field before removing it.
+				cachedPkaTwo = pkData.physicochemical.SecondaryPKA[0]
 			}
 			pkaTwo.inPkPhysicochemical = false
 			delete pkData.physicochemical.SecondaryPKA
+			debugObjects(pkData.physicochemical)
 		}
 	}
 }

@@ -73,6 +73,18 @@ Page {
             type : model.type
             hintText : model.hint
             entryValidator : root.assignValidator(model.type)
+            function resetComponent(){
+              if ( root.editMode && resetEnvironmentData[model.name][0]!=null) { 
+                setEntry(resetEnvironmentData[model.name])
+                root.environmentData[model.name] = resetEnvironmentData[model.name]
+              } else { 
+                reset()
+                root.environmentData[model.name] = [null, null]
+              }
+            }
+            function loadComponentData(){
+              setEntry (root.environmentData[model.name])
+            }
             onInputAccepted : {
               root.environmentData[model.name] = input
               if (model.name === "Name" && root.editMode && !nameWarningFlagged){
@@ -89,10 +101,10 @@ Page {
                 model.valid = Qt.binding(function() {return entry.validInput}) 
               }
               //Connect load function of wizard (called when opening an existing environment) to individual entries
-              root.onLoadConfiguration.connect(function (environment) { setEntry (environment[model.name]) } )
+              root.onLoadConfiguration.connect(loadComponentData)
               //Connect wizard reset button to entry reset functions -- if we are editing an existing environment, then restore
               //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-              root.onResetConfiguration.connect(function () { if ( root.editMode && resetEnvironmentData[model.name][0]!=null) { setEntry(resetEnvironmentData[model.name]); } else { reset(); } } )
+              root.onResetConfiguration.connect(resetComponent)
             }
           }
         }
@@ -145,13 +157,25 @@ Page {
             type : model.type
             hintText : model.hint
             entryValidator : fractionValidator
+            function resetComponent(){
+              if ( root.editMode && resetEnvironmentData[model.name][0]!=null) { 
+                setEntry(resetEnvironmentData[model.name])
+                root.environmentData[model.name] = resetEnvironmentData[model.name]
+              } else { 
+                reset()
+                root.environmentData[model.name] = [null, null]
+              }
+            }
+            function loadComponentData(){
+              setEntry (root.environmentData[model.name])
+            }
             Component.onCompleted : {
               model.valid = Qt.binding(function() {return entry.validInput}) 
               //Connect load function of wizard (called when opening an existing environment) to individual entries
-              root.onLoadConfiguration.connect(function (environment) { setEntry (environment[model.name]) } )
+              root.onLoadConfiguration.connect(loadComponentData)
               //Connect wizard reset button to entry reset functions -- if we are editing an existing environment, then restore
               //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-              root.onResetConfiguration.connect(function () { if ( root.editMode && resetEnvironmentData[model.name][0]!=null) { setEntry(resetEnvironmentData[model.name]); } else { reset(); } } )
+              root.onResetConfiguration.connect(resetComponent)
             }
             onInputAccepted : {
               root.environmentData[model.name] = input
@@ -203,9 +227,18 @@ Page {
             type : model.type
             hintText : model.hint
             entryValidator : fractionValidator
+            function resetComponent(){
+              if (!root.editMode) { 
+                reset()
+                root.environmentData[model.name] = [null, null]
+              }
+            }
+            function loadComponentData(){
+              setEntry (root.environmentData[model.name])
+            }
             Component.onCompleted : {
               setComponentList('Aerosol')    //Make sure the list of substances is populated
-              root.onResetConfiguration.connect( function() { if (!root.editMode) { reset() } } )   //If "new" compound (!edit), then reset wipes out all data
+              root.onResetConfiguration.connect(resetComponent)   //If "new" compound (!edit), then reset wipes out all data
               model.valid = Qt.binding(function() {return entry.validInput})
               if (root.editMode && model.name !== ""){
                 //This function populates field when loading from file, if the sub has been defined

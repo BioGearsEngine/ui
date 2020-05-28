@@ -34,6 +34,18 @@ Page {
         type : model.type
         hintText : model.hint
         entryValidator : root.assignValidator(model.type)
+        function resetComponent(){
+          if (root.editMode && resetData[model.name][0]!=null){
+            setEntry(resetData[model.name])
+            nutritionData[model.name] = resetData[model.name]
+          } else {
+            reset()
+            nutritionData[model.name] = [null, null]
+          }
+        }
+        function loadComponentData(){
+          setEntry(nutritionData[model.name])
+        }
         onInputAccepted : {
           root.nutritionData[model.name] = input
           if (model.name === "Name" && root.editMode && !nameWarningFlagged){
@@ -50,10 +62,10 @@ Page {
             model.valid = Qt.binding(function() {return entry.validInput}) 
           }
           //Connect load function of wizard (called when opening an existing nutrition file) to individual entries
-          root.onLoadConfiguration.connect(function (nutrition) { setEntry (nutrition[model.name]) } )
+          root.onLoadConfiguration.connect(loadComponentData)
           //Connect wizard reset button to entry reset functions -- if we are editing an existing nutrition file, then restore
           //the loaded value on reset.  If loaded file had no data for this field (null check), or if we are not in edit mode, then full reset
-          root.onResetConfiguration.connect(function () { if ( root.editMode && resetData[model.name][0]!=null) { setEntry(root.resetData[model.name]); } else { reset(); } } )
+          root.onResetConfiguration.connect(resetComponent)
         }
       }
     }
