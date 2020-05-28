@@ -482,11 +482,18 @@ Page {
           type : wrapper.parent ? model.type : ""
           hintText : wrapper.parent ? model.hint : ""
           entryValidator : root.assignValidator(model.type)
+          function resetComponent(){
+            resetEntry(unitScalarEntry, model.group + '-' + model.name)
+          }
+          function loadComponentData(){
+            setEntry(parent.groupData[model.name])
+          }
           Component.onCompleted : {
             if (wrapper.parent){
               model.valid = Qt.binding(function() {return entry.validInput})
-              root.onResetConfiguration.connect(function () { console.log(model.name); resetEntry(unitScalarEntry, model.group + "-" + model.name) } )
-              root.onLoadConfiguration.connect(function () { setEntry(parent.groupData[model.name]) })
+              root.onResetConfiguration.connect(resetComponent)
+              root.onLoadConfiguration.connect(loadComponentData)
+              console.log(index + ': ' + model.name + ' = Complete')
             }
           }
           onInputAccepted : {
@@ -495,9 +502,9 @@ Page {
                 parent.groupData[model.name] = [null, null]
               } else {
                 parent.groupData[model.name] = input
-                if (model.name === "IonicState"){
-                  checkIonicState(input[0])   //Functionality for handling zwitterions
-                }
+              }
+              if (model.name === "IonicState"){
+                checkZwitterion(input[0])   //Functionality for handling zwitterions
               }
             }
           }
@@ -531,7 +538,8 @@ Page {
       ListElement {name : "ReabsorptionRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation"}  
       ListElement {name : "TransportMaximum"; unit : "massRate"; type : "double"; hint : "Enter a value"; valid : true; group : "clearance_regulation"} 
       ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "clearance_regulation"}
-    ListElement {name : "PrimaryPKA"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
+    ListElement {name : "PrimaryPKA"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}
+      ListElement {name : "SecondaryPKA"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"} 
       ListElement {name : "BindingProtein"; unit : "protein"; type : "enum"; hint : ""; valid : true; group : "pkPhysicochemical"}     
       ListElement {name : "BloodPlasmaRatio"; unit : ""; type : "double"; hint : "Enter a value"; valid : true; group : "pkPhysicochemical"}     
       ListElement {name : "FractionUnboundInPlasma"; unit : ""; type : "0To1"; hint : "Enter a value [0-1]"; valid : true; group : "pkPhysicochemical"} 
