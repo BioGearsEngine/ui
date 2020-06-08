@@ -2347,15 +2347,18 @@ void Scenario::create_infection_action(QString location, int severity, double mi
 void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W = 0.0)
 {
   auto action = std::make_unique<biogears::SEExercise>();
+  auto genericExercise = biogears::SEExercise::SEGeneric{};
+ 
   if (intensity > 0.0) {
-    action->GetIntensity().SetValue(intensity);
+    genericExercise.Intensity.SetValue(intensity);
   } else if (workRate_W > 0.0) {
-    action->GetDesiredWorkRate().SetValue(workRate_W, biogears::PowerUnit::W);
+    genericExercise.DesiredWorkRate.SetValue(workRate_W, biogears::PowerUnit::W);
+    
   } else {
     //Reach this block if both inputs are 0, meaning we turn off action)
-    action->GetIntensity().SetValue(0.0);
+    genericExercise.Intensity.SetValue(0.0);
   }
-
+  action->SetGenericExercise(genericExercise);
   _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_pain_stimulus_action(double severity, QString location)
