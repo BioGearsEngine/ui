@@ -340,7 +340,7 @@ GraphAreaForm {
         console.log("Error : Chart component not ready");
       } else {
         switch (title) {
-          case "Pressure-Volume Curve" :
+          case "Respiratory PV Curve" :
             var chartObject = chartComponent.createObject(customGridView,{"width" : customGridView.cellWidth, "height" : customGridView.cellHeight });
             chartObject.initializeRespiratoryPVSeries(model,request,title);
             customObjectModel.append(chartObject);
