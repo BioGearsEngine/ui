@@ -30,8 +30,8 @@ property alias  refresh_rate   : contextMenu.refresh_rate
   tickCount : 3
  }
   MouseArea {
-  anchors.fill : parent
-  acceptedButtons: Qt.LeftButton | Qt.RightButton
+    anchors.fill : parent
+    acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: {
         if (mouse.button === Qt.RightButton){
            contextMenu.popup()
@@ -41,30 +41,26 @@ property alias  refresh_rate   : contextMenu.refresh_rate
         if (mouse.source === Qt.MouseEventNotSynthesized)
             contextMenu.popup()
     }
-  Menu {
-      id: contextMenu
+    Menu {
+        id: contextMenu
 
-       property int refresh_rate :  (speed_lhz.checked) ? 1 : (speed_5hz.checked) ? 5 : (speed_10hz.checked) ? 
-                              10 : (speed_5s.checked) ? -5 : (speed_10s.checked) ? -10 : 1
+        property int refresh_rate : rateGroup.checkedButton.rate
 
-      Label { text: "Refresh Rate"; font.pixelSize: 16;    font.bold: true}
-      ButtonGroup { id: rateGroup }
-      Row{ 
-        id: rateRow1; 
-        RadioButton{id:speed_lhz; text: "1hz"; checked: true; ButtonGroup.group:rateGroup} 
-        RadioButton{id:speed_5hz; text: "5hz"; ButtonGroup.group:rateGroup} 
-        RadioButton{id:speed_10hz; text: "10hz"; ButtonGroup.group:rateGroup}
-      }
-      Row{
-        id: rateRow2;  
-        RadioButton{id:speed_5s; text: "5s"; ButtonGroup.group:rateGroup} 
-        RadioButton{id:speed_10s; text: "10s"; ButtonGroup.group:rateGroup}
-      }
+        Label { text: "Refresh Rate"; font.pixelSize: 16; font.bold: true}
+        ButtonGroup { 
+          id: rateGroup 
+        }
+        Row{ 
+          id: rateRow1; 
+          RadioButton{id:speed_lhz;  property int rate:  1; text: "1hz";  ButtonGroup.group:rateGroup; checked: true} 
+          RadioButton{id:speed_5hz;  property int rate:  5; text: "5hz";  ButtonGroup.group:rateGroup} 
+          RadioButton{id:speed_10hz; property int rate: 10; text: "10hz"; ButtonGroup.group:rateGroup}
+        }
+        Row{
+          id: rateRow2;  
+          RadioButton{id:speed_5s;  property int rate:  -5;  text: "5s" ; ButtonGroup.group:rateGroup} 
+          RadioButton{id:speed_10s; property int rate: -10;  text: "10s"; ButtonGroup.group:rateGroup}
+        }
+    }
   }
- }
 }
-
-/*##^## Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
- ##^##*/
