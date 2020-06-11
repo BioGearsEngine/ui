@@ -11,47 +11,49 @@
         <file>Main.qml</file>
         <file>MainForm.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>UIActionSwitch.qml</file>
-        <file>UIActionSwitchForm.qml</file>
-        <file>UIActionDialogForm.ui.qml</file>
-        <file>UIComboBox.qml</file>
-        <file>UIComboBoxForm.ui.qml</file>
-        <file>UIControlPhysiology.ui.qml</file>
-        <file>UIPlaybackForm.ui.qml</file>
-        <file>UIPlotSeries.qml</file>
-        <file>UIPlotSeriesForm.ui.qml</file>
-        <file>UIRadioButton.qml</file>
-        <file>UIRadioButtonForm.ui.qml</file>
-        <file>UIScalarForm.ui.qml</file>
-        <file>UISpinBox.qml</file>
-        <file>UISpinBoxForm.ui.qml</file>
-        <file>UIActionDialog.qml</file>
-        <file>UITabButtonForm.ui.qml</file>
-        <file>UITextField.qml</file>
-        <file>UITextFieldForm.ui.qml</file>
-        <file>UITextInputForm.ui.qml</file>
         <file>CustomPlots.qml</file>
         <file>CustomPlotsForm.ui.qml</file>
         <file>MenuArea.qml</file>
         <file>MenuAreaForm.ui.qml</file>
-        <file>UIPatientWizard.qml</file>
-        <file>UIPatientWizardForm.ui.qml</file>
         <file>WizardDialog.qml</file>
         <file>WizardDialogForm.ui.qml</file>
-        <file>UIUnitScalarEntry.qml</file>
-        <file>UIUnitScalarEntryForm.ui.qml</file>
         <file>PatientMenu.qml</file>
         <file>PatientMenuForm.ui.qml</file>
-        <file>UINutritionWizard.qml</file>
-        <file>UINutritionWizardForm.ui.qml</file>
-        <file>UICompoundWizard.qml</file>
-        <file>UICompoundWizardForm.ui.qml</file>
-        <file>UISubstanceEntry.qml</file>
-        <file>UISubstanceEntryForm.ui.qml</file>
-        <file>UIEnvironmentWizard.qml</file>
-        <file>UIEnvironmentWizardForm.ui.qml</file>
         <file>UISubstanceWizard.qml</file>
         <file>UISubstanceWizardForm.ui.qml</file>
+        <file alias="UIActionSwitch.qml" >elements/UIActionSwitch.qml</file>
+        <file alias="UIActionSwitchForm.qml" >elements/UIActionSwitchForm.qml</file>
+        <file alias="UIActionDialogForm.ui.qml" >elements/UIActionDialogForm.ui.qml</file>
+        <file alias="UIComboBox.qml" >elements/UIComboBox.qml</file>
+        <file alias="UIComboBoxForm.ui.qml" >elements/UIComboBoxForm.ui.qml</file>
+        <file alias="UIControlPhysiology.ui.qml" >elements/UIControlPhysiology.ui.qml</file>
+        <file alias="UIPlaybackForm.ui.qml" >elements/UIPlaybackForm.ui.qml</file>
+        <file alias="UIPlotSeries.qml" >elements/UIPlotSeries.qml</file>
+        <file alias="UIPlotSeriesForm.ui.qml" >elements/UIPlotSeriesForm.ui.qml</file>
+        <file alias="UIRadioButton.qml" >elements/UIRadioButton.qml</file>
+        <file alias="UIRadioButtonForm.ui.qml" >elements/UIRadioButtonForm.ui.qml</file>
+        <file alias="UIScalarForm.ui.qml" >elements/UIScalarForm.ui.qml</file>
+        <file alias="UISpinBox.qml" >elements/UISpinBox.qml</file>
+        <file alias="UISpinBoxForm.ui.qml" >elements/UISpinBoxForm.ui.qml</file>
+        <file alias="UIActionDialog.qml" >elements/UIActionDialog.qml</file>
+        <file alias="UITabButtonForm.ui.qml" >elements/UITabButtonForm.ui.qml</file>
+        <file alias="UITextField.qml" >elements/UITextField.qml</file>
+        <file alias="UITextFieldForm.ui.qml" >elements/UITextFieldForm.ui.qml</file>
+        <file alias="UITextInputForm.ui.qml" >elements/UITextInputForm.ui.qml</file>
+        <file alias="UIPatientWizard.qml" >elements/UIPatientWizard.qml</file>
+        <file alias="UIPatientWizardForm.ui.qml" >elements/UIPatientWizardForm.ui.qml</file>
+        <file alias="UIUnitScalarEntry.qml" >elements/UIUnitScalarEntry.qml</file>
+        <file alias="UIUnitScalarEntryForm.ui.qml" >elements/UIUnitScalarEntryForm.ui.qml</file>
+        <file alias="UINutritionWizard.qml" >elements/UINutritionWizard.qml</file>
+        <file alias="UINutritionWizardForm.ui.qml" >elements/UINutritionWizardForm.ui.qml</file>
+        <file alias="UICompoundWizard.qml" >elements/UICompoundWizard.qml</file>
+        <file alias="UICompoundWizardForm.ui.qml" >elements/UICompoundWizardForm.ui.qml</file>
+        <file alias="UISubstanceEntry.qml" >elements/UISubstanceEntry.qml</file>
+        <file alias="UISubstanceEntryForm.ui.qml" >elements/UISubstanceEntryForm.ui.qml</file>
+        <file alias="UIEnvironmentWizard.qml" >elements/UIEnvironmentWizard.qml</file>
+        <file alias="UIEnvironmentWizardForm.ui.qml" >elements/UIEnvironmentWizardForm.ui.qml</file>
+        <file alias="UIAsthmaAttackForm.ui.qml"  >actions/UIAsthmaAttackForm.ui.qml</file>
+        <file alias="UIPainStimulusForm.ui.qml" >actions/UIPainStimulusForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
