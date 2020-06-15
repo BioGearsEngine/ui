@@ -140,22 +140,67 @@ ControlsForm {
     id : actionSwitchModel
     function addSwitch(actionData, onFunc, offFunc) {
       var v_actionComponent = Qt.createComponent("UIActionSwitch.qml");
-	    if ( v_actionComponent.status != Component.Ready){
-		    if (v_actionComponent.status == Component.Error){
-			    console.log("Error : " + v_actionComponent.errorString() );
-			    return;
-		    }
-	      console.log("Error : Action switch component not ready");
-	    } else {
-		    var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0], "width" : actionSwitchView.width, "height" : 50});
+      if ( v_actionComponent.status == Component.Ready)  {
+        var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0],
+         "width" : actionSwitchView.width, "height" : 50,
+         "Layout.fillWidth" : true, "Layout.preferedHeight" : 100});
         v_actionSwitch.toggleActionOn.connect(onFunc);
         if (offFunc){
           v_actionSwitch.toggleActionOff.connect(offFunc);
         } else {
           v_actionSwitch.supportDeactivate = false
         }
-		    actionSwitchModel.append(v_actionSwitch);
-	    }
+        actionSwitchModel.append(v_actionSwitch);
+      } else {
+        if (v_actionComponent.status == Component.Error){
+          console.log("Error : " + v_actionComponent.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+
+  function addAsthmaAction(actionData, onFunc, offFunc) {
+      var v_actionComponent = Qt.createComponent("UIAsthmaAttackForm.ui.qml");
+      if ( v_actionComponent.status == Component.Ready)  {
+        var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0],
+         "width" : actionSwitchView.width, "height" : 50,
+         "Layout.fillWidth" : true, "Layout.preferedHeight" : 100});
+          console.log("onFunc=%1 offFunc=%2".arg(onFunc).arg(offFunc))
+          v_actionSwitch.activate.connect(onFunc);
+        if (offFunc){
+          v_actionSwitch.deactivate.connect(offFunc);
+        } else {
+          v_actionSwitch.supportDeactivate = false
+        }
+        actionSwitchModel.append(v_actionSwitch);
+      } else {
+        if (v_actionComponent.status == Component.Error){
+          console.log("Error : " + v_actionComponent.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+
+    function addPainStimulusAction(actionData, onFunc, offFunc) {
+      var v_actionComponent = Qt.createComponent("UIPainStimulusForm.ui.qml");
+      if ( v_actionComponent.status == Component.Ready)  {
+        var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0], "width" : actionSwitchView.width});
+        v_actionSwitch.activate.connect(onFunc);
+        if (offFunc){
+          v_actionSwitch.deactivate.connect(offFunc);
+        } else {
+          v_actionSwitch.supportDeactivate = false
+        }
+        actionSwitchModel.append(v_actionSwitch);
+      } else {
+        if (v_actionComponent.status == Component.Error){
+          console.log("Error : " + v_actionComponent.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
     }
   }
 

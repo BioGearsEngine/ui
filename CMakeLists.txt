@@ -25,6 +25,7 @@ include(cmake/cmake-common_logic.cmake)
 # Change this to custimize your project
 ################################################################################
 project( ${ROOT_PROJECT_NAME}  LANGUAGES CXX C)
+generate_project_suffix()
 
 
  list(APPEND CMAKE_MODULE_PATH  ${PROJECT_SOURCE_DIR}/cmake  ${PROJECT_SOURCE_DIR}/cmake/common)
@@ -85,4 +86,3 @@ endif()
 install(FILES cmake/Find${ROOT_PROJECT_NAME}.cmake
         DESTINATION cmake/)
 
-generate_project_suffix()
