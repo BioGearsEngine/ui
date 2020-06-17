@@ -18,25 +18,136 @@ Rectangle {
   signal adjust( var list)
 
   property double intensity : 0.0
+  property string actionType : "Pain Stimulus"
   property string location : "LeftArm"
   property bool enabled : false
   property bool collapsed : true
 
-  property string fullName  : "<b>Pain Stimulus</b> [<font color=\"lightsteelblue\"> %1</font>] \nIntensity = %2".arg(location).arg(intensity)
-  property string shortName : "<b>Pain Stimulus</b> [<font color=\"lightsteelblue\"> %1</font>] @ %2".arg(location).arg(intensity)
+  property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg(location).arg(intensity)
+  property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(location).arg(intensity)
 
   Loader {
     id : loader
 
     Component {
       id : details
-      Rectangle {
-        height : 200
-        width : root.width
 
-        color : "red"
-        border.color : "yellow"
+      GridLayout {
+        id: grid
+        columns : 4
+        rows    : 4
+        width : root.width -5
+        anchors.centerIn : parent
+      
+        Label {
+          font.pixelSize : 10
+          font.bold : true
+          color : "blue"
+          text : "%1".arg(actionType)
+        }
+      
+        Label {
+          font.pixelSize : 10
+          font.bold : false
+          color : "steelblue"
+          text : "[%1]".arg(root.location)
+          Layout.alignment : Qt.AlignHCenter
+        }
+        //Column 2
+        Label {
+          Layout.row : 1
+          Layout.column : 0
+          text : "Intensity"
+        }
+      
+        Slider {
+          id: stimulus
+      
+          Layout.fillWidth : true
+          Layout.columnSpan : 2
+          from : 0
+          to : 1
+          stepSize : 0.01
+          value : root.intensity
+
+          onMoved : {
+            root.intensity = value
+          }
+        }
+        Label {
+          text : "%1".arg(root.intensity)
+        }
+      
+        // Column 3
+        Rectangle {
+          id: toggle
+      
+          Layout.row : 2
+          Layout.column : 2
+          Layout.columnSpan : 2
+          Layout.fillWidth : true
+          Layout.preferredHeight : 30
+      
+          color:        root.enabled? 'green': 'red' // background
+          opacity:      enabled  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
+      
+          Text {
+            text:  root.enabled?    'On': 'Off'
+            color: root.enabled? 'white': 'white'
+            x:    (root.enabled? 0: pill.width) + (parent.width - pill.width - width) / 2
+            font.pixelSize: 0.5 * toggle.height
+            anchors.verticalCenter: parent.verticalCenter
+          }
+          Rectangle { // pill
+              id: pill
+      
+              x: root.enabled? toggle.width - pill.width: 0 // binding must not be broken with imperative x = ...
+              width: parent.width * .5;
+              height: parent.height // square
+              border.width: parent.border.width
+      
+          }
+          MouseArea {
+              id: mouseArea
+      
+              anchors.fill: parent
+      
+              drag {
+                  target:   pill
+                  axis:     Drag.XAxis
+                  maximumX: toggle.width - pill.width
+                  minimumX: 0
+              }
+      
+              onReleased: { // releasing at the end of drag
+                if( root.enabled) {
+                   if(pill.x < toggle.width - pill.width) {
+                      root.enabled = false // right to left
+                      pill.x  = 0
+                    } else {
+                      pill.x  = toggle.width - pill.width
+                    }
+                } else {
+                    if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
+                      root.enabled = true // left  to right
+                      pill.x = toggle.width - pill.width
+                  } else {
+                      pill.x = 0
+                  }
+                }
+              }
+              onClicked: {
+                root.enabled = !root.enabled
+                if ( root.enabled ){
+                  pill.x = toggle.width - pill.width
+                } else {
+                  pill.x = 0
+                }
+              }// emit
+          }
+        }
       }
+
     }
     Component {
       id : summary
