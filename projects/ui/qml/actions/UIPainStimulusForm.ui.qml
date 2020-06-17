@@ -177,14 +177,33 @@ Rectangle {
           MouseArea {
               id : labelMouseArea
               anchors.fill : parent
-              acceptedButtons : Qt.RightButton
+              hoverEnabled : true
+
+              Timer {
+                id : infoTimer
+                interval: 500; running: false; repeat: false
+                onTriggered:  actionTip.visible  = true
+              }
+
+              onEntered: {
+                infoTimer.start()
+                actionTip.visible  = false
+              }
+              onPositionChanged : {
+                infoTimer.restart()
+                actionTip.visible  = false
+              }
+              onExited : {
+                infoTimer.stop()
+                actionTip.visible  = false
+              }
           }
           ToolTip {
             id : actionTip
             parent : actionLabel
             x : 0
             y : parent.height + 5
-            visible : labelMouseArea.pressed
+            visible : false
             text : root.fullName
             contentItem : Text {
               text : actionTip.text
@@ -246,14 +265,10 @@ Rectangle {
       propagateComposedEvents : true
 
       onDoubleClicked: { // Double Clicking Window
-        console.log("Double Clicked")
         if ( mouse.button === Qt.LeftButton ){
-          console.log("Left Double Clicked")
           if ( loader.state === "collapsed") {
-            console.log("Expanding")
             loader.state = "expanded"
           } else {
-            console.log("Collapsing")
             loader.state = "collapsed"
           }
         } else {
