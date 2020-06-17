@@ -71,7 +71,7 @@ Rectangle {
       Layout.preferredHeight : 30
 
       color:        checked? 'green': 'red' // background
-      opacity:      enabled  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
+      opacity:      enabled  &&  !sliderMouseArea.pressed? 1: 0.3 // disabled/pressed state
 
       Text {
         text:  toggle.checked?    'On': 'Off'
@@ -90,42 +90,80 @@ Rectangle {
 
       }
       MouseArea {
-          id: mouseArea
-        
-          anchors.fill: parent
-        
-          drag {
-              target:   pill
-              axis:     Drag.XAxis
-              maximumX: toggle.width - pill.width
-              minimumX: 0
-          }
-        
-          onReleased: { // releasing at the end of drag
-            if( toggle.checked) {
-               if(pill.x < toggle.width - pill.width) {
-                  toggle.checked = false // right to left
-                  pill.x  = 0
-                } else {
-                  pill.x  = toggle.width - pill.width
-                }
-            } else {
-                if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
-                  toggle.checked = true // left  to right
-                  pill.x = toggle.width - pill.width
+        id: sliderMouseArea
+        anchors.fill: parent
+      
+        drag {
+            target:   pill
+            axis:     Drag.XAxis
+            maximumX: toggle.width - pill.width
+            minimumX: 0
+        }
+      
+        onReleased: { // releasing at the end of drag
+          if( toggle.checked) {
+              if(pill.x < toggle.width - pill.width) {
+                toggle.checked = false // right to left
+                pill.x  = 0
               } else {
-                  pill.x = 0
+                pill.x  = toggle.width - pill.width
               }
+          } else {
+              if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
+                toggle.checked = true // left  to right
+                pill.x = toggle.width - pill.width
+            } else {
+                pill.x = 0
             }
           }
-          onClicked: {
-            toggle.checked = !toggle.checked 
-            if ( toggle.checked ){
-              pill.x = toggle.width - pill.width
-            } else {
-              pill.x = 0
-            }
-          }// emit
+        }
+        onClicked: {
+          toggle.checked = !toggle.checked 
+          if ( toggle.checked ){
+            pill.x = toggle.width - pill.width
+          } else {
+            pill.x = 0
+          }
+        }// emit
+      }
+    }
+  }
+  MouseArea {
+    id: ssctionMouseArea
+    anchors.fill: parent
+    z: sliderMouseArea.z - 1
+    acceptedButtons:  Qt.LeftButton | Qt.RightButton
+    propagateComposedEvents : true
+
+    onClicked: {
+      console.log("Outer On Clicked")
+      if (mouse.button === Qt.RightButton){
+        contextMenu.popup()
+      } else {
+        mouse.accepted = false
+      }
+    }
+    onDoubleClicked: { // Double Clicking Window
+    console.log("Outer On Double Clicked")
+      if ( mouse.button === Qt.LeftButton ){
+        console.log ("Double Clicked!")
+        if ( root.state === "Collapsed") {
+          root.state = "Expanded"
+        } else {
+          root.state = "Collapsed"
+        }
+      } else {
+        mouse.accepted = false
+      }
+    }
+    Menu {
+      id: contextMenu
+      MenuItem {
+        text : "Config"
+      }
+
+      MenuItem {
+        text : "Remove"
       }
     }
   }
