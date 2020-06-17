@@ -17,10 +17,14 @@ Rectangle {
   signal deactivate()
   signal adjust( var list)
 
-  property double intesity : 0.0
+  property double intensity : 0.0
   property string location : "LeftArm"
   property bool enabled : false
   property bool collapsed : true
+
+  property string fullName  : "<b>Pain Stimulus</b> [<font color=\"lightsteelblue\"> %1</font>] \nIntensity = %2".arg(location).arg(intensity)
+  property string shortName : "<b>Pain Stimulus</b> [<font color=\"lightsteelblue\"> %1</font>] @ %2".arg(location).arg(intensity)
+
   Loader {
     id : loader
 
@@ -36,15 +40,78 @@ Rectangle {
     }
     Component {
       id : summary
-      Rectangle {
-        height : 100
-        width  : root.width
+      RowLayout {
+        id : actionRow
+        spacing : 5
+        height : childrenRect.height
+        width : root.width
+        Label {
+          id : actionLabel
+          width : parent.width * 3/4 - actionRow.spacing / 2
+          color : '#1A5276'
+          text : root.shortName
+          elide : Text.ElideRight
+          font.pointSize : 8
+          font.bold : true
+          horizontalAlignment  : Text.AlignLeft
+          leftPadding : 5
+          verticalAlignment : Text.AlignVCenter
+          background : Rectangle {
+              id : labelBackground
+              anchors.fill : parent
+              color : 'transparent'
+              border.color : 'grey'
+              border.width : 0
+          }
+          MouseArea {
+              id : labelMouseArea
+              anchors.fill : parent
+              acceptedButtons : Qt.RightButton
+          }
+          ToolTip {
+            id : actionTip
+            parent : actionLabel
+            x : 0
+            y : parent.height + 5
+            visible : labelMouseArea.pressed
+            text : root.fullName
+            contentItem : Text {
+              text : actionTip.text
+              color : '#1A5276'
+              font.pointSize : 10
+            }
+            background : Rectangle {
+              color : "white"
+              border.color : "black"
+            }
+          }
+        }
+        Rectangle {
+          id: toggle
+          Layout.fillWidth : true
+          height : 20
+          border.color : "blue"
+          color:        root.enabled? 'green': 'red' // background
+          opacity:      enabled  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
 
-        color : "steelblue"
-        border.color: "black"
+          Text {
+            text:  root.enabled?    'On': 'Off'
+            color:  'white'
+            horizontalAlignment : Text.AlignHCenter
+            anchors.centerIn : parent
+            font.pixelSize: 0.5 * toggle.height
+
+          }
+          MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            onClicked: {
+              root.enabled = !root.enabled
+            }// emit
+          }
+        }
       }
     }
-
     sourceComponent : details
     state  : "expanded"
 
