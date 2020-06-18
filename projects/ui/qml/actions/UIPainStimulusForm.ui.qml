@@ -15,6 +15,7 @@ Rectangle {
 
   signal activate()
   signal deactivate()
+  signal remove()
   signal adjust( var list)
 
   property double intensity : 0.0
@@ -29,6 +30,13 @@ Rectangle {
   Loader {
     id : loader
 
+    onEnabledChanged : {
+      if ( enabled) {
+        root.activate()
+      } else {
+        root.deactivate();
+      }
+    }
     Component {
       id : details
 
@@ -72,6 +80,8 @@ Rectangle {
 
           onMoved : {
             root.intensity = value
+            if ( root.enabled )
+               root.enabled = false;
           }
         }
         Label {
@@ -262,7 +272,12 @@ Rectangle {
       anchors.fill: parent
       z: -1
       acceptedButtons:  Qt.LeftButton | Qt.RightButton
-      propagateComposedEvents : true
+      
+      onClicked : {
+        if ( mouse.button == Qt.RightButton) {
+          contextMenu.popup()
+        }
+      }
 
       onDoubleClicked: { // Double Clicking Window
         if ( mouse.button === Qt.LeftButton ){
@@ -273,6 +288,25 @@ Rectangle {
           }
         } else {
           mouse.accepted = false
+        }
+      }
+
+      Menu {
+        id : contextMenu
+        MenuItem {
+          text : (loader.state === "collapsed")? "Configure" : "Collapse"
+           onTriggered: {
+             if ( loader.state === "collapsed"){
+               loader.state = "expanded"
+             } else {
+               loader.state = "collapsed"
+             }
+
+           }
+        }
+        MenuItem {
+          text : "Remove"
+           onTriggered: root.remove()
         }
       }
     }
