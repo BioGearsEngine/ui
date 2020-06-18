@@ -10,33 +10,37 @@ Rectangle {
   id: root
   color: "transparent"
   border.color: "black"
-
-  height : loader.height
+  height : loader.item.height
 
   signal activate()
   signal deactivate()
-  signal remove()
+  signal remove( string uuid )
   signal adjust( var list)
 
   property double intensity : 0.0
   property string actionType : "Pain Stimulus"
   property string location : "LeftArm"
-  property bool enabled : false
+  property string uuid : ""
+  property bool active : false
   property bool collapsed : true
 
   property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg(location).arg(intensity)
   property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(location).arg(intensity)
 
+  onActiveChanged : {
+    if ( active) {
+      console.log ("active")
+      root.activate()
+    } else {
+      root.deactivate();
+      console.log ("inactive")
+    }
+  }
+
   Loader {
     id : loader
 
-    onEnabledChanged : {
-      if ( enabled) {
-        root.activate()
-      } else {
-        root.deactivate();
-      }
-    }
+     
     Component {
       id : details
 
@@ -74,14 +78,14 @@ Rectangle {
           Layout.fillWidth : true
           Layout.columnSpan : 2
           from : 0
-          to : 1
-          stepSize : 0.01
+          to : 10
+          stepSize : 1
           value : root.intensity
 
           onMoved : {
             root.intensity = value
-            if ( root.enabled )
-               root.enabled = false;
+            if ( root.active )
+               root.active = false;
           }
         }
         Label {
@@ -98,20 +102,22 @@ Rectangle {
           Layout.fillWidth : true
           Layout.preferredHeight : 30
       
-          color:        root.enabled? 'green': 'red' // background
-          opacity:      enabled  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
+          color:        root.active? 'green': 'red' // background
+          opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
       
           Text {
-            text:  root.enabled?    'On': 'Off'
-            color: root.enabled? 'white': 'white'
-            x:    (root.enabled? 0: pill.width) + (parent.width - pill.width - width) / 2
+            text:  root.active?    'On': 'Off'
+            color: root.active? 'white': 'white'
+            horizontalAlignment : Text.AlignHCenter
+            width : pill.width
+            x:    root.active ? 0: pill.width
             font.pixelSize: 0.5 * toggle.height
             anchors.verticalCenter: parent.verticalCenter
           }
           Rectangle { // pill
               id: pill
       
-              x: root.enabled? toggle.width - pill.width: 0 // binding must not be broken with imperative x = ...
+              x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
               width: parent.width * .5;
               height: parent.height // square
               border.width: parent.border.width
@@ -129,30 +135,19 @@ Rectangle {
                   minimumX: 0
               }
       
-              onReleased: { // releasing at the end of drag
-                if( root.enabled) {
+              onReleased: { // Did we drag the button far enough.
+                if( root.active) {
                    if(pill.x < toggle.width - pill.width) {
-                      root.enabled = false // right to left
-                      pill.x  = 0
-                    } else {
-                      pill.x  = toggle.width - pill.width
+                      root.active = false // right to left
                     }
                 } else {
                     if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
-                      root.enabled = true // left  to right
-                      pill.x = toggle.width - pill.width
-                  } else {
-                      pill.x = 0
-                  }
+                      root.active = true // left  to right
+                  } 
                 }
               }
               onClicked: {
-                root.enabled = !root.enabled
-                if ( root.enabled ){
-                  pill.x = toggle.width - pill.width
-                } else {
-                  pill.x = 0
-                }
+                root.active = !root.active
               }// emit
           }
         }
@@ -188,7 +183,7 @@ Rectangle {
               id : labelMouseArea
               anchors.fill : parent
               hoverEnabled : true
-
+              propagateComposedEvents :true
               Timer {
                 id : infoTimer
                 interval: 500; running: false; repeat: false
@@ -231,11 +226,11 @@ Rectangle {
           Layout.fillWidth : true
           height : 20
           border.color : "blue"
-          color:        root.enabled? 'green': 'red' // background
-          opacity:      enabled  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
+          color:        root.active? 'green': 'red' // background
+          opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
 
           Text {
-            text:  root.enabled?    'On': 'Off'
+            text:  root.active?    'On': 'Off'
             color:  'white'
             horizontalAlignment : Text.AlignHCenter
             anchors.centerIn : parent
@@ -246,7 +241,7 @@ Rectangle {
             id: mouseArea
             anchors.fill: parent
             onClicked: {
-              root.enabled = !root.enabled
+              root.active = !root.active
             }// emit
           }
         }
@@ -306,9 +301,15 @@ Rectangle {
         }
         MenuItem {
           text : "Remove"
-           onTriggered: root.remove()
+           onTriggered: {
+            root.deactivate()
+            root.remove( root.uuid )
+           }
         }
       }
     }
+  }
+  Component.onCompleted : {
+    console.log(width,height)
   }
 }

@@ -166,7 +166,6 @@ ControlsForm {
         var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0],
          "width" : actionSwitchView.width, "height" : 50,
          "Layout.fillWidth" : true, "Layout.preferedHeight" : 100});
-          console.log("onFunc=%1 offFunc=%2".arg(onFunc).arg(offFunc))
           v_actionSwitch.activate.connect(onFunc);
         if (offFunc){
           v_actionSwitch.deactivate.connect(offFunc);
@@ -183,20 +182,21 @@ ControlsForm {
       }
     }
 
-    function addPainStimulusAction(actionData, onFunc, offFunc) {
-      var v_actionComponent = Qt.createComponent("UIPainStimulusForm.ui.qml");
-      if ( v_actionComponent.status == Component.Ready)  {
-        var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0], "width" : actionSwitchView.width});
-        v_actionSwitch.activate.connect(onFunc);
-        if (offFunc){
-          v_actionSwitch.deactivate.connect(offFunc);
-        } else {
-          v_actionSwitch.supportDeactivate = false
-        }
-        actionSwitchModel.append(v_actionSwitch);
+    function addPainStimulusAction(props, onFunc, offFunc) {
+      var v_painStimulusForm = Qt.createComponent("UIPainStimulusForm.ui.qml");
+      if ( v_painStimulusForm.status == Component.Ready)  {
+        var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
+                                                                                "location" : props.location, "intensity" : props.painScore,
+                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true})
+        v_painStimulus.uuid = uuidv4()
+        v_painStimulus.activate.connect(onFunc)
+        v_painStimulus.deactivate.connect(offFunc)
+        v_painStimulus.remove.connect(removeAction)
+
+        actionSwitchModel.append(v_painStimulus)
       } else {
-        if (v_actionComponent.status == Component.Error){
-          console.log("Error : " + v_actionComponent.errorString() );
+        if (v_painStimulusForm.status == Component.Error){
+          console.log("Error : " + v_painStimulusForm.errorString() );
           return;
         }
         console.log("Error : Action switch component not ready");
@@ -228,6 +228,24 @@ ControlsForm {
   } 
   openDrawerButton.onPressed : {
     root.openActionDrawer();
+  }
+
+  function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+
+  function removeAction( uuid) {
+      console.log(uuid)
+      for ( let i = 0; i < actionSwitchModel.count; ++i){
+        console.log (actionSwitchModel, actionSwitchModel.get(i), actionSwitchModel.get(i).uuid)
+        if (actionSwitchModel.get(i).uuid === uuid){
+          actionSwitchModel.remove(i)
+        }
+      }
   }
 }
 

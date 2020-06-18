@@ -178,7 +178,7 @@ ActionDrawerForm {
             let locationCombo = painDialog.addComboBox('Location', 'location', locationData, locationProps)
             let painScoreProps = {prefHeight : dialogHeight / 3, spinMax : 10, spinStep : 1, elementRatio : 0.5}
             let painSpinBox = painDialog.addSpinBox('Visual Analog Score', 'painScore', painScoreProps)
-            painDialog.applyProps.connect(    function(props) {    actionModel.addPainStimulusAction    (    props.description, 
+            painDialog.applyProps.connect(    function(props) {    actionModel.addPainStimulusAction    (    props, 
                                                                                                                                                                 function () { scenario.create_pain_stimulus_action(props.painScore / 10.0, props.location) },
                                                                                                                                                                 function () { scenario.create_pain_stimulus_action(0.0, props.location) }
                                                                                                                                                             )
