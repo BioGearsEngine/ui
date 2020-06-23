@@ -138,27 +138,6 @@ ControlsForm {
 
   ObjectModel {
     id : actionSwitchModel
-    function addSwitch(actionData, onFunc, offFunc) {
-      var v_actionComponent = Qt.createComponent("UIActionSwitch.qml");
-      if ( v_actionComponent.status == Component.Ready)  {
-        var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0],
-         "width" : actionSwitchView.width, "height" : 50,
-         "Layout.fillWidth" : true, "Layout.preferedHeight" : 100});
-        v_actionSwitch.toggleActionOn.connect(onFunc);
-        if (offFunc){
-          v_actionSwitch.toggleActionOff.connect(offFunc);
-        } else {
-          v_actionSwitch.supportDeactivate = false
-        }
-        actionSwitchModel.append(v_actionSwitch);
-      } else {
-        if (v_actionComponent.status == Component.Error){
-          console.log("Error : " + v_actionComponent.errorString() );
-          return;
-        }
-        console.log("Error : Action switch component not ready");
-      }
-    }
 
     function add_binary_action(componentType) {
         var v_severityForm = Qt.createComponent(componentType);
@@ -176,7 +155,6 @@ ControlsForm {
           console.log("Error : Action switch component not ready");
         }
     }
-
     function add_single_range_action(componentType, props) {
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
@@ -197,7 +175,6 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
-
     function add_pain_stimulus_action(props) {
       var v_painStimulusForm = Qt.createComponent("UIPainStimulus.qml");
       if ( v_painStimulusForm.status == Component.Ready)  {
@@ -218,7 +195,6 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
-    
     function add_infection_action(props) {
       var v_actionComponent = Qt.createComponent("UIInfection.qml");
       if ( v_actionComponent.status == Component.Ready)  {
@@ -238,7 +214,6 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
-
     function add_hemorrhage_action(props) {
       var compartment = Qt.createComponent("UIHemorrhage.qml");
       if ( compartment.status == Component.Ready)  {
@@ -339,6 +314,25 @@ ControlsForm {
       var compartment = Qt.createComponent("UITransfusion.qml");
       if ( compartment.status == Component.Ready)  {
         var action = compartment.createObject(actionSwitchView,{ "rate" : props.rate,  "volume" : props.bagVolume,   "blood_type" : props.type,
+                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+    function create_compound_infusion_action(props) {
+            var compartment = Qt.createComponent("UICompoundInfusion.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "rate" : props.rate,  "volume" : props.bagVolume,   "compound" : props.compound,
                                                                   "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
         action.scenario = biogears_scenario

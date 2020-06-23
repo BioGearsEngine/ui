@@ -327,7 +327,7 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_bronchoconstriction(actionItem){
-let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
       add_single_range_action("Broncho Construction", "Severity", severityProps, 
         function(props) {actionModel.add_single_range_action("UIBronchoconstriction.qml", props)} )
     }
@@ -451,9 +451,9 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
         let dose = props.dose
         let concentration = props.concentration
         let rate = props.rate
-        let routeDisplay = route.split('-')[0] + ":"                                    //Shows "Bolus" in "Bolus-Intravenous"
-        let routeDetail = route.split('-')[1]                                                    //Shows "Intravenous" in "Bolus-Intravenous"
-        let description = substance + " " + routeDisplay        //Overriding description for substances
+        let routeDisplay = route.split('-')[0] + ":"         //Shows "Bolus" in "Bolus-Intravenous"
+        let routeDetail = route.split('-')[1]                //Shows "Intravenous" in "Bolus-Intravenous"
+        let description = substance + " " + routeDisplay     //Overriding description for substances
         switch (route) {
             case 'Bolus-Intraarterial' :
                 //Intraarterial is CDM::enumBolusAdministration::0
@@ -509,13 +509,7 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
     /// Sets up a text field for rate
     function setup_fluidInfusion(actionItem){
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
+        if ( dialogComponent.status == Component.Ready) {
             var infusionDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 2});
             infusionDialog.initializeProperties({name : actionItem.name, compound : '', bagVolume : 0, rate : 0})
             let dialogHeight = infusionDialog.contentItem.height
@@ -526,13 +520,15 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
             let compoundCombo = infusionDialog.addComboBox('Compound', 'compound', compoundListData, compoundComboProps)
             let bagVolumeText = infusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1, colSpan : 1})
             let rateText = infusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1, colSpan : 1})            
-            infusionDialog.applyProps.connect( function(props)    { actionModel.addSwitch    (    props.description, 
-                                                                                                                                                                function () { scenario.create_substance_compound_infusion_action(props.compound, props.bagVolume, props.rate) },
-                                                                                                                                                            )
-                                                                                                            }
-                                                                    )
+            infusionDialog.applyProps.connect( function(props)    { actionModel.create_compound_infusion_action(props) })
             actionDrawer.closed.connect(infusionDialog.destroy)
             infusionDialog.open()
+        } else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
         }
     }
 
@@ -573,34 +569,6 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
     }
 
         //----------------------------------------------------------------------------------------
-    /// Create dialog window for actions that accepts single severity input (asthma, burn, airway obstruction, etc.)
-    /// Accepts action name, label, biogears function, and args to customize spin box
-    /// Sets up a spin box to track severity
-    function setup_action(file, name, label, setup_function, toggle_function, customArgs){
-        console.log("ActionDrawer:setup_action setup_function=%1, toggle_function=%2".arg(setup_function).arg(toggle_function))
-        var dialogComponent = Qt.createComponent(file);
-        if ( dialogComponent.status == Component.Ready){
-            var severityDialog = dialogComponent.createObject(root.parent);
-            let itemHeight = severityDialog.contentItem.height / 4
-            Object.assign(customArgs, {prefHeight : itemHeight})
-            severityDialog.initializeProperties({name : name, severity : 0})
-            severityDialog.addSpinBox(label, 'severity', customArgs)
-            severityDialog.applyProps.connect( function (props) {    setup_function( props.description,
-                                                                                     function () { toggle_function (props.severity) },
-                                                                                     function () { toggle_function (0.0) }
-                                                                                )
-                                                                }
-                                             )
-            actionDrawer.closed.connect(severityDialog.destroy)
-            severityDialog.open()
-        } else {
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        }
-    }
 }
 
 

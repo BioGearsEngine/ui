@@ -63,7 +63,7 @@ UIActionForm {
       Label {
         text : "%1ml".arg(root.volume )
       }
-            //Column 3
+      //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
