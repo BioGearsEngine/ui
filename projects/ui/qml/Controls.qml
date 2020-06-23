@@ -160,37 +160,36 @@ ControlsForm {
       }
     }
 
-  function addAsthmaAction(actionData, onFunc, offFunc) {
-      var v_actionComponent = Qt.createComponent("UIAsthmaAttackForm.ui.qml");
-      if ( v_actionComponent.status == Component.Ready)  {
-        var v_actionSwitch = v_actionComponent.createObject(actionSwitchView,{ "nameLong" : actionData, "namePretty" : actionData.split(":")[0],
-         "width" : actionSwitchView.width, "height" : 50,
-         "Layout.fillWidth" : true, "Layout.preferedHeight" : 100});
-          v_actionSwitch.activate.connect(onFunc);
-        if (offFunc){
-          v_actionSwitch.deactivate.connect(offFunc);
-        } else {
-          v_actionSwitch.supportDeactivate = false
-        }
-        actionSwitchModel.append(v_actionSwitch);
+  function addAsthmaAction(props, physiology) {
+      var v_painStimulusForm = Qt.createComponent("UIAsthmaAttack.qml");
+      if ( v_painStimulusForm.status == Component.Ready)  {
+        var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
+                                                                                "severity" : props.severity,
+                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                                               })
+        v_painStimulus.scenario = biogears_scenario
+        v_painStimulus.uuid = uuidv4()
+        v_painStimulus.remove.connect(removeAction)
+
+        actionSwitchModel.append(v_painStimulus)
       } else {
-        if (v_actionComponent.status == Component.Error){
-          console.log("Error : " + v_actionComponent.errorString() );
+        if (v_painStimulusForm.status == Component.Error){
+          console.log("Error : " + v_painStimulusForm.errorString() );
           return;
         }
         console.log("Error : Action switch component not ready");
       }
     }
 
-    function addPainStimulusAction(props, onFunc, offFunc) {
-      var v_painStimulusForm = Qt.createComponent("UIPainStimulus.ui.qml");
+    function addPainStimulusAction(props, physiology) {
+      var v_painStimulusForm = Qt.createComponent("UIPainStimulus.qml");
       if ( v_painStimulusForm.status == Component.Ready)  {
         var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
                                                                                 "location" : props.location, "intensity" : props.painScore,
-                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true})
+                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                                               })
+        v_painStimulus.scenario = biogears_scenario
         v_painStimulus.uuid = uuidv4()
-        v_painStimulus.activate.connect(onFunc)
-        v_painStimulus.deactivate.connect(offFunc)
         v_painStimulus.remove.connect(removeAction)
 
         actionSwitchModel.append(v_painStimulus)

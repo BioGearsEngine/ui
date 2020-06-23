@@ -11,12 +11,11 @@ UIActionForm {
   border.color: "black"
   height : loader.item.height
 
-  property double intensity : 0.0
-  property string location : "LeftArm"
+  property double severity : 0.0
   
   actionType : "Pain Stimulus"
-  fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg(location).arg(intensity)
-  shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(location).arg(intensity)
+  fullName  : "<b>%1</b> Severity = %3".arg(actionType).arg(severity)
+  shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
 
   details : Component  {
     GridLayout {
@@ -31,18 +30,12 @@ UIActionForm {
         color : "blue"
         text : "%1".arg(actionType)
       }      
-      Label {
-        font.pixelSize : 10
-        font.bold : false
-        color : "steelblue"
-        text : "[%1]".arg(root.location)
-        Layout.alignment : Qt.AlignHCenter
-      }
+
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Intensity"
+        text : "Severity"
       }      
       Slider {
         id: stimulus      
@@ -51,16 +44,16 @@ UIActionForm {
         from : 0
         to : 10
         stepSize : 1
-        value : root.intensity
+        value : root.severity
 
         onMoved : {
-          root.intensity = value
+          root.severity = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1".arg(root.intensity)
+        text : "%1".arg(root.severity)
       }
     
       // Column 3
@@ -122,6 +115,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_pain_stimulus_action(intensity/10.0,location)  }
-  onDeactivate: { scenario.create_pain_stimulus_action(0,location)  }
+  onActivate:   { scenario.create_asthma_action(severity)  }
+  onDeactivate: { scenario.create_asthma_action(0)  }
 }

@@ -178,12 +178,7 @@ ActionDrawerForm {
             let locationCombo = painDialog.addComboBox('Location', 'location', locationData, locationProps)
             let painScoreProps = {prefHeight : dialogHeight / 3, spinMax : 10, spinStep : 1, elementRatio : 0.5}
             let painSpinBox = painDialog.addSpinBox('Visual Analog Score', 'painScore', painScoreProps)
-            painDialog.applyProps.connect(    function(props) {    actionModel.addPainStimulusAction    (    props, 
-                                                                                                                                                                function () { scenario.create_pain_stimulus_action(props.painScore / 10.0, props.location) },
-                                                                                                                                                                function () { scenario.create_pain_stimulus_action(0.0, props.location) }
-                                                                                                                                                            )
-                                                                                                            }
-                                                                        )
+            painDialog.applyProps.connect(function(props) {actionModel.addPainStimulusAction(props)})
             actionDrawer.closed.connect(painDialog.destroy)
             painDialog.open();
         }
@@ -345,13 +340,25 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_asthma(actionItem){
-        let label = 'Severity'
-        let setup_func  = function(params, onFunc, offFunc) { console.log("ActionDrawer:Setup_Asthma:Lambda (%1,%2,%3)".arg(actionModel).arg(actionModel.addAsthmaAction).arg(params)); 
-        actionModel.addAsthmaAction(params, onFunc, offFunc) }
-        let toggle_func = function(sev)   { scenario.create_asthma_action(sev) }
-        let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-        console.log("ActionDrawer:setup_asthma setup_func=%1 toggle_func=%2".arg(setup_func).arg(toggle_func))
-        setup_action("UIActionDialog.qml", actionItem.name, label, setup_func,  toggle_func, customArgs)
+      var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+      if ( dialogComponent.status != Component.Ready){
+          if (dialogComponent.status == Component.Error){
+              console.log("Error : " + dialogComponent.errorString() );
+              return;
+          }
+          console.log("Error : Action dialog component not ready");
+      } else {
+          var dialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
+          dialog.initializeProperties({name : actionItem.name,  severity : 0 })
+          let dialogHeight = dialog.contentItem.height
+          //BEGIN  PROPERTIES
+          let severityProps   = { prefHeight : dialogHeight / 3,  unitScale : true, spinMax : 100, spinStep : 5, elementRatio : 0.5}
+          let severitySpinBox = painDialog.addSpinBox('Severity', 'severity', severityProps)
+          //END  PROPERTIES
+          dialog.applyProps.connect(function(props) {actionModel.addAsthmaAction(props)})
+          actionDrawer.closed.connect(dialog.destroy)
+          dialog.open();
+      }
     }
 
     //----------------------------------------------------------------------------------------
