@@ -351,10 +351,8 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_apnea(actionItem){
-        let label = 'Severity'
-        let func = function(sev) { scenario.create_apnea_action(sev) }
-        let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-        setup_severityAction(actionItem.name, label, func, customArgs)
+      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      setup_severityAction("Apnea", severityProps, function(props) {actionModel.addSeverityAction("UIApnea.qml",props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -362,10 +360,8 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_airwayObstruction(actionItem){
-        let label = 'Severity'
-        let func = function(sev) { scenario.Fcreate_airway_obstruction_action(sev) }
-        let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-        setup_severityAction(actionItem.name, label, func, customArgs)
+      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      setup_severityAction("Airway Obstruction", severityProps, function(props) {actionModel.addSeverityAction("UIAirwayObstruction.qml",props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -373,10 +369,8 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_bronchoconstriction(actionItem){
-        let label = 'Severity'
-        let func = function(sev) { scenario.create_bronchoconstriction_action(sev) }
-        let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-        setup_severityAction(actionItem.name, label, func, customArgs)
+let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      setup_severityAction("Broncho Construction", severityProps, function(props) {actionModel.addSeverityAction("UIBronchoconstriction.qml",props)} )
     }
 
     //----------------------------------------------------------------------------------------

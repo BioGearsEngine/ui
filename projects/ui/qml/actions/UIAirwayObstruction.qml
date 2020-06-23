@@ -12,7 +12,7 @@ UIActionForm {
 
   property double severity : 0.0
   
-  actionType : "Acute Stress"
+  actionType : "Airway Obstruction"
   fullName  : "<b>%1</b> Severity = %2".arg(actionType).arg(severity)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
 
@@ -114,6 +114,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_acute_stress_action(severity)  }
-  onDeactivate: { scenario.create_acute_stress_action(0)  }
+  onActivate:   { scenario.create_airway_obstruction_action(severity)  }
+  onDeactivate: { scenario.create_airway_obstruction_action(0)  }
 }
