@@ -544,13 +544,7 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
     /// Sets up a text field for rate
     function setup_transfusion(actionItem){
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
+        if ( dialogComponent.status == Component.Ready) {
             var transfusionDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 2});
             transfusionDialog.initializeProperties({name : actionItem.name, type : '', bagVolume : 0, rate : 0})
             let dialogHeight = transfusionDialog.contentItem.height
@@ -561,13 +555,15 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
             let compoundCombo = transfusionDialog.addComboBox('Blood Type', 'type', bloodTypeListData, bloodTypeComboProps)
             let bagVolumeText = transfusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : dialogHeight /4, prefWidth : dialogWidth / 2.1})
             let rateText = transfusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1})            
-            transfusionDialog.applyProps.connect( function(props)    { actionModel.addSwitch    (    props.description, 
-                                                                                                                                                                function () { scenario.create_blood_transfusion_action(props.type, props.bagVolume, props.rate) },
-                                                                                                                                                            )
-                                                                                                            }
-                                                                    )
+            transfusionDialog.applyProps.connect( function(props){ actionModel.add_transfusion_action(props)})
             actionDrawer.closed.connect(transfusionDialog.destroy)
             transfusionDialog.open()
+        }else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
         }
     }
 

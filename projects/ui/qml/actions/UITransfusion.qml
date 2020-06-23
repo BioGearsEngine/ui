@@ -10,13 +10,14 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property double severity : 0.0
-  property int type : 0
-  property string type_str : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
+
+  property double volume : 0
+  property double rate : 0
+  property string blood_type : ""
   
   actionType : "Transfusion"
-  fullName  : "<b>%1</b><br> Type = %2<br> Severity = %3".arg(actionType).arg(type_str).arg(severity)
-  shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(type_str)
+  fullName  : "<b>%1</b><br> Volume = %2<br> Rate = %3".arg(actionType).arg(volume).arg(rate)
+  shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(blood_type)
 
   details : Component  {
     GridLayout {
@@ -35,23 +36,47 @@ UIActionForm {
         font.pixelSize : 10
         font.bold : false
         color : "steelblue"
-        text : "[%1]".arg(root.compartment)
+        text : "[%1]".arg(root.blood_type)
         Layout.alignment : Qt.AlignHCenter
       }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Severity"
+        text : "Volume"
       }      
       Slider {
-        id: stimulus      
+        id: bagVolume      
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
         to : 1
         stepSize : 0.05
-        value : root.severity
+        value : root.volume
+
+        onMoved : {
+          root.volume = value
+          if ( root.active )
+              root.active = false;
+        }
+      }
+      Label {
+        text : "%1ml".arg(root.volume )
+      }
+            //Column 3
+      Label {
+        Layout.row : 2
+        Layout.column : 0
+        text : "Flow Rate"
+      }      
+      Slider {
+        id: flowRate
+        Layout.fillWidth : true
+        Layout.columnSpan : 2
+        from : 0
+        to : 1
+        stepSize : 0.05
+        value : root.rate
 
         onMoved : {
           root.rate = value
@@ -60,13 +85,13 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.severity )
+        text : "%1ml/min".arg(root.rate )
       }
     
-      // Column 3
+      // Column 4
       Rectangle {
         id: toggle      
-        Layout.row : 2
+        Layout.row : 3
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
@@ -122,6 +147,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_traumatic_brain_injury_action(severity, type)  }
-  onDeactivate: { scenario.create_traumatic_brain_injury_action(0, type)  }
+  onActivate:   { scenario.create_blood_transfusion_action(blood_type, volume, rate)  }
+  onDeactivate: { scenario.create_blood_transfusion_action(blood_type, 0, 0)  }
 }

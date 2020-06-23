@@ -335,6 +335,25 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
+    function add_transfusion_action(props) {
+      var compartment = Qt.createComponent("UITransfusion.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "rate" : props.rate,  "volume" : props.bagVolume,   "blood_type" : props.type,
+                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
   }
 
   playback.onRestartClicked: {
