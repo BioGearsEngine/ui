@@ -342,26 +342,8 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_asthma(actionItem){
-      var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-      if ( dialogComponent.status == Component.Ready){
-          var dialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
-          dialog.initializeProperties({name : actionItem.name,  severity : 0 })
-          let dialogHeight = dialog.contentItem.height
-          //BEGIN  PROPERTIES
-          let severityProps   = { prefHeight : dialogHeight / 3,  unitScale : true, spinMax : 100, spinStep : 5, elementRatio : 0.5}
-          let severitySpinBox = dialog.addSpinBox('Severity', 'severity', severityProps)
-          //END  PROPERTIES
-          dialog.applyProps.connect(function(props) {actionModel.addAsthmaAction(props)})
-          actionDrawer.closed.connect(dialog.destroy)
-          dialog.open();
-      } else {
-          if (dialogComponent.status == Component.Error){
-            console.log("Error : " + dialogComponent.errorString() );
-          } else {
-            console.log("Error : Action dialog component not ready");
-          }
-          return;
-      } 
+      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      setup_severityAction("Asthma Attack", severityProps, function(props) {actionModel.addSeverityAction("UIAsthmaAttack.qml",props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -381,7 +363,7 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_airwayObstruction(actionItem){
         let label = 'Severity'
-        let func = function(sev) { scenario.create_airway_obstruction_action(sev) }
+        let func = function(sev) { scenario.Fcreate_airway_obstruction_action(sev) }
         let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
         setup_severityAction(actionItem.name, label, func, customArgs)
     }
@@ -402,39 +384,35 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_acuteStress(actionItem){
-        let label = 'Severity'
-        let func = function(sev) { scenario.create_acute_stress_action(sev) }
-        let customArgs = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-        setup_severityAction(actionItem.name, label, func, customArgs)
+        let spinnerProperties = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+        setup_severityAction("Acute Stress", spinnerProperties, function(props) {actionModel.addSeverityAction("UIAcuteStress.qml",props)} )
     }
 
     //----------------------------------------------------------------------------------------
     /// Create dialog window for actions that accepts single severity input (asthma, burn, airway obstruction, etc.)
     /// Accepts action name, label, biogears function, and args to customize spin box
     /// Sets up a spin box to track severity
-    function setup_severityAction(name, label, func, customArgs){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
-            var severityDialog = dialogComponent.createObject(root.parent);
-            let itemHeight = severityDialog.contentItem.height / 4
-            Object.assign(customArgs, {prefHeight : itemHeight})
-            severityDialog.initializeProperties({name : name, severity : 0})
-            severityDialog.addSpinBox(label, 'severity', customArgs)
-            severityDialog.applyProps.connect( function (props) {    actionModel.addSwitch(    props.description,
-                                                                                                                                                                        function () { func (props.severity) },
-                                                                                                                                                                        function () { func (0.0) }
-                                                                                                                                                                    )
-                                                                                                                    }
-                                                                                )
-            actionDrawer.closed.connect(severityDialog.destroy)
-            severityDialog.open()
-        }
+    function setup_severityAction(actionName, spinnerProperties, creationFunc ){
+       var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+       if ( dialogComponent.status == Component.Ready){
+           var dialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
+           dialog.initializeProperties({name : actionName,  severity : 0 })
+           let dialogHeight = dialog.contentItem.height
+           //BEGIN  PROPERTIES
+           spinnerProperties.prefHeight = dialogHeight / 3
+           let severitySpinBox = dialog.addSpinBox('Severity', 'severity', spinnerProperties)
+           //END  PROPERTIES
+           dialog.applyProps.connect(creationFunc)
+           actionDrawer.closed.connect(dialog.destroy)
+           dialog.open();
+       } else {
+           if (dialogComponent.status == Component.Error){
+             console.log("Error : " + dialogComponent.errorString() );
+           } else {
+             console.log("Error : Action dialog component not ready");
+           }
+           return;
+       }
     }
 
     //----------------------------------------------------------------------------------------

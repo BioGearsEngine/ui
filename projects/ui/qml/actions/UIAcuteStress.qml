@@ -12,7 +12,7 @@ UIActionForm {
 
   property double severity : 0.0
   
-  actionType : "Asthma Attack"
+  actionType : "Acute Stress"
   fullName  : "<b>%1</b> Severity = %2".arg(actionType).arg(severity)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
 
