@@ -143,6 +143,7 @@ ColumnLayout {
       clip: true
       anchors.fill : parent
       focus : true
+      spacing : 2
       model : actionSwitchModel  //Defined in Controls.qml
     }
   }

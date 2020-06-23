@@ -9,7 +9,6 @@ UIActionForm {
   id: root
   color: "transparent"
   border.color: "black"
-  height : loader.item.height
 
   property double intensity : 0.0
   property string location : "LeftArm"

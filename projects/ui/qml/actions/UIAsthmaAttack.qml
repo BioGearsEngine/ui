@@ -9,11 +9,10 @@ UIActionForm {
   id: root
   color: "transparent"
   border.color: "black"
-  height : loader.item.height
 
   property double severity : 0.0
   
-  actionType : "Pain Stimulus"
+  actionType : "Asthma Attack"
   fullName  : "<b>%1</b> Severity = %3".arg(actionType).arg(severity)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
 
@@ -42,8 +41,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
-        to : 10
-        stepSize : 1
+        to : 1
+        stepSize : 0.05
         value : root.severity
 
         onMoved : {

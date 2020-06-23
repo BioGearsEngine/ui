@@ -162,26 +162,28 @@ ActionDrawerForm {
     /// Sets up a combo box for location
     /// Sets up a spin box for VAS scale
     function setup_painStimulus(actionItem){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
+      var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+      if ( dialogComponent.status == Component.Ready){
+          var painDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
+          painDialog.initializeProperties({name : actionItem.name, location : '', painScore : 0 })
+          let dialogHeight = painDialog.contentItem.height
+          let locationData = {type : 'ListModel', role : 'location', elements : ['Abdomen', 'Chest','Head', 'LeftArm','LeftLeg','RightArm','RightLeg']}
+          let locationProps = {prefHeight : dialogHeight / 3, elementRatio : 0.5}
+          let locationCombo = painDialog.addComboBox('Location', 'location', locationData, locationProps)
+          let painScoreProps = {prefHeight : dialogHeight / 3, spinMax : 10, spinStep : 1, elementRatio : 0.5}
+          let painSpinBox = painDialog.addSpinBox('Visual Analog Score', 'painScore', painScoreProps)
+          painDialog.applyProps.connect(function(props) {actionModel.addPainStimulusAction(props)})
+          actionDrawer.closed.connect(painDialog.destroy)
+          painDialog.open();
+      } else {
+        if (dialogComponent.status == Component.Error){
+          console.log("Error : " + dialogComponent.errorString() );
+          return;
         } else {
-            var painDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
-            painDialog.initializeProperties({name : actionItem.name, location : '', painScore : 0 })
-            let dialogHeight = painDialog.contentItem.height
-            let locationData = {type : 'ListModel', role : 'location', elements : ['Abdomen', 'Chest','Head', 'LeftArm','LeftLeg','RightArm','RightLeg']}
-            let locationProps = {prefHeight : dialogHeight / 3, elementRatio : 0.5}
-            let locationCombo = painDialog.addComboBox('Location', 'location', locationData, locationProps)
-            let painScoreProps = {prefHeight : dialogHeight / 3, spinMax : 10, spinStep : 1, elementRatio : 0.5}
-            let painSpinBox = painDialog.addSpinBox('Visual Analog Score', 'painScore', painScoreProps)
-            painDialog.applyProps.connect(function(props) {actionModel.addPainStimulusAction(props)})
-            actionDrawer.closed.connect(painDialog.destroy)
-            painDialog.open();
+          console.log("Error : Action dialog component not ready");
+          return 
         }
+      }
     }
 
     //----------------------------------------------------------------------------------------
@@ -341,24 +343,25 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_asthma(actionItem){
       var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-      if ( dialogComponent.status != Component.Ready){
-          if (dialogComponent.status == Component.Error){
-              console.log("Error : " + dialogComponent.errorString() );
-              return;
-          }
-          console.log("Error : Action dialog component not ready");
-      } else {
+      if ( dialogComponent.status == Component.Ready){
           var dialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
           dialog.initializeProperties({name : actionItem.name,  severity : 0 })
           let dialogHeight = dialog.contentItem.height
           //BEGIN  PROPERTIES
           let severityProps   = { prefHeight : dialogHeight / 3,  unitScale : true, spinMax : 100, spinStep : 5, elementRatio : 0.5}
-          let severitySpinBox = painDialog.addSpinBox('Severity', 'severity', severityProps)
+          let severitySpinBox = dialog.addSpinBox('Severity', 'severity', severityProps)
           //END  PROPERTIES
           dialog.applyProps.connect(function(props) {actionModel.addAsthmaAction(props)})
           actionDrawer.closed.connect(dialog.destroy)
           dialog.open();
-      }
+      } else {
+          if (dialogComponent.status == Component.Error){
+            console.log("Error : " + dialogComponent.errorString() );
+          } else {
+            console.log("Error : Action dialog component not ready");
+          }
+          return;
+      } 
     }
 
     //----------------------------------------------------------------------------------------
