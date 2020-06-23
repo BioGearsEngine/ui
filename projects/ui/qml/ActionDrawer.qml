@@ -170,18 +170,12 @@ ActionDrawerForm {
     /// Sets up a spinbox for severity
     function setup_tensionPneumothorax(actionItem){
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
+        if ( dialogComponent.status == Component.Ready) {
             var tensionDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
             tensionDialog.initializeProperties({name : actionItem.name, severity : 0, type : 0, side : 0 })
             let dialogHeight = tensionDialog.contentItem.height
             let dialogWidth = tensionDialog.contentItem.width
-            let typeButtons = ['Closed','Open']   //This is the order as defined in CDM::enumOpenClosed
+            let typeButtons = ['Open','Closed']   //This is the order as defined in CDM::enumOpenClosed
             let typeOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
             let typeRadioButton = tensionDialog.addRadioButton('Type', 'type', typeButtons, typeOptions)
             let sideButtons = ['Left','Right']   //This is the order as defined in CDM::enumSide
@@ -189,13 +183,15 @@ ActionDrawerForm {
             let sideRadioButton = tensionDialog.addRadioButton('Side','side',sideButtons,sideOptions)
             let severityOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2, colSpan : 2, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
             let severitySpinbox = tensionDialog.addSpinBox('Severity', 'severity',severityOptions)
-            tensionDialog.applyProps.connect(    function(props) {    actionModel.addSwitch    (    props.description, 
-                                                                                                                                                                function () { scenario.create_tension_pneumothorax_action(props.severity, props.type, props.side) },
-                                                                                                                                                            )
-                                                                                                            }
-                                                                        )
+            tensionDialog.applyProps.connect(function(props) {actionModel.add_tension_pneumothorax_action(props)})
             actionDrawer.closed.connect(tensionDialog.destroy)
             tensionDialog.open()
+        } else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
         }
     }
 
@@ -236,13 +232,7 @@ ActionDrawerForm {
     /// Sets up a spinbox for severity
     function setup_traumaticBrainInjury(actionItem){
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
+        if ( dialogComponent.status == Component.Ready){
             var tbiDialog = dialogComponent.createObject(root.parent, { numRows : 1, numColumns : 2});
             tbiDialog.initializeProperties({name : actionItem.name, severity : 0, type : 0})
             let dialogWidth = tbiDialog.contentItem.width
@@ -252,15 +242,16 @@ ActionDrawerForm {
             let typeRadioButton = tbiDialog.addRadioButton('Type','type',typeButtons, typeOptions);
             let severityOptions = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 4, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
             let severitySpinBox = tbiDialog.addSpinBox('Severity','severity', severityOptions)
-            tbiDialog.applyProps.connect(    function(props) {    actionModel.addSwitch    (    props.description, 
-                                                                                                                                                                function () { scenario.create_traumatic_brain_injury_action(props.severity, props.type) },
-                                                                                                                                                                function () { scenario.create_traumatic_brain_injury_action(0.0, props.type) }
-                                                                                                                                                            )
-                                                                                                            }
-                                                                        )
+            tbiDialog.applyProps.connect( function(props) {actionModel.add_tramatic_brain_injury_action(props)})
             actionDrawer.closed.connect(tbiDialog.destroy)
             tbiDialog.open();
-        }    
+        } else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
+        } 
     }
 
     //----------------------------------------------------------------------------------------

@@ -52,7 +52,10 @@
         <file alias="UISubstanceEntryForm.ui.qml" >elements/UISubstanceEntryForm.ui.qml</file>
         <file alias="UIEnvironmentWizard.qml" >elements/UIEnvironmentWizard.qml</file>
         <file alias="UIEnvironmentWizardForm.ui.qml" >elements/UIEnvironmentWizardForm.ui.qml</file>
-        <!-- Actions for the Control Window-->
+        <!-- Actions Templates-->
+        <file alias="UIActionForm.ui.qml" >actions/UIActionForm.ui.qml</file>
+        <!-- Patient Acctions for the Control Window-->
+        <!-- Insults for the Control Window-->
         <file alias="UIAsthmaAttack.qml"  >actions/UIAsthmaAttack.qml</file>
         <file alias="UIPainStimulus.qml" >actions/UIPainStimulus.qml</file>
         <file alias="UIAcuteStress.qml" >actions/UIAcuteStress.qml</file>
@@ -63,7 +66,10 @@
         <file alias="UICardiacArrest.qml" >actions/UICardiacArrest.qml</file>
         <file alias="UIInfection.qml" >actions/UIInfection.qml</file>
         <file alias="UIHemorrhage.qml" >actions/UIHemorrhage.qml</file>
-        <file alias="UIActionForm.ui.qml" >actions/UIActionForm.ui.qml</file>
+        <file alias="UITensionPneumothorax.qml" >actions/UITensionPneumothorax.qml</file>
+        <file alias="UITraumaticBrainInjury.qml" >actions/UITraumaticBrainInjury.qml</file>
+        <!-- Intervensions for the Control Window-->
+        <!-- Conditions for the Control Window-->
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
