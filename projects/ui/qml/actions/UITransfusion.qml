@@ -87,7 +87,6 @@ UIActionForm {
       Label {
         text : "%1ml/min".arg(root.rate )
       }
-    
       // Column 4
       Rectangle {
         id: toggle      

@@ -401,7 +401,7 @@ ActionDrawerForm {
             let doseField = drugDialog.addTextField('Dose (ml)', 'dose', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
             let concentrationField = drugDialog.addTextField('Concentration (ug/mL)', 'concentration', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
             let rateField = drugDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-            drugDialog.applyProps.connect(root.apply_drugAction)
+            drugDialog.applyProps.connect(function(props) { actionModel.add_drug_administration_action(props) } )
             adminCombo.comboUpdate.connect(function (value) { root.manage_drugOptions(value, doseField, concentrationField, rateField)} )
             actionDrawer.closed.connect(drugDialog.destroy)
             drugDialog.open();
@@ -441,66 +441,6 @@ ActionDrawerForm {
                 rateField.editable = false
         }
     }
-
-    //----------------------------------------------------------------------------------------
-    /// Helper function for setup_SubstanceActions
-    /// Takes props set by user and identifies correct Biogears action to call according to admin route
-    function apply_drugAction(props){
-        let route = props.adminRoute
-        let substance = props.substance
-        let dose = props.dose
-        let concentration = props.concentration
-        let rate = props.rate
-        let routeDisplay = route.split('-')[0] + ":"         //Shows "Bolus" in "Bolus-Intravenous"
-        let routeDetail = route.split('-')[1]                //Shows "Intravenous" in "Bolus-Intravenous"
-        let description = substance + " " + routeDisplay     //Overriding description for substances
-        switch (route) {
-            case 'Bolus-Intraarterial' :
-                //Intraarterial is CDM::enumBolusAdministration::0
-                description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
-                actionModel.addSwitch(description, 
-                                                            function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
-                                                            );
-                break;
-            case 'Bolus-Intramuscular' :
-                description += "\n    Route = " + routeDetail  + "Dose (mL) = " + dose + "\n   Concentration (ug/mL) = " + concentration
-                //Intramuscular is CDM::enumBolusAdministration::1
-                actionModel.addSwitch(description, 
-                                                            function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) } 
-                                                            );
-                break;
-            case 'Bolus-Intravenous' :
-                description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
-                //Intravenous is CDM::enumBolusAdministration::2
-                actionModel.addSwitch(description, 
-                                                            function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) } 
-                                                            );
-                break;
-            case 'Infusion-Intravenous' :
-                description += "\n    Route = " + routeDetail  + "\n    Concentration (ug/mL) = " + concentration + "\n    Rate (mL/min) = " + rate
-                actionModel.addSwitch(description, 
-                                                            function () { scenario.create_substance_infusion_action(substance, concentration, rate)}, 
-                                                            function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
-                                                            );
-                break;
-            case 'Oral':
-                description += "\n    Dose (mg) = " + dose
-                //Oral (GI) is CDM::enumOralAdministration::1
-                actionModel.addSwitch(description, 
-                                                            function () { scenario.create_substance_oral_action(substance, 0, dose) } 
-                                                            );
-                break;
-            case 'Transmucosal':
-                description += "\n    Dose (mg) = " + dose
-                //Transcmucosal is CDM::enumOralAdministration::0
-                actionModel.addSwitch(description, 
-                                                            function () { scenario.create_substance_oral_action(substance, 1, dose) } 
-                                                            );
-                close();
-                break;
-        }
-    }
-
     //----------------------------------------------------------------------------------------
     /// Create compound infusion dialog window that handles fluid infusion actions
     /// Initializes properties for compound, bag volume, and rate
@@ -520,7 +460,7 @@ ActionDrawerForm {
             let compoundCombo = infusionDialog.addComboBox('Compound', 'compound', compoundListData, compoundComboProps)
             let bagVolumeText = infusionDialog.addTextField('Bag Volume (mL)', 'bagVolume', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1, colSpan : 1})
             let rateText = infusionDialog.addTextField('Rate (mL/min)', 'rate', {prefHeight : dialogHeight / 4, prefWidth : dialogWidth / 2.1, colSpan : 1})            
-            infusionDialog.applyProps.connect( function(props)    { actionModel.create_compound_infusion_action(props) })
+            infusionDialog.applyProps.connect( function(props)    { actionModel.add_compound_infusion_action(props) })
             actionDrawer.closed.connect(infusionDialog.destroy)
             infusionDialog.open()
         } else {

@@ -329,8 +329,8 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
-    function create_compound_infusion_action(props) {
-            var compartment = Qt.createComponent("UICompoundInfusion.qml");
+    function add_compound_infusion_action(props) {
+      var compartment = Qt.createComponent("UICompoundInfusion.qml");
       if ( compartment.status == Component.Ready)  {
         var action = compartment.createObject(actionSwitchView,{ "rate" : props.rate,  "volume" : props.bagVolume,   "compound" : props.compound,
                                                                   "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
@@ -348,6 +348,85 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
+    function add_drug_administration_action(props) {
+      var compartment = Qt.createComponent("UIDrugAdministration.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "adminRoute" : props.adminRoute, "drug" : props.substance,
+                                                                 "dose" : props.dose,  "concentration" : props.concentration,   "rate" : props.rate,
+                                                                 "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+
+    //     //----------------------------------------------------------------------------------------
+    // /// Helper function for setup_SubstanceActions
+    // /// Takes props set by user and identifies correct Biogears action to call according to admin route
+    // function apply_drugAction(props){
+    //     let route = props.adminRoute
+    //     let substance = props.substance
+    //     let dose = props.dose
+    //     let concentration = props.concentration
+    //     let rate = props.rate
+    //     let routeDisplay = route.split('-')[0] + ":"         //Shows "Bolus" in "Bolus-Intravenous"
+    //     let routeDetail = route.split('-')[1]                //Shows "Intravenous" in "Bolus-Intravenous"
+    //     let description = substance + " " + routeDisplay     //Overriding description for substances
+    //     switch (route) {
+    //         case 'Bolus-Intraarterial' :
+    //             //Intraarterial is CDM::enumBolusAdministration::0
+    //             description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
+    //             actionModel.addSwitch(description, 
+    //                                                         function () { scenario.create_substance_bolus_action(substance, 0, dose, concentration) } 
+    //                                                         );
+    //             break;
+    //         case 'Bolus-Intramuscular' :
+    //             description += "\n    Route = " + routeDetail  + "Dose (mL) = " + dose + "\n   Concentration (ug/mL) = " + concentration
+    //             //Intramuscular is CDM::enumBolusAdministration::1
+    //             actionModel.addSwitch(description, 
+    //                                                         function () { scenario.create_substance_bolus_action(substance, 1, dose, concentration) } 
+    //                                                         );
+    //             break;
+    //         case 'Bolus-Intravenous' :
+    //             description += "\n    Route = " + routeDetail  + "\n    Dose (mL) = " + dose + "\n    Concentration (ug/mL) = " + concentration
+    //             //Intravenous is CDM::enumBolusAdministration::2
+    //             actionModel.addSwitch(description, 
+    //                                                         function () { scenario.create_substance_bolus_action(substance, 2, dose, concentration) } 
+    //                                                         );
+    //             break;
+    //         case 'Infusion-Intravenous' :
+    //             description += "\n    Route = " + routeDetail  + "\n    Concentration (ug/mL) = " + concentration + "\n    Rate (mL/min) = " + rate
+    //             actionModel.addSwitch(description, 
+    //                                                         function () { scenario.create_substance_infusion_action(substance, concentration, rate)}, 
+    //                                                         function () { scenario.create_substance_infusion_action(substance, 0.0, 0.0) }
+    //                                                         );
+    //             break;
+    //         case 'Oral':
+    //             description += "\n    Dose (mg) = " + dose
+    //             //Oral (GI) is CDM::enumOralAdministration::1
+    //             actionModel.addSwitch(description, 
+    //                                                         function () { scenario.create_substance_oral_action(substance, 0, dose) } 
+    //                                                         );
+    //             break;
+    //         case 'Transmucosal':
+    //             description += "\n    Dose (mg) = " + dose
+    //             //Transcmucosal is CDM::enumOralAdministration::0
+    //             actionModel.addSwitch(description, 
+    //                                                         function () { scenario.create_substance_oral_action(substance, 1, dose) } 
+    //                                                         );
+    //             close();
+    //             break;
+    //     }
+    // }
   }
 
   playback.onRestartClicked: {

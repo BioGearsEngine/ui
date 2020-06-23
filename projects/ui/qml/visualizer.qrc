@@ -72,7 +72,7 @@
         <file alias="UITourniquet.qml" >actions/UITourniquet.qml</file>
         <file alias="UINeedleDecompression.qml" >actions/UINeedleDecompression.qml</file>
         <file alias="UITransfusion.qml" >actions/UITransfusion.qml</file>
-        <file alias="UIDrugInfusion.qml" >actions/UIDrugInfusion.qml</file>
+        <file alias="UIDrugAdministration.qml" >actions/UIDrugAdministration.qml</file>
         <file alias="UICompoundInfusion.qml" >actions/UICompoundInfusion.qml</file>
         <!-- Conditions for the Control Window-->
     </qresource>
