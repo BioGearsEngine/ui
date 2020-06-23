@@ -37,24 +37,23 @@ ActionDrawerForm {
     /// Sets up a spin box to set rate with upper bound of 1000 mL/min and step size of 10 mL/min
     /// Sets up a combo box for location and populate list with acceptable comparments
     function setup_hemorrhage(actionItem){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-      if ( dialogComponent.status == Component.Ready){
-            var hemDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 1});
-            let itemHeight = hemDialog.contentItem.height / 3
-            hemDialog.initializeProperties({name : 'Hemorrhage', location : '', rate: 0});
+      var component = Qt.createComponent("UIActionDialog.qml");
+      if ( component.status == Component.Ready){
+            var dialog = component.createObject(root.parent, {'numRows' : 2, 'numColumns' : 1});
+            let itemHeight = dialog.contentItem.height / 3
+            dialog.initializeProperties({name : 'Hemorrhage', location : '', rate: 0});
             let rateSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 1000, spinStep : 10}
-            hemDialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', rateSpinProps)
+            dialog.addSpinBox('Bleeding Rate (mL/min)', 'rate', rateSpinProps)
             let locationModelData = { type : 'ListModel', role : 'name', elements : ['Aorta', 'Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']}
-            hemDialog.addComboBox('Location', 'location', locationModelData, {prefHeight : itemHeight})
-            hemDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
-                                          function () {scenario.create_hemorrhage_action(props.location, props.rate) },
-                                          function () {scenario.create_hemorrhage_action(props.location, 0.0) }
-                                         )})
-            actionDrawer.closed.connect(hemDialog.destroy)
-            hemDialog.open()
+            dialog.addComboBox('Location', 'location', locationModelData, {prefHeight : itemHeight})
+
+            
+            dialog.applyProps.connect(function(props) {actionModel.add_hemorrhage_action(props)})
+            actionDrawer.closed.connect(dialog.destroy)
+            dialog.open()
       } else {
-          if (dialogComponent.status == Component.Error){
-              console.log("Error : " + dialogComponent.errorString() );
+          if (component.status == Component.Error){
+              console.log("Error : " + component.errorString() );
               return;
           }
         console.log("Error : Action dialog component not ready");

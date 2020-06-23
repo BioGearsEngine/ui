@@ -238,6 +238,27 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
+
+    function add_hemorrhage_action(props) {
+      var compartment = Qt.createComponent("UIHemorrhage.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
+                                                                                "compartment" : props.location, "rate" : props.rate,
+                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                                              })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
   }
 
   playback.onRestartClicked: {

@@ -77,8 +77,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
-        to : 10
-        stepSize : 1
+        to : 500
+        stepSize : 10
         value : root.mic
 
         onMoved : {

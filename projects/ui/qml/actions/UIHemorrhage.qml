@@ -10,12 +10,12 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property double intensity : 0.0
-  property string location : "LeftArm"
+  property double rate : 0.0
+  property string compartment : "LeftArm"
   
-  actionType : "Pain Stimulus"
-  fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg(location).arg(intensity)
-  shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(location).arg(intensity)
+  actionType : "Hemorrhage"
+  fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Rate = %3ml/min".arg(actionType).arg(compartment).arg(rate)
+  shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3ml/min</font>".arg(actionType).arg(compartment).arg(rate)
 
   details : Component  {
     GridLayout {
@@ -34,14 +34,14 @@ UIActionForm {
         font.pixelSize : 10
         font.bold : false
         color : "steelblue"
-        text : "[%1]".arg(root.location)
+        text : "[%1]".arg(root.compartment)
         Layout.alignment : Qt.AlignHCenter
       }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Intensity"
+        text : "Rate"
       }      
       Slider {
         id: stimulus      
@@ -50,16 +50,16 @@ UIActionForm {
         from : 0
         to : 10
         stepSize : 1
-        value : root.intensity
+        value : root.rate
 
         onMoved : {
-          root.intensity = value
+          root.rate = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1".arg(root.intensity)
+        text : "%1ml/min".arg(root.rate )
       }
     
       // Column 3
@@ -121,6 +121,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_hemorrhage_action(intensity/10.0,location)  }
-  onDeactivate: { scenario.create_hemorrhage_action(0,location)  }
+  onActivate:   { scenario.create_hemorrhage_action(compartment, rate)  }
+  onDeactivate: { scenario.create_hemorrhage_action(compartment, 0)  }
 }
