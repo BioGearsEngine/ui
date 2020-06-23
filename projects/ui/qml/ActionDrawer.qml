@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQml.Models 2.2
 import com.biogearsengine.ui.scenario 1.0
 
+
 ActionDrawerForm {
     id: root
     signal openActionDrawer()
@@ -312,11 +313,8 @@ ActionDrawerForm {
     /// is either on or off.  The action switch is thus all we need
     function setup_cardiacArrest(actionItem){
         //In "On" function, 1 --> CDM::enumOnOff = On.  In "Off" function, 0 --> CDM::enumOnOff = Off
-        actionModel.addSwitch(actionItem.name, 
-                                                    function () { scenario.create_cardiac_arrest_action(1) },
-                                                    function () { scenario.create_cardiac_arrest_action(0) }
-                                                    )
         
+        actionModel.add_binary_action("UICardiacArrest.qml")
     }
 
     //----------------------------------------------------------------------------------------

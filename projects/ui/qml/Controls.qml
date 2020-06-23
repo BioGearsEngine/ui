@@ -160,6 +160,22 @@ ControlsForm {
       }
     }
 
+  function add_binary_action(componentType, physiology) {
+      var v_severityForm = Qt.createComponent(componentType);
+      if ( v_severityForm.status == Component.Ready)  {
+        var v_action = v_severityForm.createObject(actionSwitchView,{ "width" : actionSwitchView.width,  "Layout.fillWidth" : true,})
+        v_action.scenario = biogears_scenario
+        v_action.uuid = uuidv4()
+        v_action.remove.connect(removeAction)
+        actionSwitchModel.append(v_action)
+      } else {
+        if (v_severityForm.status == Component.Error){
+          console.log("Error : " + v_severityForm.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+  }
   function add_single_range_action(componentType, props, physiology) {
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
