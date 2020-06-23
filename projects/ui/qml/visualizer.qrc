@@ -61,6 +61,8 @@
         <file alias="UIBronchoconstriction.qml" >actions/UIBronchoconstriction.qml</file>
         <file alias="UIBurnWound.qml" >actions/UIBurnWound.qml</file>
         <file alias="UICardiacArrest.qml" >actions/UICardiacArrest.qml</file>
+        <file alias="UIInfection.qml" >actions/UIInfection.qml</file>
+        <file alias="UIHemorrhage.qml" >actions/UIHemorrhage.qml</file>
         <file alias="UIActionForm.ui.qml" >actions/UIActionForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">

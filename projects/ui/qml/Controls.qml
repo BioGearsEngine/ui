@@ -160,29 +160,30 @@ ControlsForm {
       }
     }
 
-  function add_binary_action(componentType, physiology) {
-      var v_severityForm = Qt.createComponent(componentType);
-      if ( v_severityForm.status == Component.Ready)  {
-        var v_action = v_severityForm.createObject(actionSwitchView,{ "width" : actionSwitchView.width,  "Layout.fillWidth" : true,})
-        v_action.scenario = biogears_scenario
-        v_action.uuid = uuidv4()
-        v_action.remove.connect(removeAction)
-        actionSwitchModel.append(v_action)
-      } else {
-        if (v_severityForm.status == Component.Error){
-          console.log("Error : " + v_severityForm.errorString() );
-          return;
+    function add_binary_action(componentType) {
+        var v_severityForm = Qt.createComponent(componentType);
+        if ( v_severityForm.status == Component.Ready)  {
+          var v_action = v_severityForm.createObject(actionSwitchView,{ "width" : actionSwitchView.width,  "Layout.fillWidth" : true,})
+          v_action.scenario = biogears_scenario
+          v_action.uuid = uuidv4()
+          v_action.remove.connect(removeAction)
+          actionSwitchModel.append(v_action)
+        } else {
+          if (v_severityForm.status == Component.Error){
+            console.log("Error : " + v_severityForm.errorString() );
+            return;
+          }
+          console.log("Error : Action switch component not ready");
         }
-        console.log("Error : Action switch component not ready");
-      }
-  }
-  function add_single_range_action(componentType, props, physiology) {
+    }
+
+    function add_single_range_action(componentType, props) {
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
         var v_action = v_severityForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
                                                                       "severity" : props.spinnerValue,
                                                                       "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
-                                                                               })
+                                                                              })
         v_action.scenario = biogears_scenario
         v_action.uuid = uuidv4()
         v_action.remove.connect(removeAction)
@@ -197,13 +198,13 @@ ControlsForm {
       }
     }
 
-    function addPainStimulusAction(props, physiology) {
+    function add_pain_stimulus_action(props) {
       var v_painStimulusForm = Qt.createComponent("UIPainStimulus.qml");
       if ( v_painStimulusForm.status == Component.Ready)  {
         var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
                                                                                 "location" : props.location, "intensity" : props.painScore,
                                                                                 "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
-                                                                               })
+                                                                              })
         v_painStimulus.scenario = biogears_scenario
         v_painStimulus.uuid = uuidv4()
         v_painStimulus.remove.connect(removeAction)
@@ -212,6 +213,26 @@ ControlsForm {
       } else {
         if (v_painStimulusForm.status == Component.Error){
           console.log("Error : " + v_painStimulusForm.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+    
+    function add_infection_action(props) {
+      var v_actionComponent = Qt.createComponent("UIInfection.qml");
+      if ( v_actionComponent.status == Component.Ready)  {
+        var v_action = v_actionComponent.createObject(actionSwitchView,{  "location" : props.location, "mic" : props.mic, "severity" : props.severity,
+                                                                          "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                                        })
+        v_action.scenario = biogears_scenario
+        v_action.uuid = uuidv4()
+        v_action.remove.connect(removeAction)
+
+        actionSwitchModel.append(v_action)
+      } else {
+        if (v_actionComponent.status == Component.Error){
+          console.log("Error : " + v_actionComponent.errorString() );
           return;
         }
         console.log("Error : Action switch component not ready");
@@ -246,21 +267,21 @@ ControlsForm {
   }
 
   function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-function removeAction( uuid) {
-      console.log(uuid)
-      for ( let i = 0; i < actionSwitchModel.count; ++i){
-        console.log (actionSwitchModel, actionSwitchModel.get(i), actionSwitchModel.get(i).uuid)
-        if (actionSwitchModel.get(i).uuid === uuid){
-          actionSwitchModel.remove(i)
-        }
-      }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
+
+  function removeAction( uuid) {
+        console.log(uuid)
+        for ( let i = 0; i < actionSwitchModel.count; ++i){
+          console.log (actionSwitchModel, actionSwitchModel.get(i), actionSwitchModel.get(i).uuid)
+          if (actionSwitchModel.get(i).uuid === uuid){
+            actionSwitchModel.remove(i)
+          }
+        }
+    }
 }
 
 /*##^## Designer {

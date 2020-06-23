@@ -38,14 +38,8 @@ ActionDrawerForm {
     /// Sets up a combo box for location and populate list with acceptable comparments
     function setup_hemorrhage(actionItem){
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-      if ( dialogComponent.status != Component.Ready){
-          if (dialogComponent.status == Component.Error){
-              console.log("Error : " + dialogComponent.errorString() );
-              return;
-          }
-        console.log("Error : Action dialog component not ready");
-      } else {
-          var hemDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 1});
+      if ( dialogComponent.status == Component.Ready){
+            var hemDialog = dialogComponent.createObject(root.parent, {'numRows' : 2, 'numColumns' : 1});
             let itemHeight = hemDialog.contentItem.height / 3
             hemDialog.initializeProperties({name : 'Hemorrhage', location : '', rate: 0});
             let rateSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 1000, spinStep : 10}
@@ -53,14 +47,18 @@ ActionDrawerForm {
             let locationModelData = { type : 'ListModel', role : 'name', elements : ['Aorta', 'Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']}
             hemDialog.addComboBox('Location', 'location', locationModelData, {prefHeight : itemHeight})
             hemDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
-                                                                                                                                                            function () {scenario.create_hemorrhage_action(props.location, props.rate) },
-                                                                                                                                                            function () {scenario.create_hemorrhage_action(props.location, 0.0) }
-                                                                                                                                                            )
-                                                                                                        }
-                                                                    )
-      actionDrawer.closed.connect(hemDialog.destroy)
+                                          function () {scenario.create_hemorrhage_action(props.location, props.rate) },
+                                          function () {scenario.create_hemorrhage_action(props.location, 0.0) }
+                                         )})
+            actionDrawer.closed.connect(hemDialog.destroy)
             hemDialog.open()
-      }
+      } else {
+          if (dialogComponent.status == Component.Error){
+              console.log("Error : " + dialogComponent.errorString() );
+              return;
+          }
+        console.log("Error : Action dialog component not ready");
+      } 
     }
 
     /// Creates a tourniquet dialog window and assign properties for location and application level
@@ -103,31 +101,28 @@ ActionDrawerForm {
     /// Sets up a spin box to set severity.  Passes an array ['Mild', 'Medium','Severe'] to display enums in spin box
     /// Sets up a combo box for location and populate list with acceptable comparments
     function setup_infection(actionItem){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
-            var infectionDialog = dialogComponent.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
-            let itemHeight = infectionDialog.contentItem.height / 4
-            infectionDialog.initializeProperties({name : 'Infection', location : '', severity : 0, mic : 0})
+        var component = Qt.createComponent("UIActionDialog.qml");
+        if ( component.status == Component.Ready) {
+            var dialog = component.createObject(root.parent, {'numRows' : 3, 'numColumns' : 1});
+            let itemHeight = dialog.contentItem.height / 4
+            dialog.initializeProperties({name : 'Infection', location : '', severity : 0, mic : 0})
             let micSpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 500, spinStep : 10}
-            infectionDialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
+            dialog.addSpinBox('Min. Inhibitory Concentration (mg/L)', 'mic', micSpinProps)
             let severitySpinProps = {prefHeight : itemHeight, elementRatio : 0.6, spinMax : 3, displayEnum : ['','Mild','Moderate','Severe']}
-            infectionDialog.addSpinBox('Severity', 'severity', severitySpinProps)
+            dialog.addSpinBox('Severity', 'severity', severitySpinProps)
             let locationListData = { type : 'ListModel', role : 'name', elements : ['Gut', 'Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']}
             let locationProps = {prefHeight : itemHeight, elementRatio : 0.6}
-            infectionDialog.addComboBox('Location', 'location', locationListData, locationProps)
-            infectionDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
-                                                                                                                                                                        function () {scenario.create_infection_action(props.location, props.severity, props.mic) },
-                                                                                                                                                                )
-                                                                                                                    }
-                                                                                )
-            actionDrawer.closed.connect(infectionDialog.destroy)
-            infectionDialog.open()
+            dialog.addComboBox('Location', 'location', locationListData, locationProps)
+
+            dialog.applyProps.connect(function(props) {actionModel.add_infection_action(props)})
+            actionDrawer.closed.connect(dialog.destroy)
+            dialog.open()
+        } else {
+            if (component.status == Component.Error){
+                console.log("Error : %1".arg(component.errorString()))
+                return;
+            }
+            console.log("Error : Action dialog component not ready")
         }
     }
 
@@ -155,7 +150,7 @@ ActionDrawerForm {
           let locationCombo = painDialog.addComboBox('Location', 'location', locationData, locationProps)
           let painScoreProps = {prefHeight : dialogHeight / 3, spinMax : 10, spinStep : 1, elementRatio : 0.5}
           let painSpinBox = painDialog.addSpinBox('Visual Analog Score', 'painScore', painScoreProps)
-          painDialog.applyProps.connect(function(props) {actionModel.addPainStimulusAction(props)})
+          painDialog.applyProps.connect(function(props) {actionModel.add_pain_stimulus_action(props)})
           actionDrawer.closed.connect(painDialog.destroy)
           painDialog.open();
       } else {
