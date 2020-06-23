@@ -10,13 +10,12 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property double severity : 0.0
-  property int type : 0
-  property string type_str : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
+  property int side : 0
+  property string side_str : (root.side == 0) ? "Left" : "Right"
   
-  actionType : "Traumatic Brain Injury"
-  fullName  : "<b>%1</b><br> Type = %2<br> Severity = %3".arg(actionType).arg(type_str).arg(severity)
-  shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(type_str)
+  actionType : "Needle Decompression"
+  fullName  : "<b>%1</b><br> Side = %2".arg(actionType).arg(side_str)
+  shortName : "[<font color=\"lightsteelblue\">%2</font>] <b>%1</b>".arg(actionType).arg(side_str)
 
   details : Component  {
     GridLayout {
@@ -35,14 +34,14 @@ UIActionForm {
         font.pixelSize : 10
         font.bold : false
         color : "steelblue"
-        text : "[%1]".arg(root.compartment)
+        text : "[%1]".arg(root.side)
         Layout.alignment : Qt.AlignHCenter
       }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Severity"
+        text : "Side"
       }      
       Slider {
         id: stimulus      
@@ -50,17 +49,17 @@ UIActionForm {
         Layout.columnSpan : 2
         from : 0
         to : 1
-        stepSize : 0.05
-        value : root.severity
+        stepSize : 1
+        value : root.side
 
         onMoved : {
-          root.rate = value
+          root.side = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1".arg(root.severity )
+        text : "%1".arg(root.side_str )
       }
     
       // Column 3
@@ -122,6 +121,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_traumatic_brain_injury_action(severity, type)  }
-  onDeactivate: { scenario.create_traumatic_brain_injury_action(0, type)  }
+  onActivate:   { scenario.create_needle_decompression_action(active, side)  }
+  onDeactivate: { scenario.create_needle_decompression_action(0, side)  }
 }

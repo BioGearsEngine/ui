@@ -69,6 +69,8 @@
         <file alias="UITensionPneumothorax.qml" >actions/UITensionPneumothorax.qml</file>
         <file alias="UITraumaticBrainInjury.qml" >actions/UITraumaticBrainInjury.qml</file>
         <!-- Intervensions for the Control Window-->
+        <file alias="UITourniquet.qml" >actions/UITourniquet.qml</file>
+        <file alias="UINeedleDecompression.qml" >actions/UINeedleDecompression.qml</file>
         <!-- Conditions for the Control Window-->
     </qresource>
     <qresource prefix="/icons">

@@ -10,13 +10,15 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property double severity : 0.0
-  property int type : 0
-  property string type_str : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
+  property string compartment : ""
+  property int state : 0
+  property string state_str : (root.state == 0) ? "Applied" : ( root.state == 1) ? "Misapplied" : "None"
+  property string state_str_formated : (root.state == 0) ? "[<font color=\"green\">%2</font>]".arg(root.state_str) : 
+                                       (root.state == 1) ? "[<font color=\"red\">%2</font>]".arg(root.state_str) : ""
   
-  actionType : "Traumatic Brain Injury"
-  fullName  : "<b>%1</b><br> Type = %2<br> Severity = %3".arg(actionType).arg(type_str).arg(severity)
-  shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(type_str)
+  actionType : "Tourniquet"
+  fullName  : "<b>%1</b><br> Location = %2<br> State = %3".arg(actionType).arg(compartment).arg(state_str)
+  shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b> %3".arg(actionType).arg(compartment).arg((root.active) ? state_str_formated.arg(state_str) : "")
 
   details : Component  {
     GridLayout {
@@ -42,7 +44,7 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Severity"
+        text : "Application"
       }      
       Slider {
         id: stimulus      
@@ -50,17 +52,17 @@ UIActionForm {
         Layout.columnSpan : 2
         from : 0
         to : 1
-        stepSize : 0.05
-        value : root.severity
+        stepSize : 1
+        value : root.state
 
         onMoved : {
-          root.rate = value
+          root.state = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1".arg(root.severity )
+        text : "%1".arg(root.state_str )
       }
     
       // Column 3
@@ -122,6 +124,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_traumatic_brain_injury_action(severity, type)  }
-  onDeactivate: { scenario.create_traumatic_brain_injury_action(0, type)  }
+  onActivate:   { scenario.create_tourniquet_action(compartment, state)  }
+  onDeactivate: { scenario.create_tourniquet_action(compartment, 2)  }
 }

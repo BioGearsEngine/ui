@@ -297,6 +297,44 @@ ControlsForm {
         console.log("Error : Action switch component not ready");
       }
     }
+    function add_needle_decompression_action(props) {
+      var compartment = Qt.createComponent("UINeedleDecompression.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "side" : props.side,
+                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+    function add_tourniquet_action(props) {
+      var compartment = Qt.createComponent("UITourniquet.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "compartment" : props.location,  "state" : props.level,
+                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
   }
 
   playback.onRestartClicked: {

@@ -14,7 +14,7 @@ UIActionForm {
   property int type : 0
   property string type_str : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
   
-  actionType : "Traumatic Brain Injury"
+  actionType : "Transfusion"
   fullName  : "<b>%1</b><br> Type = %2<br> Severity = %3".arg(actionType).arg(type_str).arg(severity)
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(type_str)
 

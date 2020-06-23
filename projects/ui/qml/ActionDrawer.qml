@@ -64,14 +64,8 @@ ActionDrawerForm {
     /// Sets up a combo box for location and populate list with acceptable comparments
     /// Sets up a radio button group for application level (i.e. how well was the tourniquet applied)
     function setup_tourniquet(actionItem){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-      if ( dialogComponent.status != Component.Ready){
-          if (dialogComponent.status == Component.Error){
-              console.log("Error : " + dialogComponent.errorString() );
-              return;
-          }
-        console.log("Error : Action dialog component not ready");
-      } else {
+     var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+     if ( dialogComponent.status == Component.Ready) {
           var tourniquetDialog = dialogComponent.createObject(root.parent, {'numRows' : 1, 'numColumns' : 2});
             tourniquetDialog.initializeProperties({name : actionItem.name, location : '', level : 0})
             let dialogWidth = tourniquetDialog.contentItem.width
@@ -82,16 +76,17 @@ ActionDrawerForm {
             let levelButtonGroup = ["Correct", "Misapplied"]
             let levelProps = {prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 2, elementRatio : 0.6}
             let levelRadioButton = tourniquetDialog.addRadioButton('Application Status','level',levelButtonGroup,levelProps)
-            tourniquetDialog.applyProps.connect( function(props) { actionModel.addSwitch(  props.description,
-                                                                                                                                                            function () {scenario.create_tourniquet_action(props.location, props.level) },
-                                                                                                                                                            function () {scenario.create_tourniquet_action(props.location, 2) }
-                                                                                                                                                            )
-                                                                                                        }
-                                                                    )
+            tourniquetDialog.applyProps.connect( function(props) {actionModel.add_tourniquet_action(props)} )
             //Note that "2" option for level in "Off Function" corresponds to "No tourniquet" in CDM::TourniquetApplicationLevel
-      actionDrawer.closed.connect(tourniquetDialog.destroy)
+            actionDrawer.closed.connect(tourniquetDialog.destroy)
             tourniquetDialog.open()
-        }
+        } else {
+          if (dialogComponent.status == Component.Error){
+              console.log("Error : " + dialogComponent.errorString() );
+              return;
+          }
+          console.log("Error : Action dialog component not ready");
+      } 
     }
     
     //----------------------------------------------------------------------------------------
@@ -199,30 +194,25 @@ ActionDrawerForm {
     /// Creates a needle decompression dialog and assigns side (left/right)
     /// Sets up a radio button for side
     /// Assumes that state = on when function switch is on and state= off when function switch is off
-    function setup_needleDecompression(actionItem){
+    function setup_needleDecompression(actionItem) {
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
+         if ( dialogComponent.status == Component.Ready){
             var needleDialog = dialogComponent.createObject(root.parent, { numRows : 1, numColumns : 1});
             needleDialog.initializeProperties({name : actionItem.name, side : ''})
             let needleRadioGroup = ['Left', 'Right']
             let needleProps = {prefHeight : needleDialog.contentItem.height / 3, prefWidth : needleDialog.contentItem.width / 2}
             let needleRadioButton = needleDialog.addRadioButton('Side', 'side', needleRadioGroup, needleProps)
             //In "On" function, 1 --> CDM::enumOnOff = On.  In "Off" function, 0 --> CDM::enumOnOff = Off
-            needleDialog.applyProps.connect(    function(props) {    actionModel.addSwitch    (    props.description, 
-                                                                                                                                                                function () { scenario.create_needle_decompression_action(1, props.side) },
-                                                                                                                                                                function () { scenario.create_needle_decompression_action(0, props.side) }
-                                                                                                                                                            )
-                                                                                                            }
-                                                                        )
+            needleDialog.applyProps.connect( function(props) {actionModel.add_needle_decompression_action(props)} )
             actionDrawer.closed.connect(needleDialog.destroy)
             needleDialog.open()
-        }
+        }else {
+          if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
+        } 
     }
 
 
