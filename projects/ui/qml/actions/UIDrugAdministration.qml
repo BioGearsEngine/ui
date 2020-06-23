@@ -215,8 +215,8 @@ UIActionForm {
     } else if ( root.adminRoute == 'Bolus-Intravenous') {
       scenario.create_substance_bolus_action(drug, 2, dose, concentration) 
     }  else if ( root.adminRoute == 'Infusion-Intravenous') {
-      scenario.create_substance_compound_infusion_action(drug, concentration, rate) 
-    } else if ( root.adminRoute == 'Infusion-Intravenous') {
+      scenario.create_substance_infusion_action(drug, concentration, rate) 
+    } else if ( root.adminRoute == 'Oral') {
       scenario.create_substance_oral_action(drug, 0, dose) 
     } else {
       scenario.create_substance_oral_action(drug, 1, dose) 
@@ -230,8 +230,8 @@ UIActionForm {
     } else if ( root.adminRoute == 'Bolus-Intravenous') {
       scenario.create_substance_bolus_action(drug, 2, 0, 0) 
     }  else if ( root.adminRoute == 'Infusion-Intravenous') {
-      scenario.create_substance_compound_infusion_action(drug, 0, 0) 
-    } else if ( root.adminRoute == 'Infusion-Intravenous') {
+      scenario.create_substance_infusion_action(drug, 0, 0) 
+    } else if ( root.adminRoute == 'Oral') {
       scenario.create_substance_oral_action(drug, 0, 0) 
     } else {
       scenario.create_substance_oral_action(drug, 1, 0) 
