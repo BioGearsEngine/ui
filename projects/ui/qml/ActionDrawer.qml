@@ -134,27 +134,9 @@ ActionDrawerForm {
     /// Creates burn dialog window and assign fraction body surface area burned property
     /// Sets up a spin box to set fraction body surface area (scales to output text in floating point)
     function setup_burn(actionItem){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
-            var burnDialog = dialogComponent.createObject(root.parent);
-            let itemHeight = burnDialog.contentItem.height / 4
-            burnDialog.initializeProperties({name : actionItem.name, severity : 0})
-            let burnArgs = {prefHeight : itemHeight, elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
-            burnDialog.addSpinBox('Fraction Body Surface Area', 'severity', burnArgs)
-            burnDialog.applyProps.connect( function(props)    { actionModel.addSwitch    (    props.description, 
-                                                                                                                                                                function () { scenario.create_burn_action(props.severity) },
-                                                                                                                                                            )
-                                                                                                            }
-                                                                    )
-            actionDrawer.closed.connect(burnDialog.destroy)
-            burnDialog.open()
-        }
+      let severityProps = {elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
+      add_single_range_action("Burn Wound", "Fraction, Body Surface Area", severityProps, 
+           function(props) {actionModel.add_single_range_action("UIBurnWound.qml", props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -343,7 +325,8 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_asthma(actionItem){
       let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-      setup_severityAction("Asthma Attack", severityProps, function(props) {actionModel.addSeverityAction("UIAsthmaAttack.qml",props)} )
+      add_single_range_action("Asthma Attack", "Severity", severityProps, 
+      function(props) {actionModel.add_single_range_action("UIAsthmaAttack.qml" ,props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -352,7 +335,8 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_apnea(actionItem){
       let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-      setup_severityAction("Apnea", severityProps, function(props) {actionModel.addSeverityAction("UIApnea.qml",props)} )
+      add_single_range_action("Apnea", "Severity", severityProps, 
+        function(props) {actionModel.add_single_range_action("UIApnea.qml", props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -361,7 +345,8 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_airwayObstruction(actionItem){
       let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-      setup_severityAction("Airway Obstruction", severityProps, function(props) {actionModel.addSeverityAction("UIAirwayObstruction.qml",props)} )
+      add_single_range_action("Airway Obstruction", "Severity", severityProps, 
+        function(props) {actionModel.add_single_range_action("UIAirwayObstruction.qml", props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -370,7 +355,8 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_bronchoconstriction(actionItem){
 let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-      setup_severityAction("Broncho Construction", severityProps, function(props) {actionModel.addSeverityAction("UIBronchoconstriction.qml",props)} )
+      add_single_range_action("Broncho Construction", "Severity", severityProps, 
+        function(props) {actionModel.add_single_range_action("UIBronchoconstriction.qml", props)} )
     }
 
     //----------------------------------------------------------------------------------------
@@ -379,22 +365,23 @@ let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinSt
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_acuteStress(actionItem){
         let spinnerProperties = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-        setup_severityAction("Acute Stress", spinnerProperties, function(props) {actionModel.addSeverityAction("UIAcuteStress.qml",props)} )
+        add_single_range_action("Acute Stress", "Severity", spinnerProperties, 
+          function(props) {console.log(props.spinnerValue);actionModel.add_single_range_action("UIAcuteStress.qml", props)} )
     }
 
     //----------------------------------------------------------------------------------------
-    /// Create dialog window for actions that accepts single severity input (asthma, burn, airway obstruction, etc.)
+    /// Create dialog window for actions that accepts single double input (asthma, burn, airway obstruction, etc.)
     /// Accepts action name, label, biogears function, and args to customize spin box
     /// Sets up a spin box to track severity
-    function setup_severityAction(actionName, spinnerProperties, creationFunc ){
+    function add_single_range_action(title,label, spinnerProperties, creationFunc ){
        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
        if ( dialogComponent.status == Component.Ready){
            var dialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 1});
-           dialog.initializeProperties({name : actionName,  severity : 0 })
+           dialog.initializeProperties({name : title,  severity : 0 })
            let dialogHeight = dialog.contentItem.height
            //BEGIN  PROPERTIES
            spinnerProperties.prefHeight = dialogHeight / 3
-           let severitySpinBox = dialog.addSpinBox('Severity', 'severity', spinnerProperties)
+           let severitySpinBox = dialog.addSpinBox(label, "spinnerValue", spinnerProperties)
            //END  PROPERTIES
            dialog.applyProps.connect(creationFunc)
            actionDrawer.closed.connect(dialog.destroy)

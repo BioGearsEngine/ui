@@ -160,12 +160,12 @@ ControlsForm {
       }
     }
 
-  function addSeverityAction(componentType, props, physiology) {
+  function add_single_range_action(componentType, props, physiology) {
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
         var v_action = v_severityForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
-                                                                                "severity" : props.severity,
-                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                                      "severity" : props.spinnerValue,
+                                                                      "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                                })
         v_action.scenario = biogears_scenario
         v_action.uuid = uuidv4()

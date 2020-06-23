@@ -10,11 +10,12 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property double severity : 0.0
-
-  actionType : "Acute Stress"
-  fullName  : "<b>%1</b> Severity = %2".arg(actionType).arg(severity)
-  shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
+  property double tbsa : 0.0
+  property alias severity  : root.tbsa
+  
+  actionType : "Burn Wound"
+  fullName  : "<b>%1</b> Total Burn Sufrace Area = %2".arg(actionType).arg(tbsa)
+  shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(tbsa)
 
   details : Component  {
     GridLayout {
@@ -34,7 +35,7 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Severity"
+        text : "TBSA"
       }      
       Slider {
         id: stimulus      
@@ -43,16 +44,16 @@ UIActionForm {
         from : 0
         to : 1
         stepSize : 0.05
-        value : root.severity
+        value : root.tbsa
 
         onMoved : {
-          root.severity = value
+          root.tbsa = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1".arg(root.severity)
+        text : "%1".arg(root.tbsa)
       }
     
       // Column 3
@@ -114,6 +115,6 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_acute_stress_action(severity)  }
-  onDeactivate: { scenario.create_acute_stress_action(0)  }
+  onActivate:   { scenario.create_burn_action(tbsa)  }
+  onDeactivate: { scenario.create_burn_action(0)  }
 }
