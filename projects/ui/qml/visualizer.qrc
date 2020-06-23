@@ -52,8 +52,9 @@
         <file alias="UISubstanceEntryForm.ui.qml" >elements/UISubstanceEntryForm.ui.qml</file>
         <file alias="UIEnvironmentWizard.qml" >elements/UIEnvironmentWizard.qml</file>
         <file alias="UIEnvironmentWizardForm.ui.qml" >elements/UIEnvironmentWizardForm.ui.qml</file>
-        <file alias="UIAsthmaAttackForm.ui.qml"  >actions/UIAsthmaAttackForm.ui.qml</file>
-        <file alias="UIPainStimulusForm.ui.qml" >actions/UIPainStimulusForm.ui.qml</file>
+        <file alias="UIAsthmaAttack.qml"  >actions/UIAsthmaAttack.qml</file>
+        <file alias="UIPainStimulus.qml" >actions/UIPainStimulus.qml</file>
+        <file alias="UIActionForm.ui.qml" >actions/UIActionForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

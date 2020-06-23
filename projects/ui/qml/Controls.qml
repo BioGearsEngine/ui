@@ -183,7 +183,7 @@ ControlsForm {
     }
 
     function addPainStimulusAction(props, onFunc, offFunc) {
-      var v_painStimulusForm = Qt.createComponent("UIPainStimulusForm.ui.qml");
+      var v_painStimulusForm = Qt.createComponent("UIPainStimulus.ui.qml");
       if ( v_painStimulusForm.status == Component.Ready)  {
         var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
                                                                                 "location" : props.location, "intensity" : props.painScore,
@@ -237,8 +237,7 @@ ControlsForm {
   });
 }
 
-
-  function removeAction( uuid) {
+function removeAction( uuid) {
       console.log(uuid)
       for ( let i = 0; i < actionSwitchModel.count; ++i){
         console.log (actionSwitchModel, actionSwitchModel.get(i), actionSwitchModel.get(i).uuid)

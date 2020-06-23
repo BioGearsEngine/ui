@@ -5,7 +5,8 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.2
 import com.biogearsengine.ui.scenario 1.0
 
-
+//NOTE: NOt Tested Needs Validation on Implementation of Consume Meal 
+//      I think we should lock in digestion rate but allow people to increase/decrease portions
 Rectangle {
   id: root
   color: "transparent"
@@ -18,14 +19,28 @@ Rectangle {
   signal adjust( var list)
 
   property double intensity : 0.0
-  property string actionType : "Pain Stimulus"
-  property string location : "LeftArm"
+  property string actionType : "Consume Meal"
+
+  //Begin Action Properties
+  property string name : "Default"
+  property double carbohydrate_mass : 1
+  property double fat_mass : 1
+  property double protien_mass : 1
+  property double calcium_mass : 1
+  property double sodium_mass  : 1
+  property double water_volume : 1
+
+  property double carbohydrate_rate : 1
+  property double fat_rate : 1
+  property double protien_rate : 1
+  //End Action Properties
+
   property string uuid : ""
   property bool active : false
   property bool collapsed : true
 
-  property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg(location).arg(intensity)
-  property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(location).arg(intensity)
+  property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(name)
+  property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]<br/>Carbohdrate %3g<br/>Fat %4g<br/>Protien %5g<br/>Calcium %6g<br/>Socium %7g<br/>Water %8ml<br/>".arg(actionType).arg(name).arg(carbohydrate_mass).arg(fat_mass).arg(protien_mass).arg(calcium_mass).arg(sodium_mass).arg(water_volume)
 
   onActiveChanged : {
     if ( active) {
@@ -40,14 +55,13 @@ Rectangle {
   Loader {
     id : loader
 
-     
     Component {
       id : details
 
       GridLayout {
         id: grid
         columns : 4
-        rows    : 4
+        rows    : 15
         width : root.width -5
         anchors.centerIn : parent
       
@@ -62,14 +76,15 @@ Rectangle {
           font.pixelSize : 10
           font.bold : false
           color : "steelblue"
-          text : "[%1]".arg(root.location)
+          text : "[%1]".arg(root.name)
           Layout.alignment : Qt.AlignHCenter
         }
+        
         //Column 2
         Label {
           Layout.row : 1
           Layout.column : 0
-          text : "Intensity"
+          text : "Carbohydrates"
         }
       
         Slider {
@@ -89,67 +104,144 @@ Rectangle {
           }
         }
         Label {
-          text : "%1".arg(root.intensity)
+          text : "%1".arg(root.carbohydrate_mass)
+        }
+        //Column 3
+        Label {
+          Layout.row : 2
+          Layout.column : 0
+          text : "Fat"
         }
       
-        // Column 3
-        Rectangle {
-          id: toggle
+        Slider {
+          id: stimulus
       
-          Layout.row : 2
-          Layout.column : 2
-          Layout.columnSpan : 2
           Layout.fillWidth : true
-          Layout.preferredHeight : 30
-      
-          color:        root.active? 'green': 'red' // background
-          opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
-      
-          Text {
-            text:  root.active?    'On': 'Off'
-            color: root.active? 'white': 'white'
-            horizontalAlignment : Text.AlignHCenter
-            width : pill.width
-            x:    root.active ? 0: pill.width
-            font.pixelSize: 0.5 * toggle.height
-            anchors.verticalCenter: parent.verticalCenter
+          Layout.columnSpan : 2
+          from : 0
+          to : 10
+          stepSize : 1
+          value : root.intensity
+
+          onMoved : {
+            root.intensity = value
+            if ( root.active )
+               root.active = false;
           }
-          Rectangle { // pill
-              id: pill
+        }
+        Label {
+          text : "%1".arg(root.fat_mass)
+        }
+      //Column 4
+        Label {
+          Layout.row : 3
+          Layout.column : 0
+          text : "Carbohydrates"
+        }
       
-              x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
-              width: parent.width * .5;
-              height: parent.height // square
-              border.width: parent.border.width
+        Slider {
+          id: stimulus
       
+          Layout.fillWidth : true
+          Layout.columnSpan : 2
+          from : 0
+          to : 10
+          stepSize : 1
+          value : root.intensity
+
+          onMoved : {
+            root.intensity = value
+            if ( root.active )
+               root.active = false;
           }
-          MouseArea {
-              id: mouseArea
+        }
+        Label {
+          text : "%1".arg(root.protien_mass)
+        }
+        
+      //Column 5
+        Label {
+          Layout.row : 4
+          Layout.column : 0
+          text : "Calcium"
+        }
       
-              anchors.fill: parent
+        Slider {
+          id: stimulus
       
-              drag {
-                  target:   pill
-                  axis:     Drag.XAxis
-                  maximumX: toggle.width - pill.width
-                  minimumX: 0
-              }
-      
-              onReleased: { // Did we drag the button far enough.
-                if( root.active) {
-                   if(pill.x < toggle.width - pill.width) {
-                      root.active = false // right to left
-                    }
-                } else {
-                    if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
-                      root.active = true // left  to right
-                  } 
-                }
-              }
-              onClicked: {
-                root.active = !root.active
-              }// emit
+          Layout.fillWidth : true
+          Layout.columnSpan : 2
+          from : 0
+          to : 10
+          stepSize : 1
+          value : root.intensity
+
+          onMoved : {
+            root.intensity = value
+            if ( root.active )
+               root.active = false;
           }
+        }
+        Label {
+          text : "%1".arg(root.calcium_mass)
+        }
+        //Column 6
+        Label {
+          Layout.row : 5
+          Layout.column : 0
+          text : "Sodium"
+        }
+      
+        Slider {
+          id: stimulus
+      
+          Layout.fillWidth : true
+          Layout.columnSpan : 2
+          from : 0
+          to : 10
+          stepSize : 1
+          value : root.intensity
+
+          onMoved : {
+            root.intensity = value
+            if ( root.active )
+               root.active = false;
+          }
+        }
+        Label {
+          text : "%1".arg(root.sodium_mass)
+        }
+        //Column 7
+        Label {
+          Layout.row : 6
+          Layout.column : 0
+          text : "Water"
+        }
+      
+        Slider {
+          id: stimulus
+      
+          Layout.fillWidth : true
+          Layout.columnSpan : 2
+          from : 0
+          to : 10
+          stepSize : 1
+          value : root.intensity
+
+          onMoved : {
+            root.intensity = value
+            if ( root.active )
+               root.active = false;
+          }
+        }
+        Label {
+          text : "%1".arg(root.water_volume)
+        }
+        
+        // Column 8
+        Button {
+          id : activate
+          onClicked: root.activate()
         }
       }
 
@@ -221,29 +313,9 @@ Rectangle {
             }
           }
         }
-        Rectangle {
-          id: toggle
-          Layout.fillWidth : true
-          height : 20
-          border.color : "blue"
-          color:        root.active? 'green': 'red' // background
-          opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state
-
-          Text {
-            text:  root.active?    'On': 'Off'
-            color:  'white'
-            horizontalAlignment : Text.AlignHCenter
-            anchors.centerIn : parent
-            font.pixelSize: 0.5 * toggle.height
-
-          }
-          MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            onClicked: {
-              root.active = !root.active
-            }// emit
-          }
+        Button {
+          id : activate
+          onClicked: root.activate()
         }
       }
     }
