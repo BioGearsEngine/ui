@@ -1160,11 +1160,7 @@ void Scenario::create_substance(QVariantMap substanceData)
 
     auto& subPD = newSubstance->GetPD(); //Creates SESubstancePharmacodynamics
 
-    //EC50 and Shape Parameter are required -- All others default to 0 (no effect) if not given
-    //EC50
-    subMetric = pdData["EC50"].toList();
-    auto& ecUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
-    subPD.GetEC50().SetValue(subMetric[0].toDouble(), ecUnit);
+    //Shape Parameter is required -- All others default to 0 (no effect) if not given
     //Shape Parameter
     subMetric = pdData["ShapeParameter"].toList();
     subPD.GetEMaxShapeParameter().SetValue(subMetric[0].toDouble());
@@ -1176,55 +1172,140 @@ void Scenario::create_substance(QVariantMap substanceData)
     } else {
       subPD.GetEffectSiteRateConstant().SetValue(0.0, biogears::FrequencyUnit::Per_s);
     }
-    double modifier = 0.0;
+    double modifierE0 = 0.0;
+    double modifierEC50 = 0.0;
     //Bronchodilation
-    subMetric = pdData["BronchodilationModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetBronchodilation().SetValue(modifier);
+    subMetric = pdData["BronchodilationMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetBronchodilation().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["BronchodilationEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetBronchodilation().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetBronchodilation().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Diastolic Pressure
-    subMetric = pdData["DiastolicPressureModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetDiastolicPressureModifier().SetValue(modifier);
+    subMetric = pdData["DiastolicPressureMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetDiastolicPressureModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["DiastolicPressureEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetDiastolicPressureModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetDiastolicPressureModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Systolic Pressure
-    subMetric = pdData["SystolicPressureModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetSystolicPressureModifier().SetValue(modifier);
+    subMetric = pdData["SystolicPressureMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetSystolicPressureModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["SystolicPressureEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetSystolicPressureModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetSystolicPressureModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Fever
-    subMetric = pdData["FeverModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetFeverModifier().SetValue(modifier);
+    subMetric = pdData["FeverMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetFeverModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["FeverEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetFeverModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetFeverModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Heart Rate
-    subMetric = pdData["HeartRateModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetHeartRateModifier().SetValue(modifier);
+    subMetric = pdData["HeartRateMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetHeartRateModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["HeartRateEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetHeartRateModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetHeartRateModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Hemorrhage
-    subMetric = pdData["HemorrhageModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetHemorrhageModifier().SetValue(modifier);
+    subMetric = pdData["HemorrhageMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetHemorrhageModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["HemorrhageEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetHemorrhageModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetHemorrhageModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Respiration Rate
-    subMetric = pdData["RespirationRateModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetRespirationRateModifier().SetValue(modifier);
+    subMetric = pdData["RespirationRateMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetRespirationRateModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["RespirationRateEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetRespirationRateModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetRespirationRateModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Sedation
-    subMetric = pdData["SedationModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetSedation().SetValue(modifier);
+    subMetric = pdData["SedationMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetSedation().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["SedationEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetSedation().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetSedation().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Tidal Volume
-    subMetric = pdData["TidalVolumeModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetTidalVolumeModifier().SetValue(modifier);
+    subMetric = pdData["TidalVolumeMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetTidalVolumeModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["TidalVolumeEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetTidalVolumeModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetTidalVolumeModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Tubular Permeability
-    subMetric = pdData["TubularPermeabilityModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetTubularPermeabilityModifier().SetValue(modifier);
+    subMetric = pdData["TubularPermeabilityMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetTubularPermeabilityModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["TubularPermeabilityEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetTubularPermeabilityModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetTubularPermeabilityModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Central Nervous
-    subMetric = pdData["CentralNervousModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetCentralNervousModifier().SetValue(modifier);
+    subMetric = pdData["CentralNervousMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetCentralNervousModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["CentralNervousEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetCentralNervousModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetCentralNervousModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Pain
-    subMetric = pdData["PainModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetPainModifier().SetValue(modifier);
+    subMetric = pdData["PainReductionMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetPainModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["PainReductionEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetPainModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetPainModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Antibacterial Effect
     subMetric = pdData["AntibacterialEffect"].toList();
     if (!subMetric[0].isNull()) {
@@ -1234,17 +1315,37 @@ void Scenario::create_substance(QVariantMap substanceData)
       subPD.GetAntibacterialEffect().SetValue(0.0, biogears::FrequencyUnit::Per_s);
     }
     //Neuromuscular Block
-    subMetric = pdData["NeuromuscularBlockModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    subPD.GetNeuromuscularBlock().SetValue(modifier);
+    subMetric = pdData["NeuromuscularBlockMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetNeuromuscularBlock().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["NeuromuscularBlockEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetNeuromuscularBlock().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetNeuromuscularBlock().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
     //Pupillary Response
-    auto& pupilResponse = subPD.GetPupillaryResponse();
-    subMetric = pdData["Pupil-SizeModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    pupilResponse.GetSizeModifier().SetValue(modifier);
-    subMetric = pdData["Pupil-ReactivityModifier"].toList();
-    modifier = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
-    pupilResponse.GetReactivityModifier().SetValue(modifier);
+    subMetric = pdData["PupilSizeMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetPupilSizeModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["PupilSizeEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetPupilSizeModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetPupilSizeModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
+    subMetric = pdData["PupilReactivityMaxEffect"].toList();
+    modifierE0 = subMetric[0].isNull() ? 0.0 : subMetric[0].toDouble();
+    subPD.GetPupilReactivityModifier().GetEMax().SetValue(modifierE0);
+    subMetric = pdData["PupilReactivityEC50"].toList();
+    if (!subMetric[0].isNull()) {
+      auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(subMetric[1].toString().toStdString());
+      subPD.GetPupilReactivityModifier().GetEC50().SetValue(subMetric[0].toDouble(), cUnit);
+    } else {
+      subPD.GetPupilReactivityModifier().GetEC50().SetValue(0.0, biogears::MassPerVolumeUnit::ug_Per_mL);
+    }
   }
 
   export_substance(newSubstance);
@@ -1485,73 +1586,128 @@ QVariantMap Scenario::edit_substance()
       substanceMap["TissueKinetics"] = pkMap;
     }
   }
+
   //----Pharmacodynamics
   if (sub->HasPD()) {
     auto& subPD = sub->GetPD();
     QVariantMap pdMap;
-    //EC50
-    subField[0] = subPD.GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
-    subField[1] = "ug/L";
-    pdMap["EC50"] = subField;
     //Shape parameter
     subField[0] = subPD.GetEMaxShapeParameter().GetValue();
     subField[1] = "";
     pdMap["ShapeParameter"] = subField;
     //Effect site rate constant
-    subField[0] = subPD.GetEffectSiteRateConstant().GetValue(biogears::FrequencyUnit::Per_s);
-    subField[1] = "1/s";
+    subField[0] = subPD.GetEffectSiteRateConstant().GetValue(biogears::FrequencyUnit::Per_min);
+    subField[1] = "1/min";
     pdMap["EffectSiteRateConstant"] = subField;
     //Antibacterial effect
     subField[0] = subPD.GetAntibacterialEffect().GetValue(biogears::FrequencyUnit::Per_s);
     subField[1] = "1/s";
     pdMap["AntibacterialEffect"] = subField;
-
-    subField[1] = ""; //Remainin modifiers have no unit, set units place to empty ahead of time
     //Bronchodilation Modifier
-    subField[0] = subPD.GetBronchodilation().GetValue();
-    pdMap["BronchodilationModifier"] = subField;
+    subField[0] = subPD.GetBronchodilation().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["BronchodilationMaxEffect"] = subField;
+    subField[0] = subPD.GetBronchodilation().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["BronchodilationEC50"] = subField;
     //Diastolic pressure Modifier
-    subField[0] = subPD.GetDiastolicPressureModifier().GetValue();
-    pdMap["DiastolicPressureModifier"] = subField;
+    subField[0] = subPD.GetDiastolicPressureModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["DiastolicPressureMaxEffect"] = subField;
+    subField[0] = subPD.GetDiastolicPressureModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["DiastolicPressureEC50"] = subField;
     //Systolic pressure Modifier
-    subField[0] = subPD.GetSystolicPressureModifier().GetValue();
-    pdMap["SystolicPressureModifier"] = subField;
+    subField[0] = subPD.GetSystolicPressureModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["SystolicPressureMaxEffect"] = subField;
+    subField[0] = subPD.GetSystolicPressureModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["SystolicPressureEC50"] = subField;
     //Fever Modifier
-    subField[0] = subPD.GetFeverModifier().GetValue();
-    pdMap["FeverModifier"] = subField;
+    subField[0] = subPD.GetFeverModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["FeverMaxEffect"] = subField;
+    subField[0] = subPD.GetFeverModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["FeverEC50"] = subField;
     //Heart Rate Modifier
-    subField[0] = subPD.GetHeartRateModifier().GetValue();
-    pdMap["HeartRateModifier"] = subField;
+    subField[0] = subPD.GetHeartRateModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["HeartRateMaxEffect"] = subField;
+    subField[0] = subPD.GetHeartRateModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["HeartRateEC50"] = subField;
     //Hemorrhage Modifier
-    subField[0] = subPD.GetHemorrhageModifier().GetValue();
-    pdMap["HemorrhageModifier"] = subField;
+    subField[0] = subPD.GetHemorrhageModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["HemorrhageMaxEffect"] = subField;
+    subField[0] = subPD.GetHemorrhageModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["HemorrhageEC50"] = subField;
     //Neuromuscular Modifier
-    subField[0] = subPD.GetNeuromuscularBlock().GetValue();
-    pdMap["NeuromuscularBlockModifier"] = subField;
+    subField[0] = subPD.GetNeuromuscularBlock().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["NeuromuscularBlockMaxEffect"] = subField;
+    subField[0] = subPD.GetNeuromuscularBlock().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["NeuromuscularBlockEC50"] = subField;
     //Pain Modifier
-    subField[0] = subPD.GetPainModifier().GetValue();
-    pdMap["PainModifier"] = subField;
+    subField[0] = subPD.GetPainModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["PainReductionMaxEffect"] = subField;
+    subField[0] = subPD.GetPainModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["PainReductionEC50"] = subField;
     //Respiration Rate Modifier
-    subField[0] = subPD.GetRespirationRateModifier().GetValue();
-    pdMap["PainModifier"] = subField;
+    subField[0] = subPD.GetRespirationRateModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["RespirationRateMaxEffect"] = subField;
+    subField[0] = subPD.GetRespirationRateModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["RespirationRateEC50"] = subField;
     //Tidal Volume Modifier
-    subField[0] = subPD.GetTidalVolumeModifier().GetValue();
-    pdMap["TidalVolumeModifier"] = subField;
+    subField[0] = subPD.GetTidalVolumeModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["TidalVolumeMaxEffect"] = subField;
+    subField[0] = subPD.GetTidalVolumeModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["TidalVolumeEC50"] = subField;
     //Sedation Modifier
-    subField[0] = subPD.GetSedation().GetValue();
-    pdMap["SedationModifier"] = subField;
+    subField[0] = subPD.GetSedation().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["SedationMaxEffect"] = subField;
+    subField[0] = subPD.GetSedation().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["SedationEC50"] = subField;
     //Tubular Permeability Modifier
-    subField[0] = subPD.GetTubularPermeabilityModifier().GetValue();
-    pdMap["TubularPermeabilityModifier"] = subField;
+    subField[0] = subPD.GetTubularPermeabilityModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["TubularPermeabilityMaxEffect"] = subField;
+    subField[0] = subPD.GetTubularPermeabilityModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["TubularPermeabilityEC50"] = subField;
     //Central Nervous Modifier
-    subField[0] = subPD.GetCentralNervousModifier().GetValue();
-    pdMap["CentralNervousModifier"] = subField;
+    subField[0] = subPD.GetCentralNervousModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["CentralNervousMaxEffect"] = subField;
+    subField[0] = subPD.GetCentralNervousModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["CentralNervousEC50"] = subField;
     //Pupil-Size Modifier
-    subField[0] = subPD.GetPupillaryResponse().GetSizeModifier().GetValue();
-    pdMap["Pupil-SizeModifier"] = subField;
+    subField[0] = subPD.GetPupilSizeModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["PupilSizeMaxEffect"] = subField;
+    subField[0] = subPD.GetPupilSizeModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["PupilSizeEC50"] = subField;
     //Pupil-Reactivity Modifier
-    subField[0] = subPD.GetPupillaryResponse().GetReactivityModifier().GetValue();
-    pdMap["Pupil-ReactivityModifier"] = subField;
+    subField[0] = subPD.GetPupilReactivityModifier().GetEMax().GetValue();
+    subField[1] = "";
+    pdMap["PupilReactivityMaxEffect"] = subField;
+    subField[0] = subPD.GetPupilReactivityModifier().GetEC50().GetValue(biogears::MassPerVolumeUnit::ug_Per_L);
+    subField[1] = "ug/L";
+    pdMap["PupilReactivityEC50"] = subField;
 
     //Add PD map to Substance Map
     substanceMap["Pharmacodynamics"] = pdMap;
@@ -2351,6 +2507,7 @@ void Scenario::create_infection_action(QString location, int severity, double mi
 void Scenario::create_exercise_action(int type, double property_1, double property_2, double weight_kg)
 {
   auto action = std::make_unique<biogears::SEExercise>();
+
   auto generic = biogears::SEExercise::SEGeneric{};
   auto cycling = biogears::SEExercise::SECycling{};
   auto running = biogears::SEExercise::SERunning{};
@@ -2385,8 +2542,7 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
     action->SetStrengthExercise(strength);
     break;
   }
- 
-  
+
   _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_pain_stimulus_action(double severity, QString location)

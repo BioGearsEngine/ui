@@ -220,37 +220,46 @@ UISubstanceWizardForm {
 
 	//--Function to check PD specific data
 	function verifyPdData() {
-		let requiredCount = 0
+		debugObjects(pdData)
+		let hasShapeParam = false
 		let numModifiers = 0
 		let errorStr = ""
 		let valid = true
 		for (let key in pdData){
-			if (key === "EC50" || key === "ShapeParameter"){
+			if ( key === "ShapeParameter"){
 				if (pdData[key][0]!==null){
-					++requiredCount
+					hasShapeParam = true
 				}
 			} else {
-				if (pdData[key][0]!==null){
-					++numModifiers
+				//User must specify an Max Effect and EC50 for a modifier for it to be valid.  While traversing keys, identify those
+				//corresponding to MaxEffect.  Search for their counterpart EC50 entries and check that both entries (or none) are given.
+				//This excludes AntibacterialEffect (no "MaxEffect" string) intentionally, because it does not require and EC50
+				if (key.includes("MaxEffect")){
+					let modName = key.split("MaxEffect")[0]
+					let ec50Key = modName+"EC50"
+					console.log(modName, ec50Key)
+					if (pdData[key][0]!==null && pdData[ec50Key][0]===null){
+						errorString += "Pharmacodynamics: \n\t " + modName + " cannot set Max Effect without EC50.\n*"
+						valid = false
+					} else if (pdData[key][0]===null && pdData[ec50Key][0]!==null){
+						errorString += "Pharmacodynamics: \n\t " + modName + " cannot set EC50 without Max Effect.\n*"
+						valid = false
+					} else {
+						++numModifiers
+					}
 				}
 			}	
 		}
-		//There are two required PD fields.  If we have both, then input is valid (any modifiers
-		// not specified will be assigned 0).  If we have no required fields, then we are valid if there are 
+		//There is one required PD field (ShapeParameter).  If we have it, then input is valid (any modifiers
+		// not specified will be assigned 0).  If we do not have shape parameter, then we are valid if there are 
 		// no modifiers (meaning substance has no PD, which is fine), but invalid if we try to give modifiers
 		// (incomplete PD type).  Any other configuration is invalid.
-		if (requiredCount === 1){
-			//Only one of two required inputs given
+		if (!hasShapeParam && numModifiers > 0){
+			//Optional fields given but not shape parameter
 			valid = false
-			errorString += "Pharmacodynamics: \n\tBoth EC50 and Shape Parameter must be defined to set up substance PD.\n*"
-		} else {
-			if (requiredCount === 0 && numModifiers > 0){
-				//Optional fields given but not required
-				valid = false
-				errorString += "Pharmacodynamics: \n\tBoth EC50 and Shape Parameter must be defined to set up substance PD.\n*"
-			}
+			errorString += "Pharmacodynamics: \n\tShape Parameter must be defined to set up substance PD.\n*"
 		}
-		return [valid, requiredCount + numModifiers > 0]
+		return [valid, hasShapeParam]
 	}
 
 	//--Helper function that determines validity of all or nothing data (like Clearance, PK Physiochemicals, Tissue Kinetics, etc)
@@ -414,7 +423,6 @@ UISubstanceWizardForm {
 				pkData.physicochemical.SecondaryPKA[0] = cachedPkaTwo
 				cachedPkaTwo = -1
 			}
-			debugObjects(pkData.physicochemical)
 		} else if (pkaTwo.inPkPhysicochemical){										//If ionic state is anything else and pka 2 is active, we need to remove it.
 			if (pkData.physicochemical.SecondaryPKA[0]!==null) {
 				//Cache any data that was stored in the pka 2 field before removing it.
@@ -422,7 +430,6 @@ UISubstanceWizardForm {
 			}
 			pkaTwo.inPkPhysicochemical = false
 			delete pkData.physicochemical.SecondaryPKA
-			debugObjects(pkData.physicochemical)
 		}
 	}
 }
