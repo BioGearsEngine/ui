@@ -261,7 +261,7 @@ Scenario& Scenario::environment_name(QString name)
 //-------------------------------------------------------------------------------
 Scenario& Scenario::load_patient(QString file)
 {
-  substances_to_lists();
+  setup_physiology_lists();
 
   auto path = file.toStdString();
   if (!QFileInfo::exists(file)) {
@@ -521,12 +521,13 @@ double Scenario::get_simulation_time()
   return _engine->GetSimulationTime(biogears::TimeUnit::s);
 }
 //---------------------------------------------------------------------------------
-void Scenario::substances_to_lists()
+void Scenario::setup_physiology_lists()
 {
   _drugs_list.clear(); //Substances with pharmacokinetic/pharmacodynamic props
   _compounds_list.clear(); //Consist of a combination of components
   _transfusions_list.clear(); //Blood products to be transfused
   _components_list.clear(); //Substances elibigle to be added as components to compounds
+  _nutrition_list.clear(); //Nutrients that can be loaded to ConsumeMeal action
 
   QDir subDirectory = QDir("substances");
   std::unique_ptr<CDM::ObjectData> subXmlData;
@@ -569,6 +570,21 @@ void Scenario::substances_to_lists()
       }
     }
   }
+
+  QDir nutritionDirectory = QDir("nutrition");
+  if (!nutritionDirectory.exists()) {
+    std::cout << "This is not the nutrition directory you're looking for";
+  } else {
+    QDirIterator nutritionIt(nutritionDirectory, QDirIterator::NoIteratorFlags);
+    while (nutritionIt.hasNext()) {
+      auto it = nutritionIt.next(); //Only used to advance iterator--don't really need the string that is returned by this function
+      auto nutritionFileInfo = nutritionIt.fileInfo();
+      QString nutritionName = nutritionFileInfo.baseName();
+      if (!nutritionName.isEmpty()) {
+        _nutrition_list.push_back(nutritionName);
+      }
+    }
+  }
 }
 //---------------------------------------------------------------------------------
 QVector<QString> Scenario::get_drugs()
@@ -589,6 +605,11 @@ QVector<QString> Scenario::get_transfusion_products()
 QVector<QString> Scenario::get_components()
 {
   return _components_list;
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::get_nutrition()
+{
+  return _nutrition_list;
 }
 //---------------------------------------------------------------------------------
 QtLogForward* Scenario::getLogFoward()
@@ -1349,6 +1370,10 @@ void Scenario::create_substance(QVariantMap substanceData)
   }
 
   export_substance(newSubstance);
+  //If the substance has PD behavior, add it to the list of drugs so that it will be immediately available to use in Bg Actions
+  if (newSubstance->HasPD() && newSubstance->HasPK()) {
+    _drugs_list.push_back(QString::fromStdString(newSubstance->GetName()));
+  }
 }
 
 QVariantMap Scenario::edit_substance()
@@ -1732,7 +1757,7 @@ void Scenario::export_substance(const biogears::SESubstance* substance)
   std::unique_ptr<CDM::SubstanceData> subData(substance->Unload());
   CDM::Substance(stream, *subData, info); //Need to speficy CDM so no collision with Substance QObject
   stream.close();
-  _engine->GetLogger()->Info("Saved compound: " + fullPath);
+  _engine->GetLogger()->Info("Saved substance: " + fullPath);
   return;
 }
 
@@ -1760,6 +1785,9 @@ void Scenario::create_compound(QVariantMap compoundData)
   }
 
   export_compound(newCompound);
+  //Add compound to _compounds_list so that it is immediately available to use in SubCompoundInfusion action
+  //Add to transfusion list as well if blood components are defined
+  _compounds_list.push_back(QString::fromStdString(newCompound->GetName()));
 }
 
 QVariantMap Scenario::edit_compound()
@@ -1898,6 +1926,8 @@ void Scenario::create_nutrition(QVariantMap nutrition)
   }
 
   export_nutrition(newNutrition);
+  //Add new nutriton to _nutrition_list so that it is immediately available to Bg Consume Meal action
+  _nutrition_list.push_back(QString::fromStdString(newNutrition->GetName()));
 }
 
 QVariantMap Scenario::edit_nutrition()
@@ -1986,6 +2016,46 @@ QVariantMap Scenario::edit_nutrition()
   return nutritionMap;
 }
 
+QVariantMap Scenario::load_nutrition_for_meal(QString nutritionName)
+{
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  QVariantMap nutritionMap;
+  QDir nutritionDirectory = QDir("nutrition");
+  if (!nutritionDirectory.exists()) {
+    std::cout << "This is not the nutrition directory you're looking for";
+  } else {
+    QString fileBaseName = nutritionName + ".xml";
+    QFileInfo nutritionFileInfo(nutritionDirectory, fileBaseName);
+    biogears::SENutrition* nutrition = new biogears::SENutrition(_engine->GetLogger());
+    if (nutritionFileInfo.isFile()) {
+      std::unique_ptr<CDM::ObjectData> nutritionXMLData = biogears::Serializer::ReadFile(nutritionFileInfo.filePath().toStdString(), _engine->GetLogger());
+      CDM::NutritionData* nutritionData = dynamic_cast<CDM::NutritionData*>(nutritionXMLData.get());
+      nutrition->Load(*nutritionData);
+      if (nutrition->HasWater()) {
+        nutritionMap["Water"] = nutrition->GetWater().GetValue(biogears::VolumeUnit::mL);
+      }
+      if (nutrition->HasFat()) {
+        nutritionMap["Fat"] = nutrition->GetFat().GetValue(biogears::MassUnit::g);
+      }
+      if (nutrition->HasProtein()) {
+        nutritionMap["Protein"] = nutrition->GetProtein().GetValue(biogears::MassUnit::g);
+      }
+      if (nutrition->HasCarbohydrate()) {
+        nutritionMap["Carbohydrate"] = nutrition->GetCarbohydrate().GetValue(biogears::MassUnit::g);
+      }
+      if (nutrition->HasSodium()) {
+        nutritionMap["Sodium"] = nutrition->GetSodium().GetValue(biogears::MassUnit::mg);
+      }
+      if (nutrition->HasCalcium()) {
+        nutritionMap["Calcium"] = nutrition->GetCalcium().GetValue(biogears::MassUnit::mg);
+      }
+      if (nutrition->HasName()) {
+        nutritionMap["Meal"] = QString::fromStdString(nutrition->GetName());
+      }
+    }
+  }
+  return nutritionMap;
+}
 void Scenario::export_nutrition()
 {
   if (_engine->GetActions().GetPatientActions().HasConsumeNutrients()) {
@@ -2397,6 +2467,7 @@ void Scenario::export_state(bool saveAs)
 #include <biogears/cdm/patient/actions/SEBronchoconstriction.h>
 #include <biogears/cdm/patient/actions/SEBurnWound.h>
 #include <biogears/cdm/patient/actions/SECardiacArrest.h>
+#include <biogears/cdm/patient/actions/SEConsumeNutrients.h>
 #include <biogears/cdm/patient/actions/SEExercise.h>
 #include <biogears/cdm/patient/actions/SEHemorrhage.h>
 #include <biogears/cdm/patient/actions/SEInfection.h>
@@ -2620,21 +2691,8 @@ void Scenario::create_acute_stress_action(double severity)
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_consume_nutrients(double calcium_g, double carbs_g, double fat_g, double protien_g, double sodium_g, double water_ml)
-{
-  auto action = std::make_unique<biogears::SEConsumeNutrients>();
-  auto& nutrition = action->GetNutrition();
 
-  nutrition.GetCalcium().SetValue(calcium_g, biogears::MassUnit::g);
-  nutrition.GetCarbohydrate().SetValue(carbs_g, biogears::MassUnit::g);
-  nutrition.GetFat().SetValue(fat_g, biogears::MassUnit::g);
-  nutrition.GetProtein().SetValue(protien_g, biogears::MassUnit::g);
-  nutrition.GetSodium().SetValue(sodium_g, biogears::MassUnit::g);
-  nutrition.GetWater().SetValue(water_ml, biogears::VolumeUnit::mL);
-
-  _action_queue.as_source().insert(std::move(action));
-}
-void Scenario::create_anasthesia_machien_action(double o2_fraction, double o2_volume1, double o2_volume2)
+void Scenario::create_anesthesia_machine_action(double o2_fraction, double o2_volume1, double o2_volume2)
 {
   auto action = std::make_unique<biogears::SEAnesthesiaMachineConfiguration>(_engine->GetSubstanceManager());
   auto& config = action->GetConfiguration();
@@ -2650,9 +2708,21 @@ void Scenario::create_anasthesia_machien_action(double o2_fraction, double o2_vo
   config.SetOxygenSource(CDM::enumAnesthesiaMachineOxygenSource::Wall);
   config.GetPositiveEndExpiredPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
   config.SetPrimaryGas(CDM::enumAnesthesiaMachinePrimaryGas::Nitrogen);
-  config.GetReliefValvePressure().SetValue(20.0, biogears::PressureUnit::cmH2O);  
+  config.GetReliefValvePressure().SetValue(20.0, biogears::PressureUnit::cmH2O);
   config.GetRespiratoryRate().SetValue(12, biogears::FrequencyUnit::Per_min);
   config.GetVentilatorPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
+}
+
+void Scenario::create_consume_meal_action(QString mealName, double carbs_g, double fat_g, double protein_g, double sodium_mg, double calcium_mg, double water_mL)
+{
+  auto action = std::make_unique<biogears::SEConsumeNutrients>();
+  action->GetNutrition().SetName(mealName.toStdString());
+  action->GetNutrition().GetCarbohydrate().SetValue(carbs_g, biogears::MassUnit::g);
+  action->GetNutrition().GetFat().SetValue(fat_g, biogears::MassUnit::g);
+  action->GetNutrition().GetProtein().SetValue(protein_g, biogears::MassUnit::g);
+  action->GetNutrition().GetSodium().SetValue(sodium_mg, biogears::MassUnit::mg);
+  action->GetNutrition().GetCalcium().SetValue(calcium_mg, biogears::MassUnit::mg);
+  action->GetNutrition().GetWater().SetValue(water_mL, biogears::VolumeUnit::mL);
 
   _action_queue.as_source().insert(std::move(action));
 }

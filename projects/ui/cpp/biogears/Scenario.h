@@ -71,6 +71,7 @@ public:
   Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
   Q_INVOKABLE QVariantMap edit_nutrition();
   Q_INVOKABLE void export_nutrition();
+  Q_INVOKABLE QVariantMap load_nutrition_for_meal(QString nutritionName); //Load existing nutrion file into ConsumeMeal action dialog
   Q_INVOKABLE void create_patient(QVariantMap patient); //Create and save a new patient
   Q_INVOKABLE QVariantMap edit_patient();
   Q_INVOKABLE void export_patient(); //Export current patient (uses save_patient)
@@ -95,6 +96,7 @@ public:
   Q_INVOKABLE QVector<QString> get_compounds();
   Q_INVOKABLE QVector<QString> get_transfusion_products();
   Q_INVOKABLE QVector<QString> get_components();
+  Q_INVOKABLE QVector<QString> get_nutrition();
 
   Q_INVOKABLE QtLogForward* getLogFoward();
 
@@ -102,12 +104,11 @@ public:
   bool is_paused() const;
   bool is_throttled() const;
 
-  void substances_to_lists();
-
 public: //Action Factory Interface;
   Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
 
   Q_INVOKABLE void create_asthma_action(double severity);
+  Q_INVOKABLE void create_consume_meal_action(QString mealName, double carbs_g, double fat_g, double protein_g, double sodium_mg, double calcium_mg, double water_mL);
   Q_INVOKABLE void create_substance_bolus_action(QString substance, int route, double dose_mL, double concentration_ug_Per_mL);
   Q_INVOKABLE void create_substance_oral_action(QString substance, int route, double dose_mg);
   Q_INVOKABLE void create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min);
@@ -126,9 +127,8 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_cardiac_arrest_action(bool state);
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
-  Q_INVOKABLE void create_consume_nutrients(double calcium_g, double carbs_g, double fat_g, double protien_g, double sodium_g, double water_ml);
   Q_INVOKABLE void create_inhaler_action(bool active);
-  Q_INVOKABLE void create_anasthesia_machien_action(double mix, double volume_1, double volume_2);
+  Q_INVOKABLE void create_anesthesia_machine_action(double mix, double volume_1, double volume_2);
 
   Q_INVOKABLE QString patient_name_and_time();
   Q_INVOKABLE QString get_patient_state_files();
@@ -161,6 +161,8 @@ protected:
 
   void setup_physiology_model();
   void setup_physiology_substances(BioGearsData*);
+  void setup_physiology_lists();
+
 
   void physiology_thread_main();
   void physiology_thread_step();
@@ -194,6 +196,7 @@ private:
   QVector<QString> _components_list;        //Subs that can be components of compounds
   QVector<QString> _ambient_gas_list;       //Gases that can be added to environment
   QVector<QString> _ambient_aerosol_list;   //Aerosolized liquids that can be added to environment
+  QVector<QString> _nutrition_list;
 
   BioGearsData* _physiology_model;
 

@@ -18,13 +18,13 @@ Rectangle {
     anchors.left : root.left
     anchors.right : root.right
     anchors.top : root.top
-    height: root.height * .50
+    height: root.height * .75
     
     // contentWidth : consoleArea.contentWidth
 
     TextArea {  
       id: consoleArea
-      height: root.height * .50
+      height: root.height * .75
       width : root.width
       readOnly : true
       textFormat : TextEdit.RichText

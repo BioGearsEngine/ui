@@ -24,7 +24,7 @@ Dialog {
   header : Rectangle {
     id : headerBackground
     width : parent.width
-    height : parent.height * 0.2
+    height : 50
     color: "#1A5276"
     border.color: "#1A5276"
     Text {

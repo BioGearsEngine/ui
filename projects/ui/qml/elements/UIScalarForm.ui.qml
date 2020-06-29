@@ -13,7 +13,7 @@ ColumnLayout {
         id: value
         Layout.alignment: Qt.AlignCenter
         text: "22"
-        font.pointSize: 20
+        font.pointSize: 14
     }
     Label {
         id: name

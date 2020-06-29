@@ -8,6 +8,7 @@ Item {
   //Properties -- used to customize look / functionality of component
   property real prefWidth : parent.width
   property real prefHeight : root.implicitHeight
+  property int textSize : 8
   property int colSpan : 1
   property int rowSpan : 1
   property bool editable : true
@@ -20,7 +21,7 @@ Item {
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
   Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-  
+
   //States
   states : [
     State {
@@ -45,13 +46,18 @@ Item {
 
   TextField {
     id:textField
-    anchors.fill : parent
-    font.pointSize : 11
+    //Text field height is dictated by implicit height of text.  If you try to set it using height properties, the text will not respect
+    // the boundaries and will appear out of place w/ respect to other alignment settings.  If you need a smaller text field, then you
+    // need to set the text size smaller (or allow more space in widget for the field).
+    anchors.left : parent.left
+    anchors.right : parent.right
+    font.pointSize : root.textSize
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
     validator : DoubleValidator {
       bottom : 0.0
       top : root.maxValue
+      decimals : 3
     }
     background : Rectangle {
       id : backgroundRect

@@ -13,6 +13,7 @@ RowLayout {
   property real elementRatio : 0.5          //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
   property real prefWidth : parent.width
   property real prefHeight
+  property real fontSize : 12
   property int colSpan : 1
   property int rowSpan : 1
   property string splitToken                //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
@@ -36,7 +37,7 @@ RowLayout {
     text: "Unset"
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
-    font.pointSize: 12
+    font.pointSize: root.fontSize
   }
   ComboBox {
     id: value
@@ -45,7 +46,7 @@ RowLayout {
     Layout.fillHeight : true
     Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1     //If no preferred height, set to -1, which flags Qml Layout to use implicit maximum height
     font.weight: Font.Medium
-    font.pointSize: 12
+    font.pointSize: root.fontSize
     editable: true 
     currentIndex : -1
     contentItem : Text {

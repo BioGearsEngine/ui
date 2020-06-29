@@ -10,309 +10,288 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
+  property string actionType : "Consume Meal"
 
   //Begin Action Properties
   property string name : "Default"
-  property double carbohydrate_g : 1
-  property double fat_g : 1
-  property double protien_g : 1
-  property double calcium_g : 1
-  property double sodium_g  : 1
-  property double water_ml : 1
+  property double carbohydrate_mass : 0
+  property double fat_mass : 0
+  property double protein_mass : 0
+  property double calcium_mass : 0
+  property double sodium_mass  : 0
+  property double water_volume : 0
 
-  //End Action Properties
-  property Timer delaytimer : root.delaytimer
+  property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(name)
+  property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]<br/>Carbohdrate %3g<br/>Fat %4g<br/>Protein %5g<br/>Calcium %6g<br/>Socium %7g<br/>Water %8ml<br/>".arg(actionType).arg(name).arg(carbohydrate_mass).arg(fat_mass).arg(protein_mass).arg(calcium_mass).arg(sodium_mass).arg(water_volume)
 
-  actionType : "Consume Meal"
-  fullName  : "<b>Consume <font color=\"lightsteelblue\">%1</font>  Meal</b>".arg(root.name)
-  shortName : "<b>Consume <font color=\"lightsteelblue\">%1</font> </b>".arg(root.name)
-
-  Timer {
-    id : delaytimer
-    interval : 5000
-    running : false
-    repeat : false
-
-    onTriggered : {
-      root.active = false
-    }
-  }
-
-  summary : Component {
-    RowLayout {
-      id : actionRow
-      spacing : 5
-      height : childrenRect.height
-      width : root.width
-      Label {
-        id : actionLabel
-        width : parent.width * 3/4 - actionRow.spacing / 2
-        color : '#1A5276'
-        text : root.shortName
-        elide : Text.ElideRight
-        font.pointSize : 8
-        font.bold : true
-        horizontalAlignment  : Text.AlignLeft
-        leftPadding : 5
-        verticalAlignment : Text.AlignVCenter
-        background : Rectangle {
-            id : labelBackground
-            anchors.fill : parent
-            color : 'transparent'
-            border.color : 'grey'
-            border.width : 0
-        }
-        MouseArea {
-            id : labelMouseArea
-            anchors.fill : parent
-            hoverEnabled : true
-            propagateComposedEvents :true
-            Timer {
-              id : infoTimer
-              interval: 500; running: false; repeat: false
-              onTriggered:  actionTip.visible  = true
-            }
-
-            onEntered: {
-              infoTimer.start()
-              actionTip.visible  = false
-            }
-            onPositionChanged : {
-              infoTimer.restart()
-              actionTip.visible  = false
-            }
-            onExited : {
-              infoTimer.stop()
-              actionTip.visible  = false
-            }
-        }
-        ToolTip {
-          id : actionTip
-          parent : actionLabel
-          x : 0
-          y : parent.height + 5
-          visible : false
-          text : root.fullName
-          contentItem : Text {
-            text : actionTip.text
-            color : '#1A5276'
-            font.pointSize : 10
-          }
-          background : Rectangle {
-            color : "white"
-            border.color : "black"
-          }
-        }
-      }
-      Rectangle {
-        Layout.fillWidth : true
-      }
-      Button {
-        id: toggle
-        width  : 40
-        height : 20
-        text : "Feed"
-        MouseArea {
-          id: mouseArea
-          anchors.fill: parent
-          enabled : !root.active
-          onClicked: {
-            root.active = true
-            delaytimer.running = true
-          }// emit
-        }
-      }
-    }
-  } // End Summary Component
-
-  details : Component {
-    id : details
-
+  details : Component  {
     GridLayout {
       id: grid
       columns : 4
-      rows    : 15
+      rows    : 8
       width : root.width -5
       anchors.centerIn : parent
-    
       Label {
         font.pixelSize : 10
         font.bold : true
         color : "blue"
         text : "%1".arg(actionType)
-      }
-    
+        Layout.maximumHeight : root.parent.height / grid.rows
+      }      
       Label {
         font.pixelSize : 10
         font.bold : false
         color : "steelblue"
-        text : "[%1]".arg(root.name)
+        text : "[%1]".arg(root.location)
         Layout.alignment : Qt.AlignHCenter
+        Layout.maximumHeight : root.parent.height / grid.rows
       }
-      
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : "Carbohydrates"
-      }
+        text : "Carbohydrate (g)"
+        Layout.maximumHeight : root.parent.height / grid.rows
+      }      
       Slider {
-        id: carboydrates
-    
+        id: carbSlider
+        Layout.row : 1
+        Layout.column : 1
         Layout.fillWidth : true
+        Layout.maximumHeight : root.parent.height / grid.rows
         Layout.columnSpan : 2
         from : 0
-        to : 500
-        stepSize : 1
-        value : root.carbohydrate_g
+        to : 300          //300 g is reasonable amount for one day
+        stepSize : 5
+        value : root.carbohydrate_mass
 
         onMoved : {
-          root.carbohydrate_g = value
+          root.carbohydrate_mass = value
           if ( root.active )
-            root.active = false;
+              root.active = false;
         }
       }
       Label {
-        text : "%1 g".arg(root.carbohydrate_g)
+        Layout.row : 1
+        Layout.column : 3
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "%1".arg(root.carbohydrate_mass)
       }
       //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
-        text : "Fat"
-      }
+        text : "Fat (g)"
+        Layout.maximumHeight : root.parent.height / grid.rows
+      }      
       Slider {
-        id: fat
-    
+        id: fatSlider
+        Layout.row : 2
+        Layout.column : 1
+        Layout.maximumHeight : root.parent.height / grid.rows
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
-        to : 500
-        stepSize : 1
-        value : root.fat_g
+        to : 80          //80 g is reasonable amount for one day
+        stepSize : 5
+        value : root.fat_mass
 
         onMoved : {
-          root.fat_g = value
+          root.fat_mass = value
           if ( root.active )
-            root.active = false;
+              root.active = false;
         }
       }
       Label {
-        text : "%1 g".arg(root.fat_g)
+        Layout.row : 2
+        Layout.column : 3
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "%1".arg(root.fat_mass)
       }
-      //Column 4
+    //Column 4
       Label {
         Layout.row : 3
         Layout.column : 0
-        text : "Carbohydrates"
-      }
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "Protein (g)"
+      }      
       Slider {
-        id: protien
-    
+        id: proteinSlider
+        Layout.row : 3
+        Layout.column : 1
+        Layout.maximumHeight : root.parent.height / grid.rows
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
-        to : 500
-        stepSize : 1
-        value : root.protien_g
+        to : 100          //60ish g is reasonable amount / day for sedentary person, bump up to 100 account for active
+        stepSize : 5
+        value : root.protein_mass
 
         onMoved : {
-          root.protien_g = value
+          root.protein_mass = value
           if ( root.active )
-            root.active = false;
+              root.active = false;
         }
       }
       Label {
-        text : "%1 g".arg(root.protien_g)
+        Layout.row : 3
+        Layout.column : 3
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "%1".arg(root.protein_mass)
       }
       //Column 5
       Label {
         Layout.row : 4
         Layout.column : 0
-        text : "Calcium"
-      }
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "Calcium (mg)"
+      }      
       Slider {
-        id: calcium
-    
+        id: calciumSlider
+        Layout.row : 4
+        Layout.column : 1
         Layout.fillWidth : true
         Layout.columnSpan : 2
+        Layout.maximumHeight : root.parent.height / grid.rows
         from : 0
-        to : 500
-        stepSize : 1
-        value : root.calcium_g
+        to : 2000         //2000 mg is reasonable upper limit for one day
+        stepSize : 100
+        value : root.calcium_mass
 
         onMoved : {
-          root.calcium_g = value
+          root.calcium_mass = value
           if ( root.active )
-            root.active = false;
+              root.active = false;
         }
       }
       Label {
-        text : "%1 g".arg(root.calcium_g)
+        Layout.row : 4
+        Layout.column : 3
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "%1".arg(root.calcium_mass)
       }
       //Column 6
       Label {
         Layout.row : 5
         Layout.column : 0
-        text : "Sodium"
-      }
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "Sodium (mg)"
+      }      
       Slider {
-        id: sodium
-    
+        id: sodiumSlider
+        Layout.row : 5
+        Layout.column : 1
         Layout.fillWidth : true
         Layout.columnSpan : 2
+        Layout.maximumHeight : root.parent.height / grid.rows
         from : 0
-        to : 500
-        stepSize : 1
-        value : root.sodium_g
+        to : 3000         //3000 mg is more than recommended amount, but most people go above recommendations
+        stepSize : 100
+        value : root.sodium_mass
 
         onMoved : {
-          root.sodium_g = value
+          root.sodium_mass = value
           if ( root.active )
-            root.active = false;
+              root.active = false;
         }
       }
       Label {
-        text : "%1 g".arg(root.sodium_g)
+        Layout.row : 5
+        Layout.column : 3
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "%1".arg(root.sodium_mass)
       }
       //Column 7
       Label {
         Layout.row : 6
         Layout.column : 0
-        text : "Water"
-      }
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "Water (mL)"
+      }      
       Slider {
-        id: water
-    
+        id: waterSlider
+        Layout.row : 6
+        Layout.column : 1
         Layout.fillWidth : true
         Layout.columnSpan : 2
+        Layout.maximumHeight : root.parent.height / grid.rows
         from : 0
-        to : 500
-        stepSize : 1
-        value : root.water_ml
+        to : 3000         //3000 mL is more than recommended amount per day
+        stepSize : 100
+        value : root.water_volume
 
         onMoved : {
-          root.water_ml = value
+          root.water_volume = value
           if ( root.active )
-            root.active = false;
+              root.active = false;
         }
       }
       Label {
-        text : "%1 ml".arg(root.water_ml)
+        Layout.row : 6
+        Layout.column : 3
+        Layout.maximumHeight : root.parent.height / grid.rows
+        text : "%1".arg(root.water_volume)
       }
       // Column 8
-      Button {
-        id : activate
-        enabled : !root.active
-        text : "Feed"
-        onClicked: {
-          root.active = true
-          delaytimer.running = true
+      Rectangle {
+        id: toggle      
+        Layout.row : 7
+        Layout.column : 2
+        Layout.columnSpan : 2
+        Layout.maximumHeight : root.parent.height / grid.rows
+        Layout.fillWidth : true
+        Layout.preferredHeight : 30      
+        color:        root.active? 'green': 'red' // background
+        opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
+        Text {
+          text:  root.active?    'On': 'Off'
+          color: root.active? 'white': 'white'
+          horizontalAlignment : Text.AlignHCenter
+          width : pill.width
+          x:    root.active ? 0: pill.width
+          font.pixelSize: 0.5 * toggle.height
+          anchors.verticalCenter: parent.verticalCenter
+        }
+        Rectangle { // pill
+            id: pill
+    
+            x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
+            width: parent.width * .5;
+            height: parent.height // square
+            border.width: parent.border.width
+    
+        }
+        MouseArea {
+            id: mouseArea
+    
+            anchors.fill: parent
+    
+            drag {
+                target:   pill
+                axis:     Drag.XAxis
+                maximumX: toggle.width - pill.width
+                minimumX: 0
+            }
+    
+            onReleased: { // Did we drag the button far enough.
+              if( root.active) {
+                  if(pill.x < toggle.width - pill.width) {
+                    root.active = false // right to left
+                  }
+              } else {
+                  if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
+                    root.active = true // left  to right
+                } 
+              }
+            }
+            onClicked: {
+              root.active = !root.active
+            }// emit
         }
       }
     }
-  }// Details Component
+  }// End Details Component
 
-  onActivate:   { console.log("Feeding the patient %1".arg(name));scenario.create_consume_nutrients(carbohydrate_g, fat_g, protien_g, calcium_g, sodium_g, water_ml)  }
-  onDeactivate: {   }
+  onActivate:   { scenario.create_consume_meal_action(name, carbohydrate_mass, fat_mass, protein_mass, sodium_mass,calcium_mass, water_volume)  }
+  onDeactivate: { console.log("Cannot deactivate meal") }
 }

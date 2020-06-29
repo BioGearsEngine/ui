@@ -573,34 +573,51 @@ ActionDrawerForm {
         }
     }
 
-    function setup_consumeMeal (actionItem) {
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status == Component.Ready) {
-            var mealDialog = dialogComponent.createObject(root.parent, {'numRows' : 4, 'numColumns' : 2});
-            mealDialog.initializeProperties({name : actionItem.name, type : '', bagVolume : 0, rate : 0})
-            let dialogWidth = mealDialog.contentItem.width
-            let dialogHeight = mealDialog.contentItem.height
-
-            let nameField = mealDialog.addTextField('Name', 'name',  {prefWidth : dialogWidth, prefHeight : dialogHeight / 3, colSpan : 2, editable : true})
-            nameField.textField.validator = null
-            let rateSpinProps = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 4, elementRatio : 0.4, spinMax : 500, spinStep : 1, unitScale : false}
-            let calcium_g = mealDialog.addSpinBox('Calcium (g)', 'calcium', rateSpinProps)
-            let carbs_g   = mealDialog.addSpinBox('Carbs (g)', 'carbs', rateSpinProps)
-            let fat_g     = mealDialog.addSpinBox('Fat (g)', 'fat', rateSpinProps)
-            let protien_g = mealDialog.addSpinBox('Protien (g)', 'protien', rateSpinProps)
-            let sodium_g  = mealDialog.addSpinBox('Sodium (g)', 'sodium', rateSpinProps)
-            let water_ml  = mealDialog.addSpinBox('Water (mL)', 'water', rateSpinProps)
-            
-            mealDialog.applyProps.connect( function(props){ actionModel.add_consume_meal(props)})
-            actionDrawer.closed.connect(mealDialog.destroy)
-            mealDialog.open()
+    //Consume Meal
+    function setup_consumeMeal(actionItem){
+      var v_dialogComponent = Qt.createComponent("UIActionDialog.qml");
+        if ( v_dialogComponent.status == Component.Ready) {
+            var v_mealDialog = v_dialogComponent.createObject(root.parent, {'numRows' : 5, 'numColumns' : 2});
+            v_mealDialog.height = 350
+            v_mealDialog.initializeProperties({name : actionItem.name, fileName : '', mealName : '', carbohydrate : 0, fat : 0, protein : 0, calcium : 0, sodium : 0, water : 0, fileName : ''})
+            let l_dialogHeight = v_mealDialog.contentItem.height
+            let l_dialogWidth  = v_mealDialog.contentItem.width
+            //let l_optionCheckBox = Qt.createQmlObject("import QtQuick.Controls 1.4; CheckBox { text : 'Use file'; checked : false}", v_mealDialog.contentItem, "CheckBox")
+            //let compoundList = scenario.get_compounds() -- Get nutrition files or open dialog
+            let l_nutritionList = scenario.get_nutrition()
+            let l_nutritionListData = {type : 'ListModel', role : 'nutrition', elements : l_nutritionList}
+            let l_nutritionFileProps = {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth, elementRatio : 0.55, colSpan : 2, fontSize : 10}
+            let l_nutritionCombo = v_mealDialog.addComboBox('Load nutrition from file (optional)', 'fileName', l_nutritionListData, l_nutritionFileProps)
+            let l_nutritionName = v_mealDialog.addTextField('Meal Name', 'mealName', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_water = v_mealDialog.addTextField('Water (mL)', 'water', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_fat = v_mealDialog.addTextField('Fat Content (g)', 'fat', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_carbs = v_mealDialog.addTextField('Carbohydrate Content (g)', 'carbohydrate', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_protein = v_mealDialog.addTextField('Protein Content (g)', 'protein', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_sodium = v_mealDialog.addTextField('Sodium Content (mg)', 'sodium', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_calcium = v_mealDialog.addTextField('Calcium Content (mg)', 'calcium', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            l_nutritionCombo.comboUpdate.connect(function(selection) { loadNutritionData(v_mealDialog, selection)} )
+            v_mealDialog.applyProps.connect( function(props)    { actionModel.add_consume_meal_action(props) })
+            actionDrawer.closed.connect(v_mealDialog.destroy)
+            v_mealDialog.open()
         } else {
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
+            if (v_dialogComponent.status == Component.Error){
+                console.log("Error : " + v_dialogComponent.errorString() );
                 return;
             }
             console.log("Error : Action dialog component not ready");
         }
+    }
+    function loadNutritionData(mealDialog, fileName){
+      let l_children = mealDialog.contentItem.children      //content children of dialog are all the components we created
+      let l_nutritionInfo = scenario.load_nutrition_for_meal(fileName)
+      for (let child in l_children){
+        //Only look for text fields (they have the data we need to overwrite).  Perform search by determing if child has textField prop
+			  if (l_children[child].textField){
+          let l_searchKey = l_children[child].textField.placeholderText.split(" ")[0]
+          l_children[child].textField.text = l_nutritionInfo[l_searchKey]
+          l_children[child].textFieldUpdate(l_nutritionInfo[l_searchKey])  //Force update to properties object to make sure we are tracking data
+        }
+		  }
     }
 
     //Placeholder function for other actions that have not yet been defined in Scenario.cpp

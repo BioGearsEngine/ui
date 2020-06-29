@@ -130,14 +130,19 @@ ColumnLayout {
     }
     Layout.preferredWidth: root.width
     Layout.alignment: Qt.AlignHCenter
+    Layout.preferredHeight : drawerText.implicitHeight * 1.5
   }
 
   Item {
     id : actionButtonWrapper
     Layout.preferredWidth : root.width
-    Layout.preferredHeight : 400
+    //This item needs to exactly fill remaining space, or else scroll feature of ListView will not have correct scoll boundaries
+    //Controls item height is implicit (depends entirely on objects that fill it), so we cannot bind to it without creating a loop.
+    //Since parent of Controls is main window, root.parent.height gets us an absolute height from which we can subtract other item
+    //heights to get remaining space for action list view.  Note that we need to subtract the height of the file menu bar, which sits
+    //atop the controls area in the main window.
+    Layout.preferredHeight : root.parent.height - (patientMenu.height + configuration_row1.height + configuration_row2.height + physiology.height + playback_controls.height + openDrawerButton.height + 6 * root.spacing + root.parent.menuArea.height)
     z : 2
-
     ListView {
       id : actionSwitchView
       clip: true
