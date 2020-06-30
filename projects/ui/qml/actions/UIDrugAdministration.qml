@@ -59,6 +59,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 0
         text : "Dose"
+        visible : dosage.concentration
       }      
       Slider {
         id: dosage
@@ -69,7 +70,7 @@ UIActionForm {
         stepSize : 1
         value : root.dose
 
-        enabled :  (root.adminRoute!=  'Infusion-Intravenous') ?  true : false
+        visible :  (root.adminRoute!=  'Infusion-Intravenous') ?  true : false
 
         onMoved : {
           root.dose = value
@@ -86,12 +87,14 @@ UIActionForm {
               else (root.adminRoute == 'Oral' || root.adminRoute == 'Transmucosal')
                 return "%1mg".arg(root.dose)
           }
+          visible : dosage.concentration
       }
       //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
         text : "Concentration"
+        visible : flowRate.concentration
       }      
       Slider {
         id: concentration
@@ -101,7 +104,7 @@ UIActionForm {
         to : 1000
         stepSize : 1
         value : root.concentration
-        enabled : {
+        visible : {
           if ( root.adminRoute == 'Oral' || root.adminRoute == 'Transmucosal') {
             return false;
           } else {
@@ -116,12 +119,14 @@ UIActionForm {
       }
       Label {
         text : "%1ug/mL".arg(root.concentration )
+        visible : flowRate.concentration
       }
     //Column 4
       Label {
         Layout.row : 3
         Layout.column : 0
         text : "Flow Rate"
+        visible : flowRate.visible
       }      
       Slider {
         id: flowRate
@@ -131,7 +136,7 @@ UIActionForm {
         to : 1000
         stepSize : 1
         value : root.rate
-        enabled : {
+        visible : {
           if ( root.adminRoute == 'Infusion-Intravenous' ) {
             return true;
           } else {
@@ -146,6 +151,7 @@ UIActionForm {
       }
       Label {
         text : "%1ml/min".arg(root.rate )
+        visible : flowRate.visible
       }
     
       // Column 5
