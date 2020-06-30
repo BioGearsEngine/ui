@@ -4,6 +4,49 @@ import com.biogearsengine.ui.scenario 1.0
 
   ObjectModel {
     id : actionSwitchModel
+    property ListView actionSwitchView
+
+    property Item notification :     Component {
+      id : notifierComponet
+      Rectangle {
+        id: notifierRect
+        property string message 
+        height : 100
+        width :  body.width + 50
+        color : "lightslategrey"
+        opacity: 1.0
+        visible: false;
+        radius : 5
+        Rectangle {
+          color : "white"
+          anchors.left : parent.left
+          anchors.right : parent.right
+          height : title.height
+          Text {
+            id: title
+            text : "Notificaiton"
+            font.bold: true
+            font.pixelSize : 15
+          }
+        }
+        Text {
+          id : body
+          text : message
+          anchors.centerIn : parent
+          font.pixelSize : 25
+        }
+        Timer {
+          id: opacityTimer
+          interval: 100; running: true; repeat: true
+          onTriggered: {
+            parent.opacity = parent.opacity - .1
+            if ( parent.opacity < 0.1 ) {
+              parent.destroy()
+            }
+          }
+        }
+      }
+    }
 
     function add_binary_action(componentType) {
         var v_severityForm = Qt.createComponent(componentType);
@@ -13,6 +56,7 @@ import com.biogearsengine.ui.scenario 1.0
           v_action.uuid = uuidv4()
           v_action.remove.connect(removeAction)
           actionSwitchModel.append(v_action)
+         notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_action.actionType), z : 200, dim: false})
         } else {
           if (v_severityForm.status == Component.Error){
             console.log("Error : " + v_severityForm.errorString() );
@@ -33,6 +77,7 @@ import com.biogearsengine.ui.scenario 1.0
         v_action.remove.connect(removeAction)
 
         actionSwitchModel.append(v_action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_action.actionType), z : 200, dim: false})
       } else {
         if (v_severityForm.status == Component.Error){
           console.log("Error : " + v_severityForm.errorString() );
@@ -53,6 +98,7 @@ import com.biogearsengine.ui.scenario 1.0
         v_painStimulus.remove.connect(removeAction)
 
         actionSwitchModel.append(v_painStimulus)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_painStimulus.actionType), z : 200, dim: false})
       } else {
         if (v_painStimulusForm.status == Component.Error){
           console.log("Error : " + v_painStimulusForm.errorString() );
@@ -72,6 +118,7 @@ import com.biogearsengine.ui.scenario 1.0
         v_action.remove.connect(removeAction)
 
         actionSwitchModel.append(v_action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_action.actionType), z : 200, dim: false})
       } else {
         if (v_actionComponent.status == Component.Error){
           console.log("Error : " + v_actionComponent.errorString() );
@@ -92,6 +139,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -111,6 +159,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -130,6 +179,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -149,6 +199,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -168,6 +219,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -187,6 +239,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -206,6 +259,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -226,6 +280,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );

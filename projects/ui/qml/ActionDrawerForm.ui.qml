@@ -14,7 +14,7 @@ Drawer {
     interactive : true
     closePolicy : Popup.NoAutoClose
     position : 0
-
+     dim: false
     ColumnLayout {
         id : drawerColumn
         anchors.fill : parent
