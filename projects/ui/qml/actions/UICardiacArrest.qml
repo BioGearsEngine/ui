@@ -111,6 +111,6 @@ UIActionForm {
     }
   } // End Summary dETAILS
 
-  onActivate:   { scenario.create_cardiac_arrest_action(1)  }
-  onDeactivate: { scenario.create_cardiac_arrest_action(0)  }
+  onActivate:   { scenario.create_cardiac_arrest_action(true)  }
+  onDeactivate: { scenario.create_cardiac_arrest_action(false)  }
 }

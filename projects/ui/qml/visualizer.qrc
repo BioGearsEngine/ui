@@ -56,6 +56,7 @@
         <file alias="UIActionForm.ui.qml" >actions/UIActionForm.ui.qml</file>
         <!-- Patient Acctions for the Control Window-->
         <!-- Insults for the Control Window-->
+        <file alias="ActionModel.qml"  >actions/ActionModel.qml</file>
         <file alias="UIAsthmaAttack.qml"  >actions/UIAsthmaAttack.qml</file>
         <file alias="UIPainStimulus.qml" >actions/UIPainStimulus.qml</file>
         <file alias="UIAcuteStress.qml" >actions/UIAcuteStress.qml</file>

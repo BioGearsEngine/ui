@@ -123,7 +123,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_traumatic_brain_injury_action(double severity, int type);
   Q_INVOKABLE void create_acute_stress_action(double severity);
   Q_INVOKABLE void create_apnea_action(double severity);
-  Q_INVOKABLE void create_cardiac_arrest_action(int state);
+  Q_INVOKABLE void create_cardiac_arrest_action(bool state);
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
   Q_INVOKABLE QString patient_name_and_time();

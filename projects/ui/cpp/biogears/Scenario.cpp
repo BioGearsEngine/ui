@@ -2394,10 +2394,10 @@ void Scenario::create_needle_decompression_action(int state, int side)
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_cardiac_arrest_action(int state)
+void Scenario::create_cardiac_arrest_action(bool  state)
 {
   auto action = std::make_unique<biogears::SECardiacArrest>();
-  action->SetActive((CDM::enumOnOff::value)state);
+  action->SetActive(state);
 
   _action_queue.as_source().insert(std::move(action));
 }
