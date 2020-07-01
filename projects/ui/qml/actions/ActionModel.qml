@@ -318,7 +318,7 @@ import com.biogearsengine.ui.scenario 1.0
     function add_anesthesia_machine_action(props) {
       var compartment = Qt.createComponent("UIAnesthesiaMachine.qml");
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{  "mix" : props.mix,
+        var action = compartment.createObject(actionSwitchView,{  "mix" : props.mix * 100,
                                                                  "bottle_1" : props.volume_1,"bottle_2" : props.volume_2,
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
@@ -343,7 +343,8 @@ import com.biogearsengine.ui.scenario 1.0
     function add_exercise_action(props) {
       var compartment = Qt.createComponent("UIExercise.qml");
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{ "type" : props.type, "weight" : props.weight,
+        console.log(props.type)
+        var action = compartment.createObject(actionSwitchView,{ "type" : props.exerciseType, "weight" : props.weightPack,
                                                                  "property_1" : props.field_1, "property_2" : props.field_3,  
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })

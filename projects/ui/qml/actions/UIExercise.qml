@@ -39,7 +39,7 @@ UIActionForm {
         font.pixelSize : 10
         font.bold : false
         color : "steelblue"
-        text : "[%1]".arg(root.compartment)
+        text : "[%1]".arg(root.type)
         Layout.alignment : Qt.AlignHCenter
       }
  //Column 2
@@ -47,11 +47,11 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 0
         text : {
-          if ( type == "Generic") {
+          if ( root.type == "Generic") {
             return "Work Rate"
-          } else if ( type == "Cycling") {
+          } else if ( root.type == "Cycling") {
             return "Cadence"
-          } else if ( type == "Running" ) {
+          } else if ( root.type == "Running" ) {
             return "Velocity"
           } else {
             return "Weight"
@@ -65,7 +65,7 @@ UIActionForm {
         from : 0
         to : 100
         stepSize : 1
-        value : root.paramater_1
+        value : root.property_1
         onMoved : {
           root.property_1 = value
           if ( root.active )
@@ -74,11 +74,11 @@ UIActionForm {
       }
       Label {
         text : {
-          if ( type == "Generic") {
+          if ( root.type == "Generic") {
             return "%1 W".arg(root.property_1)
-          } else if ( type == "Cycling") {
+          } else if ( root.type == "Cycling") {
             return "%1 Hz".arg(root.property_1)
-          } else if ( type == "Running" ) {
+          } else if ( root.type == "Running" ) {
             return "%1 m/s".arg(root.property_1)
           } else {
             return "%1 kg".arg(root.property_1)
@@ -90,11 +90,11 @@ UIActionForm {
         Layout.row : 2
         Layout.column : 0
         text : {
-          if ( type == "Generic") {
+          if ( root.type == "Generic") {
             return "Intensity"
-          } else if ( type == "Cycling") {
+          } else if ( root.type == "Cycling") {
             return "Power Cycle"
-          } else if ( type == "Running" ) {
+          } else if ( root.type == "Running" ) {
             return "Incline"
           } else {
             return "Repitition"
@@ -117,42 +117,42 @@ UIActionForm {
       }
       Label {
         text : {
-           if ( type == "Generic") {
+           if ( root.type == "Generic") {
             return "%1".arg(property_2)
-          } else if ( type == "Cycling") {
+          } else if ( root.type == "Cycling") {
             return "%1 W".arg(root.property_2)
-          } else if ( type == "Running" ) {
+          } else if ( root.type == "Running" ) {
             return "%1 \%".arg(root.property_2)
           } else {
-            return "%1".arg(property_2)
+            return "%1".arg(root.property_2)
           }
-        }property_2
+        }
       }
     //Column 4
       Label {
         Layout.row : 3
         Layout.column : 0
         text : "Weight"
-        visible : ( type == "Running" || type == "Cycling") ? true : false
+        visible : ( root.type == "Running" || root.type == "Cycling") ? true : false
       }      
       Slider {
-        id: flowRate
+        id: weight_slider
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
         to : 1000
         stepSize : 1
-        value : root.rate
-        visible : ( type == "Running" || type == "Cycling") ? true : false
+        value : root.weight
+        visible : ( root.type == "Running" || root.type == "Cycling") ? true : false
         onMoved : {
-          root.rate = value
+          root.weight = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
         text : "%1 kg".arg(weight)
-        visible : ( type == "Running" || type == "Cycling") ? true : false
+        visible : ( root.type == "Running" || root.type == "Cycling") ? true : false
       }
     
       // Column 5
@@ -215,17 +215,17 @@ UIActionForm {
   }// End Details Component
  
   onActivate:   { 
-    let type = 0
-    if ( type == "Generic") {
-      type = 0
-    } else if ( type == "Cycling") {
-      type = 1
-    } else if ( type == "Running" ) {
-      type = 2
+    let type_v = 0
+    if ( root.type == "Generic") {
+      type_v = 0
+    } else if ( root.type == "Cycling") {
+      type_v = 1
+    } else if ( root.type == "Running" ) {
+      type_v = 2
     } else {
-      type = 3
+      type_v = 3
     }
-    scenario.create_exercise_action(type, weight, intensity, workRate) 
+    scenario.create_exercise_action(type_v, weight, property_1, property_2) 
   }
   onDeactivate: { 
       scenario.create_exercise_action(0, 0, 0, 0) 

@@ -2363,6 +2363,7 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
       generic.Intensity.SetValue(property_2);
     }
     action->SetGenericExercise(generic);
+    break;
   case 1:
     if (property_1 > 0) {
       cycling.CadenceCycle.SetValue(property_1,biogears::FrequencyUnit::Hz);
@@ -2371,15 +2372,18 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
     }
     cycling.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
     action->SetCyclingExercise(cycling);
+    break;
   case 2:
     running.SpeedRun.SetValue(property_1, biogears::LengthPerTimeUnit::m_Per_s); 
     running.InclineRun.SetValue(property_2);
     running.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
     action->SetRunningExercise(running);
+    break;
   case 3:
     strength.WeightStrength.SetValue(property_1, biogears::MassUnit::kg);
     strength.RepsStrength.SetValue(property_2);
     action->SetStrengthExercise(strength);
+    break;
   }
  
   
@@ -2490,7 +2494,7 @@ void Scenario::create_anasthesia_machien_action(double o2_fraction, double o2_vo
   config.SetOxygenSource(CDM::enumAnesthesiaMachineOxygenSource::Wall);
   config.GetPositiveEndExpiredPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
   config.SetPrimaryGas(CDM::enumAnesthesiaMachinePrimaryGas::Nitrogen);
-  config.GetReliefValvePressure().SetValue(20.0, biogears::PressureUnit::cmH2O);
+  config.GetReliefValvePressure().SetValue(20.0, biogears::PressureUnit::cmH2O);  
   config.GetRespiratoryRate().SetValue(12, biogears::FrequencyUnit::Per_min);
   config.GetVentilatorPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
 

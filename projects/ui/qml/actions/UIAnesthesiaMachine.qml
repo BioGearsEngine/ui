@@ -10,12 +10,13 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
+  property string type : "Generic"
   property double  mix : 0.0
   property double  bottle_1 : 0.0
   property double  bottle_2 : 0.0
 
   actionType : "Anesthesia Machine"
-  fullName  :  "<b>%1</b><br>".arg(actionType)
+  fullName  :  "<b>%2 %1</b><br>".arg(actionType).arg(type)
 
   shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(mix)
 
@@ -83,7 +84,7 @@ UIActionForm {
         }
       }
       Label {
-        text :  "%1 ml".arg(bottle_2)
+        text :  "%1 ml".arg(root.bottle_2)
       }
       //Column 4
       Label {
@@ -97,8 +98,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
-        to : 1
-        stepSize : 0.01
+        to : 100
+        stepSize : 1
         value : root.mix
         onMoved : {
           root.mix = value
@@ -170,7 +171,7 @@ UIActionForm {
   }// End Details Component
  
   onActivate:   { 
-    scenario.create_anasthesia_machien_action(mix, bottle_1, bottle_2) 
+    scenario.create_anasthesia_machien_action(mix/100, bottle_1, bottle_2) 
   }
   onDeactivate: { 
     scenario.create_anasthesia_machien_action(.5, 0, 0)   
