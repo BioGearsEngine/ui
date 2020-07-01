@@ -173,7 +173,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.carbohydrate_g)
+        text : "%1 g".arg(root.carbohydrate_g)
       }
       //Column 3
       Label {
@@ -198,7 +198,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.fat_g)
+        text : "%1 g".arg(root.fat_g)
       }
       //Column 4
       Label {
@@ -223,7 +223,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.protien_g)
+        text : "%1 g".arg(root.protien_g)
       }
       //Column 5
       Label {
@@ -248,7 +248,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.calcium_g)
+        text : "%1 g".arg(root.calcium_g)
       }
       //Column 6
       Label {
@@ -273,7 +273,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.sodium_g)
+        text : "%1 g".arg(root.sodium_g)
       }
       //Column 7
       Label {
@@ -298,7 +298,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1".arg(root.water_ml)
+        text : "%1 ml".arg(root.water_ml)
       }
       // Column 8
       Button {
