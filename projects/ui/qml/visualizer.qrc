@@ -71,6 +71,10 @@
         <file alias="UIDrugAdministration.qml">actions/UIDrugAdministration.qml</file>
         <file alias="UICompoundInfusion.qml">actions/UICompoundInfusion.qml</file>
         <file alias="UIConsumeMeal.qml">actions/UIConsumeMeal.qml</file>
+        <file alias="ActionModel.qml">actions/ActionModel.qml</file>
+        <file alias="UIAnesthesiaMachine.qml">actions/UIAnesthesiaMachine.qml</file>
+        <file alias="UIExercise.qml">actions/UIExercise.qml</file>
+        <file alias="UIInhaler.qml">actions/UIInhaler.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

@@ -19,6 +19,7 @@ RowLayout {
   property int spinStep : 1
   property int colSpan : 1
   property int rowSpan : 1
+  property bool required : true
   //Property aliases -- used to access sub-components outside of form file
   property alias label: name
   property alias spinBox : spinBox

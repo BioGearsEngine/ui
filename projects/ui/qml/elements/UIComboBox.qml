@@ -32,9 +32,9 @@ UIComboBoxForm {
   //----------------------------------------------
   //Generates description of property for dialog window description assembly
   function getDescription(){
-    if (comboBox.model instanceof ListModel){
+    if (comboBox.currentIndex!=-1 && comboBox.model instanceof ListModel){
       return label.text + " = " + comboBox.model.get(comboBox.currentIndex)[comboBox.textRole]
-    } else if (comboBox.model instanceof FolderListModel){
+    } else if (comboBox.currentIndex!=-1 && comboBox.model instanceof FolderListModel){
       return label.text + " = " + comboBox.model.get(comboBox.currentIndex, comboBox.textRole)
     } else {
       return ''
@@ -43,7 +43,7 @@ UIComboBoxForm {
   //----------------------------------------------
   //A combo box property is valid if the index is not equal to -1 (meaning nothing displayed in box)
   function isValid(){
-    return comboBox.currentIndex != -1
+   return root.required ? comboBox.currentIndex != -1 : true
   }
 
 }

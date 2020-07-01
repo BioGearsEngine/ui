@@ -45,7 +45,7 @@ UISpinBoxForm {
   //----------------------------------------------
   //A spin box property needs to return a non-zero value for the action to be valid
   function isValid(){
-    return spinBox.value != 0
+    return root.required ? spinBox.value != 0 : true
   }
 
   //----------------------------------------------

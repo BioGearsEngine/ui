@@ -52,7 +52,7 @@ UITextFieldForm {
   //A text field property is valid if text in an *editable* field is not empty (as determined by length of text) 
   function isValid() {
     if (root.editable){
-      return !(textField.text.length===0)
+      return root.required ? !(textField.text.length===0) : true
     }
     return !editable
   }

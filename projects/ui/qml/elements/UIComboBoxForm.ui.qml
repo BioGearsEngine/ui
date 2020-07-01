@@ -16,6 +16,7 @@ RowLayout {
   property real fontSize : 12
   property int colSpan : 1
   property int rowSpan : 1
+  property bool required : true
   property string splitToken                //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
                                             //we do not want to display (e.g. PatientState@0s vs PatientState).  This splitToken tells which character to split the file name at.  
   //Property aliases -- used to access subcomponents outside form file

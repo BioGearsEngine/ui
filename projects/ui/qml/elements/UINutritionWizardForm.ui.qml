@@ -81,11 +81,8 @@ Page {
     id : nutritionDataModel
     ListElement {name : "Name"; unit: ""; type : "string"; hint : "*Required"; valid : true}
     ListElement {name : "Carbohydrate"; unit : "mass"; type : "double"; hint : "Mass of carbs to ingest"; valid : true}
-    ListElement {name : "CarbohydrateDigestionRate";  unit : "massRate"; type : "double"; hint : "Carb absorption rate in GI"; valid : true }
     ListElement {name : "Protein"; unit : "mass"; type : "double"; hint : "Mass of protein to ingest"; valid : true}
-    ListElement {name : "ProteinDigestionRate";  unit : "massRate"; type : "double"; hint : "Protein absorption rate in GI"; valid : true }
     ListElement {name : "Fat"; unit : "mass"; type : "double"; hint : "Mass of fat to ingest"; valid : true}
-    ListElement {name : "FatDigestionRate";  unit : "massRate"; type : "double"; hint : "Fat absorption rate in GI"; valid : true }
     ListElement {name : "Calcium";  unit : "mass"; type : "double"; hint : "Amount of calcium to ingest"; valid : true}
     ListElement {name : "Sodium";  unit : "mass"; type : "double"; hint : "Amount of protein to ingest"; valid : true}
     ListElement {name : "Water";  unit : "volume"; type : "double"; hint : "Amount of water to ingest"; valid : true}

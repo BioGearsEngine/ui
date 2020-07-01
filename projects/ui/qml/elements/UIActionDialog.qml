@@ -16,7 +16,7 @@ UIActionDialogForm {
       root.applyProps(actionProps);
       close();
     } else {
-      console.log('Invalid configuration : Check that all values are defined and non-zero')
+      console.log('Invalid configuration : Check that all required values are defined')
     }
   }
   

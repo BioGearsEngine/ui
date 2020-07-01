@@ -582,13 +582,11 @@ ActionDrawerForm {
             v_mealDialog.initializeProperties({name : actionItem.name, fileName : '', mealName : '', carbohydrate : 0, fat : 0, protein : 0, calcium : 0, sodium : 0, water : 0, fileName : ''})
             let l_dialogHeight = v_mealDialog.contentItem.height
             let l_dialogWidth  = v_mealDialog.contentItem.width
-            //let l_optionCheckBox = Qt.createQmlObject("import QtQuick.Controls 1.4; CheckBox { text : 'Use file'; checked : false}", v_mealDialog.contentItem, "CheckBox")
-            //let compoundList = scenario.get_compounds() -- Get nutrition files or open dialog
             let l_nutritionList = scenario.get_nutrition()
             let l_nutritionListData = {type : 'ListModel', role : 'nutrition', elements : l_nutritionList}
-            let l_nutritionFileProps = {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth, elementRatio : 0.55, colSpan : 2, fontSize : 10}
+            let l_nutritionFileProps = {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth, elementRatio : 0.55, colSpan : 2, fontSize : 10, required : false}
             let l_nutritionCombo = v_mealDialog.addComboBox('Load nutrition from file (optional)', 'fileName', l_nutritionListData, l_nutritionFileProps)
-            let l_nutritionName = v_mealDialog.addTextField('Meal Name', 'mealName', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
+            let l_nutritionName = v_mealDialog.addTextField('Meal Name', 'mealName', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10, validateDouble : false})
             let l_water = v_mealDialog.addTextField('Water (mL)', 'water', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
             let l_fat = v_mealDialog.addTextField('Fat Content (g)', 'fat', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})
             let l_carbs = v_mealDialog.addTextField('Carbohydrate Content (g)', 'carbohydrate', {prefHeight : l_dialogHeight / 5, prefWidth : l_dialogWidth / 2.1, colSpan : 1, textSize : 10})

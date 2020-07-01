@@ -14,15 +14,117 @@ UIActionForm {
 
   //Begin Action Properties
   property string name : "Default"
-  property double carbohydrate_mass : 0
-  property double fat_mass : 0
-  property double protein_mass : 0
-  property double calcium_mass : 0
-  property double sodium_mass  : 0
-  property double water_volume : 0
+  property double carbs_g : 0
+  property double fat_g : 0
+  property double protein_g : 0
+  property double calcium_mg : 0
+  property double sodium_mg  : 0
+  property double water_mL : 0
 
-  property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(name)
-  property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]<br/>Carbohdrate %3g<br/>Fat %4g<br/>Protein %5g<br/>Calcium %6g<br/>Socium %7g<br/>Water %8ml<br/>".arg(actionType).arg(name).arg(carbohydrate_mass).arg(fat_mass).arg(protein_mass).arg(calcium_mass).arg(sodium_mass).arg(water_volume)
+  fullName  : "<b>Consume <font color=\"lightsteelblue\">%1</font>  Meal</b>".arg(root.name)
+  shortName : "<b>Consume <font color=\"lightsteelblue\">%1</font> </b>".arg(root.name)
+  //End Action Properties
+  property alias delayTimer : delayTimer
+
+  Timer {
+    id : delayTimer
+    interval : 5000
+    running : false
+    repeat : false
+    onTriggered : {
+      if (root.active){
+        root.active = false
+      }
+    }
+  }
+
+  summary : Component {
+    RowLayout {
+      id : actionRow
+      spacing : 5
+      height : childrenRect.height
+      width : root.parent.width
+      Label {
+        id : actionLabel
+        Layout.preferredWidth : parent.width * 2/4 - actionRow.spacing / 2
+        color : '#1A5276'
+        text : root.shortName
+        elide : Text.ElideRight
+        font.pointSize : 8
+        font.bold : true
+        horizontalAlignment  : Text.AlignLeft
+        leftPadding : 5
+        verticalAlignment : Text.AlignVCenter
+        background : Rectangle {
+            id : labelBackground
+            anchors.fill : parent
+            color : 'transparent'
+            border.color : 'grey'
+            border.width : 0
+        }
+        MouseArea {
+            id : labelMouseArea
+            anchors.fill : parent
+            hoverEnabled : true
+            propagateComposedEvents :true
+            Timer {
+              id : infoTimer
+              interval: 500; running: false; repeat: false
+              onTriggered:  actionTip.visible  = true
+            }
+            onEntered: {
+              infoTimer.start()
+              actionTip.visible  = false
+            }
+            onPositionChanged : {
+              infoTimer.restart()
+              actionTip.visible  = false
+            }
+            onExited : {
+              infoTimer.stop()
+              actionTip.visible  = false
+            }
+        }
+        ToolTip {
+          id : actionTip
+          parent : actionLabel
+          x : 0
+          y : parent.height + 5
+          visible : false
+          text : root.fullName
+          contentItem : Text {
+            text : actionTip.text
+            color : '#1A5276'
+            font.pointSize : 10
+          }
+          background : Rectangle {
+            color : "white"
+            border.color : "black"
+          }
+        }
+      }
+      Rectangle {
+        Layout.fillWidth : true
+      }
+      Button {
+        id: toggle
+        Layout.preferredWidth : parent.width * 1/4 - actionRow.spacing 
+        Layout.rightMargin : 20
+        Layout.preferredHeight : parent.height
+        enabled : !root.active
+        text : "Feed"
+        MouseArea {
+          id: mouseArea
+          anchors.fill: parent
+          enabled : !root.active
+          onClicked: {
+            root.active = true
+            root.delayTimer.restart()
+          }// emit
+        }
+      }
+    }
+  } // End Summary Component
 
   details : Component  {
     GridLayout {
@@ -63,10 +165,10 @@ UIActionForm {
         from : 0
         to : 300          //300 g is reasonable amount for one day
         stepSize : 5
-        value : root.carbohydrate_mass
+        value : root.carbs_g
 
         onMoved : {
-          root.carbohydrate_mass = value
+          root.carbs_g = value
           if ( root.active )
               root.active = false;
         }
@@ -75,7 +177,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
-        text : "%1".arg(root.carbohydrate_mass)
+        text : "%1".arg(root.carbs_g)
       }
       //Column 3
       Label {
@@ -94,10 +196,10 @@ UIActionForm {
         from : 0
         to : 80          //80 g is reasonable amount for one day
         stepSize : 5
-        value : root.fat_mass
+        value : root.fat_g
 
         onMoved : {
-          root.fat_mass = value
+          root.fat_g = value
           if ( root.active )
               root.active = false;
         }
@@ -106,7 +208,7 @@ UIActionForm {
         Layout.row : 2
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
-        text : "%1".arg(root.fat_mass)
+        text : "%1".arg(root.fat_g)
       }
     //Column 4
       Label {
@@ -125,10 +227,10 @@ UIActionForm {
         from : 0
         to : 100          //60ish g is reasonable amount / day for sedentary person, bump up to 100 account for active
         stepSize : 5
-        value : root.protein_mass
+        value : root.protein_g
 
         onMoved : {
-          root.protein_mass = value
+          root.protein_g = value
           if ( root.active )
               root.active = false;
         }
@@ -137,7 +239,7 @@ UIActionForm {
         Layout.row : 3
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
-        text : "%1".arg(root.protein_mass)
+        text : "%1".arg(root.protein_g)
       }
       //Column 5
       Label {
@@ -156,10 +258,10 @@ UIActionForm {
         from : 0
         to : 2000         //2000 mg is reasonable upper limit for one day
         stepSize : 100
-        value : root.calcium_mass
+        value : root.calcium_mg
 
         onMoved : {
-          root.calcium_mass = value
+          root.calcium_mg = value
           if ( root.active )
               root.active = false;
         }
@@ -168,7 +270,7 @@ UIActionForm {
         Layout.row : 4
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
-        text : "%1".arg(root.calcium_mass)
+        text : "%1".arg(root.calcium_mg)
       }
       //Column 6
       Label {
@@ -187,10 +289,10 @@ UIActionForm {
         from : 0
         to : 3000         //3000 mg is more than recommended amount, but most people go above recommendations
         stepSize : 100
-        value : root.sodium_mass
+        value : root.sodium_mg
 
         onMoved : {
-          root.sodium_mass = value
+          root.sodium_mg = value
           if ( root.active )
               root.active = false;
         }
@@ -199,7 +301,7 @@ UIActionForm {
         Layout.row : 5
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
-        text : "%1".arg(root.sodium_mass)
+        text : "%1".arg(root.sodium_mg)
       }
       //Column 7
       Label {
@@ -218,10 +320,10 @@ UIActionForm {
         from : 0
         to : 3000         //3000 mL is more than recommended amount per day
         stepSize : 100
-        value : root.water_volume
+        value : root.water_mL
 
         onMoved : {
-          root.water_volume = value
+          root.water_mL = value
           if ( root.active )
               root.active = false;
         }
@@ -230,68 +332,26 @@ UIActionForm {
         Layout.row : 6
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
-        text : "%1".arg(root.water_volume)
+        text : "%1".arg(root.water_mL)
       }
       // Column 8
-      Rectangle {
-        id: toggle      
+      Button {
+        id : activate
+        Layout.preferredHeight : root.parent.height / grid.rows
+        Layout.rightMargin : 10
         Layout.row : 7
         Layout.column : 2
         Layout.columnSpan : 2
-        Layout.maximumHeight : root.parent.height / grid.rows
-        Layout.fillWidth : true
-        Layout.preferredHeight : 30      
-        color:        root.active? 'green': 'red' // background
-        opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
-        Text {
-          text:  root.active?    'On': 'Off'
-          color: root.active? 'white': 'white'
-          horizontalAlignment : Text.AlignHCenter
-          width : pill.width
-          x:    root.active ? 0: pill.width
-          font.pixelSize: 0.5 * toggle.height
-          anchors.verticalCenter: parent.verticalCenter
-        }
-        Rectangle { // pill
-            id: pill
-    
-            x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
-            width: parent.width * .5;
-            height: parent.height // square
-            border.width: parent.border.width
-    
-        }
-        MouseArea {
-            id: mouseArea
-    
-            anchors.fill: parent
-    
-            drag {
-                target:   pill
-                axis:     Drag.XAxis
-                maximumX: toggle.width - pill.width
-                minimumX: 0
-            }
-    
-            onReleased: { // Did we drag the button far enough.
-              if( root.active) {
-                  if(pill.x < toggle.width - pill.width) {
-                    root.active = false // right to left
-                  }
-              } else {
-                  if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
-                    root.active = true // left  to right
-                } 
-              }
-            }
-            onClicked: {
-              root.active = !root.active
-            }// emit
+        enabled : !root.active
+        text : "Feed"
+        onClicked: {
+          root.active = true
+          root.delayTimer.restart()
         }
       }
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_consume_meal_action(name, carbohydrate_mass, fat_mass, protein_mass, sodium_mass,calcium_mass, water_volume)  }
-  onDeactivate: { console.log("Cannot deactivate meal") }
+  onActivate:   { scenario.create_consume_meal_action(name, carbs_g, fat_g, protein_g, sodium_mg, calcium_mg, water_mL)  }
+  onDeactivate: { }
 }

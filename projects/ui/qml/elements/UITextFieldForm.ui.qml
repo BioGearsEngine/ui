@@ -12,6 +12,8 @@ Item {
   property int colSpan : 1
   property int rowSpan : 1
   property bool editable : true
+  property bool validateDouble : true
+  property bool required : true
   property real maxValue : Infinity
   //Property aliases -- used to access text field sub-properties outside of form file
   property alias textField : textField
@@ -44,6 +46,13 @@ Item {
     }
     ]
 
+  DoubleValidator {
+    id : doubleValidator
+    bottom : 0.0
+    top : root.maxValue
+    decimals : 3
+  }
+
   TextField {
     id:textField
     //Text field height is dictated by implicit height of text.  If you try to set it using height properties, the text will not respect
@@ -54,11 +63,7 @@ Item {
     font.pointSize : root.textSize
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
-    validator : DoubleValidator {
-      bottom : 0.0
-      top : root.maxValue
-      decimals : 3
-    }
+    validator : validateDouble ? doubleValidator : null
     background : Rectangle {
       id : backgroundRect
       anchors.fill : parent

@@ -1868,13 +1868,6 @@ void Scenario::create_nutrition(QVariantMap nutrition)
     auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
     newNutrition->GetCarbohydrate().SetValue(carbs, massUnit);
   }
-  //Carbohydrate digestion rate
-  nMetric = nutrition["CarbohydrateDigestionRate"].toList();
-  if (!nMetric[0].isNull()) {
-    double carbRate = nMetric[0].toDouble();
-    auto& massPerTimeUnit = biogears::MassPerTimeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
-    newNutrition->GetCarbohydrateDigestionRate().SetValue(carbRate, massPerTimeUnit);
-  }
   //Protein mass
   nMetric = nutrition["Protein"].toList();
   if (!nMetric[0].isNull()) {
@@ -1882,26 +1875,12 @@ void Scenario::create_nutrition(QVariantMap nutrition)
     auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
     newNutrition->GetProtein().SetValue(protein, massUnit);
   }
-  //Protein digestion rate
-  nMetric = nutrition["ProteinDigestionRate"].toList();
-  if (!nMetric[0].isNull()) {
-    double proteinRate = nMetric[0].toDouble();
-    auto& massPerTimeUnit = biogears::MassPerTimeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
-    newNutrition->GetProteinDigestionRate().SetValue(proteinRate, massPerTimeUnit);
-  }
   //Fat mass
   nMetric = nutrition["Fat"].toList();
   if (!nMetric[0].isNull()) {
     double fat = nMetric[0].toDouble();
     auto& massUnit = biogears::MassUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
     newNutrition->GetFat().SetValue(fat, massUnit);
-  }
-  //Fat digestion rate
-  nMetric = nutrition["FatDigestionRate"].toList();
-  if (!nMetric[0].isNull()) {
-    double fatRate = nMetric[0].toDouble();
-    auto& massPerTimeUnit = biogears::MassPerTimeUnit::GetCompoundUnit(nMetric[1].toString().toStdString());
-    newNutrition->GetFatDigestionRate().SetValue(fatRate, massPerTimeUnit);
   }
   //Calcium mass
   nMetric = nutrition["Calcium"].toList();
@@ -1964,35 +1943,17 @@ QVariantMap Scenario::edit_nutrition()
     nutritionField[1] = "g";
     nutritionMap["Carbohydrate"] = nutritionField;
   }
-  //Carbohydrate digestion rate
-  if (nutrition->HasCarbohydrateDigestionRate()) {
-    nutritionField[0] = nutrition->GetCarbohydrateDigestionRate(biogears::MassPerTimeUnit::g_Per_min);
-    nutritionField[1] = "g/min";
-    nutritionMap["CarbohydrateDigestionRate"] = nutritionField;
-  }
   //Proteins
   if (nutrition->HasProtein()) {
     nutritionField[0] = nutrition->GetProtein(biogears::MassUnit::g);
     nutritionField[1] = "g";
     nutritionMap["Protein"] = nutritionField;
   }
-  //Protein digestion rate
-  if (nutrition->HasProteinDigestionRate()) {
-    nutritionField[0] = nutrition->GetProteinDigestionRate(biogears::MassPerTimeUnit::g_Per_min);
-    nutritionField[1] = "g/min";
-    nutritionMap["ProteinDigestionRate"] = nutritionField;
-  }
   //Fats
   if (nutrition->HasFat()) {
     nutritionField[0] = nutrition->GetFat(biogears::MassUnit::g);
     nutritionField[1] = "g";
     nutritionMap["Fat"] = nutritionField;
-  }
-  //Fat digestion rate
-  if (nutrition->HasFatDigestionRate()) {
-    nutritionField[0] = nutrition->GetFatDigestionRate(biogears::MassPerTimeUnit::g_Per_min);
-    nutritionField[1] = "g/min";
-    nutritionMap["FatDigestionRate"] = nutritionField;
   }
   //Calcium
   if (nutrition->HasCalcium()) {

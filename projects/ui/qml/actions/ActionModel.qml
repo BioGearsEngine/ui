@@ -290,14 +290,14 @@ import com.biogearsengine.ui.scenario 1.0
         console.log("Error : Action switch component not ready");
       }
     }
-    function add_consume_meal(props) {
+    function add_consume_meal_action(props) {
       var compartment = Qt.createComponent("UIConsumeMeal.qml");
       if ( compartment.status == Component.Ready)  {
 
-        var action = compartment.createObject(actionSwitchView,{ "name" : props.name, 
-                                                                 "carbs_g" : props.carbs, "fat_g" : props.fat,
-                                                                 "protien_g" : props.protien,  "sodium_g" : props.sodium,  
-                                                                 "water_ml" : props.water,  "calcium_g" : props.calcium,  
+        var action = compartment.createObject(actionSwitchView,{ "name" : props.mealName, 
+                                                                 "carbs_g" : props.carbohydrate, "fat_g" : props.fat,
+                                                                 "protein_g" : props.protein,  "sodium_mg" : props.sodium,  
+                                                                 "water_ml" : props.water,  "calcium_mg" : props.calcium,  
                                                                  "rate" : props.rate,
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
