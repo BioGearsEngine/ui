@@ -2344,21 +2344,41 @@ void Scenario::create_infection_action(QString location, int severity, double mi
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W = 0.0)
+void Scenario::create_exercise_action(int type, double property_1, double property_2, double weight_kg)
 {
   auto action = std::make_unique<biogears::SEExercise>();
-  auto genericExercise = biogears::SEExercise::SEGeneric{};
-
-  if (intensity > 0.0) {
-    genericExercise.Intensity.SetValue(intensity);
-  } else if (workRate_W > 0.0) {
-    genericExercise.DesiredWorkRate.SetValue(workRate_W, biogears::PowerUnit::W);
-
-  } else {
-    //Reach this block if both inputs are 0, meaning we turn off action)
-    genericExercise.Intensity.SetValue(0.0);
+  auto generic = biogears::SEExercise::SEGeneric{};
+  auto cycling = biogears::SEExercise::SECycling{};
+  auto running = biogears::SEExercise::SERunning{};
+  auto strength = biogears::SEExercise::SEStrengthTraining{};
+  switch (type) {
+  case 0:
+    if (  property_1 > 0) {
+      generic.DesiredWorkRate.SetValue(property_1, biogears::PowerUnit::W);
+    } else {
+      generic.Intensity.SetValue(property_2);
+    }
+    action->SetGenericExercise(generic);
+  case 1:
+    if (property_1 > 0) {
+      cycling.CadenceCycle.SetValue(property_1,biogears::FrequencyUnit::Hz);
+    } else {
+      cycling.PowerCycle.SetValue(property_2, biogears::PowerUnit::W);
+    }
+    cycling.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
+    action->SetCyclingExercise(cycling);
+  case 2:
+    running.SpeedRun.SetValue(property_1, biogears::LengthPerTimeUnit::m_Per_s); 
+    running.InclineRun.SetValue(property_2);
+    running.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
+    action->SetRunningExercise(running);
+  case 3:
+    strength.WeightStrength.SetValue(property_1, biogears::MassUnit::kg);
+    strength.RepsStrength.SetValue(property_2);
+    action->SetStrengthExercise(strength);
   }
-  action->SetGenericExercise(genericExercise);
+ 
+  
   _action_queue.as_source().insert(std::move(action));
 }
 void Scenario::create_pain_stimulus_action(double severity, QString location)

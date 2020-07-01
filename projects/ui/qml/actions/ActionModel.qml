@@ -318,4 +318,25 @@ import com.biogearsengine.ui.scenario 1.0
     function prompt_user_of_unsupported_action(props) {
       notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 is current Unsupported".arg(props.name), "header" : "Unsupported Action".arg(props.name), z : 200, dim: false})
     }
+    function add_exercise_action(props) {
+      var compartment = Qt.createComponent("UIExercise.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{ "type" : props.type, "weight" : props.weight,
+                                                                 "property_1" : props.field_1, "property_2" : props.field_3,  
+                                                                 "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
   }

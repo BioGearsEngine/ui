@@ -248,39 +248,73 @@ ActionDrawerForm {
     /// Create exercise dialog window with options to supply arg as intensity scale or work rate
     /// Sets input method ratio button : User can input intensity (0-1) or work rate (in W)
     /// Sets up two text fields (one per option):  Visibility controlled by which input method is currently selected
-    function setup_exercise(actionItem){
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status == Component.Ready) {
-            var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
-            exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
-            let dialogHeight = exerciseDialog.contentItem.height
-            let dialogWidth = exerciseDialog.contentItem.width
-            let inputOptionGroup = ['Intensity Level', 'Power Demand']
-            let inputOptionProps = {rowSpan: 2, prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 3, elementRatio : 0.5}
-            let optionsRadioButton = exerciseDialog.addRadioButton('Input Method', 'inputType',inputOptionGroup, inputOptionProps)
-            let intensityProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, maxValue : 1.0, editable : false}
-            let intensityTextField = exerciseDialog.addTextField('Intensity Level (0-1)', 'intensity', intensityProps)
-            let powerProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, editable : false}
-            let powerTextField = exerciseDialog.addTextField('Power (W)', 'workRate', powerProps)
-            let radioToIntensityState = ["unfocused","nonEditable"]            //Intensity is index = 0 in button group--so set states such that 0 = unfocused (visible but not currently being edited) and 1 = non-editable
-            let radioToPowerState = ["nonEditable", "unfocused"]                //Power is index = 1 in button group -- so set states such that 1 = unfocused (visible but not currently being edited) and 0 = non-editable
-            optionsRadioButton.radioGroupUpdate.connect( function (state) { intensityTextField.changeState(radioToIntensityState[state])});
-            optionsRadioButton.radioGroupUpdate.connect( function (state) { powerTextField.changeState(radioToPowerState[state])});
-            exerciseDialog.applyProps.connect(function (props) { actionModel.addSwitch(    props.description, 
-                                                                                                                                                                    function () { scenario.create_exercise_action(props.intensity, props.workRate) },
-                                                                                                                                                                    function () { scenario.create_exercise_action(0.0, 0.0) }
-                                                                                                                                                                )
-                                                                                                                }
-                                                                            )
-            actionDrawer.closed.connect(exerciseDialog.destroy)
-            exerciseDialog.open()
-        } else {
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
+    function setup_exercise(actionItem) {
+      var dialogComponent =  Qt.createComponent("UIActionDialog.qml");
+      if ( dialogComponent.status == Component.Ready ) {
+        var exerciseDialog = dialogComponent.createObject(root.parent, {'width' : 800, 'numRows' : 5, 'numColumns' : 6 } );
+        let itemHeight = exerciseDialog.contentItem.height / 3
+        let itemWidth1 = exerciseDialog.contentItem.width / 2
+        let itemWidth2 = exerciseDialog.contentItem.width / 3
+        let exerciseListData = { type : 'ListModel', role : 'type', elements : ['Generic', 'Cycling', 'Running', 'Strength']}
+        let exerciseComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
+        let exerciseCombo = exerciseDialog.addComboBox('Exercise Type', 'exerciseType', exerciseListData, exerciseComboProps)
+        
+        let weightPackCycleField = exerciseDialog.addTextField('Optional Pack (kg)', 'weightPack', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 3})
+        //fields
+        let field_1 = exerciseDialog.addTextField('field_1', 'field_1',  {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+        let field_2 = exerciseDialog.addTextField('field_2', 'field_2',  {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+        let field_3 = exerciseDialog.addTextField('field_3', 'field_3',  {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+
+        exerciseCombo.comboUpdate.connect(function (value) {
+          field_1.editable = false
+          field_2.editable = false
+          field_3.editable = false
+          weightPackCycleField.editable = false
+          switch (value) {
+            case 'Generic' : 
+              //Generic
+              field_1.editable = true
+              field_3.editable = true
+              field_1.textField.placeholderText = "Work Rate (W)"
+              field_3.textField.placeholderText = "Intensity"
+              break;
+            case 'Cycling' :  
+              //Cycling
+              //add checkbox for weight pack
+              field_1.editable = true
+              field_3.editable = true
+              field_1.textField.placeholderText = "Cadence (Hz)"
+              field_3.textField.placeholderText = "PowerCycle (W)"
+              weightPackCycleField.editable = true
+
+              break;
+            case 'Running' :  
+              //Running
+              //add checkbox for weight pack 
+              field_1.editable = true
+              field_3.editable = true
+              field_1.textField.placeholderText = "Velocity (m/s)"
+              field_3.textField.placeholderText = "Incline (%)"
+              weightPackCycleField.editable = true
+              break;
+            case 'Strength' :  
+              // Strength
+              field_1.editable = true
+              field_3.editable = true
+              field_1.textField.placeholderText = "Weight (Kg)"
+              field_3.textField.placeholderText = "Repititions"
+              break;
+          }
+        })
+        exerciseDialog.applyProps.connect(function (props) {actionModel.add_exercise_action(props)})
+        actionDrawer.closed.connect( exerciseDialog.destroy )
+        exerciseDialog.open()
+      } else {
+        if ( dialogComponent.status == Component.Error ) {
+          console.log("Error : " + dialogComponent.errorString() );
+          return;
         }
+      }
     }
 
     //----------------------------------------------------------------------------------------
