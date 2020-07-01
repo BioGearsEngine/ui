@@ -327,6 +327,15 @@ ActionDrawerForm {
     }
 
     //----------------------------------------------------------------------------------------
+    /// Set up function for Inhaler Action.  No dialog window is created because cardiac arrest 
+    /// is either on or off.  The action switch is thus all we need
+    function setup_inhaler(actionItem){
+        //In "On" function, 1 --> CDM::enumOnOff = On.  In "Off" function, 0 --> CDM::enumOnOff = Off
+        
+        actionModel.add_binary_action("UIInhaler.qml")
+    }
+
+    //----------------------------------------------------------------------------------------
     /// Set up arguments for asthma action, including severity property and spin box arguments
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
@@ -528,7 +537,7 @@ ActionDrawerForm {
             transfusionDialog.applyProps.connect( function(props){ actionModel.add_transfusion_action(props)})
             actionDrawer.closed.connect(transfusionDialog.destroy)
             transfusionDialog.open()
-        }else {
+        } else {
             if (dialogComponent.status == Component.Error){
                 console.log("Error : " + dialogComponent.errorString() );
                 return;
@@ -544,23 +553,15 @@ ActionDrawerForm {
             exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
             let dialogHeight = exerciseDialog.contentItem.height
             let dialogWidth = exerciseDialog.contentItem.width
-            let inputOptionGroup = ['Intensity Level', 'Power Demand']
-            let inputOptionProps = {rowSpan: 2, prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 3, elementRatio : 0.5}
-            let optionsRadioButton = exerciseDialog.addRadioButton('Input Method', 'inputType',inputOptionGroup, inputOptionProps)
-            let intensityProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, maxValue : 1.0, editable : false}
-            let intensityTextField = exerciseDialog.addTextField('Intensity Level (0-1)', 'intensity', intensityProps)
-            let powerProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, editable : false}
-            let powerTextField = exerciseDialog.addTextField('Power (W)', 'workRate', powerProps)
-            let radioToIntensityState = ["unfocused","nonEditable"]            //Intensity is index = 0 in button group--so set states such that 0 = unfocused (visible but not currently being edited) and 1 = non-editable
-            let radioToPowerState = ["nonEditable", "unfocused"]                //Power is index = 1 in button group -- so set states such that 1 = unfocused (visible but not currently being edited) and 0 = non-editable
-            optionsRadioButton.radioGroupUpdate.connect( function (state) { intensityTextField.changeState(radioToIntensityState[state])});
-            optionsRadioButton.radioGroupUpdate.connect( function (state) { powerTextField.changeState(radioToPowerState[state])});
-            exerciseDialog.applyProps.connect(function (props) { actionModel.addSwitch(    props.description, 
-                                                                                                                                                                    function () { scenario.create_exercise_action(props.intensity, props.workRate) },
-                                                                                                                                                                    function () { scenario.create_exercise_action(0.0, 0.0) }
-                                                                                                                                                                )
-                                                                                                                }
-                                                                            )
+            
+            let oxygenOptions = {colSpan  : 2, prefWidth : dialogWidth * .9,  prefHeight : dialogHeight / 4, elementRatio : 0.1, spinMax : 100, spinStep : 1, unitScale : true}
+            let oxygenSpinbox = exerciseDialog.addSpinBox('O2 Mix','mix', oxygenOptions)
+            
+            let bottleOptions = {colSpan  : 2, prefWidth : dialogWidth * .9 , prefHeight : dialogHeight / 4, elementRatio : 0.1, spinMax : 5000, spinStep : 100, unitScale : false}
+            let bottle1SpinBox = exerciseDialog.addSpinBox('Bottle 1 (mL)','volume_1', bottleOptions)
+            let bottle2SpinBox = exerciseDialog.addSpinBox('Bottle 2 (mL)','volume_2', bottleOptions)
+
+            exerciseDialog.applyProps.connect(function (props) { actionModel.add_anesthesia_machine_action(props)})
             actionDrawer.closed.connect(exerciseDialog.destroy)
             exerciseDialog.open()
         } else {
@@ -571,42 +572,6 @@ ActionDrawerForm {
             console.log("Error : Action dialog component not ready");
         }
     }
-
-    function setup_inhaler (actionItem) {
-        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status == Component.Ready) {
-            var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
-            exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
-            let dialogHeight = exerciseDialog.contentItem.height
-            let dialogWidth = exerciseDialog.contentItem.width
-            let inputOptionGroup = ['Intensity Level', 'Power Demand']
-            let inputOptionProps = {rowSpan: 2, prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 3, elementRatio : 0.5}
-            let optionsRadioButton = exerciseDialog.addRadioButton('Input Method', 'inputType',inputOptionGroup, inputOptionProps)
-            let intensityProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, maxValue : 1.0, editable : false}
-            let intensityTextField = exerciseDialog.addTextField('Intensity Level (0-1)', 'intensity', intensityProps)
-            let powerProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, editable : false}
-            let powerTextField = exerciseDialog.addTextField('Power (W)', 'workRate', powerProps)
-            let radioToIntensityState = ["unfocused","nonEditable"]            //Intensity is index = 0 in button group--so set states such that 0 = unfocused (visible but not currently being edited) and 1 = non-editable
-            let radioToPowerState = ["nonEditable", "unfocused"]                //Power is index = 1 in button group -- so set states such that 1 = unfocused (visible but not currently being edited) and 0 = non-editable
-            optionsRadioButton.radioGroupUpdate.connect( function (state) { intensityTextField.changeState(radioToIntensityState[state])});
-            optionsRadioButton.radioGroupUpdate.connect( function (state) { powerTextField.changeState(radioToPowerState[state])});
-            exerciseDialog.applyProps.connect(function (props) { actionModel.addSwitch(    props.description, 
-                                                                                                                                                                    function () { scenario.create_exercise_action(props.intensity, props.workRate) },
-                                                                                                                                                                    function () { scenario.create_exercise_action(0.0, 0.0) }
-                                                                                                                                                                )
-                                                                                                                }
-                                                                            )
-            actionDrawer.closed.connect(exerciseDialog.destroy)
-            exerciseDialog.open()
-        } else {
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        }
-    }
-
 
     function setup_consumeMeal (actionItem) {
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");

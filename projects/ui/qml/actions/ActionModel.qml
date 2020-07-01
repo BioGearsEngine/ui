@@ -315,6 +315,28 @@ import com.biogearsengine.ui.scenario 1.0
         console.log("Error : Action switch component not ready");
       }
     }
+    function add_anesthesia_machine_action(props) {
+      var compartment = Qt.createComponent("UIAnesthesiaMachine.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{  "mix" : props.mix,
+                                                                 "bottle_1" : props.volume_1,"bottle_2" : props.volume_2,
+                                                                 "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+    
     function prompt_user_of_unsupported_action(props) {
       notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 is current Unsupported".arg(props.name), "header" : "Unsupported Action".arg(props.name), z : 200, dim: false})
     }

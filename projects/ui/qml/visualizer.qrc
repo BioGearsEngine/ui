@@ -71,7 +71,8 @@
         <file alias="UITraumaticBrainInjury.qml" >actions/UITraumaticBrainInjury.qml</file>
         <file alias="UIConsumeMeal.qml" >actions/UIConsumeMeal.qml</file>
         <file alias="UIExercise.qml" >actions/UIExercise.qml</file>
-        
+        <file alias="UIInhaler.qml" >actions/UIInhaler.qml</file>
+        <file alias="UIAnesthesiaMachine.qml" >actions/UIAnesthesiaMachine.qml</file>
         <!-- Intervensions for the Control Window-->
         <file alias="UITourniquet.qml" >actions/UITourniquet.qml</file>
         <file alias="UINeedleDecompression.qml" >actions/UINeedleDecompression.qml</file>

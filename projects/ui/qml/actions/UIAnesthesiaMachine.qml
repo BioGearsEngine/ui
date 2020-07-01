@@ -10,17 +10,14 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property string type : ""
-  property double  weight : 0.0
-  property double  property_1 : 0.0
-  property double  property_2 : 0.0
+  property double  mix : 0.0
+  property double  bottle_1 : 0.0
+  property double  bottle_2 : 0.0
 
-  
+  actionType : "Anesthesia Machine"
+  fullName  :  "<b>%1</b><br>".arg(actionType)
 
-  actionType : "Exercise"
-  fullName  :  "<b>%1 %2</b><br>".arg(type).arg(actionType)
-
-  shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(type)
+  shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(mix)
 
   details : Component  {
     GridLayout {
@@ -42,117 +39,75 @@ UIActionForm {
         text : "[%1]".arg(root.compartment)
         Layout.alignment : Qt.AlignHCenter
       }
- //Column 2
+      //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
-        text : {
-          if ( type == "Generic") {
-            return "Work Rate"
-          } else if ( type == "Cycling") {
-            return "Cadence"
-          } else if ( type == "Running" ) {
-            return "Velocity"
-          } else {
-            return "Weight"
-          }
-        }
+        text : "Bottle 1 Volume"
       }      
       Slider {
-        id: property_1
+        id: bottle_1
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
         to : 100
         stepSize : 1
-        value : root.paramater_1
+        value : root.bottle_1
         onMoved : {
-          root.property_1 = value
+          root.bottle_1 = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : {
-          if ( type == "Generic") {
-            return "%1 W".arg(root.property_1)
-          } else if ( type == "Cycling") {
-            return "%1 Hz".arg(root.property_1)
-          } else if ( type == "Running" ) {
-            return "%1 m/s".arg(root.property_1)
-          } else {
-            return "%1 kg".arg(root.property_1)
-          }
-        }
+        text : "%1 ml".arg(root.bottle_1)
       }
       //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
-        text : {
-          if ( type == "Generic") {
-            return "Intensity"
-          } else if ( type == "Cycling") {
-            return "Power Cycle"
-          } else if ( type == "Running" ) {
-            return "Incline"
-          } else {
-            return "Repitition"
-          }
-        }
+        text : "Bottle 2 Volume"
       }      
       Slider {
-        id: property_2
+        id: concentration
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
         to : 100
         stepSize : 1
-        value : root.property_2
+        value : root.bottle_2
         onMoved : {
-          root.property_2 = value
+          root.bottle_2 = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : {
-           if ( type == "Generic") {
-            return "%1".arg(property_2)
-          } else if ( type == "Cycling") {
-            return "%1 W".arg(root.property_2)
-          } else if ( type == "Running" ) {
-            return "%1 %".arg(root.property_2)
-          } else {
-            return "%1".arg(property_2)
-          }
-        }property_2
+        text :  "%1 ml".arg(bottle_2)
       }
-    //Column 4
+      //Column 4
       Label {
         Layout.row : 3
         Layout.column : 0
-        text : "Weight"
-        visible : ( type == "Running" || type == "Cycling") ? true : false
+        text : "mix"
+      
       }      
       Slider {
         id: flowRate
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
-        to : 1000
-        stepSize : 1
-        value : root.rate
-        visible : ( type == "Running" || type == "Cycling") ? true : false
+        to : 1
+        stepSize : 0.01
+        value : root.mix
         onMoved : {
-          root.rate = value
+          root.mix = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1 kg".arg(weight)
-        visible : ( type == "Running" || type == "Cycling") ? true : false
+        text : "%1 %".arg(mix)
       }
     
       // Column 5
@@ -215,20 +170,9 @@ UIActionForm {
   }// End Details Component
  
   onActivate:   { 
-    let type = 0
-    if ( type == "Generic") {
-      type = 0
-    } else if ( type == "Cycling") {
-      type = 1
-    } else if ( type == "Running" ) {
-      type = 2
-    } else {
-      type = 3
-    }
-    scenario.create_exercise_action(type, weight, intensity, workRate) 
+    scenario.create_anasthesia_machien_action(mix, bottle_1, bottle_2) 
   }
   onDeactivate: { 
-      scenario.create_exercise_action(0, 0, 0, 0) 
-
+    scenario.create_anasthesia_machien_action(.5, 0, 0)   
   }
 }

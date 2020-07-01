@@ -2253,7 +2253,11 @@ void Scenario::export_state(bool saveAs)
 #include <biogears/cdm/patient/actions/SESubstanceOralDose.h>
 #include <biogears/cdm/patient/actions/SETensionPneumothorax.h>
 #include <biogears/cdm/patient/actions/SETourniquet.h>
-
+#include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerAction.h>
+#include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerConfiguration.h>
+#include <biogears/cdm/system/equipment/Anesthesia/actions/SEAnesthesiaMachineAction.h>
+#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachine.h>
+#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachineOxygenBottle.h>
 namespace bio {
 //---------------------------------------------------------------------------------
 // ACTION FACTORY FUNCTIONS TO BE REFACTORED TO ACTION FACTORY LATER
@@ -2421,6 +2425,13 @@ void Scenario::create_cardiac_arrest_action(bool state)
 
   _action_queue.as_source().insert(std::move(action));
 }
+void Scenario::create_inhaler_action(bool state)
+{
+  auto action = std::make_unique<biogears::SEInhalerConfiguration>(_engine->GetSubstanceManager());
+  auto& inhaler = action->GetConfiguration();
+  //TODO: Make this Useful.
+  _action_queue.as_source().insert(std::move(action));
+}
 void Scenario::create_airway_obstruction_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAirwayObstruction>();
@@ -2460,6 +2471,28 @@ void Scenario::create_consume_nutrients(double calcium_g, double carbs_g, double
   nutrition.GetProtein().SetValue(0.0, biogears::MassUnit::g);
   nutrition.GetSodium().SetValue(0.0, biogears::MassUnit::g);
   nutrition.GetWater().SetValue(0.0, biogears::VolumeUnit::mL);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_anasthesia_machien_action(double o2_fraction, double o2_volume1, double o2_volume2)
+{
+  auto action = std::make_unique<biogears::SEAnesthesiaMachineConfiguration>(_engine->GetSubstanceManager());
+  auto& config = action->GetConfiguration();
+  config.GetOxygenFraction().SetValue(o2_fraction);
+  config.GetOxygenBottleOne().GetVolume().SetValue(o2_volume1, biogears::VolumeUnit::L);
+  config.GetOxygenBottleTwo().GetVolume().SetValue(o2_volume2, biogears::VolumeUnit::L);
+
+  //Any of these values could auso be adjusted, but I don't think its required
+  //for this example
+  config.SetConnection(CDM::enumAnesthesiaMachineConnection::Mask);
+  config.GetInletFlow().SetValue(2.0, biogears::VolumePerTimeUnit::L_Per_min);
+  config.GetInspiratoryExpiratoryRatio().SetValue(.5);
+  config.SetOxygenSource(CDM::enumAnesthesiaMachineOxygenSource::Wall);
+  config.GetPositiveEndExpiredPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
+  config.SetPrimaryGas(CDM::enumAnesthesiaMachinePrimaryGas::Nitrogen);
+  config.GetReliefValvePressure().SetValue(20.0, biogears::PressureUnit::cmH2O);
+  config.GetRespiratoryRate().SetValue(12, biogears::FrequencyUnit::Per_min);
+  config.GetVentilatorPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
 
   _action_queue.as_source().insert(std::move(action));
 }
