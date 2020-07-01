@@ -2469,12 +2469,12 @@ void Scenario::create_consume_nutrients(double calcium_g, double carbs_g, double
   auto action = std::make_unique<biogears::SEConsumeNutrients>();
   auto& nutrition = action->GetNutrition();
 
-  nutrition.GetCalcium().SetValue( 0.0, biogears::MassUnit::g);
-  nutrition.GetCarbohydrate().SetValue(0.0, biogears::MassUnit::g);
-  nutrition.GetFat().SetValue(0.0, biogears::MassUnit::g);
-  nutrition.GetProtein().SetValue(0.0, biogears::MassUnit::g);
-  nutrition.GetSodium().SetValue(0.0, biogears::MassUnit::g);
-  nutrition.GetWater().SetValue(0.0, biogears::VolumeUnit::mL);
+  nutrition.GetCalcium().SetValue(calcium_g, biogears::MassUnit::g);
+  nutrition.GetCarbohydrate().SetValue(carbs_g, biogears::MassUnit::g);
+  nutrition.GetFat().SetValue(fat_g, biogears::MassUnit::g);
+  nutrition.GetProtein().SetValue(protien_g, biogears::MassUnit::g);
+  nutrition.GetSodium().SetValue(sodium_g, biogears::MassUnit::g);
+  nutrition.GetWater().SetValue(water_ml, biogears::VolumeUnit::mL);
 
   _action_queue.as_source().insert(std::move(action));
 }
