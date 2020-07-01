@@ -154,7 +154,7 @@ void Scenario::restart(QString patient_file)
 {
   _paused = true;
   emit pausedToggled(_paused);
-  _throttle = true; 
+  _throttle = true;
   emit throttledToggled(_throttle);
 
   load_patient(patient_file);
@@ -2348,12 +2348,12 @@ void Scenario::create_exercise_action(double intensity = 0.0, double workRate_W 
 {
   auto action = std::make_unique<biogears::SEExercise>();
   auto genericExercise = biogears::SEExercise::SEGeneric{};
- 
+
   if (intensity > 0.0) {
     genericExercise.Intensity.SetValue(intensity);
   } else if (workRate_W > 0.0) {
     genericExercise.DesiredWorkRate.SetValue(workRate_W, biogears::PowerUnit::W);
-    
+
   } else {
     //Reach this block if both inputs are 0, meaning we turn off action)
     genericExercise.Intensity.SetValue(0.0);
@@ -2394,7 +2394,7 @@ void Scenario::create_needle_decompression_action(int state, int side)
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_cardiac_arrest_action(bool  state)
+void Scenario::create_cardiac_arrest_action(bool state)
 {
   auto action = std::make_unique<biogears::SECardiacArrest>();
   action->SetActive(state);
@@ -2426,6 +2426,20 @@ void Scenario::create_acute_stress_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAcuteStress>();
   action->GetSeverity().SetValue(severity);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_consume_nutrients(double calcium_g, double carbs_g, double fat_g, double protien_g, double sodium_g, double water_ml)
+{
+  auto action = std::make_unique<biogears::SEConsumeNutrients>();
+  auto& nutrition = action->GetNutrition();
+
+  nutrition.GetCalcium().SetValue( 0.0, biogears::MassUnit::g);
+  nutrition.GetCarbohydrate().SetValue(0.0, biogears::MassUnit::g);
+  nutrition.GetFat().SetValue(0.0, biogears::MassUnit::g);
+  nutrition.GetProtein().SetValue(0.0, biogears::MassUnit::g);
+  nutrition.GetSodium().SetValue(0.0, biogears::MassUnit::g);
+  nutrition.GetWater().SetValue(0.0, biogears::VolumeUnit::mL);
 
   _action_queue.as_source().insert(std::move(action));
 }

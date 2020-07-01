@@ -126,6 +126,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_cardiac_arrest_action(bool state);
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
+  Q_INVOKABLE void create_consume_nutrients(double calcium_g, double carbs_g, double fat_g, double protien_g, double sodium_g, double water_ml);
   Q_INVOKABLE QString patient_name_and_time();
   Q_INVOKABLE QString get_patient_state_files();
   Q_INVOKABLE QList<QString> get_nested_patient_state_list();

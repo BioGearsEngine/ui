@@ -290,6 +290,31 @@ import com.biogearsengine.ui.scenario 1.0
         console.log("Error : Action switch component not ready");
       }
     }
+    function add_consume_meal(props) {
+      var compartment = Qt.createComponent("UIConsumeMeal.qml");
+      if ( compartment.status == Component.Ready)  {
+
+        var action = compartment.createObject(actionSwitchView,{ "name" : props.name, 
+                                                                 "carbs_g" : props.carbs, "fat_g" : props.fat,
+                                                                 "protien_g" : props.protien,  "sodium_g" : props.sodium,  
+                                                                 "water_ml" : props.water,  "calcium_g" : props.calcium,  
+                                                                 "rate" : props.rate,
+                                                                 "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
     function prompt_user_of_unsupported_action(props) {
       notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 is current Unsupported".arg(props.name), "header" : "Unsupported Action".arg(props.name), z : 200, dim: false})
     }

@@ -69,6 +69,8 @@
         <file alias="UIHemorrhage.qml" >actions/UIHemorrhage.qml</file>
         <file alias="UITensionPneumothorax.qml" >actions/UITensionPneumothorax.qml</file>
         <file alias="UITraumaticBrainInjury.qml" >actions/UITraumaticBrainInjury.qml</file>
+        <file alias="UIConsumeMeal.qml" >actions/UIConsumeMeal.qml</file>
+        
         <!-- Intervensions for the Control Window-->
         <file alias="UITourniquet.qml" >actions/UITourniquet.qml</file>
         <file alias="UINeedleDecompression.qml" >actions/UINeedleDecompression.qml</file>

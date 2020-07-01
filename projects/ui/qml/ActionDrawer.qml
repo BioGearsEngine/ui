@@ -250,13 +250,7 @@ ActionDrawerForm {
     /// Sets up two text fields (one per option):  Visibility controlled by which input method is currently selected
     function setup_exercise(actionItem){
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
-        if ( dialogComponent.status != Component.Ready){
-            if (dialogComponent.status == Component.Error){
-                console.log("Error : " + dialogComponent.errorString() );
-                return;
-            }
-            console.log("Error : Action dialog component not ready");
-        } else {
+        if ( dialogComponent.status == Component.Ready) {
             var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
             exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
             let dialogHeight = exerciseDialog.contentItem.height
@@ -280,6 +274,12 @@ ActionDrawerForm {
                                                                             )
             actionDrawer.closed.connect(exerciseDialog.destroy)
             exerciseDialog.open()
+        } else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
         }
     }
 
@@ -343,7 +343,7 @@ ActionDrawerForm {
     }
 
     //----------------------------------------------------------------------------------------
-    /// Create dialog window for actions that accepts single double input (asthma, burn, airway obstruction, etc.)
+    /// Create dialog window for actions that accepts single let input (asthma, burn, airway obstruction, etc.)
     /// Accepts action name, label, biogears function, and args to customize spin box
     /// Sets up a spin box to track severity
     function add_single_range_action(title,label, spinnerProperties, creationFunc ){
@@ -495,6 +495,107 @@ ActionDrawerForm {
             actionDrawer.closed.connect(transfusionDialog.destroy)
             transfusionDialog.open()
         }else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
+        }
+    }
+
+    function setup_anesthesia_machine (actionItem) {
+        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+        if ( dialogComponent.status == Component.Ready) {
+            var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
+            exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
+            let dialogHeight = exerciseDialog.contentItem.height
+            let dialogWidth = exerciseDialog.contentItem.width
+            let inputOptionGroup = ['Intensity Level', 'Power Demand']
+            let inputOptionProps = {rowSpan: 2, prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 3, elementRatio : 0.5}
+            let optionsRadioButton = exerciseDialog.addRadioButton('Input Method', 'inputType',inputOptionGroup, inputOptionProps)
+            let intensityProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, maxValue : 1.0, editable : false}
+            let intensityTextField = exerciseDialog.addTextField('Intensity Level (0-1)', 'intensity', intensityProps)
+            let powerProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, editable : false}
+            let powerTextField = exerciseDialog.addTextField('Power (W)', 'workRate', powerProps)
+            let radioToIntensityState = ["unfocused","nonEditable"]            //Intensity is index = 0 in button group--so set states such that 0 = unfocused (visible but not currently being edited) and 1 = non-editable
+            let radioToPowerState = ["nonEditable", "unfocused"]                //Power is index = 1 in button group -- so set states such that 1 = unfocused (visible but not currently being edited) and 0 = non-editable
+            optionsRadioButton.radioGroupUpdate.connect( function (state) { intensityTextField.changeState(radioToIntensityState[state])});
+            optionsRadioButton.radioGroupUpdate.connect( function (state) { powerTextField.changeState(radioToPowerState[state])});
+            exerciseDialog.applyProps.connect(function (props) { actionModel.addSwitch(    props.description, 
+                                                                                                                                                                    function () { scenario.create_exercise_action(props.intensity, props.workRate) },
+                                                                                                                                                                    function () { scenario.create_exercise_action(0.0, 0.0) }
+                                                                                                                                                                )
+                                                                                                                }
+                                                                            )
+            actionDrawer.closed.connect(exerciseDialog.destroy)
+            exerciseDialog.open()
+        } else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
+        }
+    }
+
+    function setup_inhaler (actionItem) {
+        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+        if ( dialogComponent.status == Component.Ready) {
+            var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
+            exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
+            let dialogHeight = exerciseDialog.contentItem.height
+            let dialogWidth = exerciseDialog.contentItem.width
+            let inputOptionGroup = ['Intensity Level', 'Power Demand']
+            let inputOptionProps = {rowSpan: 2, prefWidth : dialogWidth / 2, prefHeight : dialogHeight / 3, elementRatio : 0.5}
+            let optionsRadioButton = exerciseDialog.addRadioButton('Input Method', 'inputType',inputOptionGroup, inputOptionProps)
+            let intensityProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, maxValue : 1.0, editable : false}
+            let intensityTextField = exerciseDialog.addTextField('Intensity Level (0-1)', 'intensity', intensityProps)
+            let powerProps = {prefWidth : dialogWidth / 3, prefHeight : dialogHeight / 3, editable : false}
+            let powerTextField = exerciseDialog.addTextField('Power (W)', 'workRate', powerProps)
+            let radioToIntensityState = ["unfocused","nonEditable"]            //Intensity is index = 0 in button group--so set states such that 0 = unfocused (visible but not currently being edited) and 1 = non-editable
+            let radioToPowerState = ["nonEditable", "unfocused"]                //Power is index = 1 in button group -- so set states such that 1 = unfocused (visible but not currently being edited) and 0 = non-editable
+            optionsRadioButton.radioGroupUpdate.connect( function (state) { intensityTextField.changeState(radioToIntensityState[state])});
+            optionsRadioButton.radioGroupUpdate.connect( function (state) { powerTextField.changeState(radioToPowerState[state])});
+            exerciseDialog.applyProps.connect(function (props) { actionModel.addSwitch(    props.description, 
+                                                                                                                                                                    function () { scenario.create_exercise_action(props.intensity, props.workRate) },
+                                                                                                                                                                    function () { scenario.create_exercise_action(0.0, 0.0) }
+                                                                                                                                                                )
+                                                                                                                }
+                                                                            )
+            actionDrawer.closed.connect(exerciseDialog.destroy)
+            exerciseDialog.open()
+        } else {
+            if (dialogComponent.status == Component.Error){
+                console.log("Error : " + dialogComponent.errorString() );
+                return;
+            }
+            console.log("Error : Action dialog component not ready");
+        }
+    }
+
+
+    function setup_consumeMeal (actionItem) {
+        var dialogComponent = Qt.createComponent("UIActionDialog.qml");
+        if ( dialogComponent.status == Component.Ready) {
+            var mealDialog = dialogComponent.createObject(root.parent, {'numRows' : 4, 'numColumns' : 2});
+            mealDialog.initializeProperties({name : actionItem.name, type : '', bagVolume : 0, rate : 0})
+            let dialogWidth = mealDialog.contentItem.width
+            let dialogHeight = mealDialog.contentItem.height
+
+            let nameField = mealDialog.addTextField('Name', 'name',  {prefWidth : dialogWidth, prefHeight : dialogHeight / 3, colSpan : 2, editable : true})
+            nameField.textField.validator = null
+            let rateSpinProps = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 4, elementRatio : 0.4, spinMax : 500, spinStep : 1, unitScale : false}
+            let calcium_g = mealDialog.addSpinBox('Calcium (g)', 'calcium', rateSpinProps)
+            let carbs_g   = mealDialog.addSpinBox('Carbs (g)', 'carbs', rateSpinProps)
+            let fat_g     = mealDialog.addSpinBox('Fat (g)', 'fat', rateSpinProps)
+            let protien_g = mealDialog.addSpinBox('Protien (g)', 'protien', rateSpinProps)
+            let sodium_g  = mealDialog.addSpinBox('Sodium (g)', 'sodium', rateSpinProps)
+            let water_ml  = mealDialog.addSpinBox('Water (mL)', 'water', rateSpinProps)
+            
+            mealDialog.applyProps.connect( function(props){ actionModel.add_consume_meal(props)})
+            actionDrawer.closed.connect(mealDialog.destroy)
+            mealDialog.open()
+        } else {
             if (dialogComponent.status == Component.Error){
                 console.log("Error : " + dialogComponent.errorString() );
                 return;
