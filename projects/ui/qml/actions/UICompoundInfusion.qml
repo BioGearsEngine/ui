@@ -60,7 +60,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1ml".arg(root.volume )
+        text : "%1 ml".arg(root.volume )
       }
       //Column 3
       Label {
@@ -84,7 +84,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1ml/min".arg(root.rate )
+        text : "%1 ml/min".arg(root.rate )
       }
     
       // Column 3

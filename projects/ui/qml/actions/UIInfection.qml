@@ -88,7 +88,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1mg/L".arg(root.mic)
+        text : "%1 mg/L".arg(root.mic)
       }
       // Column 4
       Rectangle {

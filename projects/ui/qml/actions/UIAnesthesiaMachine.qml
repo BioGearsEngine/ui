@@ -69,7 +69,7 @@ UIActionForm {
         text : "Bottle 2 Volume"
       }      
       Slider {
-        id: concentration
+        id: bottle_2
         Layout.fillWidth : true
         Layout.columnSpan : 2
         from : 0
@@ -107,7 +107,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1 %".arg(mix)
+        text : "%1 \%".arg(mix)
       }
     
       // Column 5

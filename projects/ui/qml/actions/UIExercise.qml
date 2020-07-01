@@ -122,7 +122,7 @@ UIActionForm {
           } else if ( type == "Cycling") {
             return "%1 W".arg(root.property_2)
           } else if ( type == "Running" ) {
-            return "%1 %".arg(root.property_2)
+            return "%1 \%".arg(root.property_2)
           } else {
             return "%1".arg(property_2)
           }

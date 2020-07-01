@@ -59,7 +59,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1ml/min".arg(root.rate )
+        text : "%1 ml/min".arg(root.rate )
       }
     
       // Column 3

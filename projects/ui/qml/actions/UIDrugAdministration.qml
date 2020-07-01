@@ -24,11 +24,11 @@ UIActionForm {
            root.adminRoute == 'Bolus-Intramuscular' || 
            root.adminRoute == 'Bolus-Intravenous')
     {
-      tmp += "<br> Dose %1mL<br> Concentration %2ug/mL".arg(root.dose).arg(root.concentration)
+      tmp += "<br> Dose %1 mL<br> Concentration %2ug/mL".arg(root.dose).arg(root.concentration)
     } else if ( root.adminRoute == 'Infusion-Intravenous') {
-      tmp += "<br> Concentration %1ug/mL<br> Concentration %2mL/min".arg(root.concentration).arg(root.rate)
+      tmp += "<br> Concentration %1 ug/mL<br> Concentration %2mL/min".arg(root.concentration).arg(root.rate)
     } else {
-      tmp += "<br> Dose %1mg".arg(root.dose)
+      tmp += "<br> Dose %1 mg".arg(root.dose)
     }
     return tmp
   }
@@ -83,9 +83,9 @@ UIActionForm {
               if (root.adminRoute == 'Bolus-Intraarterial' ||
                   root.adminRoute == 'Bolus-Intramuscular' || 
                   root.adminRoute == 'Bolus-Intravenous')
-                return "%1%mL".arg(root.dose)
+                return "%1 mL".arg(root.dose)
               else (root.adminRoute == 'Oral' || root.adminRoute == 'Transmucosal')
-                return "%1mg".arg(root.dose)
+                return "%1 mg".arg(root.dose)
           }
           visible : dosage.concentration
       }
@@ -118,7 +118,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1ug/mL".arg(root.concentration )
+        text : "%1 ug/mL".arg(root.concentration )
         visible : flowRate.concentration
       }
     //Column 4
@@ -150,7 +150,7 @@ UIActionForm {
         }
       }
       Label {
-        text : "%1ml/min".arg(root.rate )
+        text : "%1 ml/min".arg(root.rate )
         visible : flowRate.visible
       }
     
