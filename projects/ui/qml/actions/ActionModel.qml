@@ -11,6 +11,7 @@ import com.biogearsengine.ui.scenario 1.0
       Rectangle {
         id: notifierRect
         property string message 
+        property string header : "New Action" 
         height : 100
         width :  body.width + 50
         color : "lightslategrey"
@@ -24,7 +25,7 @@ import com.biogearsengine.ui.scenario 1.0
           height : title.height
           Text {
             id: title
-            text : "Notificaiton"
+            text : header
             font.bold: true
             font.pixelSize : 15
           }
@@ -56,7 +57,7 @@ import com.biogearsengine.ui.scenario 1.0
           v_action.uuid = uuidv4()
           v_action.remove.connect(removeAction)
           actionSwitchModel.append(v_action)
-         notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_action.actionType), z : 200, dim: false})
+         notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(v_action.actionType), z : 200, dim: false})
         } else {
           if (v_severityForm.status == Component.Error){
             console.log("Error : " + v_severityForm.errorString() );
@@ -77,7 +78,7 @@ import com.biogearsengine.ui.scenario 1.0
         v_action.remove.connect(removeAction)
 
         actionSwitchModel.append(v_action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(v_action.actionType), z : 200, dim: false})
       } else {
         if (v_severityForm.status == Component.Error){
           console.log("Error : " + v_severityForm.errorString() );
@@ -98,7 +99,7 @@ import com.biogearsengine.ui.scenario 1.0
         v_painStimulus.remove.connect(removeAction)
 
         actionSwitchModel.append(v_painStimulus)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_painStimulus.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(v_painStimulus.actionType), z : 200, dim: false})
       } else {
         if (v_painStimulusForm.status == Component.Error){
           console.log("Error : " + v_painStimulusForm.errorString() );
@@ -118,7 +119,7 @@ import com.biogearsengine.ui.scenario 1.0
         v_action.remove.connect(removeAction)
 
         actionSwitchModel.append(v_action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(v_action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(v_action.actionType), z : 200, dim: false})
       } else {
         if (v_actionComponent.status == Component.Error){
           console.log("Error : " + v_actionComponent.errorString() );
@@ -139,7 +140,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -159,7 +160,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -179,7 +180,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -199,7 +200,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -219,7 +220,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -239,7 +240,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -259,7 +260,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -280,7 +281,7 @@ import com.biogearsengine.ui.scenario 1.0
         action.remove.connect(removeAction)
 
         actionSwitchModel.append(action)
-        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Created %1".arg(action.actionType), z : 200, dim: false})
+        notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
       } else {
         if (compartment.status == Component.Error){
           console.log("Error : " + compartment.errorString() );
@@ -288,5 +289,8 @@ import com.biogearsengine.ui.scenario 1.0
         }
         console.log("Error : Action switch component not ready");
       }
+    }
+    function prompt_user_of_unsupported_action(props) {
+      notifierComponet.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 is current Unsupported".arg(props.name), "header" : "Unsupported Action".arg(props.name), z : 200, dim: false})
     }
   }

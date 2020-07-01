@@ -102,11 +102,11 @@ Drawer {
                 ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_needleDecompression(actionItem)}}
                 ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(actionItem) { root.setup_tourniquet(actionItem)}}
                 ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_transfusion(actionItem)}}
-                ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
-                ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
-                ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
-                ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
-                ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.setup_OtherActions(actionItem)}}
+                ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
+                ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
+                ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
+                ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
+                ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
             }
         }
         Button {

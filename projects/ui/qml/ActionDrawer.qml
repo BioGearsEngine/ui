@@ -328,7 +328,7 @@ ActionDrawerForm {
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_bronchoconstriction(actionItem){
       let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
-      add_single_range_action("Broncho Construction", "Severity", severityProps, 
+      add_single_range_action("Broncho Constriction", "Severity", severityProps, 
         function(props) {actionModel.add_single_range_action("UIBronchoconstriction.qml", props)} )
     }
 
@@ -504,8 +504,9 @@ ActionDrawerForm {
     }
 
     //Placeholder function for other actions that have not yet been defined in Scenario.cpp
-    function setup_OtherActions(actionItem){
+    function unsupported_action(actionItem){
         console.log("Support coming for " + actionItem.name);
+        actionModel.prompt_user_of_unsupported_action({name : actionItem.name}) 
     }
 
         //----------------------------------------------------------------------------------------
