@@ -107,7 +107,7 @@ UIActionDialogForm {
         spin.spinBox.textFromValue(0)
         spin.spinBox.decrease()
       }
-      if (spin.unitScale) {
+      if (spin.spinBox != 1) {
         spin.spinBox.valueFromText = function(text) { return spin.valueFromDecimal(spin.spinBox.text) }
         spin.spinBox.textFromValue = function(text) { return spin.valueToDecimal(spin.spinBox.value) }
       }

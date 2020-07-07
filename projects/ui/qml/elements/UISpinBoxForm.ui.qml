@@ -14,7 +14,7 @@ RowLayout {
   property real prefWidth : parent.width
   property real prefHeight : root.implicitHeight
   property var displayEnum : []                   //Text to display insted of values, if desired (e.g. 'Mild', 'Moderate', 'Severe' instead of 0, 1, 2)
-  property bool unitScale : false                 //SpinBox does not support float step-sizes.  If flagged, this tells SpinBox to divide all values by the maximum spin value so that they are output on 0-1 scale
+  property int spinScale : 1                      //SpinBox does not support float step-sizes.  This property scales all spinBox display values so that they are in the range [spin.from/spinScale, spin.to/spinScale] 
   property int spinMax : 1
   property int spinStep : 1
   property int colSpan : 1

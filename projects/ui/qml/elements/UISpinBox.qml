@@ -14,11 +14,7 @@ UISpinBoxForm {
 
   //Handle new spin box value (adjusted for scaling if necesary) and emit spinUpdate
   spinBox.onValueModified : {
-    if (unitScale) {
-      spinUpdate(spinBox.value / spinBox.to);
-    } else {
-      spinUpdate(spinBox.value)
-    }
+    spinUpdate(spinBox.value / spinScale)
   }
 
   //Handle reset signal by setting spin box value back to 0
@@ -32,10 +28,7 @@ UISpinBoxForm {
   //----------------------------------------------
   //Generates description of property for dialog window description assembly
   function getDescription(){
-    let dispValue = spinBox.value
-    if (unitScale){
-      dispValue = dispValue / spinBox.to
-    }
+    let dispValue = spinBox.value / spinScale
     if (displayEnum.length > 0){
       dispValue = displayEnum[spinBox.value]
     }
@@ -88,11 +81,7 @@ UISpinBoxForm {
   //Ex : If spin box displays 0.2 and spin.to = 100, then spin box will store 20
   //Note that the scaled value (spin.value / spin.to) is then passed to spinUpdate
   function valueFromDecimal (text) {
-    if (unitScale){
-      return Number.fromLocaleString(text) * spinBox.to
-    } else {
-      console.log('UISpinBoxForm:  You must define unitScale property')
-    }
+    return Number.fromLocaleString(text) * spinScale
   }
 
   //----------------------------------------------
@@ -102,11 +91,7 @@ UISpinBoxForm {
   //Ex : If spin box value = 30 and spin.to = 100, then 0.3 will be displayed.
   //Note that the scaled value (spin.value / spin.to) is then passed to spinUpdate
   function valueToDecimal (value) {
-      if (unitScale){
-        return Number(value/spinBox.to).toLocaleString('f', 2);  //Defaulting to 2 decimals for now
-      } else {
-        console.log('UISpinBoxForm:  You must define unitScale property')
-      }
+    return Number(value/spinScale).toLocaleString('f', 2);  //Defaulting to 2 decimals for now
   }
 }
 

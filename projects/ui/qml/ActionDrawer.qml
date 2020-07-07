@@ -124,7 +124,7 @@ ActionDrawerForm {
     /// Creates burn dialog window and assign fraction body surface area burned property
     /// Sets up a spin box to set fraction body surface area (scales to output text in floating point)
     function setup_burn(actionItem){
-      let severityProps = {elementRatio : 0.6, unitScale : true, spinMax : 100, spinStep : 5}
+      let severityProps = {elementRatio : 0.6, spinScale : 100, spinMax : 100, spinStep : 5}
       add_single_range_action("Burn Wound", "Fraction, Body Surface Area", severityProps, 
            function(props) {actionModel.add_single_range_action("UIBurnWound.qml", props)} )
     }
@@ -176,7 +176,7 @@ ActionDrawerForm {
             let sideButtons = ['Left','Right']   //This is the order as defined in CDM::enumSide
             let sideOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2.1, elementRatio : 0.3}
             let sideRadioButton = tensionDialog.addRadioButton('Side','side',sideButtons,sideOptions)
-            let severityOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2, colSpan : 2, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
+            let severityOptions = {prefHeight : dialogHeight / 3, prefWidth : dialogWidth / 2, colSpan : 2, elementRatio : 0.4, spinScale : 100, spinMax : 100, spinStep : 5}
             let severitySpinbox = tensionDialog.addSpinBox('Severity', 'severity',severityOptions)
             tensionDialog.applyProps.connect(function(props) {actionModel.add_tension_pneumothorax_action(props)})
             actionDrawer.closed.connect(tensionDialog.destroy)
@@ -230,7 +230,7 @@ ActionDrawerForm {
             let typeButtons = ['Diffuse','Left Focal', 'Right Focal']
             let typeOptions = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 2, elementRatio : 0.3}
             let typeRadioButton = tbiDialog.addRadioButton('Type','type',typeButtons, typeOptions);
-            let severityOptions = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 4, elementRatio : 0.4, spinMax : 100, spinStep : 5, unitScale : true}
+            let severityOptions = {prefWidth : dialogWidth / 2.5, prefHeight : dialogHeight / 4, elementRatio : 0.4, spinScale : 100, spinMax : 100, spinStep : 5}
             let severitySpinBox = tbiDialog.addSpinBox('Severity','severity', severityOptions)
             tbiDialog.applyProps.connect( function(props) {actionModel.add_tramatic_brain_injury_action(props)})
             actionDrawer.closed.connect(tbiDialog.destroy)
@@ -340,7 +340,7 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_asthma(actionItem){
-      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      let severityProps = {elementRatio : 0.5, spinScale : 100, spinMax : 100, spinStep : 5}
       add_single_range_action("Asthma Attack", "Severity", severityProps, 
       function(props) {actionModel.add_single_range_action("UIAsthmaAttack.qml" ,props)} )
     }
@@ -350,7 +350,7 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_apnea(actionItem){
-      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      let severityProps = {elementRatio : 0.5, spinScale : 100, spinMax : 100, spinStep : 5}
       add_single_range_action("Apnea", "Severity", severityProps, 
         function(props) {actionModel.add_single_range_action("UIApnea.qml", props)} )
     }
@@ -360,7 +360,7 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_airwayObstruction(actionItem){
-      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      let severityProps = {elementRatio : 0.5, spinScale : 100, spinMax : 100, spinStep : 5}
       add_single_range_action("Airway Obstruction", "Severity", severityProps, 
         function(props) {actionModel.add_single_range_action("UIAirwayObstruction.qml", props)} )
     }
@@ -370,7 +370,7 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_bronchoconstriction(actionItem){
-      let severityProps = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+      let severityProps = {elementRatio : 0.5, spinScale : 100, spinMax : 100, spinStep : 5}
       add_single_range_action("Broncho Constriction", "Severity", severityProps, 
         function(props) {actionModel.add_single_range_action("UIBronchoconstriction.qml", props)} )
     }
@@ -380,7 +380,7 @@ ActionDrawerForm {
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation
     function setup_acuteStress(actionItem){
-        let spinnerProperties = {elementRatio : 0.5, unitScale : true, spinMax : 100, spinStep : 5}
+        let spinnerProperties = {elementRatio : 0.5, spinScale : 100, spinMax : 100, spinStep : 5}
         add_single_range_action("Acute Stress", "Severity", spinnerProperties, 
           function(props) {console.log(props.spinnerValue);actionModel.add_single_range_action("UIAcuteStress.qml", props)} )
     }
@@ -549,21 +549,68 @@ ActionDrawerForm {
     function setup_anesthesia_machine (actionItem) {
         var dialogComponent = Qt.createComponent("UIActionDialog.qml");
         if ( dialogComponent.status == Component.Ready) {
-            var exerciseDialog = dialogComponent.createObject(root.parent, { numRows : 2, numColumns : 2});
-            exerciseDialog.initializeProperties({name : actionItem.name, inputType : '', intensity : 0, workRate : 0})
-            let dialogHeight = exerciseDialog.contentItem.height
-            let dialogWidth = exerciseDialog.contentItem.width
-            
-            let oxygenOptions = {colSpan  : 2, prefWidth : dialogWidth * .9,  prefHeight : dialogHeight / 4, elementRatio : 0.1, spinMax : 100, spinStep : 1, unitScale : true}
-            let oxygenSpinbox = exerciseDialog.addSpinBox('O2 Mix','mix', oxygenOptions)
-            
-            let bottleOptions = {colSpan  : 2, prefWidth : dialogWidth * .9 , prefHeight : dialogHeight / 4, elementRatio : 0.1, spinMax : 5000, spinStep : 100, unitScale : false}
-            let bottle1SpinBox = exerciseDialog.addSpinBox('Bottle 1 (mL)','volume_1', bottleOptions)
-            let bottle2SpinBox = exerciseDialog.addSpinBox('Bottle 2 (mL)','volume_2', bottleOptions)
+            var ventilatorDialog = dialogComponent.createObject(root.parent, { numRows : 8, numColumns : 2});
+            ventilatorDialog.height = 450
+            ventilatorDialog.width = 750
+            ventilatorDialog.initializeProperties({name : actionItem.name, connection : '', primaryGas : '', inletFlow : 5, pMax : 10, peep : 1, ieRatio : 0.5, o2Frac : 0.25, o2Source : '', respirationRate : 12, reliefPressure : 100, bottle1 : 0, bottle2 : 0})
+            let dialogHeight = ventilatorDialog.contentItem.height
+            let dialogWidth = ventilatorDialog.contentItem.width
+            //Connection type
+            let connectionListData = {type : 'ListModel', role : 'type', elements : ["Mask", "Tube"]}
+            let connectionOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.4} 
+            let connectionCombo = ventilatorDialog.addComboBox('Connection', 'connection', connectionListData, connectionOptions)
+            //Primary gas
+            let gasListData = {type : 'ListModel', role : 'gas', elements : ["Nitrogen", "Air"]}
+            let gasOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.5}
+            let gasCombo = ventilatorDialog.addComboBox('Primary Gas', 'primaryGas', gasListData, gasOptions)
+            //Inlet Flow
+            let flowOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 15, spinStep: 1}
+            let flowSpinBox = ventilatorDialog.addSpinBox('Inlet Flow (L/min)', 'inletFlow', flowOptions)
+            flowSpinBox.spinBox.value = ventilatorDialog.actionProps["inletFlow"]   //Set initial value to reasonable flow rate
+            //IE Ratio
+            let ieOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 200, spinStep : 5, spinScale : 100}
+            let ieSpinBox = ventilatorDialog.addSpinBox('IE Ratio', 'ieRatio', ieOptions)
+            ieSpinBox.spinBox.value = ventilatorDialog.actionProps["ieRatio"]*100   //Set initial value to reasonable ratio
+            //Ventilator Pressure
+            let pressureOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 20, spinStep : 1}
+            let pressureSpinBox = ventilatorDialog.addSpinBox('Max Pressure (cmH2O)', 'pMax', pressureOptions)
+            pressureSpinBox.spinBox.value = ventilatorDialog.actionProps["pMax"]   //Set initial value to reasonable pressure
+            //Positive End Expired Pressure
+            let peepOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 5, spinStep : 1}
+            let peepSpinBox = ventilatorDialog.addSpinBox('PEEP (cmH2O)', 'peep', peepOptions)
+            peepSpinBox.spinBox.value = ventilatorDialog.actionProps["pMax"]   //Set initial value to reasonable peep
+            //Respiration Rate
+            let rrOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 20, spinStep : 1}
+            let rrSpinBox = ventilatorDialog.addSpinBox('Respiration Rate', 'respirationRate', rrOptions)
+            rrSpinBox.spinBox.value = ventilatorDialog.actionProps["respirationRate"]   //Set initial value to reasonable respiration rate
+            //Relief valve pressure
+            let reliefOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 150, spinStep : 10}
+            let reliefSpinBox = ventilatorDialog.addSpinBox('Relief Valve Pressure (cmH2O)', 'reliefPressure', reliefOptions)
+            reliefSpinBox.spinBox.value = ventilatorDialog.actionProps["reliefPressure"]   //Set initial value to reasonable relief
+            //Oxygen fraction
+            let o2FracOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.6, spinMax : 100, spinStep : 1, spinScale : 100}
+            let o2FracSpinBox = ventilatorDialog.addSpinBox('Oxygen Fraction', 'o2Frac', o2FracOptions)
+            o2FracSpinBox.spinBox.value = ventilatorDialog.actionProps["o2Frac"]   //Set initial value to reasonable o2Frac
+            //Oxygen source
+            let sourceListData = {type : 'ListModel', role : 'type', elements : ["Wall", "Bottle One", "Bottle Two"]}
+            let sourceOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.4} 
+            let sourceCombo = ventilatorDialog.addComboBox('OxygenSource', 'o2Source', sourceListData, sourceOptions)
+            //Oxygen bottle volumes
+            let bottleOptions = {prefWidth : dialogWidth * .45 , prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.5, spinMax : 5000, spinStep : 100, required : false}
+            let bottle1SpinBox = ventilatorDialog.addSpinBox('O2 Bottle 1 (mL)','bottle1', bottleOptions)
+            let bottle2SpinBox = ventilatorDialog.addSpinBox('O2 Bottle 2 (mL)','bottle2', bottleOptions)
+            //Left chamber -- for adding volatile anesthetic drugs
+            let leftChamberLabel = Qt.createQmlObject("import QtQuick 2.12; import QtQuick.Controls 2.5; Item { width : 375; height : 55; Label {anchors.centerIn : parent; text : 'Left Chamber Substance'; font.pointSize : 12; horizontalAlignment : Text.AlignHCenter; verticalAlignment : Text.AlignVCenter}}", ventilatorDialog.contentItem, "AM-LeftSubChamberLabel")
+            let leftChamberSub = Qt.createQmlObject("import QtQuick 2.12; Item { width : 375; height : 55; property alias subEntry : subEntry; UISubstanceEntry {id : subEntry; type : 'fraction'; anchors.centerIn : parent; prefWidth : parent.width * 0.9; prefHeight : parent.height * 0.9} }", ventilatorDialog.contentItem, "AM-LeftSubChamberEntry")
+            leftChamberSub.subEntry.entry.substanceInput.font.pointSize = 12
+            //right chamber -- for adding volatile anesthetic drugs
+            let rightChamberLabel = Qt.createQmlObject("import QtQuick 2.12; import QtQuick.Controls 2.5; Item { width : 375; height : 55; Label {anchors.centerIn : parent; text : 'Right Chamber Substance'; font.pointSize : 12; horizontalAlignment : Text.AlignHCenter; verticalAlignment : Text.AlignVCenter}}", ventilatorDialog.contentItem, "AM-RightSubChamberLabel")
+            let rightChamberSub = Qt.createQmlObject("import QtQuick 2.12; Item { width : 375; height : 55; property alias subEntry : subEntry; UISubstanceEntry {id : subEntry; type : 'fraction'; anchors.centerIn : parent; prefWidth : parent.width * 0.9; prefHeight : parent.height * 0.9} }", ventilatorDialog.contentItem, "AM-RightSubChamberEntry")
+            rightChamberSub.subEntry.entry.substanceInput.font.pointSize = 12
 
-            exerciseDialog.applyProps.connect(function (props) { actionModel.add_anesthesia_machine_action(props)})
-            actionDrawer.closed.connect(exerciseDialog.destroy)
-            exerciseDialog.open()
+            ventilatorDialog.applyProps.connect(function (props) { actionModel.add_anesthesia_machine_action(props)})
+            actionDrawer.closed.connect(ventilatorDialog.destroy)
+            ventilatorDialog.open()
         } else {
             if (dialogComponent.status == Component.Error){
                 console.log("Error : " + dialogComponent.errorString() );
