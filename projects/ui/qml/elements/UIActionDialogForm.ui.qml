@@ -15,6 +15,7 @@ Dialog {
   property int numColumns : 1
   property int colSpace: 0
   property int rowSpace : 0
+  property string errorString : ""
   //Base properties
   width : 500
   height : 250

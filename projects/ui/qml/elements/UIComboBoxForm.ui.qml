@@ -55,7 +55,7 @@ RowLayout {
     Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1    //If no preferred height, set to -1, which flags Qml Layout to use implicit maximum height
     text: "Unset"
     verticalAlignment : Text.AlignVCenter
-    horizontalAlignment : Text.AlignHCenter
+    horizontalAlignment : Text.AlignLeft
     font.pointSize: root.fontSize
   }
   ComboBox {

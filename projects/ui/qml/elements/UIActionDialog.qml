@@ -4,6 +4,7 @@ import Qt.labs.folderlistmodel 2.12
 
 UIActionDialogForm {
   id: root
+  
   //-------Signals and Handlers--------------
    
   // Emit properties when they have been set 
@@ -16,7 +17,7 @@ UIActionDialogForm {
       root.applyProps(actionProps);
       close();
     } else {
-      console.log('Invalid configuration : Check that all required values are defined')
+      console.log(errorString)
     }
   }
   
@@ -46,6 +47,7 @@ UIActionDialogForm {
       console.log("Error : UIcomboBox component not ready");
     } else {
       var combo = comboComponent.createObject(root.contentItem);
+      combo.objectName = label
       combo.label.text = label
       combo.comboBox.textRole = modelData.role
       switch (modelData.type) {
@@ -92,6 +94,7 @@ UIActionDialogForm {
 	    console.log("Error : UIspinBox component not ready");
 	  } else {
 		  var spin = spinComponent.createObject(root.contentItem);
+      spin.objectName = label
       spin.label.text = label
       if (Object.keys(customArgs).length > 0){
         parseCustomArgs(customArgs, spin)
@@ -132,6 +135,7 @@ UIActionDialogForm {
 	    console.log("Error : UIfieldBox component not ready");
 	  } else {
 		  var field = fieldComponent.createObject(root.contentItem);
+      field.objectName = label
       field.textField.placeholderText = label
       if (Object.keys(customArgs).length > 0){
         parseCustomArgs(customArgs, field)
@@ -199,12 +203,14 @@ UIActionDialogForm {
   // Assembles a string describing the action and the input provided by user
   // Displayed next to action switch
   function generateDescription(){
-    let description = actionProps.name + ": \n    "
+    let description = actionProps.name + ": <br>    "
     let numChildren = root.contentItem.children.length
     for (let child = 0; child < numChildren; ++child){
-      description += root.contentItem.children[child].getDescription()
-      if (child != numChildren-1){
-        description += "\n    "
+      if (root.contentItem.children[child].getDescription){   //Check if child has getDescription defined
+        description += root.contentItem.children[child].getDescription()      //Execute getDescription
+        if (child != numChildren-1){
+          description += "<br>    "
+        }
       }
     }
     Object.assign(actionProps, {description: description})
@@ -226,12 +232,17 @@ UIActionDialogForm {
   // Loops over all components added to dialog contentItem and calls their respective isValid methods
   // Returns false if any property has not been assigned a valid value
   function validProps(){
+    let valid = true
+    errorString = "" //Reset error string
     for (let child in root.contentItem.children){
-     if (!root.contentItem.children[child].isValid()){
-        return false
+      if (root.contentItem.children[child].isValid){    //Check if child item has isValid function defined
+        if (!root.contentItem.children[child].isValid()){ //Execute isValid function
+          valid = false
+          errorString += root.contentItem.children[child].objectName + " is invalid\n";
+        }
       }
     }
-    return true
+    return valid
   }
    
 }

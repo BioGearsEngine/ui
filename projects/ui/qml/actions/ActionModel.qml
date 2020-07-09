@@ -318,9 +318,12 @@ import com.biogearsengine.ui.scenario 1.0
     function add_anesthesia_machine_action(props) {
       var compartment = Qt.createComponent("UIAnesthesiaMachine.qml");
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{  "mix" : props.mix * 100,
-                                                                 "bottle_1" : props.volume_1,"bottle_2" : props.volume_2,
-                                                                 "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+        var action = compartment.createObject(actionSwitchView,{  "description" : props.description, "connection" : props.connection, "primaryGas" : props.primaryGas, "o2Source" : props.o2Source,
+                                                                  "leftChamberSub" : props.leftSub[0], "rightChamberSub" : props.rightSub[0], "inletFlow_L_Per_min" : props.inletFlow,
+                                                                  "ieRatio" : props.ieRatio, "pMax_cmH2O" : props.pMax, "peep_cmH2O" : props.peep, "respirationRate_Per_min" : props.respirationRate,
+                                                                  "reliefPressure_cmH2O" : props.reliefPressure, "o2Fraction" : props.o2Frac, "leftChamberFraction" : props.leftSub[1],
+                                                                  "rightChamberFraction" : props.rightSub[1], "bottle1_mL" : props.bottle1,"bottle2_mL" : props.bottle2,
+                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
         action.scenario = biogears_scenario
         action.uuid = uuidv4()

@@ -93,6 +93,7 @@ public:
   Q_INVOKABLE void step();
 
   Q_INVOKABLE QVector<QString> get_drugs();
+  Q_INVOKABLE QVector<QString> get_volatile_drugs();
   Q_INVOKABLE QVector<QString> get_compounds();
   Q_INVOKABLE QVector<QString> get_transfusion_products();
   Q_INVOKABLE QVector<QString> get_components();
@@ -128,7 +129,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
   Q_INVOKABLE void create_inhaler_action(bool active);
-  Q_INVOKABLE void create_anesthesia_machine_action(double mix, double volume_1, double volume_2);
+  Q_INVOKABLE void create_anesthesia_machine_action(int connection, int primaryGas, int source, double pMax_cmH2O, double peep_cmH2O, double reliefPressure_cmH2O, double inletFlow_L_Per_min, double respirationRate_Per_min, double ieRatio, double o2Fraction, double bottle1_mL, double bottle2_mL, QString leftSub, double leftSubFraction, QString rightSub, double rightSubFraction);
 
   Q_INVOKABLE QString patient_name_and_time();
   Q_INVOKABLE QString get_patient_state_files();
@@ -191,6 +192,7 @@ private:
   std::atomic<bool> _throttle;
 
   QVector<QString> _drugs_list;             //Subs with PK/PD data
+  QVector<QString> _volatile_drugs_list;    //Gaseous subs with PK/PD that can be added to ventilator
   QVector<QString> _compounds_list;         //Compounds
   QVector<QString> _transfusions_list;      //Blood products
   QVector<QString> _components_list;        //Subs that can be components of compounds

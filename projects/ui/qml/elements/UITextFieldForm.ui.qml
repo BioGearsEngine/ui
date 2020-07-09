@@ -15,6 +15,7 @@ Item {
   property bool validateDouble : true
   property bool required : true
   property real maxValue : Infinity
+  property var resetValue : null
   //Property aliases -- used to access text field sub-properties outside of form file
   property alias textField : textField
   //Layout options

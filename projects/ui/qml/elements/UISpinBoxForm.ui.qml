@@ -21,6 +21,7 @@ RowLayout {
   property int rowSpan : 1
   property bool required : true
   property bool available : true
+  property var resetValue : null
   //Property aliases -- used to access sub-components outside of form file
   property alias label: name
   property alias spinBox : spinBox
@@ -55,7 +56,7 @@ RowLayout {
     Layout.fillHeight : true
     Layout.maximumHeight : root.prefHeight
     text: "Unset"
-    horizontalAlignment : Text.AlignHCenter
+    horizontalAlignment : Text.AlignLeft
     verticalAlignment : Text.AlignVCenter
     font.pointSize: 12
     font.bold: false

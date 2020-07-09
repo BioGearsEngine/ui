@@ -19,7 +19,11 @@ UISpinBoxForm {
 
   //Handle reset signal by setting spin box value back to 0
   onResetSpinBox : {
-    spinBox.value = 0
+    if (resetValue === null){
+      spinBox.value = 0
+    } else {
+      spinBox.value = resetValue
+    }
     spinUpdate(spinBox.value)
   }
 

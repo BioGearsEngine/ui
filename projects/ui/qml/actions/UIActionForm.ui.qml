@@ -192,7 +192,9 @@ Rectangle {
         MenuItem {
           text : "Remove"
            onTriggered: {
-            root.deactivate()
+            if (root.active){
+              root.deactivate()
+            }
             root.remove( root.uuid )
            }
         }

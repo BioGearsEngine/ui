@@ -32,6 +32,9 @@ UISubstanceEntryForm {
     if (filter === 'Aerosol'){
       components = ['Sarin','ForestFireParticulate']
     }
+    if (filter === 'VolatileDrugs'){
+      components = scenario.get_volatile_drugs()
+    }
     for (let i = 0; i < components.length; ++i){
       let element = { "component" : components[i] }
       entry.componentListModel.append(element)

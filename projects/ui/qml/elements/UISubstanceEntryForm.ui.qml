@@ -68,6 +68,7 @@ Rectangle {
       property var unitModel : substanceEntry.units[unit]
       property alias substanceInput : substanceInput
       property alias componentListModel : componentListModel
+      property alias scalarInput : scalarInput
 
       columns : 5
       rows : 2
@@ -295,6 +296,7 @@ Rectangle {
                                                               scalarInput.text = existing[1]; } }
       property alias substanceInput : substanceInput
       property alias componentListModel : componentListModel
+      property alias scalarInput : scalarInput
       Layout.fillWidth : true
       Layout.fillHeight : true
       rowSpacing : 0

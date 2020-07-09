@@ -16,7 +16,11 @@ UITextFieldForm {
 
   // Handle reset signal by clearing text from field
   onResetTextField : {
-    textField.clear();
+    if (resetValue === null){
+      textField.clear();
+    } else {
+      textField.text = resetValue
+    }
   }
 
   // Handle newly edited text by calling update signal and passing new value
@@ -51,10 +55,10 @@ UITextFieldForm {
   //----------------------------------------------
   //A text field property is valid if text in an *editable* field is not empty (as determined by length of text) 
   function isValid() {
-    if (root.editable){
+    if (root.available){
       return root.required ? !(textField.text.length===0) : true
     }
-    return !editable
+    return !available
   }
 
 

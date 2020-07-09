@@ -550,6 +550,9 @@ void Scenario::setup_physiology_lists()
         if (subData != nullptr) {
           if (subData->Pharmacodynamics().present() && subData->Pharmacokinetics().present()) {
             _drugs_list.append(QString::fromStdString(subData->Name()));
+            if (subData->State().get() == CDM::enumSubstanceState::Gas) {
+              _volatile_drugs_list.append(QString::fromStdString(subData->Name())); //Drugs that can be vaporized and given through ventilator
+            }
           }
           if (subData->State().present() && subData->State().get() != CDM::enumSubstanceState::Solid) {
             _components_list.append(QString::fromStdString(subData->Name()));
@@ -590,6 +593,11 @@ void Scenario::setup_physiology_lists()
 QVector<QString> Scenario::get_drugs()
 {
   return _drugs_list;
+}
+//---------------------------------------------------------------------------------
+QVector<QString> Scenario::get_volatile_drugs()
+{
+  return _volatile_drugs_list;
 }
 //---------------------------------------------------------------------------------
 QVector<QString> Scenario::get_compounds()
@@ -1372,7 +1380,10 @@ void Scenario::create_substance(QVariantMap substanceData)
   export_substance(newSubstance);
   //If the substance has PD behavior, add it to the list of drugs so that it will be immediately available to use in Bg Actions
   if (newSubstance->HasPD() && newSubstance->HasPK()) {
-    _drugs_list.push_back(QString::fromStdString(newSubstance->GetName()));
+    _drugs_list.append(QString::fromStdString(newSubstance->GetName()));
+    if (newSubstance->GetState() == CDM::enumSubstanceState::Gas) {
+      _volatile_drugs_list.append(QString::fromStdString(newSubstance->GetName())); //If drug is gaseous, it can be administered through ventilator
+    }
   }
 }
 
@@ -2432,6 +2443,7 @@ void Scenario::export_state(bool saveAs)
 #include <biogears/cdm/patient/actions/SEExercise.h>
 #include <biogears/cdm/patient/actions/SEHemorrhage.h>
 #include <biogears/cdm/patient/actions/SEInfection.h>
+#include <biogears/cdm/patient/actions/SEIntubation.h>
 #include <biogears/cdm/patient/actions/SENeedleDecompression.h>
 #include <biogears/cdm/patient/actions/SEPainStimulus.h>
 #include <biogears/cdm/patient/actions/SESubstanceAdministration.h>
@@ -2441,11 +2453,12 @@ void Scenario::export_state(bool saveAs)
 #include <biogears/cdm/patient/actions/SESubstanceOralDose.h>
 #include <biogears/cdm/patient/actions/SETensionPneumothorax.h>
 #include <biogears/cdm/patient/actions/SETourniquet.h>
+#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachine.h>
+#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachineChamber.h>
+#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachineOxygenBottle.h>
+#include <biogears/cdm/system/equipment/Anesthesia/actions/SEAnesthesiaMachineAction.h>
 #include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerAction.h>
 #include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerConfiguration.h>
-#include <biogears/cdm/system/equipment/Anesthesia/actions/SEAnesthesiaMachineAction.h>
-#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachine.h>
-#include <biogears/cdm/system/equipment/Anesthesia/SEAnesthesiaMachineOxygenBottle.h>
 namespace bio {
 //---------------------------------------------------------------------------------
 // ACTION FACTORY FUNCTIONS TO BE REFACTORED TO ACTION FACTORY LATER
@@ -2546,7 +2559,7 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
   auto strength = biogears::SEExercise::SEStrengthTraining{};
   switch (type) {
   case 0:
-    if (  property_1 > 0) {
+    if (property_1 > 0) {
       generic.DesiredWorkRate.SetValue(property_1, biogears::PowerUnit::W);
     } else {
       generic.Intensity.SetValue(property_2);
@@ -2555,7 +2568,7 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
     break;
   case 1:
     if (property_1 > 0) {
-      cycling.CadenceCycle.SetValue(property_1,biogears::FrequencyUnit::Hz);
+      cycling.CadenceCycle.SetValue(property_1, biogears::FrequencyUnit::Hz);
     } else {
       cycling.PowerCycle.SetValue(property_2, biogears::PowerUnit::W);
     }
@@ -2563,7 +2576,7 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
     action->SetCyclingExercise(cycling);
     break;
   case 2:
-    running.SpeedRun.SetValue(property_1, biogears::LengthPerTimeUnit::m_Per_s); 
+    running.SpeedRun.SetValue(property_1, biogears::LengthPerTimeUnit::m_Per_s);
     running.InclineRun.SetValue(property_2);
     running.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
     action->SetRunningExercise(running);
@@ -2653,25 +2666,40 @@ void Scenario::create_acute_stress_action(double severity)
   _action_queue.as_source().insert(std::move(action));
 }
 
-void Scenario::create_anesthesia_machine_action(double o2_fraction, double o2_volume1, double o2_volume2)
+void Scenario::create_anesthesia_machine_action(int connection, int primaryGas, int source, double pMax_cmH2O, double peep_cmH2O, double reliefPressure_cmH2O, double inletFlow_L_Per_min, double respirationRate_Per_min, double ieRatio, double o2Fraction, double bottle1_mL, double bottle2_mL, QString leftSub, double leftSubFraction, QString rightSub, double rightSubFraction)
 {
   auto action = std::make_unique<biogears::SEAnesthesiaMachineConfiguration>(_engine->GetSubstanceManager());
+  auto intubationAction = std::make_unique<biogears::SEIntubation>();
+  intubationAction->SetType(CDM::enumIntubationType::Tracheal);
   auto& config = action->GetConfiguration();
-  config.GetOxygenFraction().SetValue(o2_fraction);
-  config.GetOxygenBottleOne().GetVolume().SetValue(o2_volume1, biogears::VolumeUnit::L);
-  config.GetOxygenBottleTwo().GetVolume().SetValue(o2_volume2, biogears::VolumeUnit::L);
 
-  //Any of these values could auso be adjusted, but I don't think its required
-  //for this example
-  config.SetConnection(CDM::enumAnesthesiaMachineConnection::Mask);
-  config.GetInletFlow().SetValue(2.0, biogears::VolumePerTimeUnit::L_Per_min);
-  config.GetInspiratoryExpiratoryRatio().SetValue(.5);
-  config.SetOxygenSource(CDM::enumAnesthesiaMachineOxygenSource::Wall);
-  config.GetPositiveEndExpiredPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
-  config.SetPrimaryGas(CDM::enumAnesthesiaMachinePrimaryGas::Nitrogen);
-  config.GetReliefValvePressure().SetValue(20.0, biogears::PressureUnit::cmH2O);
-  config.GetRespiratoryRate().SetValue(12, biogears::FrequencyUnit::Per_min);
-  config.GetVentilatorPressure().SetValue(0.0, biogears::PressureUnit::cmH2O);
+  config.SetConnection((CDM::enumAnesthesiaMachineConnection::value)connection);
+  config.SetPrimaryGas((CDM::enumAnesthesiaMachinePrimaryGas::value)connection);
+  config.SetOxygenSource((CDM::enumAnesthesiaMachineOxygenSource::value)source);
+  config.GetVentilatorPressure().SetValue(pMax_cmH2O, biogears::PressureUnit::cmH2O);
+  config.GetPositiveEndExpiredPressure().SetValue(peep_cmH2O, biogears::PressureUnit::cmH2O);
+  config.GetReliefValvePressure().SetValue(reliefPressure_cmH2O, biogears::PressureUnit::cmH2O);
+  config.GetInletFlow().SetValue(inletFlow_L_Per_min, biogears::VolumePerTimeUnit::L_Per_min);
+  config.GetRespiratoryRate().SetValue(respirationRate_Per_min, biogears::FrequencyUnit::Per_min);
+  config.GetInspiratoryExpiratoryRatio().SetValue(ieRatio);
+  config.GetOxygenFraction().SetValue(o2Fraction);
+  config.GetOxygenBottleOne().GetVolume().SetValue(bottle1_mL, biogears::VolumeUnit::L);
+  config.GetOxygenBottleTwo().GetVolume().SetValue(bottle2_mL, biogears::VolumeUnit::L);
+  if (!leftSub.isEmpty()) {
+    config.GetLeftChamber().SetSubstance(*_engine->GetSubstanceManager().GetSubstance(leftSub.toStdString()));
+    config.GetLeftChamber().GetSubstanceFraction().SetValue(leftSubFraction);
+    leftSubFraction > 0.0 ? config.GetLeftChamber().SetState(CDM::enumOnOff::On) : config.GetLeftChamber().SetState(CDM::enumOnOff::Off);
+  }
+  if (!rightSub.isEmpty()) {
+    config.GetRightChamber().SetSubstance(*_engine->GetSubstanceManager().GetSubstance(rightSub.toStdString()));
+    config.GetRightChamber().GetSubstanceFraction().SetValue(rightSubFraction);
+    rightSubFraction > 0.0 ? config.GetRightChamber().SetState(CDM::enumOnOff::On) : config.GetRightChamber().SetState(CDM::enumOnOff::Off);
+  }
+
+  if (config.GetConnection() == CDM::enumAnesthesiaMachineConnection::Tube) {
+    _action_queue.as_source().insert(std::move(intubationAction));
+  }
+  _action_queue.as_source().insert(std::move(action));
 }
 
 void Scenario::create_consume_meal_action(QString mealName, double carbs_g, double fat_g, double protein_g, double sodium_mg, double calcium_mg, double water_mL)
