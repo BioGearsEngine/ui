@@ -17,6 +17,7 @@ RowLayout {
   property int colSpan : 1
   property int rowSpan : 1
   property bool required : true
+  property bool available : true
   property string splitToken                //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
                                             //we do not want to display (e.g. PatientState@0s vs PatientState).  This splitToken tells which character to split the file name at.  
   //Property aliases -- used to access subcomponents outside form file
@@ -28,6 +29,23 @@ RowLayout {
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
   Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+
+  //States
+  state : "available" //Initial state is available
+  states : [
+    State {
+      //When the field is available for input it is fully opaque and enabled
+      name : "available" ; when : root.available
+      PropertyChanges {target : name; opacity : 1.0; enabled : true}
+      PropertyChanges {target : value; opacity : 1.0; enabled : true}
+     },
+    State {
+      //When the field is unavailble for editing, turn down opacity ("ghost" out) and disable so that it cannot accept input
+      name : "unavailable"; when : !root.avaialble
+      PropertyChanges {target : name; opacity : 0.5; enabled : false}
+      PropertyChanges {target : value; opacity : 0.5; enabled : false}
+    }
+    ]
 
   Label {
     id: name

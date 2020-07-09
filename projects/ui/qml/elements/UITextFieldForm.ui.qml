@@ -11,7 +11,7 @@ Item {
   property int textSize : 8
   property int colSpan : 1
   property int rowSpan : 1
-  property bool editable : true
+  property bool available : true
   property bool validateDouble : true
   property bool required : true
   property real maxValue : Infinity
@@ -28,21 +28,21 @@ Item {
   states : [
     State {
       //When the field is available for input but not currently being edited, set background border to grey
-      name : "unfocused" ; when : root.editable && !textField.activeFocus
-      PropertyChanges {target : backgroundRect; border.color : "grey"; border.width : 1}
-      PropertyChanges {target : textField; visible : true}
+      name : "available-unfocused" ; when : root.available && !textField.activeFocus
+      PropertyChanges {target : backgroundRect; border.color : "grey"; border.width : 2; opacity : 1.0; enabled : true}
+      PropertyChanges {target : textField; opacity : 1.0; enabled : true}
      },
     State {
       //When the field is available for input and being currently edited, set background to green
-      name : "focused"; when : root.editable && textField.activeFocus
-      PropertyChanges {target : backgroundRect; border.color : "green"; border.width : 3}
-      PropertyChanges {target : textField; visible : true}
+      name : "available-focused"; when : root.available && textField.activeFocus
+      PropertyChanges {target : backgroundRect; border.color : "green"; border.width : 3; opacity : 1.0; enabled : true}
+      PropertyChanges {target : textField; opacity : 1.0; enabled : true}
     },
     State {
       //When the field is unavailble for editing, turn off visibility and remove background border
-      name : "nonEditable"; when : !root.editable
-      PropertyChanges {target : backgroundRect; border.width : 0}
-      PropertyChanges {target : textField; visible : false}
+      name : "unavailable"; when : !root.avaialble
+      PropertyChanges {target : backgroundRect; opacity : 0.35; enabled : false}
+      PropertyChanges {target : textField; opacity : 0.35; enabled : false}
     }
     ]
 
@@ -66,6 +66,7 @@ Item {
     validator : validateDouble ? doubleValidator : null
     background : Rectangle {
       id : backgroundRect
+      border.width : 1
       anchors.fill : parent
       color : "transparent"
     }

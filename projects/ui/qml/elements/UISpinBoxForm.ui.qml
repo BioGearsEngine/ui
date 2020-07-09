@@ -20,6 +20,7 @@ RowLayout {
   property int colSpan : 1
   property int rowSpan : 1
   property bool required : true
+  property bool available : true
   //Property aliases -- used to access sub-components outside of form file
   property alias label: name
   property alias spinBox : spinBox
@@ -29,6 +30,23 @@ RowLayout {
   Layout.columnSpan : colSpan
   Layout.rowSpan : rowSpan
   Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+  
+  //States
+  state : "available" //Initial state is available
+  states : [
+    State {
+      //When the field is available for input it is fully opaque and enabled
+      name : "available" ; when : root.available
+      PropertyChanges {target : name; opacity : 1.0; enabled : true}
+      PropertyChanges {target : spinBox; opacity : 1.0; enabled : true}
+     },
+    State {
+      //When the field is unavailble for editing, turn down opacity ("ghost" out) and disable so that it cannot accept input
+      name : "unavailable"; when : !root.avaialble
+      PropertyChanges {target : name; opacity : 0.5; enabled : false}
+      PropertyChanges {target : spinBox; opacity : 0.5; enabled : false}
+    }
+    ]
 
   Label {
     id: name

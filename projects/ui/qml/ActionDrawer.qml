@@ -261,46 +261,46 @@ ActionDrawerForm {
         
         let weightPackCycleField = exerciseDialog.addTextField('Optional Pack (kg)', 'weightPack', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 3})
         //fields
-        let field_1 = exerciseDialog.addTextField('field_1', 'field_1',  {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-        let field_2 = exerciseDialog.addTextField('field_2', 'field_2',  {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-        let field_3 = exerciseDialog.addTextField('field_3', 'field_3',  {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+        let field_1 = exerciseDialog.addTextField('field_1', 'field_1',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
+        let field_2 = exerciseDialog.addTextField('field_2', 'field_2',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
+        let field_3 = exerciseDialog.addTextField('field_3', 'field_3',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
 
         exerciseCombo.comboUpdate.connect(function (value) {
-          field_1.editable = false
-          field_2.editable = false
-          field_3.editable = false
-          weightPackCycleField.editable = false
+          field_1.available = false
+          field_2.available = false
+          field_3.available = false
+          weightPackCycleField.available = false
           switch (value) {
             case 'Generic' : 
               //Generic
-              field_1.editable = true
-              field_3.editable = true
+              field_1.available = true
+              field_3.available = true
               field_1.textField.placeholderText = "Work Rate (W)"
               field_3.textField.placeholderText = "Intensity"
               break;
             case 'Cycling' :  
               //Cycling
               //add checkbox for weight pack
-              field_1.editable = true
-              field_3.editable = true
+              field_1.available = true
+              field_3.available = true
               field_1.textField.placeholderText = "Cadence (Hz)"
               field_3.textField.placeholderText = "PowerCycle (W)"
-              weightPackCycleField.editable = true
+              weightPackCycleField.available = true
 
               break;
             case 'Running' :  
               //Running
               //add checkbox for weight pack 
-              field_1.editable = true
-              field_3.editable = true
+              field_1.available = true
+              field_3.available = true
               field_1.textField.placeholderText = "Velocity (m/s)"
               field_3.textField.placeholderText = "Incline (%)"
-              weightPackCycleField.editable = true
+              weightPackCycleField.available = true
               break;
             case 'Strength' :  
               // Strength
-              field_1.editable = true
-              field_3.editable = true
+              field_1.available = true
+              field_3.available = true
               field_1.textField.placeholderText = "Weight (Kg)"
               field_3.textField.placeholderText = "Repititions"
               break;
@@ -441,9 +441,9 @@ ActionDrawerForm {
             let subFolderData = {type : 'ListModel', role : 'drug', elements : drugsList}
             let subComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
             let subCombo = drugDialog.addComboBox('Substance', 'substance', subFolderData, subComboProps)
-            let doseField = drugDialog.addTextField('Dose (ml)', 'dose', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-            let concentrationField = drugDialog.addTextField('Concentration (ug/mL)', 'concentration', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
-            let rateField = drugDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 2})
+            let doseField = drugDialog.addTextField('Dose (ml)', 'dose', {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
+            let concentrationField = drugDialog.addTextField('Concentration (ug/mL)', 'concentration', {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
+            let rateField = drugDialog.addTextField('Rate (mL/min)', 'rate', { prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
             drugDialog.applyProps.connect(function(props) { actionModel.add_drug_administration_action(props) } )
             adminCombo.comboUpdate.connect(function (value) { root.manage_drugOptions(value, doseField, concentrationField, rateField)} )
             actionDrawer.closed.connect(drugDialog.destroy)
@@ -462,26 +462,26 @@ ActionDrawerForm {
             case 'Bolus-Intramuscular' :
             case 'Bolus-Intravenous' :
                 doseField.textField.placeholderText = 'Dose (mL)'
-                doseField.editable = true
-                concentrationField.editable = true
-                rateField.editable = false
+                doseField.available = true
+                concentrationField.available = true
+                rateField.available = false
                 break;
             case 'Infusion-Intravenous' :
-                doseField.editable = false
-                concentrationField.editable = true
-                rateField.editable = true
+                doseField.available = false
+                concentrationField.available = true
+                rateField.available = true
                 break;
             case 'Oral':
             case 'Transmucosal':
                 doseField.textField.placeholderText = 'Dose (mg)'
-                doseField.editable = true
-                concentrationField.editable = false
-                rateField.editable = false
+                doseField.available = true
+                concentrationField.available = false
+                rateField.available = false
                 break;    
             default :
-                doseField.editable = false
-                concentrationField.editable = false
-                rateField.editable = false
+                doseField.available = false
+                concentrationField.available = false
+                rateField.available = false
         }
     }
     //----------------------------------------------------------------------------------------
@@ -596,17 +596,21 @@ ActionDrawerForm {
             let sourceOptions = {prefWidth : dialogWidth * 0.45, prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.4} 
             let sourceCombo = ventilatorDialog.addComboBox('OxygenSource', 'o2Source', sourceListData, sourceOptions)
             //Oxygen bottle volumes
-            let bottleOptions = {prefWidth : dialogWidth * .45 , prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.5, spinMax : 5000, spinStep : 100, required : false}
+            let bottleOptions = {prefWidth : dialogWidth * .45 , prefHeight : dialogHeight / ventilatorDialog.numRows, elementRatio : 0.5, spinMax : 5000, spinStep : 100, required : false, available : true}
             let bottle1SpinBox = ventilatorDialog.addSpinBox('O2 Bottle 1 (mL)','bottle1', bottleOptions)
             let bottle2SpinBox = ventilatorDialog.addSpinBox('O2 Bottle 2 (mL)','bottle2', bottleOptions)
             //Left chamber -- for adding volatile anesthetic drugs
-            let leftChamberLabel = Qt.createQmlObject("import QtQuick 2.12; import QtQuick.Controls 2.5; Item { width : 375; height : 55; Label {anchors.centerIn : parent; text : 'Left Chamber Substance'; font.pointSize : 12; horizontalAlignment : Text.AlignHCenter; verticalAlignment : Text.AlignVCenter}}", ventilatorDialog.contentItem, "AM-LeftSubChamberLabel")
-            let leftChamberSub = Qt.createQmlObject("import QtQuick 2.12; Item { width : 375; height : 55; property alias subEntry : subEntry; UISubstanceEntry {id : subEntry; type : 'fraction'; anchors.centerIn : parent; prefWidth : parent.width * 0.9; prefHeight : parent.height * 0.9} }", ventilatorDialog.contentItem, "AM-LeftSubChamberEntry")
+            let leftChamberLabel = Qt.createQmlObject("import QtQuick 2.12; import QtQuick.Controls 2.5; Item { width : 375; height : 55; Label {anchors.fill : parent; anchors.bottomMargin : 2; text : 'Left Chamber Substance'; font.pointSize : 12; horizontalAlignment : Text.AlignHCenter; verticalAlignment : Text.AlignBottom}}", ventilatorDialog.contentItem, "AM-LeftSubChamberLabel")
+            let leftChamberSub = Qt.createQmlObject("import QtQuick 2.12; Item { width : 375; height : 55; property alias subEntry : subEntry; UISubstanceEntry {id : subEntry; type : 'fraction'; anchors.centerIn : parent; prefWidth : parent.width * 0.9; prefHeight : parent.height * 0.9; border.width : 0} }", ventilatorDialog.contentItem, "AM-LeftSubChamberEntry")
             leftChamberSub.subEntry.entry.substanceInput.font.pointSize = 12
+            leftChamberSub.subEntry.entry.componentListModel.append({"gas" : "Desflurane"})
             //right chamber -- for adding volatile anesthetic drugs
-            let rightChamberLabel = Qt.createQmlObject("import QtQuick 2.12; import QtQuick.Controls 2.5; Item { width : 375; height : 55; Label {anchors.centerIn : parent; text : 'Right Chamber Substance'; font.pointSize : 12; horizontalAlignment : Text.AlignHCenter; verticalAlignment : Text.AlignVCenter}}", ventilatorDialog.contentItem, "AM-RightSubChamberLabel")
-            let rightChamberSub = Qt.createQmlObject("import QtQuick 2.12; Item { width : 375; height : 55; property alias subEntry : subEntry; UISubstanceEntry {id : subEntry; type : 'fraction'; anchors.centerIn : parent; prefWidth : parent.width * 0.9; prefHeight : parent.height * 0.9} }", ventilatorDialog.contentItem, "AM-RightSubChamberEntry")
+            let rightChamberLabel = Qt.createQmlObject("import QtQuick 2.12; import QtQuick.Controls 2.5; Item { width : 375; height : 55; Label {anchors.fill : parent; anchors.bottomMargin : 2; text : 'Right Chamber Substance'; font.pointSize : 12; horizontalAlignment : Text.AlignHCenter; verticalAlignment : Text.AlignBottom}}", ventilatorDialog.contentItem, "AM-RightSubChamberLabel")
+            let rightChamberSub = Qt.createQmlObject("import QtQuick 2.12; Item { width : 375; height : 55; property alias subEntry : subEntry; UISubstanceEntry {id : subEntry; type : 'fraction'; anchors.centerIn : parent; prefWidth : parent.width * 0.9; prefHeight : parent.height * 0.9; border.width : 0} }", ventilatorDialog.contentItem, "AM-RightSubChamberEntry")
             rightChamberSub.subEntry.entry.substanceInput.font.pointSize = 12
+            rightChamberSub.subEntry.entry.componentListModel.append({"gas" : "Desflurane"})
+            //Signal handling
+            sourceCombo.comboUpdate.connect(function(value) { switch(value){ case "Bottle One" : bottle1SpinBox.available = true; bottle2SpinBox.available = false; break; case "Bottle Two" : bottle1SpinBox.available = false; bottle2SpinBox.available = true; break; default : bottle1SpinBox.available = false; bottle2SpinBox.available = false;}})
 
             ventilatorDialog.applyProps.connect(function (props) { actionModel.add_anesthesia_machine_action(props)})
             actionDrawer.closed.connect(ventilatorDialog.destroy)
