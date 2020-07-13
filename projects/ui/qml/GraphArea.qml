@@ -13,10 +13,8 @@ GraphAreaForm {
   signal pause(bool paused)
   signal speedToggled(int speed)
 
-  signal substanceDataUpdates(real time, var subData)
   signal stateUpdates(PatientState state)
   signal conditionUpdates(PatientConditions conditions)
-  signal newActiveSubstance(Substance sub)
 
   signal newPhysiologyModel(PhysiologyModel model)
 
@@ -122,20 +120,6 @@ GraphAreaForm {
       root.state = "max"
     }
   }
-
-  onNewActiveSubstance : {
-    //First extract the properties that are valid to plot for the new substance -- invalid properties will = -1 (see Substance.h)
-    //We also ignore unplottable properties ("Name", "objectName", "objectNameChanged", the latter two of which are auto assigned by qml)
-    let validProps = []
-    for (let prop in sub){
-      if (sub[prop] == -1.0 || prop == "Name" || prop == "objectNameChanged" || prop == "objectName"){
-        continue;
-      }
-      validProps.push({"propName" : prop})
-    }
-    substanceMenuListModel.append({"subName" : sub.Name, "props" : validProps})    
-  }
-
 
   onPhysiologyRequestModelChanged: {
     //TODO Fix Initial Plots

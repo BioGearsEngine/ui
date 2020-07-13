@@ -102,14 +102,6 @@ ControlsForm {
       playback.simulationTime = seconds_to_clock_time(time_s)
     }
 
-    onSubstanceDataChanged : {
-      root.substanceDataChanged(time_s, subData);
-    }
-
-    onActiveSubstanceAdded : {
-      root.activeSubstanceAdded(sub);
-    }
-
     onRunningToggled : {
       if( isRunning){
           playback.simButton.state = "Simulating";

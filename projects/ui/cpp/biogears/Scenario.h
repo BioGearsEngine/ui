@@ -144,8 +144,6 @@ signals:
   void patientStateChanged(PatientState patientState);
   void patientConditionsChanged(PatientConditions conditions);
 
-  void substanceDataChanged(double time_s, QVariantMap subData);
-  void activeSubstanceAdded(Substance* sub);
   void timeAdvance(double time_s);
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);
@@ -162,6 +160,7 @@ protected:
 
   void setup_physiology_model();
   void setup_physiology_substances(BioGearsData*);
+  void add_physiology_substance(biogears::SESubstance* newSub);
   void setup_physiology_lists();
 
 
@@ -180,6 +179,7 @@ private:
   biogears::Logger _logger;
   std::unique_ptr<biogears::BioGearsEngine> _engine;
   Channel _action_queue;
+  std::vector<biogears::SESubstance*> _substance_queue;
 
   std::mutex _engine_mutex;
 
@@ -201,7 +201,6 @@ private:
   QVector<QString> _nutrition_list;
 
   BioGearsData* _physiology_model;
-
 
   QtLogForward* _consoleLog;
 

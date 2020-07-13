@@ -44,12 +44,6 @@ GridLayout {
       Layout.fillHeight: false
       Layout.rowSpan : 2
 
-      onSubstanceDataChanged : {
-        graphArea.substanceDataUpdates(time, subData)
-      }
-      onActiveSubstanceAdded : {
-        graphArea.newActiveSubstance(sub)
-      }
       onPatientPhysiologyChanged : {
           console.log ("physiology changed %1".arg(model))
           graphArea.newPhysiologyModel(model)
