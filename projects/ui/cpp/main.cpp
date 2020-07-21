@@ -11,6 +11,7 @@
 #include "biogears/Substance.h"
 #include "version.h"
 
+#include "biogears/Timeline.h"
 int main(int argc, char* argv[])
 {
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -40,4 +41,6 @@ int main(int argc, char* argv[])
   engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
 
     return app.exec();
+
+  //bio::Timeline timeline{ "Scenarios/Showcase", "AsthmaAttack.xml" };
 }

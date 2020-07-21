@@ -396,7 +396,7 @@ Page {
             }
         }
     }
-
+    
     PageIndicator {
         id : indicator
 

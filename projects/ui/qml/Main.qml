@@ -8,6 +8,7 @@ import QtGraphicalEffects 1.12
 
 import com.biogearsengine.ui.scenario 1.0
 
+
 ApplicationWindow {
     id: root
     visible: true

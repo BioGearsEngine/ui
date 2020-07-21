@@ -4,6 +4,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 
 import com.biogearsengine.ui.scenario 1.0
+import QtQuick.Window 2.12
 
 GridLayout {
     id: root

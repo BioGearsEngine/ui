@@ -1,6 +1,7 @@
+import QtQuick 2.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
-import QtQuick 2.12
 import QtQuick.Dialogs 1.3
 import com.biogearsengine.ui.scenario 1.0
 
@@ -9,6 +10,30 @@ Item {
   property alias wizardDialog : wizardDialog
   width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
   height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
+
+
+   Window {
+    objectName: "wnd1"
+    visible: true
+    width: 500
+    height : 500
+    UIScenarioTimelineForm {
+      anchors.fill : parent
+      color:"blue"
+    }
+   }
+
+  Window {
+    objectName: "wnd2"
+    visible: true
+    width: 500
+    height : 500
+    UIScenarioTimelineForm {
+      anchors.fill : parent
+      color:"steelblue"
+    }
+  }
+
   MenuBar {
     id: menuBar
    //----------------File Menu-------------------
@@ -19,6 +44,12 @@ Item {
         text : "Load State"
         onTriggered : {
           scenario.load_state();
+        }
+      }
+      Action {
+        text : "Load Scenario"
+        onTriggered : {
+          dialog.item.visible = checked
         }
       }
       Action {
