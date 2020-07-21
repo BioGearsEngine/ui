@@ -19,9 +19,9 @@
         <file>WizardDialogForm.ui.qml</file>
         <file>PatientMenu.qml</file>
         <file>PatientMenuForm.ui.qml</file>
-        <file>UISubstanceWizard.qml</file>
-        <file>UISubstanceWizardForm.ui.qml</file>
-		<file alias="EnergyPanel.qml">dashboards/EnergyPanel.qml</file>
+	<file alias="EnergyPanel.qml">dashboards/EnergyPanel.qml</file>
+        <file alias="UISubstanceWizard.qml" >elements/UISubstanceWizard.qml</file>
+        <file alias="UISubstanceWizardForm.ui.qml" >elements/UISubstanceWizardForm.ui.qml</file>
         <file alias="UIActionSwitch.qml">elements/UIActionSwitch.qml</file>
         <file alias="UIActionSwitchForm.qml">elements/UIActionSwitchForm.qml</file>
         <file alias="UIActionDialogForm.ui.qml">elements/UIActionDialogForm.ui.qml</file>
