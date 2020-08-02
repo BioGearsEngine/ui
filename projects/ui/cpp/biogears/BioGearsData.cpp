@@ -150,13 +150,13 @@ void BioGearsData::initialize()
 //------------------------------------------------------------------------------------
 BioGearsData::~BioGearsData()
 {
-  _vitals->deleteLater();
-  _cardiopulmonary->deleteLater();
-  _blood_chemistry->deleteLater();
-  _energy_and_metabolism->deleteLater();
-  _renal_fluid_balance->deleteLater();
-  _substances->deleteLater();
-  _customs->deleteLater();
+//  _vitals->deleteLater();
+//  _cardiopulmonary->deleteLater();
+//  _blood_chemistry->deleteLater();
+//  _energy_and_metabolism->deleteLater();
+//  _renal_fluid_balance->deleteLater();
+//  _substances->deleteLater();
+//  _customs->deleteLater();
 }
 //------------------------------------------------------------------------------------
 int BioGearsData::rowCount(const QModelIndex& index) const
