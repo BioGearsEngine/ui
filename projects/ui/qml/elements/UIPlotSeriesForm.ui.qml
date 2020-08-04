@@ -10,7 +10,7 @@ ChartView {
   theme : ChartView.ChartThemeBlueCerulean
   titleFont.pointSize : 12
   titleFont.bold : true
-
+  antialiasing: true
   property alias xAxis : xAxis
   property alias yAxis : yAxis
 

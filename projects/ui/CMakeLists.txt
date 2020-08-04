@@ -38,18 +38,16 @@ message(STATUS "Configuring ${PROJECT_NAME}")
 #Biogears Core
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-add_source_files(HDRS ${CMAKE_CURRENT_SOURCE_DIR}/cpp "*.h"   "Headers\\Private\\")
-add_source_files(SRCS ${CMAKE_CURRENT_SOURCE_DIR}/cpp "*.cpp" "Sources\\")
-add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/qml "*.qrc"  "Resources")
-add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/qml "*.qml"  "Resources")
-add_source_files(GEN_SRCS ${CMAKE_CURRENT_BINARY_DIR}/cpp/ "version.cpp" "Sources\\")
-set(${PREFIX}_HEADERS ${HDRS} ${PUBLIC_HDRS} ${GEN_HDRS})
-set(${PREFIX}_SOURCES ${SRCS} ${GEN_SRCS} ${RESOURCES})
+add_source_files(${PREFIX}_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/cpp "*.h"   "Headers\\Private\\")
+add_source_files(${PREFIX}_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/cpp "*.cpp" "Sources\\")
+add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/qml "*.qrc"  "Resources\\")
+add_source_files(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/qml "*.qml"  "Resources\\")
+add_source_files(${PREFIX}_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cpp/ "version.cpp" "Sources\\")
 
 ###############################################################################
 #Define Logic
 ###############################################################################
-add_executable(${PROJECT_NAME} ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS})
+add_executable(${PROJECT_NAME} ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS} ${RESOURCES} )
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
   DEFINE_SYMBOL ${PROJECT_NAME}_EXPORTS
@@ -67,9 +65,6 @@ if(WIN32)
   target_compile_options(${PROJECT_NAME} PRIVATE $<$<PLATFORM_ID:Windows>:/bigobj>  PRIVATE $<$<PLATFORM_ID:Windows>:/MP>)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
 endif()
-#if(NOT Boost_USE_STATIC_LIBS)
-#   target_compile_definitions(${PROJECT_NAME} PUBLIC "BOOST_PROGRAM_OPTIONS_DYN_LINK=1")
-#endif()
 
 ###############################################################################
 # COMPILATION & LINKAGE MODIFICATIONS
@@ -86,11 +81,6 @@ target_include_directories(${PROJECT_NAME}
 
 set(${PREFIX}_LIBS
     Threads::Threads
-
-#    Boost::disable_autolinking
-#    Boost::filesystem
-#    Boost::program_options
-
     Qt5::Core
     Qt5::Widgets
     Qt5::Charts

@@ -38,9 +38,11 @@ int main(int argc, char* argv[])
   QMetaType::registerEqualsComparator<PatientConditions>();
   qmlRegisterUncreatableType<PatientConditions>("com.biogearsengine.ui.scenario", 1,  0, "PatientConditions", "Conditions of the Patient");
 
+  bio::Timeline timeline{ "Scenarios/Showcase", "AsthmaAttack.xml" };
+  exit(0);
   engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
 
     return app.exec();
 
-  //bio::Timeline timeline{ "Scenarios/Showcase", "AsthmaAttack.xml" };
+  
 }

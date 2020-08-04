@@ -9,26 +9,21 @@
 
 #include "Models/PhysiologyRequest.h"
 
-//#include <biogears/version.h>
 #include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/properties/SEScalar.h>
 #include <biogears/cdm/properties/SEScalarInversePressure.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
-#include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/properties/SEScalarVolumePerTimeMass.h>
-#include <biogears/cdm/properties/SEUnitScalar.h>
 #include <biogears/cdm/substance/SESubstanceClearance.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/substance/SESubstanceConcentration.h>
 #include <biogears/cdm/substance/SESubstanceFraction.h>
-#include <biogears/cdm/system/SESystem.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
 #include <biogears/cdm/system/equipment/ElectroCardioGram/SEElectroCardioGram.h>
-#include <biogears/container/Tree.tci.h>
 #include <biogears/container/concurrent_queue.tci.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
