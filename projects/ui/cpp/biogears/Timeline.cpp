@@ -89,8 +89,6 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 {
   using namespace biogears;
 
-  std::cout << "As PatientAction"
-            << *action << "\n\n";
   ev.eType = Event::PatientAction;
   ev.typeName = "Patient Events\n";
 
@@ -579,8 +577,6 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 bool Timeline::process_action(Event& ev, CDM::EnvironmentActionData* action)
 {
   using namespace biogears;
-  std::cout << "As EnvironmentAction"
-            << *action << "\n\n";
   ev.eType = Event::EnvironmentAction;
   ev.typeName = "Environment Action";
   if (auto change = dynamic_cast<const CDM::EnvironmentChangeData*>(action)) {
@@ -699,8 +695,6 @@ bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* actio
 {
   using namespace biogears;
 
-  std::cout << "As AnesthesiaMachienAction"
-            << *action << "\n\n";
   ev.eType = Event::AnesthesiaMachineAction;
   ev.typeName = "Anesthesia Machine Action";
   if (auto anConfig = dynamic_cast<CDM::AnesthesiaMachineConfigurationData*>(action)) {
@@ -913,8 +907,6 @@ bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* actio
 bool Timeline::process_action(Event& ev, CDM::InhalerActionData* action)
 {
   using namespace biogears;
-  std::cout << "As InhalerAction"
-            << *action << "\n\n";
   ev.eType = Event::InhalerAction;
   ev.typeName = "Inhaler Action";
   if (auto inhalerConfig = dynamic_cast<const CDM::InhalerConfigurationData*>(action)) {
@@ -955,9 +947,6 @@ bool Timeline::process_action(Event& ev, CDM::AdvanceTimeData* action)
 {
   using namespace biogears;
 
-  std::cout << "As AdvanceTime"
-            << *action << "\n\n";
-
   ev.eType = Event::AdvanceTime;
   ev.typeName = "Time Advancement";
   ev.description = "Advances the time of the simulation by the given duration";
@@ -969,9 +958,7 @@ bool Timeline::process_action(Event& ev, CDM::AdvanceTimeData* action)
 bool Timeline::process_action(Event& ev, CDM::SerializeStateData* action)
 {
   using namespace biogears;
-  std::cout << "As SerializeState"
-            << *action << "\n\n";
-
+  
   ev.eType = Event::SerializeState;
   ev.typeName = asprintf("%s %s", (action->Type() == CDM::enumSerializationType::Load) ? "Load" : "Save", "State").c_str();
   ev.description = "Serializes the current simulation state to disk";
