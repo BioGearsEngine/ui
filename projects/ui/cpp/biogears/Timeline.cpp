@@ -237,21 +237,14 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
       if (nutrition.Carbohydrate().present()) {
         ev.params.append(asprintf("Carbohydrate=%d,%s;", nutrition.Carbohydrate()->value(), nutrition.Carbohydrate()->unit()->c_str()).c_str());
       }
-      if (nutrition.CarbohydrateDigestionRate().present()) {
-        ev.params.append(asprintf("Water=%d,%s;", nutrition.CarbohydrateDigestionRate()->value(), nutrition.CarbohydrateDigestionRate()->unit()->c_str()).c_str());
-      }
       if (nutrition.Fat().present()) {
         ev.params.append(asprintf("Fat=%d,%s;", nutrition.Fat()->value(), nutrition.Fat()->unit()->c_str()).c_str());
       }
-      if (nutrition.FatDigestionRate().present()) {
-        ev.params.append(asprintf("Water=%d,%s;", nutrition.FatDigestionRate()->value(), nutrition.FatDigestionRate()->unit()->c_str()).c_str());
-      }
+
       if (nutrition.Protein().present()) {
         ev.params.append(asprintf("Water=%d,%s;", nutrition.Protein()->value(), nutrition.Protein()->unit()->c_str()).c_str());
       }
-      if (nutrition.ProteinDigestionRate().present()) {
-        ev.params.append(asprintf("Water=%d,%s;", nutrition.ProteinDigestionRate()->value(), nutrition.ProteinDigestionRate()->unit()->c_str()).c_str());
-      }
+
       if (nutrition.Sodium().present()) {
         ev.params.append(asprintf("Water=%d,%s;", nutrition.Sodium()->value(), nutrition.Sodium()->unit()->c_str()).c_str());
       }
