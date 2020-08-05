@@ -17,6 +17,10 @@ namespace bio {
 //!  This would require striking duration and an advanced sorting method for events based off
 //!  endtime instead of occurance.
 
+//! TODO: Apparently for Scalard Data Unit() is an optional.  But, it should not be for ScalarData.
+//!       For debugging reasons we need to add a lot of extra if statments and asserts to avoid
+//!       poorly formated Scenario files.
+
 Timeline::Timeline(QString path, QString name)
 {
   std::ifstream stream{ (path + "/" + name).toStdString() };
@@ -37,7 +41,7 @@ Timeline::Timeline(QString path, QString name)
 
         ev.eType = EventTypes::UnknownAction;
         ev.typeName = "Unknown Action";
-        ev.text = (action.Comment().present()) ? action.Comment().get().c_str() : "";
+        ev.comment = (action.Comment().present()) ? action.Comment().get().c_str() : "";
 
         ///!Scenario 2.0 An Event with no Duration last for ever. When a duration is preset the inverse action occurs when the duration is over
         ///!                   An Event with Occurs starts at the time specified.  If duration < action.Occurs() + action.Duration();
@@ -47,6 +51,9 @@ Timeline::Timeline(QString path, QString name)
         ev.duration = (action.Duration().present()) ? action.Duration().get() : 0.;
 
         if (process_action(ev, action)) {
+          if (ev.params.size() && ev.params.back() == ";") {
+            ev.params.remove(ev.params.size() - 1);
+          }
           _events.push_back(ev);
         } else {
           std::cerr << "Error processing the " << ev.typeName.toStdString() << "\n";
@@ -166,6 +173,8 @@ bool Timeline::process_action(Event& ev, CDM::EnvironmentActionData* action)
 //-----------------------------------------------------------------------------
 bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* action)
 {
+  using namespace biogears;
+
   std::cout << "As AnesthesiaMachienAction"
             << *action << "\n\n";
   ev.eType = EventTypes::AnesthesiaMachineAction;
@@ -174,66 +183,191 @@ bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* actio
     ev.eType = EventTypes::AnesthesiaMachineConfiguration;
     ev.typeName = "Anesthesia Machine Configuration";
     ev.description = "Change the configuration of a Anesthesia Machine";
+    ev.params = "";
+    if (anConfig->ConfigurationFile().present()) {
+      ev.params = asprintf("ConfigurationFile=%s;", anConfig->ConfigurationFile().get().c_str()).c_str();
+    }
+    if (anConfig->Configuration().present()) {
+      auto config = anConfig->Configuration().get();
+      if (config.Connection().present()) {
+        switch (config.Connection().get()) {
+        case CDM::enumAnesthesiaMachineConnection::Mask:
+          ev.params += asprintf("Connection=%s;", "Mask;").c_str();
+          break;
+        case CDM::enumAnesthesiaMachineConnection::Off:
+          ev.params += asprintf("Connection=%s;", "Off;").c_str();
+          break;
+        case CDM::enumAnesthesiaMachineConnection::Tube:
+          ev.params += asprintf("Connection=%s;", "Tube;").c_str();
+          break;
+        default:
+          ev.params += asprintf("Connection=%s;", "Off;").c_str();
+          break;
+        }
+      }
+      if (config.InletFlow().present()) {
+        auto inletFlow = config.InletFlow().get();
+        ev.params += asprintf("InletFlow=%d,%s;", inletFlow.value(), inletFlow.unit()).c_str();
+      }
+      if (config.InspiratoryExpiratoryRatio().present()) {
+        auto ratio = config.InspiratoryExpiratoryRatio().get();
+        ev.params += asprintf("InspiratoryExpiratoryRatio=%d,%s;", ratio.value(), ratio.unit()).c_str();
+      }
+      if (config.OxygenFraction().present()) {
+        auto oxygenFraction = config.OxygenFraction().get();
+        ev.params += asprintf("OxygenFraction=%d,%s;", oxygenFraction.value(), oxygenFraction.unit()).c_str();
+      }
+      if (config.OxygenSource().present()) {
+        switch( config.OxygenSource().get()) {
+        case CDM::enumAnesthesiaMachineOxygenSource::BottleOne:
+          ev.params += asprintf("OxygenSource=%s;", "BottleOne").c_str();
+          break;
+        case CDM::enumAnesthesiaMachineOxygenSource::BottleTwo:
+          ev.params += asprintf("OxygenSource=%s;", "BottleTwo").c_str();
+          break;
+        case CDM::enumAnesthesiaMachineOxygenSource::Wall:
+          ev.params += asprintf("OxygenSource=%s;", "Wall").c_str();
+          break;
+        }
+      }
+      if (config.PositiveEndExpiredPressure().present()) {
+        auto positiveEndExpiredPressure = config.PositiveEndExpiredPressure().get();
+        ev.params += asprintf("PositiveEndExpiredPressure=%d,%s;", positiveEndExpiredPressure.value(), positiveEndExpiredPressure.unit()).c_str();
+      }
+      if (config.PrimaryGas().present()) {
+        auto primaryGas = config.PrimaryGas().get();
+        ev.params += asprintf("PositiveEndExpiredPressure=%s;", primaryGas.c_str()).c_str();
+      }
+      if (config.ReliefValvePressure().present()) {
+        auto reliefValvePressure = config.ReliefValvePressure().get();
+        ev.params += asprintf("PositiveEndExpiredPressure=%d,%s;", reliefValvePressure.value(), reliefValvePressure.unit()).c_str();
+      }
+      if (config.RespiratoryRate().present()) {
+        auto respiratoryRate = config.RespiratoryRate().get();
+        ev.params += asprintf("PositiveEndExpiredPressure=%d,%s;", respiratoryRate.value(), respiratoryRate.unit()).c_str();
+      }
+      if (config.VentilatorPressure().present()) {
+        auto respiratoryRate = config.VentilatorPressure().get();
+        ev.params += asprintf("PositiveEndExpiredPressure=%d,%s;", respiratoryRate.value(), respiratoryRate.unit()).c_str();
+      }
+      if (config.LeftChamber().present()) {
+        auto leftChamber = config.LeftChamber().get();
+        if (leftChamber.Substance().present()) {
+          ev.params += asprintf("LeftChamber-Substance=%s;", leftChamber.Substance()->c_str()).c_str();
+        }
+        if (leftChamber.State().present()) {
+          ev.params += asprintf("LeftChamber-State=%s;", (leftChamber.State().get() == CDM::enumOnOff::On) ? "On" : "Off").c_str();
+        }
+        if (leftChamber.SubstanceFraction().present()) {
+          ev.params += asprintf("LeftChamber-SubstanceFraction=%d;", leftChamber.SubstanceFraction()->value()).c_str();
+        }
+      }
+      if (config.RightChamber().present()) {
+        auto rightChamber = config.RightChamber().get();
+        if (rightChamber.Substance().present()) {
+          ev.params += asprintf("RightChamber-Substance=%s;", rightChamber.Substance()->c_str()).c_str();
+        }
+        if (rightChamber.State().present()) {
+          ev.params += asprintf("RightChamber-State=%s;", (rightChamber.State().get() == CDM::enumOnOff::On) ? "On" : "Off").c_str();
+        }
+        if (rightChamber.SubstanceFraction().present()) {
+          ev.params += asprintf("RightChamber-SubstanceFraction=%d;", rightChamber.SubstanceFraction()->value()).c_str();
+        }
+      }
+      if (config.OxygenBottleOne().present() && config.OxygenBottleOne()->Volume().present()) {
+        auto oxygenBottle = config.OxygenBottleOne()->Volume().get();
+        ev.params += asprintf("OxygenBottleOne-Volume=%d,%s;", oxygenBottle.value(), oxygenBottle.unit()->c_str()).c_str();
+      }
+      if (config.OxygenBottleTwo().present() && config.OxygenBottleTwo().get().Volume().present()) {
+        auto oxygenBottle = config.OxygenBottleTwo()->Volume().get();
+        ev.params += asprintf("OxygenBottleOne-Volume=%d,%s;", oxygenBottle.value(), oxygenBottle.unit()->c_str()).c_str();
+      }
+      for (auto& event : config.ActiveEvent()) {
+        switch (event.Event()) {
+        case CDM::enumAnesthesiaMachineEvent::OxygenBottle1Exhausted:
+          ev.params += asprintf("ActiveEvent=%s;", "OxygenBottle1Exhausted").c_str();
+          break;
+        case CDM::enumAnesthesiaMachineEvent::OxygenBottle2Exhausted:
+          ev.params += asprintf("ActiveEvent=%s;", "OxygenBottle2Exhausted").c_str();
+          break;
+        case CDM::enumAnesthesiaMachineEvent::ReliefValveActive:
+          ev.params += asprintf("ActiveEvent=%s;", "ReliefValveActive").c_str();
+          break;
+        }
+      }
+    }
     return true;
   } else if (auto anO2WallLoss = dynamic_cast<CDM::OxygenWallPortPressureLossData*>(action)) {
     ev.eType = EventTypes::OxygenWallPortPressureLoss;
     ev.typeName = "Oxygen Wall Port Pressure Loss";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and the wall connection";
+    ev.params = asprintf("State=%d,%s;", (anO2WallLoss->State() == CDM::enumOnOff::On ? "On" : "Off")).c_str();
     return true;
   } else if (auto anO2TankLoss = dynamic_cast<CDM::OxygenTankPressureLossData*>(action)) {
     ev.eType = EventTypes::OxygenTankPressureLoss;
     ev.typeName = "Oxygen tank pressure loss";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and the oxygen tank";
+    ev.params = asprintf("State=%d,%s;", (anO2TankLoss->State() == CDM::enumOnOff::On ? "On" : "Off")).c_str();
     return true;
   } else if (auto anExLeak = dynamic_cast<CDM::ExpiratoryValveLeakData*>(action)) {
     ev.eType = EventTypes::ExpiratoryValveLeak;
     ev.typeName = "Expiratory valve leak";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and the expiratory valve";
+    ev.params = asprintf("Severity=%d,%s;", anExLeak->Severity().value(), anExLeak->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anExObs = dynamic_cast<CDM::ExpiratoryValveObstructionData*>(action)) {
     ev.eType = EventTypes::ExpiratoryValveObstruction;
     ev.typeName = "Expiratory valve obstruction";
     ev.description = "Modify the value of any obstruction in the expiratory valve";
+    ev.params = asprintf("Severity=%d,%s;", anExObs->Severity().value(), anExObs->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anInLeak = dynamic_cast<CDM::InspiratoryValveLeakData*>(action)) {
     ev.eType = EventTypes::InspiratoryValveLeak;
     ev.typeName = "Inspiratory valve pressure loss";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and inspiratory valve";
+    ev.params = asprintf("Severity=%d,%s;", anInLeak->Severity().value(), anInLeak->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anInObs = dynamic_cast<CDM::InspiratoryValveObstructionData*>(action)) {
     ev.eType = EventTypes::InspiratoryValveObstruction;
     ev.typeName = "Inspiratory valve obstruction";
     ev.description = "Modify the value of any obstruction in the inspiratory valve";
+    ev.params = asprintf("Severity=%d,%s;", anInObs->Severity().value(), anInObs->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anMskLeak = dynamic_cast<CDM::MaskLeakData*>(action)) {
     ev.eType = EventTypes::MaskLeak;
     ev.typeName = "Leak in the Mask Seal";
     ev.description = "Modify the severity and occurence of a mask seal ";
+    ev.params = asprintf("Severity=%d,%s;", anMskLeak->Severity().value(), anMskLeak->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anSodaFail = dynamic_cast<CDM::SodaLimeFailureData*>(action)) {
     ev.eType = EventTypes::SodaLimeFailure;
     ev.typeName = "A failure in the Soda Lime";
     ev.description = "Modifies the delivery of f NaOH & CaO chemicals";
+    ev.params = asprintf("Severity=%d,%s;", anSodaFail->Severity().value(), anSodaFail->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anTubLeak = dynamic_cast<CDM::TubeCuffLeakData*>(action)) {
     ev.eType = EventTypes::TubeCuffLeak;
     ev.typeName = "Leak in the tube cuff";
     ev.description = "Modify the occurence and severity of the tub cuff";
+    ev.params = asprintf("Severity=%d,%s;", anTubLeak->Severity().value(), anTubLeak->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anVapFail = dynamic_cast<CDM::VaporizerFailureData*>(action)) {
     ev.eType = EventTypes::VaporizerFailure;
     ev.typeName = "A failure of the vaporizer";
     ev.description = "Modifies the delivery of f NaOH & CaO chemicals";
+    ev.params = asprintf("Severity=%d,%s;", anVapFail->Severity().value(), anVapFail->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anVentLoss = dynamic_cast<CDM::VentilatorPressureLossData*>(action)) {
     ev.eType = EventTypes::VentilatorPressureLoss;
     ev.typeName = "Loss of ventilator pressure";
     ev.description = "Modify the severity of a loss in ventilator pressure";
+    ev.params = asprintf("Severity=%d,%s;", anVentLoss->Severity().value(), anVentLoss->Severity().unit()->c_str()).c_str();
     return true;
   } else if (auto anYDisc = dynamic_cast<CDM::YPieceDisconnectData*>(action)) {
     ev.eType = EventTypes::YPieceDisconnect;
     ev.typeName = "Disconnection of the Y piece";
     ev.description = "Modifies the occurence of a Y piece disconnection";
+    ev.params = asprintf("Severity=%d,%s;", anYDisc->Severity().value(), anYDisc->Severity().unit()->c_str()).c_str();
     return true;
   }
 
@@ -268,15 +402,12 @@ bool Timeline::process_action(Event& ev, CDM::InhalerActionData* action)
         auto sv = config.SpacerVolume().get();
         ev.params = asprintf("SpacerVolume=%d,%s;", sv.value(), sv.unit()->c_str()).c_str();
       }
-      if (config.State().present()) {  
+      if (config.State().present()) {
         ev.params = asprintf("State=%s;", ((config.State().get() == CDM::enumOnOff::On) ? "On" : "Off")).c_str();
       }
       if (config.Substance().present()) {
         ev.params = asprintf("Substance=%s;", config.Substance().get().c_str()).c_str();
       }
-    }
-    if (ev.params.size() && ev.params.back() == ";") {
-      ev.params.remove(ev.params.size() - 1);
     }
     return true;
   }
