@@ -40,7 +40,8 @@ int main(int argc, char* argv[])
 
   //Temp Testing Code
   bio::Timeline timeline{ "Scenarios/Showcase", "AsthmaAttack.xml" };
-  
+  std::cout << timeline << std::endl;
+
   engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
 
 
