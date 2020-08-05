@@ -94,6 +94,7 @@ struct Event {
     YPieceDisconnect,
     InhalerAction,
     InhalerConfiguration,
+    PatientAssessmentRequest,
     AdvanceTime,
     SerializeState
   };
