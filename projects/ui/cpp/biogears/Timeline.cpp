@@ -89,68 +89,445 @@ bool Timeline::process_action(Event& ev, CDM::ActionData& action)
 //-----------------------------------------------------------------------------
 bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 {
+  using namespace biogears;
+
   std::cout << "As PatientAction"
             << *action << "\n\n";
   ev.eType = EventTypes::PatientAction;
   ev.typeName = "Patient Events\n";
 
   if (auto aStress = dynamic_cast<const CDM::AcuteStressData*>(action)) {
-    aStress->Comment();
+    ev.eType = EventTypes::AcuteStress;
+    ev.typeName = "Acute Stress";
+    ev.description = "Applies Acute Stress insult";
+    ev.params = "";
+    
+     ev.params.append(asprintf("Severity=%s;", aStress->Severity().value()).c_str());
     return true;
   } else if (auto airwayObst = dynamic_cast<const CDM::AirwayObstructionData*>(action)) {
+    ev.eType = EventTypes::AirwayObstructionData;
+    ev.typeName = "Airway Obstruction";
+    ev.description = "Applies an airway obstruction";
+    ev.params = "";
+
+    ev.params.append(asprintf("Severity=%s;", airwayObst->Severity().value()).c_str());
     return true;
   } else if (auto apnea = dynamic_cast<const CDM::ApneaData*>(action)) {
+    ev.eType = EventTypes::Apnea;
+    ev.typeName = "Apnea";
+    ev.description = "Applies an apnea insult";
+    ev.params = "";
+    
+    ev.params.append(asprintf("Severity=%s;", apnea->Severity().value()).c_str());
     return true;
   } else if (auto asthmaattack = dynamic_cast<const CDM::AsthmaAttackData*>(action)) {
+    ev.eType = EventTypes::AsthmaAttack;
+    ev.typeName = "Asthma Attack";
+    ev.description = "Applies Asthma Attack Insult";
+    ev.params = "";
+    
+    ev.params.append(asprintf("Severity=%s;", asthmaattack->Severity().value()).c_str());
     return true;
   } else if (auto brainInjury = dynamic_cast<const CDM::BrainInjuryData*>(action)) {
+    ev.eType = EventTypes::BrainInjury;
+    ev.typeName = "Brain Injury";
+    ev.description = "Applies a brain injury insults";
+    ev.params = "";
+
+    ev.params.append(asprintf("Severity=%s;", brainInjury->Severity().value()).c_str());
+    switch (brainInjury->Type()) {
+    case CDM::enumBrainInjuryType::value::Diffuse:
+      ev.params.append("Type=Diffuse;");
+      break;
+    case CDM::enumBrainInjuryType::value::LeftFocal:
+      ev.params.append("Type=LeftFocal;");
+      break;
+    case CDM::enumBrainInjuryType::value::RightFocal:
+      ev.params.append("Type=RightFocal;");
+      break;
+    }
+    ev.params.append(asprintf("Severity=%s;", brainInjury->Severity().value()).c_str());
     return true;
   } else if (auto bronchoconstr = dynamic_cast<const CDM::BronchoconstrictionData*>(action)) {
+    ev.eType = EventTypes::Bronchoconstriction;
+    ev.typeName = "Bronchoconstriction";
+    ev.description = "Applies a bronchoconstriction insult";
+    ev.params = "";
+
+    ev.params.append(asprintf("Severity=%s;", bronchoconstr->Severity().value()).c_str());
     return true;
   } else if (auto burn = dynamic_cast<const CDM::BurnWoundData*>(action)) {
+    ev.eType = EventTypes::BurnWound;
+    ev.typeName = "Burn Wound";
+    ev.description = "Applies a burn wound insult";
+    ev.params = "";
+
+    ev.params.append(asprintf("State=%s;", burn->TotalBodySurfaceArea().value(), burn->TotalBodySurfaceArea().unit()->c_str()).c_str());
     return true;
   } else if (auto cardiacarrest = dynamic_cast<const CDM::CardiacArrestData*>(action)) {
+    ev.eType = EventTypes::CardiacArrest;
+    ev.typeName = "Cardiac Arrest";
+    ev.description = "Applies a cardiac arrest insult to the patient";
+    ev.params = "";
+
+    ev.params.append(asprintf("State=%s;", cardiacarrest->State() == CDM::enumOnOff::On ? "On" : "Off").c_str());
     return true;
   } else if (auto chestcomp = dynamic_cast<const CDM::ChestCompressionData*>(action)) {
     ev.eType = EventTypes::ChestCompression;
+    ev.typeName = "Chest Compression";
+    ev.description = "Manual Chest Compression";
+    ev.params = "";
+    ev.eType = EventTypes::ChestCompression;
     ev.typeName = "Chest Compression Action\n";
     if (auto cprForce = dynamic_cast<const CDM::ChestCompressionForceData*>(chestcomp)) {
+      ev.eType = EventTypes::ChestCompressionForce;
+      ev.typeName = "Chest Compression Force";
+      ev.description = "Chest Compression Force?";
+      ev.params = "";
+
+      ev.params.append(asprintf("Force=%d,%s;", cprForce->Force().value(), cprForce->Force().unit()->c_str()).c_str());
       return true;
     } else if (auto cprScale = dynamic_cast<const CDM::ChestCompressionForceScaleData*>(chestcomp)) {
+      ev.eType = EventTypes::ChestCompressionForceScale;
+      ev.typeName = "Chest Compression Force Scale";
+      ev.description = "Chest Compression Force Scale?";
+      ev.params = "";
+
+      ev.params.append(asprintf("Side=%d,%s;", cprScale->ForcePeriod()->value(), cprScale->ForcePeriod()->unit()->c_str()).c_str());
+      ev.params.append(asprintf("command=%d;", cprScale->ForceScale().value()).c_str());
       return true;
     }
     return false;
   } else if (auto chestOccl = dynamic_cast<const CDM::ChestOcclusiveDressingData*>(action)) {
+    ev.eType = EventTypes::ChestOcclusiveDressing;
+    ev.typeName = "Chest Occlusive Dressing";
+    ev.description = "Applies a occlusive dressing to the chest";
+    ev.params = "";
+
+    ev.params.append(asprintf("Side=%s;", chestOccl->Side() == CDM::enumSide::Left ? "Left" : "Right").c_str());
+    ev.params.append(asprintf("command=%s;", chestOccl->State() == CDM::enumOnOff::On ? "On" : "Off").c_str());
+
     return true;
   } else if (auto conResp = dynamic_cast<const CDM::ConsciousRespirationData*>(action)) {
+    ev.eType = EventTypes::ConsciousRespiration;
+    ev.typeName = "Conscious Respiration";
+    ev.description = "Manually Respirate the patient";
+    ev.params = "";
+
+    ev.params.append(asprintf("AppendToPrevious=%s;", conResp->AppendToPrevious() ? "True" : "False").c_str());
+    for (auto& command : conResp->Command()) {
+      ev.params.append(asprintf("command=%s;", command.Comment()->c_str()).c_str());
+    }
+
     return true;
   } else if (auto consume = dynamic_cast<const CDM::ConsumeNutrientsData*>(action)) {
+    ev.eType = EventTypes::ConsumeNutrients;
+    ev.typeName = "Consume Nutrients";
+    ev.description = "Force the patient to consume nutrients";
+    ev.params = "";
+
+    if (consume->Nutrition().present()) {
+      auto nutrition = consume->Nutrition().get();
+      if (nutrition.Name().present()) {
+        ev.params.append(asprintf("Name=%s;", nutrition.Name()->c_str()).c_str());
+      }
+      if (nutrition.Calcium().present()) {
+        ev.params.append(asprintf("Calcium=%d,%s;", nutrition.Calcium()->value(), nutrition.Calcium()->unit()->c_str()).c_str());
+      }
+      if (nutrition.Carbohydrate().present()) {
+        ev.params.append(asprintf("Carbohydrate=%d,%s;", nutrition.Carbohydrate()->value(), nutrition.Carbohydrate()->unit()->c_str()).c_str());
+      }
+      if (nutrition.CarbohydrateDigestionRate().present()) {
+        ev.params.append(asprintf("Water=%d,%s;", nutrition.CarbohydrateDigestionRate()->value(), nutrition.CarbohydrateDigestionRate()->unit()->c_str()).c_str());
+      }
+      if (nutrition.Fat().present()) {
+        ev.params.append(asprintf("Fat=%d,%s;", nutrition.Fat()->value(), nutrition.Fat()->unit()->c_str()).c_str());
+      }
+      if (nutrition.FatDigestionRate().present()) {
+        ev.params.append(asprintf("Water=%d,%s;", nutrition.FatDigestionRate()->value(), nutrition.FatDigestionRate()->unit()->c_str()).c_str());
+      }
+      if (nutrition.Protein().present()) {
+        ev.params.append(asprintf("Water=%d,%s;", nutrition.Protein()->value(), nutrition.Protein()->unit()->c_str()).c_str());
+      }
+      if (nutrition.ProteinDigestionRate().present()) {
+        ev.params.append(asprintf("Water=%d,%s;", nutrition.ProteinDigestionRate()->value(), nutrition.ProteinDigestionRate()->unit()->c_str()).c_str());
+      }
+      if (nutrition.Sodium().present()) {
+        ev.params.append(asprintf("Water=%d,%s;", nutrition.Sodium()->value(), nutrition.Sodium()->unit()->c_str()).c_str());
+      }
+      if (nutrition.Water().present()) {
+        ev.params.append(asprintf("Water=%d,%s;", nutrition.Water()->value(), nutrition.Water()->unit()->c_str()).c_str());
+      }
+    }
+    if (consume->NutritionFile().present()) {
+      ev.params.append(asprintf("NutritionFile=%s;", consume->NutritionFile()->c_str()).c_str());
+    }
     return true;
+
   } else if (auto exercise = dynamic_cast<const CDM::ExerciseData*>(action)) {
+    ev.eType = EventTypes::Exercise;
+    ev.typeName = "Exercise";
+    ev.description = "Force the patient in to an exercise state";
+    ev.params = "";
+
+    if (exercise->GenericExercise().present()) {
+      auto& generic = exercise->GenericExercise().get();
+      ev.eType = EventTypes::GeneralExercise;
+      ev.typeName = "General Exercise";
+      ev.description = "Generic Exercise Action";
+
+      if (generic.DesiredWorkRate().present()) {
+        ev.params.append(asprintf("DesiredWorkRate=%d,%s;", generic.DesiredWorkRate()->value(), generic.DesiredWorkRate()->unit()->c_str()).c_str());
+      }
+      if (generic.Intensity().present()) {
+        ev.params.append(asprintf("Intensity=%d,%s;", generic.Intensity()->value(), generic.Intensity()->unit()->c_str()).c_str());
+      }
+    }
+    if (exercise->CyclingExercise().present()) {
+      auto& cycling = exercise->CyclingExercise().get();
+      ev.eType = EventTypes::CyclingExercise;
+      ev.typeName = "Cycling Exercise";
+      ev.description = "Cycling Exercise Action";
+
+      if (cycling.AddedWeight().present()) {
+        ev.params.append(asprintf("AddedWeight=%d,%s;", cycling.AddedWeight()->value(), cycling.AddedWeight()->unit()->c_str()).c_str());
+      }
+      ev.params.append(asprintf("Power=%d,%s;", cycling.Power().value(), cycling.Power().unit()->c_str()).c_str());
+      ev.params.append(asprintf("Cadence=%d,%s;", cycling.Cadence().value(), cycling.Cadence().unit()->c_str()).c_str());
+    }
+    if (exercise->RunningExercise().present()) {
+      auto& running = exercise->RunningExercise().get();
+      ev.eType = EventTypes::RunningExercise;
+      ev.typeName = "Running Exercise";
+      ev.description = "Running Exercise Action";
+
+      if (running.AddedWeight().present()) {
+        ev.params.append(asprintf("AddedWeight=%d,%s;", running.AddedWeight()->value(), running.AddedWeight()->unit()->c_str()).c_str());
+      }
+      ev.params.append(asprintf("Power=%d;", running.Incline().value()).c_str());
+      ev.params.append(asprintf("Cadence=%d,%s;", running.Speed().value(), running.Speed().unit()->c_str()).c_str());
+    }
+    if (exercise->StrengthExercise().present()) {
+      auto& strength = exercise->StrengthExercise().get();
+      ev.eType = EventTypes::StengthExercise;
+      ev.typeName = "Strength Exercise";
+      ev.description = "Strength Exercise Action";
+
+      ev.params.append(asprintf("Repetitions=%d;", strength.Repetitions().value()).c_str());
+      ev.params.append(asprintf("Weight=%d,%s;", strength.Weight().value(), strength.Weight().unit()->c_str()).c_str());
+    }
+
     return true;
   } else if (auto hem = dynamic_cast<const CDM::HemorrhageData*>(action)) {
+    ev.eType = EventTypes::Hemorrhage;
+    ev.typeName = "Hemorrhage";
+    ev.description = "Applies a hemorrhage insult to the patient for a given compartment";
+    ev.params = "";
+
+    ev.params.append(asprintf("Compartment=%s;", hem->Compartment().c_str()).c_str());
+    ev.params.append(asprintf("InitialRate=%d,%s;", hem->InitialRate().value(), hem->InitialRate().unit()->c_str()).c_str());
     return true;
   } else if (auto infect = dynamic_cast<const CDM::InfectionData*>(action)) {
+    ev.eType = EventTypes::Infection;
+    ev.typeName = "Infection";
+    ev.description = "Applies an bacterial infection to the patient";
+    ev.params = "";
+
+    switch (infect->Severity()) {
+    case CDM::enumInfectionSeverity::Eliminated:
+      ev.params.append("Severity=Eliminated;");
+      break;
+    case CDM::enumInfectionSeverity::Mild:
+      ev.params.append("Severity=Mild;");
+      break;
+    case CDM::enumInfectionSeverity::Moderate:
+      ev.params.append("Severity=Moderate;");
+      break;
+    case CDM::enumInfectionSeverity::Severe:
+      ev.params.append("Severity=Severe;");
+      break;
+    }
+    ev.params.append(asprintf("Location=%s;", infect->Location().c_str()).c_str());
+    ev.params.append(asprintf("MinimumInhibitoryConcentration=%d;", infect->MinimumInhibitoryConcentration().value()).c_str());
+
     return true;
   } else if (auto intubation = dynamic_cast<const CDM::IntubationData*>(action)) {
+    ev.eType = EventTypes::Intubation;
+    ev.typeName = "Intubation";
+    ev.description = "Intubate the Patient";
+    ev.params = "";
+
+    switch (intubation->Type()) {
+    case CDM::enumIntubationType::Off:
+      ev.params.append(asprintf("Type=Off;").c_str());
+      break;
+    case CDM::enumIntubationType::Esophageal:
+      ev.params.append(asprintf("Type=Esophageal;").c_str());
+      break;
+    case CDM::enumIntubationType::LeftMainstem:
+      ev.params.append(asprintf("Type=LeftMainstem;").c_str());
+      break;
+    case CDM::enumIntubationType::RightMainstem:
+      ev.params.append(asprintf("Type=RightMainstem;").c_str());
+      break;
+    case CDM::enumIntubationType::Tracheal:
+      ev.params.append(asprintf("Type=Tracheal;").c_str());
+      break;
+    }
     return true;
   } else if (auto mvData = dynamic_cast<const CDM::MechanicalVentilationData*>(action)) {
+    ev.eType = EventTypes::MechanicalVentilation;
+    ev.typeName = "Mechanical Ventilation";
+    ev.description = "Mechanical Ventilation the patient";
+    ev.params = "";
+
+    ev.params.append(asprintf("State=%d;", mvData->State() == CDM::enumSide::Left ? "Left" : "Right").c_str());
+    if (mvData->Flow().present()) {
+      ev.params.append(asprintf("Flow=%d,%s;", mvData->Flow()->value(), mvData->Flow()->unit()->c_str()).c_str());
+    }
+    for (auto gas : mvData->GasFraction()) {
+      ev.params.append(asprintf("GasFraction=%s,%d;", gas.Name().c_str(), gas.FractionAmount().value()).c_str());
+    }
+    ev.params.append(asprintf("Pressure=%d,%s;", mvData->Pressure()->value(), mvData->Pressure()->unit()->c_str()).c_str());
+
     return true;
   } else if (auto needleDecomp = dynamic_cast<const CDM::NeedleDecompressionData*>(action)) {
+    ev.eType = EventTypes::NeedleDecompression;
+    ev.typeName = "Needle Decompression";
+    ev.description = "Applies a needle decompression";
+    ev.params = "";
+
+    ev.params.append(asprintf("Side=%s;", needleDecomp->Side() == CDM::enumSide::Left ? "Left" : "Right").c_str());
+    ev.params.append(asprintf("State=%s;", needleDecomp->State() == CDM::enumOnOff::On ? "On" : "Off").c_str());
     return true;
   } else if (auto pain = dynamic_cast<const CDM::PainStimulusData*>(action)) {
+    ev.eType = EventTypes::PainStimulus;
+    ev.typeName = "Pain Stimulus";
+    ev.description = "Applies pain stimulus to a compartment";
+    ev.params = "";
+
+    ev.params.append(asprintf("Severity=%s;", pain->Severity().value()).c_str());
+    if (pain->HalfLife().present()) {
+      ev.params.append(asprintf("HalfLife=%d,%s;", pain->HalfLife()->value(), pain->HalfLife()->unit()->c_str()).c_str());
+    }
+    ev.params.append(asprintf("Location=%s", pain->Location().c_str()).c_str());
+
     return true;
   } else if (auto pericardialEff = dynamic_cast<const CDM::PericardialEffusionData*>(action)) {
+    ev.eType = EventTypes::PericardialEffusion;
+    ev.typeName = "Pericardial Effusion";
+    ev.description = "Pericardial Effusion Insult";
+    ev.params = "";
+
+    ev.params.append(asprintf("EffusionRate=%d,%s", pericardialEff->EffusionRate().value(), pericardialEff->EffusionRate().unit()->c_str()).c_str());
     return true;
   } else if (auto admin = dynamic_cast<const CDM::SubstanceAdministrationData*>(action)) {
-    return true;
+    ev.eType = EventTypes::SubstanceAdministration;
+    ev.typeName = "Substance Administration";
+    ev.description = "Apply a substance to the patient";
+    ev.params = "";
+
+    if (auto bolusData = dynamic_cast<const CDM::SubstanceBolusData*>(admin)) {
+      ev.eType = EventTypes::SubstanceBolus;
+      ev.typeName = "Substance Administration by Bolus";
+      ev.description = "Apply a substance bolus to the patient";
+      ev.params = "";
+
+      switch (bolusData->AdminRoute()) {
+      case CDM::enumBolusAdministration::Intraarterial:
+        ev.params.append(asprintf("AdminRoute=Intraarterial;").c_str());
+        break;
+      case CDM::enumBolusAdministration::Intravenous:
+        ev.params.append(asprintf("AdminRoute=Intravenous;").c_str());
+        break;
+      case CDM::enumBolusAdministration::Intramuscular:
+        ev.params.append(asprintf("AdminRoute=Intramuscular;").c_str());
+        break;
+      default:
+        ev.params.append(asprintf("AdminRoute=Unknown;").c_str());
+        break;
+      }
+      ev.params.append(asprintf("Dose=%d,%s;", bolusData->Dose().value(), bolusData->Dose().unit()->c_str()).c_str());
+      ev.params.append(asprintf("AdminTime=%d,%s;", bolusData->AdminTime()->value(), bolusData->AdminTime()->unit()->c_str()).c_str());
+      ev.params.append(asprintf("AdminRoute=%s;", bolusData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "Gastrointestinal" : "Transmucosal").c_str());
+      ev.params.append(asprintf("Substance=%s;", bolusData->Substance().c_str()).c_str());
+    }
+    if (auto oralData = dynamic_cast<const CDM::SubstanceOralDoseData*>(admin)) {
+      ev.eType = EventTypes::SubstanceOralDose;
+      ev.typeName = "Substance Administration by Oral Dose";
+      ev.description = "Apply an oral dose of a substance to the patient";
+      ev.params = "";
+
+      ev.params.append(asprintf("Concentration=%d,%s;", oralData->Dose().value(), oralData->Dose().unit()->c_str()).c_str());
+      ev.params.append(asprintf("AdminRoute=%s;", oralData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "Gastrointestinal" : "Transmucosal").c_str());
+      ev.params.append(asprintf("Substance=%s;", oralData->Substance().c_str()).c_str());
+    }
+    if (auto subInfuzData = dynamic_cast<const CDM::SubstanceInfusionData*>(admin)) {
+      ev.eType = EventTypes::SubstanceInfusion;
+      ev.typeName = "Substance Administration by Infusion";
+      ev.description = "Apply a substance infusion to the patient";
+      ev.params = "";
+
+      ev.params.append(asprintf("Concentration=%d,%s;", subInfuzData->Concentration().value(), subInfuzData->Concentration().unit()->c_str()).c_str());
+      ev.params.append(asprintf("Rate=%d,%s;", subInfuzData->Rate().value(), subInfuzData->Rate().unit()->c_str()).c_str());
+      ev.params.append(asprintf("Substance=%s;", subInfuzData->Substance().c_str()).c_str());
+    }
+    if (auto subCInfuzData = dynamic_cast<const CDM::SubstanceCompoundInfusionData*>(admin)) {
+      ev.eType = EventTypes::SubstanceCompoundInfusion;
+      ev.typeName = "Substance Compound Administration by Infusion";
+      ev.description = "Apply a substance compound infusion to the patient";
+      ev.params = "";
+
+      ev.params.append(asprintf("BagVolume=%d,%s;", subCInfuzData->BagVolume().value(), subCInfuzData->BagVolume().unit()->c_str()).c_str());
+      ev.params.append(asprintf("Rate=%d,%s;", subCInfuzData->Rate().value(), subCInfuzData->BagVolume().unit()->c_str()).c_str());
+      ev.params.append(asprintf("SubstanceCompound=%s;", subCInfuzData->SubstanceCompound().c_str()).c_str());
+    }
+
+    return false;
   } else if (auto pneumo = dynamic_cast<const CDM::TensionPneumothoraxData*>(action)) {
+    ev.eType = EventTypes::TensionPneumothorax;
+    ev.typeName = "Tension Pneumothorax";
+    ev.description = "Application of a Tension Pneumothorax insult";
+    ev.params = "";
+
+    ev.params.append(asprintf("Type=%s;", (pneumo->Type() == CDM::enumPneumothoraxType::Open) ? "Open" : "Closed").c_str());
+    ev.params.append(asprintf("Severity=%d;", pneumo->Severity().value()).c_str());
+    ev.params.append(asprintf("Side=%s;", (pneumo->Side() == CDM::enumSide::Left) ? "Left" : "Right").c_str());
+
     return true;
   } else if (auto tournData = dynamic_cast<const CDM::TourniquetData*>(action)) {
+    ev.eType = EventTypes::Tourniquet;
+    ev.typeName = "Tourniquet";
+    ev.description = "Tourniquet application to a compartment";
+    ev.params = "";
+
+    ev.params.append(asprintf("", tournData->Compartment().c_str()).c_str());
+
+    switch (tournData->TourniquetLevel()) {
+    case CDM::enumTourniquetApplicationLevel::Applied:
+      ev.params.append(asprintf("TourniquetLevel=%s;", "Applied").c_str());
+      break;
+    case CDM::enumTourniquetApplicationLevel::Misapplied:
+      ev.params.append(asprintf("TourniquetLevel=%s;", "Misapplied").c_str());
+      break;
+    case CDM::enumTourniquetApplicationLevel::None:
+      ev.params.append(asprintf("TourniquetLevel=%s;", "None").c_str());
+      break;
+    }
     return true;
   } else if (auto urinate = dynamic_cast<const CDM::UrinateData*>(action)) {
+    ev.eType = EventTypes::Urinate;
+    ev.typeName = "Force Urination";
+    ev.description = "Causes patient to to empty bladder";
+    ev.params = "";
     return true;
   } else if (auto orData = dynamic_cast<const CDM::OverrideData*>(action)) {
+    ev.eType = EventTypes::Override;
+    ev.typeName = "Value Override";
+    ev.description = "Configure the current value override values";
+    ev.params = "";
+
+    //TODO: Implement OverrideData
     return true;
   }
   return false;
@@ -158,13 +535,116 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 //-----------------------------------------------------------------------------
 bool Timeline::process_action(Event& ev, CDM::EnvironmentActionData* action)
 {
+  using namespace biogears;
   std::cout << "As EnvironmentAction"
             << *action << "\n\n";
   ev.eType = EventTypes::EnvironmentAction;
   ev.typeName = "Environment Action";
   if (auto change = dynamic_cast<const CDM::EnvironmentChangeData*>(action)) {
+    ev.eType = EventTypes::EnvironmentChange;
+    ev.typeName = "EnvironmentChange";
+    ev.description = "Modify the current environment";
+    ev.params = "";
+    if (change->ConditionsFile().present()) {
+      ev.params += asprintf("conditionFile=%s;", change->ConditionsFile()->c_str()).c_str();
+    }
+    if (change->Conditions().present()) {
+      auto conditions = change->Conditions();
+      if (conditions->Name().present()) {
+        ev.params += asprintf("Conditions-Name=%s;", conditions->Name()->c_str()).c_str();
+      }
+      if (conditions->SurroundingType().present()) {
+        ev.params += asprintf("Conditions-SurroundingType=%s;", (conditions->SurroundingType().get() == CDM::enumSurroundingType::Air) ? "Air" : "Water").c_str();
+      }
+      if (conditions->AirDensity().present()) {
+        auto airDensity = conditions->AirDensity().get();
+        ev.params += asprintf("Conditions-AirDensity=%d,%s;", airDensity.value(), airDensity.unit()->c_str()).c_str();
+      }
+      if (conditions->AirVelocity().present()) {
+        auto velocity = conditions->AirVelocity().get();
+        ev.params += asprintf("Conditions-AirDensity=%d,%s;", velocity.value(), velocity.unit()->c_str()).c_str();
+      }
+      if (conditions->AmbientTemperature().present()) {
+        auto ambientTemp = conditions->AmbientTemperature().get();
+        ev.params += asprintf("Conditions-AirDensity=%d,%s;", ambientTemp.value(), ambientTemp.unit()->c_str()).c_str();
+      }
+      if (conditions->AtmosphericPressure().present()) {
+        auto ap = conditions->AtmosphericPressure().get();
+        ev.params += asprintf("Conditions-AirDensity=%d,%s;", ap.value(), ap.unit()->c_str()).c_str();
+      }
+      if (conditions->ClothingResistance().present()) {
+        auto cr = conditions->ClothingResistance().get();
+        ev.params += asprintf("Conditions-ClothingResistance=%d,%s;", cr.value(), cr.unit()->c_str()).c_str();
+      }
+      if (conditions->Emissivity().present()) {
+        auto em = conditions->Emissivity().get();
+        ev.params += asprintf("Conditions-Emissivity=%d,%s;", em.value(), em.unit()->c_str()).c_str();
+      }
+      if (conditions->MeanRadiantTemperature().present()) {
+        auto mrt = conditions->MeanRadiantTemperature().get();
+        ev.params += asprintf("Conditions-MeanRadiantTemperature=%d,%s;", mrt.value(), mrt.unit()->c_str()).c_str();
+      }
+      if (conditions->RelativeHumidity().present()) {
+        auto rh = conditions->RelativeHumidity().get();
+        ev.params += asprintf("Conditions-RelativeHumidity=%d,%s;", rh.value(), rh.unit()->c_str()).c_str();
+      }
+      if (conditions->RespirationAmbientTemperature().present()) {
+        auto rat = conditions->RelativeHumidity().get();
+        ev.params += asprintf("Conditions-RespirationAmbientTemperature=%d,%s;", rat.value(), rat.unit()->c_str()).c_str();
+      }
+      for (auto& gas : conditions->AmbientGas()) {
+        ev.params += asprintf("ConfigurationFile-AmbientGas=%s,%d;", gas.Name().c_str(), gas.FractionAmount().value()).c_str();
+      }
+      for (auto& aerosol : conditions->AmbientAerosol()) {
+        ev.params += asprintf("ConfigurationFile-AmbientGas=%s,%d,%u;", aerosol.Name().c_str(), aerosol.Concentration().value(), aerosol.Concentration().unit()).c_str();
+      }
+    }
     return true;
   } else if (auto thermal = dynamic_cast<const CDM::ThermalApplicationData*>(action)) {
+    ev.eType = EventTypes::ThermalApplication;
+    ev.typeName = "Thermal Application";
+    ev.description = "Apply active heating/cooling";
+    ev.params = "";
+    if (thermal->ActiveCooling().present()) {
+      auto ac = thermal->ActiveCooling().get();
+      ev.params.append(asprintf("ActiveCooling-Power=%d,%s", ac.Power().value(), ac.Power().unit()->c_str()).c_str());
+
+      if (ac.SurfaceArea().present()) {
+        ev.params.append(asprintf("ActiveCooling-SurfaceArea=%d,%s", ac.SurfaceArea()->value(), ac.SurfaceArea()->unit()->c_str()).c_str());
+      }
+      if (ac.SurfaceAreaFraction().present()) {
+        ev.params.append(asprintf("ActiveCooling-SurfaceAreaFraction=%d", ac.SurfaceAreaFraction()->value()).c_str());
+      }
+    }
+    if (thermal->ActiveHeating().present()) {
+      auto ah = thermal->ActiveHeating().get();
+      ev.params.append(asprintf("ActiveHeating-Power=%d,%s", ah.Power().value(), ah.Power().unit()->c_str()).c_str());
+
+      if (ah.SurfaceArea().present()) {
+        ev.params.append(asprintf("ActiveHeating-SurfaceArea=%d,%s", ah.SurfaceArea()->value(), ah.SurfaceArea()->unit()->c_str()).c_str());
+      }
+      if (ah.SurfaceAreaFraction().present()) {
+        ev.params.append(asprintf("ActiveHeating-SurfaceAreaFraction=%d", ah.SurfaceAreaFraction()->value()).c_str());
+      }
+    }
+    if (thermal->AppliedTemperature().present()) {
+      auto at = thermal->AppliedTemperature().get();
+      if (at.Temperature().present()) {
+        ev.params.append(asprintf("AppliedTemperature-Temperature=%d,%s", at.Temperature()->value(), at.Temperature()->unit()->c_str()).c_str());
+      }
+      if (at.State().present()) {
+        ev.params.append(asprintf("AppliedTemperature-State=%s", at.State().get() == CDM::enumOnOff::On ? "On" : "Off").c_str());
+      }
+      if (at.SurfaceAreaFraction().present()) {
+        ev.params.append(asprintf("AppliedTemperature-SurfaceAreaFraction=%d", at.SurfaceAreaFraction()->value()).c_str());
+      }
+      if (at.SurfaceArea().present()) {
+        ev.params.append(asprintf("AppliedTemperature-SurfaceArea=%d,%s", at.SurfaceAreaFraction()->value(), at.SurfaceAreaFraction()->unit()->c_str()).c_str());
+      }
+    }
+    if (thermal->AppendToPrevious()) {
+      ev.params.append(asprintf("AppendToPrevious=%s", thermal->AppendToPrevious() ? "True" : "False").c_str());
+    }
     return true;
   }
 
@@ -218,7 +698,7 @@ bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* actio
         ev.params += asprintf("OxygenFraction=%d,%s;", oxygenFraction.value(), oxygenFraction.unit()).c_str();
       }
       if (config.OxygenSource().present()) {
-        switch( config.OxygenSource().get()) {
+        switch (config.OxygenSource().get()) {
         case CDM::enumAnesthesiaMachineOxygenSource::BottleOne:
           ev.params += asprintf("OxygenSource=%s;", "BottleOne").c_str();
           break;
