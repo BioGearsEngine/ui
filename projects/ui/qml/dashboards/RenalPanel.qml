@@ -13,6 +13,7 @@ Item {
 	id: root
 	
 	property PhysiologyModel physiologyRenalModel
+	property PhysiologyModel physiologyRenalFluidModel
 	
 	property alias renalOverviewGridView:renalOverviewGridView
 	property alias renalTimer : renalTimer
@@ -39,9 +40,24 @@ Item {
 	property string criticalBorderColor: "red"
 	
 	
-	// Based on BioGearsData
+	// Based on BioGearsData for RENAL_OVERVIEW (physiologyRenalModel)
 	// 0 - Mean Urine Output
 	// 1 - Urine Production Rate
+	
+	// Based on BioGearsData for RENAL_FLUID_BALANCE (physiologyRenalFluidModel)
+    // 0 - Mean Urine Output
+    // 1 - Urine Production Rate
+    // 2 - Urine Volume
+    // 3 - Urine Osmolality
+    // 4 - Urine Osmolarity
+    // 5 - Glomerular Filtration Rate
+    // 6 - Renal Blood Flow
+    // 7 - Total Body Fluid Volume
+    // 8 - Extracell Fluid Volume
+    // 9 - Intracell Fluid Volume
+    // 10 - Extravascular Fluid Volume
+    // Check ua and reabsorption rate
+
 
 	
 	Timer {
@@ -62,22 +78,73 @@ Item {
 		anchors.fill : parent
 		color : Qt.rgba(0, 0.15, 0, 0.7)
 
-		GridView {
-			id : renalOverviewGridView
-			anchors.fill : parent
-			clip : true
-			cellWidth : plots.width / 2
-			cellHeight : plots.height / 2
-			model : renalOverviewModel
-			ScrollBar.vertical : ScrollBar {
-				parent : renalOverviewGridView.parent
-				anchors.top : renalOverviewGridView.top
-				anchors.right : renalOverviewGridView.right
-				anchors.bottom : renalOverviewGridView.bottom
+		
+		
+		GridLayout {	
+			id: renalPanelGrid
+			// Percentage of size and centerIn parent provides margin buffer around grid
+			height: root.height*0.9
+			width : root.width*0.95
+			anchors.centerIn : parent
+			
+			columns: 20
+			rows: 4
+
+			property double colMulti : renalPanelGrid.width / renalPanelGrid.columns
+			property double rowMulti : renalPanelGrid.height / renalPanelGrid.rows
+			function prefWidth(item){
+				return colMulti * item.Layout.columnSpan
+			}
+			function prefHeight(item){
+				return rowMulti * item.Layout.rowSpan
+			}
+			
+			Rectangle {
+				id : urinalysisConsole
+				Layout.column: 0
+				Layout.row: 0
+				Layout.columnSpan: 5
+				Layout.rowSpan: 4
+				Layout.preferredHeight: renalPanelGrid.prefHeight(this)
+				Layout.preferredWidth: renalPanelGrid.prefWidth(this) 
+				color : Qt.rgba(1, 0, 0, 0.5)
+			}
+			
+			Rectangle {
+				id : graphConsole
+				Layout.column: 5
+				Layout.row: 0
+				Layout.columnSpan: 10
+				Layout.rowSpan: 4
+				Layout.preferredHeight: renalPanelGrid.prefHeight(this)
+				Layout.preferredWidth: renalPanelGrid.prefWidth(this)
+				color : Qt.rgba(1, 1, 1, 0.0)
+				GridView {
+					id : renalOverviewGridView
+					anchors.fill : parent
+					clip : true
+					cellWidth : graphConsole.width
+					cellHeight : plots.height / 2.25
+					model : renalOverviewModel
+					ScrollBar.vertical : ScrollBar {
+						parent : renalOverviewGridView.parent
+						anchors.top : renalOverviewGridView.top
+						anchors.right : renalOverviewGridView.right
+						anchors.bottom : renalOverviewGridView.bottom
+					}
+				}
+			}
+			
+			Rectangle {
+				id : nephronConsole
+				Layout.column: 15
+				Layout.row: 0
+				Layout.columnSpan: 5
+				Layout.rowSpan: 4
+				Layout.preferredHeight: renalPanelGrid.prefHeight(this)
+				Layout.preferredWidth: renalPanelGrid.prefWidth(this) 
+				color : Qt.rgba(0, 0, 1, 0.5)
 			}
 		}
-		
-		//GridLayout {	
-		//}
 	}
 }

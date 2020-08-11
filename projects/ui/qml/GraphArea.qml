@@ -75,6 +75,7 @@ GraphAreaForm {
 	energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
 	energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
 	renalOverviewSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW))
+	renalOverviewSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE))
   }
 
   onStart : {
