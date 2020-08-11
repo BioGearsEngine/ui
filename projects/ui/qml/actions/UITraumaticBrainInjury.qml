@@ -11,14 +11,22 @@ UIActionForm {
   border.color: "black"
 
   property double severity : 0.0
-  property int type : 0
-  property string type_str : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
-  
+  property int type : -1
+  property string type_str : (root.type == -1) ? "" : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
+  property bool validBuildConfig : (severity > 0.0 && type > -1 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+
   actionType : "Traumatic Brain Injury"
   fullName  : "<b>%1</b><br> Type = %2<br> Severity = %3".arg(actionType).arg(type_str).arg(severity)
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(type_str)
 
-  details : Component  {
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "TraumaticBrainInjury", "time" : actionStartTime_s, "severity" : severity, "type" : type} : ({})
+  deactivateData : builderMode ? {"name" : "TraumaticBrainInjury", "time" : actionStartTime_s + actionDuration_s, "severity" : 0, "type" : type} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_traumatic_brain_injury_action(severity, type)  }
+  onDeactivate: { scenario.create_traumatic_brain_injury_action(0, type)  }
+
+  controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
@@ -121,7 +129,173 @@ UIActionForm {
       }
     }
   }// End Details Component
-
-  onActivate:   { scenario.create_traumatic_brain_injury_action(severity, type)  }
-  onDeactivate: { scenario.create_traumatic_brain_injury_action(0, type)  }
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 3
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        root.severity = 0
+        typeRadioGroup.radioGroup.checkState = Qt.Unchecked
+        startTimeLoader.item.clear()
+        durationLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 3
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType) + "[%1]".arg(root.compartment)
+      }    
+      //Row 2
+      RowLayout {
+        id : severityWrapper
+        Layout.maximumWidth : grid.width / 3
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.row : 1
+        Layout.column : 0
+        Label {
+          id : severityLabel
+          leftPadding : 5
+          text : "Severity"
+          font.pixelSize : 15
+        }
+        Slider {
+          id: severitySlider
+          Layout.fillWidth : true
+          from : 0
+          to : 1
+          stepSize : 0.05
+          value : root.severity
+          Layout.alignment : Qt.AlignLeft
+          onMoved : {
+            root.severity = value
+          }
+        }
+        Label {
+          text : "%1".arg(root.severity)
+          font.pixelSize : 15
+          Layout.alignment : Qt.AlignLeft
+        }
+      }
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Start Time"
+          Layout.row = 1
+          Layout.column = 1
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      Loader {
+        id : durationLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Duration"
+          Layout.row = 1
+          Layout.column = 2
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionDuration_s > 0.0){
+            item.reload(actionDuration_s)
+          }
+        }
+      }
+      Connections {
+        target : durationLoader.item
+        onTimeUpdated : {
+          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      
+      //Row 3
+      UIRadioButtonForm {
+        id : typeRadioGroup
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.alignment : Qt.AlignVCenter
+        prefWidth : grid.width / 3
+        prefHeight : 75
+        elementRatio : 0.4
+        radioGroup.checkedButton : type == -1 ? null : radioGroup.buttons[type]
+        label.text : "Type"
+        label.font.pointSize : 11
+        label.horizontalAlignment : Text.AlignLeft
+        label.padding : 5
+        buttonModel : ['Diffuse', 'Left Focal', 'Right Focal']
+        radioGroup.onClicked : {
+          type = button.buttonIndex
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height * 0.6
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 2
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height * 0.6
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+    }
+  } //end builder details component
 }

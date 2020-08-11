@@ -2514,6 +2514,7 @@ void Scenario::export_state(bool saveAs)
   emit newStateAdded();
 }
 }
+#include <biogears/cdm/patient/actions/SEAcuteRespiratoryDistress.h>
 #include <biogears/cdm/patient/actions/SEAcuteStress.h>
 #include <biogears/cdm/patient/actions/SEAirwayObstruction.h>
 #include <biogears/cdm/patient/actions/SEApnea.h>
@@ -2763,6 +2764,13 @@ void Scenario::create_apnea_action(double severity)
 void Scenario::create_acute_stress_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAcuteStress>();
+  action->GetSeverity().SetValue(severity);
+
+  _action_queue.as_source().insert(std::move(action));
+}
+void Scenario::create_ards_action(double severity)
+{
+  auto action = std::make_unique<biogears::SEAcuteRespiratoryDistress>();
   action->GetSeverity().SetValue(severity);
 
   _action_queue.as_source().insert(std::move(action));

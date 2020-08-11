@@ -64,7 +64,7 @@ RowLayout {
       contentItem : Text {
         id : buttonText
         text : radioDelegate.text
-        font.pointSize : 12
+        font.pointSize : label.font.pointSize
         x : delegateIndicator.width
         leftPadding : 10
         horizontalAlignment : Text.AlignLeft

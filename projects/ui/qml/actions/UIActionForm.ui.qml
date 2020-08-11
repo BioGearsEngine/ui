@@ -10,23 +10,50 @@ Rectangle {
   id: root
   color: "transparent"
   border.color: "black"
-  height : loader.item.height
+  height : viewLoader.item.height
 
   signal activate()
   signal deactivate()
   signal remove( string uuid )
   signal adjust( var list)
+  signal selected()     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
+  signal buildSet(var action)
 
   property Scenario scenario
+  property var activateData : ({})    //Data that turns on action that is passed to serializer in builder mode
+  property var deactivateData : ({})  //Data that turns off action (e.g. bleeding rate = 0 for hemorrhage) that is passed to serializer in builder mode
+  property bool queued : false        //Has the action been added to the scenario queue yet in build mode?
   property string actionType : "UnSet"
   property string uuid : ""
   property bool active : false
   property bool collapsed : true
+  property bool builderMode : false
+  property double actionStartTime_s : 0.0        //Time at which this action will be applied (in Scenario Builder)
+  property double actionDuration_s : 0.0          //Length of time over which action will be applied
+  property Loader viewLoader : loader
+  property alias timeEntry : timeEntry
+
 
   property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg("Identifier").arg("Value")
   property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg("Identifier")
 
-  property Component details 
+  //This state controls whether the highlighting of the rectangle containing this action.  It is used in scenario builder to help users move actions up/down
+  // queue and select action for removal.
+  state : "unselected"
+  states : [
+     State {
+        name: "unselected"
+        PropertyChanges { target : root; border.color : "black"; border.width : 1}
+      }
+
+      ,State {
+        name: "selected"
+        PropertyChanges { target : root; border.color : "green"; border.width : 2}
+      }
+  ]
+
+  property Component controlsDetails
+  property Component builderDetails
   property Component summary : Component {
     RowLayout {
       id : actionRow
@@ -39,7 +66,7 @@ Rectangle {
         color : '#1A5276'
         text : root.shortName
         elide : Text.ElideRight
-        font.pointSize : 8
+        font.pointSize : builderMode ? 16 : 8
         font.bold : true
         horizontalAlignment  : Text.AlignLeft
         leftPadding : 5
@@ -61,7 +88,9 @@ Rectangle {
               interval: 500; running: false; repeat: false
               onTriggered:  actionTip.visible  = true
             }
-
+            onClicked : {
+              selected()
+            }
             onEntered: {
               infoTimer.start()
               actionTip.visible  = false
@@ -98,6 +127,7 @@ Rectangle {
       }
       Rectangle {
         id: toggle
+        visible : !builderMode
         width  : 40
         height : 20
 
@@ -142,13 +172,20 @@ Rectangle {
 
     states : [
       State {
-        name: "expanded"
-        PropertyChanges { target : loader; sourceComponent: details}
+        name: "expandedControls"
+        PropertyChanges { target : loader; sourceComponent: controlsDetails}
       }
-
+      ,State {
+        name : "expandedBuilder"
+        PropertyChanges {target : loader; sourceComponent : builderDetails}
+      }
       ,State {
         name: "collapsed"
         PropertyChanges { target : loader; sourceComponent: summary}
+      }
+      ,State {
+        name: "unset"
+        PropertyChanges {target : loader; sourceComponent : undefined}
       }
     ]
 
@@ -162,14 +199,24 @@ Rectangle {
         if ( mouse.button == Qt.RightButton) {
           contextMenu.popup()
         }
+        selected()
       }
 
       onDoubleClicked: { // Double Clicking Window
         if ( mouse.button === Qt.LeftButton ){
-          if ( loader.state === "collapsed") {
-            loader.state = "expanded"
+          if (builderMode){
+            if ( loader.state === "collapsed") {
+              loader.state = "expandedBuilder"
+            } else {
+              //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
+              //loader.state = "collapsed"
+            }
           } else {
-            loader.state = "collapsed"
+            if ( loader.state === "collapsed") {
+              loader.state = "expandedControls"
+            } else {
+              loader.state = "collapsed"
+            }
           }
         } else {
           mouse.accepted = false
@@ -181,13 +228,15 @@ Rectangle {
         MenuItem {
           text : (loader.state === "collapsed")? "Configure" : "Collapse"
            onTriggered: {
-             if ( loader.state === "collapsed"){
-               loader.state = "expanded"
-             } else {
-               loader.state = "collapsed"
-             }
-
-           }
+            //Only using this in controls instance (not in builder mode)
+            if (!builderMode) {
+              if ( loader.state === "collapsed") {
+                loader.state = "expandedControls"
+              } else {
+                loader.state = "collapsed"
+              }
+            }
+          }
         }
         MenuItem {
           text : "Remove"
@@ -198,6 +247,155 @@ Rectangle {
             root.remove( root.uuid )
            }
         }
+      }
+    }
+  }
+
+  Component {
+    id : timeEntry
+    RowLayout {
+      signal timeUpdated (int seconds, int minutes, int hours)
+      signal clear ()
+      signal reload (int totalTime_s) 
+      property int seconds : 0
+      property int minutes : 0
+      property int hours : 0
+      property string entryName : ""
+      onHoursChanged : {
+        if (hours !== Number.fromLocaleString(hoursField.text)){
+          hoursField.text = Number(hours).toLocaleString()
+        }
+        timeUpdated(seconds, minutes, hours)
+      }
+      onMinutesChanged : {
+        if (minutes !== Number.fromLocaleString(minutesField.text)){
+          minutesField.text = Number(minutes).toLocaleString()
+        }
+        timeUpdated(seconds, minutes, hours)
+      }
+      onSecondsChanged : {
+        if (seconds !== Number.fromLocaleString(secondsField.text)){
+          secondsField.text = Number(seconds).toLocaleString()
+        }
+        timeUpdated(seconds, minutes, hours)
+      }
+      onClear : {
+        hoursField.clear()
+        minutesField.clear()
+        secondsField.clear()
+        seconds = 0
+        minutes = 0
+        hours = 0
+      }
+      onReload : {
+        hours = Math.floor(totalTime_s / 3600)
+        minutes = Math.floor((totalTime_s - hours * 3600) / 60)
+        seconds = totalTime_s - hours * 3600 - minutes * 60
+      }
+
+      Label {
+        Layout.alignment : Qt.AlignCenter
+        verticalAlignment : Text.AlignVCenter
+        text : entryName
+        font.pixelSize : 15
+        Layout.fillHeight : true
+      }
+      TextField {
+        id : hoursField
+        placeholderText : "0"
+        Layout.preferredWidth : 25
+        Layout.fillHeight : true
+        Layout.preferredHeight : implicitHeight
+        topPadding : 16
+        font.pixelSize : 15
+        Layout.alignment : Qt.AlignRight | Qt.AlignBottom
+        verticalAlignment : TextInput.AlignBottom
+        horizontalAlignment : TextInput.AlignHCenter
+        validator : IntValidator {
+          bottom : 0
+        }
+        onTextEdited : {
+          if (text===""){
+              parent.hours = 0
+          } else if(acceptableInput){
+              parent.hours = Number.fromLocaleString(text)
+          }
+        }
+      }
+      Label {
+        text : "H"
+        font.pixelSize : 15
+        Layout.alignment : Qt.AlignLeft | Qt.AlignCenter
+        rightPadding : 10
+      }
+      TextField {
+        id : minutesField
+        placeholderText : "0"
+        Layout.preferredWidth : 25
+        Layout.fillHeight : true
+        Layout.preferredHeight : implicitHeight
+        topPadding : 16
+        font.pixelSize : 15
+        Layout.alignment : Qt.AlignRight | Qt.AlignBottom
+        verticalAlignment : TextInput.AlignBottom
+        horizontalAlignment : TextInput.AlignHCenter
+        validator : IntValidator {
+          bottom : 0
+        }
+        onTextEdited : {
+          if (text ===""){
+              parent.minutes = 0
+          } else if (acceptableInput){
+            let minutesInput = Number.fromLocaleString(text)
+            if (minutesInput > 60){
+              let hoursToAdd = Math.floor(minutesInput / 60)
+              minutesInput = minutesInput % 60
+              parent.hours += hoursToAdd
+              text = Number(minutesInput).toLocaleString()
+            }
+            parent.minutes = minutesInput
+          }
+        }
+      }
+      Label {
+        text : "M"
+        font.pixelSize : 15
+        Layout.alignment : Qt.AlignLeft
+        rightPadding : 10
+      }
+      TextField {
+        id : secondsField
+        placeholderText : "0"
+        Layout.preferredWidth : 25
+        Layout.fillHeight : true
+        Layout.preferredHeight : implicitHeight
+        font.pixelSize : 15
+        topPadding : 16
+        Layout.alignment : Qt.AlignRight | Qt.AlignBottom
+        verticalAlignment : TextInput.AlignBottom
+        horizontalAlignment : TextInput.AlignHCenter
+        validator : IntValidator {
+          bottom : 0
+        }
+        onTextEdited : {
+          if (text === ""){
+              parent.seconds = 0
+          } else if (acceptableInput){
+            let secondsInput = Number.fromLocaleString(text)
+            if (secondsInput > 60){
+              let minutesToAdd = Math.floor(secondsInput / 60)
+              secondsInput = secondsInput % 60
+              parent.minutes += minutesToAdd
+              text = Number(secondsInput).toLocaleString()
+            }
+            parent.seconds = secondsInput
+          }
+        }
+      }
+      Label {
+        text : "S"
+        font.pixelSize : 15
+        Layout.alignment : Qt.AlignLeft
       }
     }
   }

@@ -85,6 +85,7 @@ Drawer {
                 id : actionMenuModel
                 ListElement { name : "Exercise"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_exercise(actionItem)}}
                 ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_consumeMeal(actionItem)}}
+                ListElement { name : "Acute Respiratory Distress"; section : "Insults"; property var func : function(actionItem) { root.setup_ards(actionItem)}}
                 ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(actionItem) {root.setup_acuteStress(actionItem)}}
                 ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(actionItem) {root.setup_airwayObstruction(actionItem)}}
                 ListElement { name : "Apnea"; section : "Insults"; property var func : function(actionItem) {root.setup_apnea(actionItem)}}

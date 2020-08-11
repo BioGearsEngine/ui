@@ -19,9 +19,9 @@
         <file>WizardDialogForm.ui.qml</file>
         <file>PatientMenu.qml</file>
         <file>PatientMenuForm.ui.qml</file>
-	<file alias="EnergyPanel.qml">dashboards/EnergyPanel.qml</file>
-        <file alias="UISubstanceWizard.qml" >elements/UISubstanceWizard.qml</file>
-        <file alias="UISubstanceWizardForm.ui.qml" >elements/UISubstanceWizardForm.ui.qml</file>
+        <file alias="EnergyPanel.qml">dashboards/EnergyPanel.qml</file>
+        <file alias="UISubstanceWizard.qml">elements/UISubstanceWizard.qml</file>
+        <file alias="UISubstanceWizardForm.ui.qml">elements/UISubstanceWizardForm.ui.qml</file>
         <file alias="UIActionSwitch.qml">elements/UIActionSwitch.qml</file>
         <file alias="UIActionSwitchForm.qml">elements/UIActionSwitchForm.qml</file>
         <file alias="UIActionDialogForm.ui.qml">elements/UIActionDialogForm.ui.qml</file>
@@ -76,6 +76,10 @@
         <file alias="UIAnesthesiaMachine.qml">actions/UIAnesthesiaMachine.qml</file>
         <file alias="UIExercise.qml">actions/UIExercise.qml</file>
         <file alias="UIInhaler.qml">actions/UIInhaler.qml</file>
+        <file alias="UIScenarioBuilder.qml">elements/UIScenarioBuilder.qml</file>
+        <file alias="UIScenarioBuilderForm.ui.qml">elements/UIScenarioBuilderForm.ui.qml</file>
+        <file alias="UIScenarioTimelineForm.ui.qml">elements/UIScenarioTimelineForm.ui.qml</file>
+        <file alias="UIAcuteRespiratoryDistress.qml">actions/UIAcuteRespiratoryDistress.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
@@ -95,5 +99,7 @@
         <file alias="biogears_logo.png">img/biogears_logo_400_400.png</file>
         <file alias="remove.png">img/remove.png</file>
         <file alias="add.png">img/add.png</file>
+        <file alias="move-down.png">img/DownArrow.png</file>
+        <file alias="move-up.png">img/UpArrow.png</file>
     </qresource>
 </RCC>

@@ -12,12 +12,20 @@ UIActionForm {
 
   property double tbsa : 0.0
   property alias severity  : root.tbsa
-  
+  property bool validBuildConfig : (severity > 0.0 && actionStartTime_s > 0.0)
+
   actionType : "Burn Wound"
   fullName  : "<b>%1</b> Total Burn Sufrace Area = %2".arg(actionType).arg(tbsa)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(tbsa)
 
-  details : Component  {
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "BurnWound", "time" : actionStartTime_s, "severity" : severity} : ({})
+  //deactivateData : builderMode ? {"name" : "BurnWound", "time" : actionStartTime_s + actionDuration_s, "severity" : 0} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_burn_action(tbsa)  }
+  onDeactivate: { scenario.create_burn_action(0)  }
+
+  controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
@@ -114,7 +122,149 @@ UIActionForm {
       }
     }
   }// End Details Component
-
-  onActivate:   { scenario.create_burn_action(tbsa)  }
-  onDeactivate: { scenario.create_burn_action(0)  }
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 3
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        root.severity = 0
+        startTimeLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 3
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType)
+      }    
+      //Row 2
+      RowLayout {
+        id : severityWrapper
+        Layout.maximumWidth : grid.width / 3
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.row : 1
+        Layout.column : 0
+        Label {
+          font.pixelSize : 15
+          text : "TBSA Fraction"
+          leftPadding : 5
+        }      
+        Slider {
+          id: stimulus      
+          Layout.fillWidth : true
+          Layout.columnSpan : 2
+          from : 0
+          to : 1
+          stepSize : 0.05
+          value : root.severity
+          onMoved : {
+            root.severity = value
+          }
+        }
+        Label {
+          text : "%1".arg(root.severity)
+          font.pixelSize: 15
+        }
+      }
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Start Time"
+          Layout.row = 1
+          Layout.column = 1
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      Rectangle {
+        //placeholder for spacing
+        color : "transparent"
+        Layout.row : 1
+        Layout.column : 2
+        Layout.preferredHeight : severityWrapper.height   //recs need preferred dimension explicity stated (not sure why fill width/height not enough to accomplish this)
+        Layout.fillWidth : true
+        Layout.maximumWidth : grid.width / 3
+        Layout.fillHeight : true
+      }
+      
+      //Row 3
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.preferredHeight : severityWrapper.height
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.preferredHeight : severityWrapper.height
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+      Rectangle {
+        //placeholder for spacing
+        color : "transparent"
+        Layout.row : 2
+        Layout.column : 2
+        Layout.preferredHeight : severityWrapper.height   //recs need preferred dimension explicity stated (not sure why fill width/height not enough to accomplish this)
+        Layout.fillWidth : true
+        Layout.maximumWidth : grid.Width / 3
+        Layout.fillHeight : true
+      }
+    }
+  } //end builder details component
 }

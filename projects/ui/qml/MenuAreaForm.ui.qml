@@ -8,11 +8,12 @@ import com.biogearsengine.ui.scenario 1.0
 Item {
   id : menuArea
   property alias wizardDialog : wizardDialog
+  property alias scenarioBuilder : scenarioBuilder
   width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
   height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
 
 
-   Window {
+ /*  Window {
     objectName: "wnd1"
     visible: true
     width: 500
@@ -25,7 +26,7 @@ Item {
     width: 500
     height : 500
   }
-
+  */
   MenuBar {
     id: menuBar
    //----------------File Menu-------------------
@@ -56,6 +57,18 @@ Item {
         onTriggered : {
           let saveAs = true
           scenario.export_state(saveAs);
+        }
+      }
+      Action {
+        text : "Create Scenario"
+        onTriggered : {
+          scenarioBuilder.launch()
+        }
+      }
+      Action {
+        text : "Load Scenario"
+        onTriggered : {
+          console.log("Support for scenario loading forthcoming")
         }
       }
       delegate : MenuItem {
@@ -195,11 +208,20 @@ Item {
     ListElement { option : "Edit"}
   }
 
+  //Dialog that handles creation/editing of subtances/nutrition/compounds/environment/patient data types
   WizardDialog {
     id : wizardDialog
     visible : false
     height : menuArea.parent.height
     width : menuArea.parent.width / 2
     x : menuArea.parent.width / 4
+  }
+  //Dialog that handles creation/editing of scenario
+  UIScenarioBuilder {
+    id : scenarioBuilder
+    visible : false
+    height : menuArea.parent.height
+    width : menuArea.parent.width
+    bg_scenario : root.parent.scenario    //grab the scenario definition from main_form (parent of menuArea)
   }
 }

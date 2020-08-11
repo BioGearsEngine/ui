@@ -108,6 +108,7 @@ public:
 public: //Action Factory Interface;
   Q_INVOKABLE void create_hemorrhage_action(QString compartment, double ml_Per_min);
 
+  Q_INVOKABLE void create_ards_action(double severity);
   Q_INVOKABLE void create_asthma_action(double severity);
   Q_INVOKABLE void create_consume_meal_action(QString mealName, double carbs_g, double fat_g, double protein_g, double sodium_mg, double calcium_mg, double water_mL);
   Q_INVOKABLE void create_substance_bolus_action(QString substance, int route, double dose_mL, double concentration_ug_Per_mL);

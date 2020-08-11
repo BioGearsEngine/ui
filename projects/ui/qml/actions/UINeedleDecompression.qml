@@ -10,14 +10,21 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property int side : 0
-  property string side_str : (root.side == 0) ? "Left" : "Right"
+  property int side : -1
+  property string side_str : (root.side == -1) ? "" : (root.side == 0) ? "Left" : "Right"
+  property bool validBuildConfig : actionStartTime_s > 0.0
   
   actionType : "Needle Decompression"
   fullName  : "<b>%1</b><br> Side = %2".arg(actionType).arg(side_str)
   shortName : "[<font color=\"lightsteelblue\">%2</font>] <b>%1</b>".arg(actionType).arg(side_str)
 
-  details : Component  {
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "NeedleDecompression", "time" : actionStartTime_s, "side" : side_str} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_needle_decompression_action(active, side)  }
+  onDeactivate: { scenario.create_needle_decompression_action(0, side)  }
+
+  controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
@@ -121,6 +128,138 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_needle_decompression_action(active, side)  }
-  onDeactivate: { scenario.create_needle_decompression_action(0, side)  }
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 3
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        root.side = -1
+        sideRadioGroup.radioGroup.checkState = Qt.Unchecked
+        startTimeLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 3
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType)
+      }    
+      //Row 2
+      UIRadioButtonForm {
+        id : sideRadioGroup
+        Layout.row : 1
+        Layout.column : 0
+        Layout.rowSpan : 2
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.alignment : Qt.AlignVCenter
+        prefWidth : grid.width / 3
+        prefHeight : 75
+        elementRatio : 0.35
+        radioGroup.checkedButton : setButtonState()
+        label.text : "Side"
+        label.font.pointSize : 14
+        buttonModel : ['Left', 'Right']
+        radioGroup.onClicked : {
+          side = button.buttonIndex
+        }
+        function setButtonState(){
+          //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
+          if (root.side == -1){
+            return null
+          } else {
+            return radioGroup.buttons[side]
+          }
+        }
+      }
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Start Time"
+          Layout.row = 1
+          Layout.column = 1
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      Rectangle {
+        //placeholder for spacing
+        color : "transparent"
+        Layout.row : 1
+        Layout.column : 2
+        Layout.preferredHeight : sideRadioGroup.height / 2   //recs need preferred dimension explicity stated (not sure why fill width/height not enough to accomplish this)
+        Layout.fillWidth : true
+        Layout.maximumWidth : grid.Width / 3
+        Layout.fillHeight : true
+      }
+      
+      //Row 3
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.preferredHeight : sideRadioGroup.height / 2
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 2
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.preferredHeight : sideRadioGroup.height / 2
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+    }
+  } //end builder details component
 }

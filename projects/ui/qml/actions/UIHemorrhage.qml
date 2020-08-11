@@ -11,13 +11,20 @@ UIActionForm {
   border.color: "black"
 
   property double rate : 0.0
-  property string compartment : "LeftArm"
+  property string compartment : ""
+  property bool validBuildConfig : (rate > 0.0 && compartment !=="" && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
   
   actionType : "Hemorrhage"
   fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Rate = %3ml/min".arg(actionType).arg(compartment).arg(rate)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3ml/min</font>".arg(actionType).arg(compartment).arg(rate)
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "Hemorrhage", "time" : actionStartTime_s, "rate_mL/min" : rate, "compartment" : compartment} : ({})
+  deactivateData : builderMode ? {"name" : "Hemorrhage", "time" : actionStartTime_s + actionDuration_s, "rate_mL/min" : 0, "compartment" : compartment} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_hemorrhage_action(compartment, rate)  }
+  onDeactivate: { scenario.create_hemorrhage_action(compartment, 0)  }
 
-  details : Component  {
+  controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
@@ -121,6 +128,183 @@ UIActionForm {
     }
   }// End Details Component
 
-  onActivate:   { scenario.create_hemorrhage_action(compartment, rate)  }
-  onDeactivate: { scenario.create_hemorrhage_action(compartment, 0)  }
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 3
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        compartmentCombo.currentIndex = -1
+        root.compartment = ""
+        root.rate = 0
+        startTimeLoader.item.clear()
+        durationLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 3
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType) + "[%1]".arg(root.compartment)
+      }    
+      //Row 2
+      RowLayout {
+        id : rateWrapper
+        Layout.maximumWidth : grid.width / 3
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.row : 1
+        Layout.column : 0
+        Label {
+          id : rateLabel
+          leftPadding : 5
+          text : "Rate"
+          font.pixelSize : 15
+        }
+        Slider {
+          id: rateSlider
+          Layout.fillWidth : true
+          from : 0
+          to : 500
+          stepSize : 10
+          value : root.rate
+          Layout.alignment : Qt.AlignLeft
+          onMoved : {
+            root.rate = value
+          }
+        }
+        Label {
+          text : "%1 mL/min".arg(root.rate)
+          font.pixelSize : 15
+          Layout.alignment : Qt.AlignLeft
+        }
+      }
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Start Time"
+          Layout.row = 1
+          Layout.column = 1
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      Loader {
+        id : durationLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Duration"
+          Layout.row = 1
+          Layout.column = 2
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionDuration_s > 0.0){
+            item.reload(actionDuration_s)
+          }
+        }
+      }
+      Connections {
+        target : durationLoader.item
+        onTimeUpdated : {
+          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      
+      //Row 3
+      RowLayout {
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.maximumWidth : grid.Width / 3
+        Layout.fillHeight : true
+        spacing : 15
+        Label {
+          leftPadding : 5
+          text : "Compartment"
+          font.pixelSize : 15
+        }      
+        ComboBox {
+          id : compartmentCombo
+          currentIndex : setCurrentIndex()    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
+          function setCurrentIndex(){
+            for (let i = 0; i < model.length; ++i){
+              if (model[i]===root.compartment){
+                return i;
+              }
+            }
+            return -1;
+          }
+          model : ['Aorta', 'Large Intestine','Left Arm', 'Left Leg', 'Muscle', 'Right Arm', 'Right Leg', 'Skin', 'Small Intestine', 'Spleen', 'Vena Cava']
+          onActivated : {
+            compartment = textAt(index)
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 2
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+    }
+  } //end builder details component
 }

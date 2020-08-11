@@ -11,16 +11,25 @@ UIActionForm {
   border.color: "black"
 
   property double severity : 0.0
-  property int  side : 0 
-  property int  type : 0
+  property int  side : -1
+  property int  type : -1
 
-  property string side_str : (root.side == 0 ) ? "Left" : "Right"
-  property string type_str : (root.type == 0 ) ? "Open" : "Closed"
+  property string side_str : (root.side == -1) ? "" : (root.side == 0 ) ? "Left" : "Right"
+  property string type_str : (root.type == -1) ? "" : (root.type == 0 ) ? "Open" : "Closed"
+  property bool validBuildConfig : (severity > 0.0 && type !== -1 && side !== -1 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Tension Pneumothorax"
   fullName  : "<b>%1</b><br> Side = %2<br> Type = %3<br> Severity = %4".arg(actionType).arg(side_str).arg(type_str).arg(severity)
   shortName : "[<font color=\"lightsteelblue\">%2</font>]<b>%1</b> <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(side_str).arg(type_str)
-  details : Component  {
+
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "TensionPneumothorax", "time" : actionStartTime_s, "severity" : severity, "type" : type, "side" : side} : ({})
+  deactivateData : builderMode ? {"name" : "TensionPneumothorax", "time" : actionStartTime_s + actionDuration_s, "severity" : 0.0, "type" : type, "side" : side} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_tension_pneumothorax_action(severity, type, side)  }
+  onDeactivate: { scenario.create_tension_pneumothorax_action(0, type, side)  }
+
+  controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
@@ -123,7 +132,212 @@ UIActionForm {
       }
     }
   }// End Details Component
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 4
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        root.severity = 0
+        typeRadioGroup.radioGroup.checkState = Qt.Unchecked
+        sideRadioGroup.radioGroup.checkState = Qt.Unchecked
+        startTimeLoader.item.clear()
+        durationLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 4
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType) + "[%1]".arg(root.compartment)
+      }    
+      //Row 2
+      RowLayout {
+        id : severityWrapper
+        Layout.maximumWidth : grid.width / 3
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.row : 1
+        Layout.columnSpan : 2
+        Layout.column : 0
+        Label {
+          id : severityLabel
+          leftPadding : 5
+          text : "Severity"
+          font.pixelSize : 15
+        }
+        Slider {
+          id: severitySlider
+          Layout.fillWidth : true
+          from : 0
+          to : 1
+          stepSize : 0.05
+          value : root.severity
+          Layout.alignment : Qt.AlignLeft
+          onMoved : {
+            root.severity = value
+          }
+        }
+        Label {
+          text : "%1".arg(root.severity)
+          font.pixelSize : 15
+          Layout.alignment : Qt.AlignLeft
+        }
+      }
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "StartTime"
+          Layout.row = 1
+          Layout.column = 2
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      Loader {
+        id : durationLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Duration"
+          Layout.row = 1
+          Layout.column = 3
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionDuration_s > 0.0){
+            item.reload(actionDuration_s)
+          }
+        }
+      }
+      Connections {
+        target : durationLoader.item
+        onTimeUpdated : {
+          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      
+      //Row 3
+      UIRadioButtonForm {
+        id : typeRadioGroup
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.alignment : Qt.AlignVCenter
+        prefWidth : grid.width / 5
+        prefHeight : 75
+        elementRatio : 0.4
+        radioGroup.checkedButton : setButtonState()
+        label.text : "Type"
+        label.font.pointSize : 11
+        label.horizontalAlignment : Text.AlignLeft
+        label.padding : 5
+        buttonModel : ['Open', 'Closed']
+        radioGroup.onClicked : {
+          type = button.buttonIndex
+        }
+        function setButtonState(){
+          //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
+          if (root.type == -1){
+            return null
+          } else {
+            return radioGroup.buttons[type]
+          }
+        }
+      }
+      UIRadioButtonForm {
+        id : sideRadioGroup
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.alignment : Qt.AlignVCenter
+        prefWidth : grid.width / 5
+        prefHeight : 75
+        elementRatio : 0.4
+        radioGroup.checkedButton : setButtonState()
+        label.text : "Side"
+        label.font.pointSize : 11
+        label.horizontalAlignment : Text.AlignLeft
+        label.padding : 5
+        buttonModel : ['Left', 'Right']
+        radioGroup.onClicked : {
+          side = button.buttonIndex
+        }
+        function setButtonState(){
+          //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
+          if (root.side == -1){
+            return null
+          } else {
+            return radioGroup.buttons[side]
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 2
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 4
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height * 0.6
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 3
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 4
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height * 0.6
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+    }
+  } //end builder details component
 
-  onActivate:   { scenario.create_tension_pneumothorax_action(severity, type, side)  }
-  onDeactivate: { scenario.create_tension_pneumothorax_action(0, type, side)  }
 }

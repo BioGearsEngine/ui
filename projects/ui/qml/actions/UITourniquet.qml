@@ -11,16 +11,25 @@ UIActionForm {
   border.color: "black"
 
   property string compartment : ""
-  property int state : 0
-  property string state_str : (root.state == 0) ? "Applied" : ( root.state == 1) ? "Misapplied" : "None"
+  property int tState : -1
+  property string state_str : (root.tState == -1) ? "" : (root.tState == 0) ? "Applied" : ( root.tState == 1) ? "Misapplied" : "None"
   property string state_str_formated : (root.state == 0) ? "[<font color=\"green\">%2</font>]".arg(root.state_str) : 
                                        (root.state == 1) ? "[<font color=\"red\">%2</font>]".arg(root.state_str) : ""
-  
+  property bool validBuildConfig : (tState !== -1 && compartment !=="" && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+
   actionType : "Tourniquet"
   fullName  : "<b>%1</b><br> Location = %2<br> State = %3".arg(actionType).arg(compartment).arg(state_str)
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b> %3".arg(actionType).arg(compartment).arg((root.active) ? state_str_formated.arg(state_str) : "")
 
-  details : Component  {
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "Tourniquet", "time" : actionStartTime_s, "compartment" : compartment, "state" : tState} : ({})
+  deactivateData : builderMode ? {"name" : "Tourniquet", "time" : actionStartTime_s + actionDuration_s, "compartment" : compartment, "state" : 2} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_tourniquet_action(compartment, tState)  }
+  onDeactivate: { scenario.create_tourniquet_action(compartment, 2)  }
+
+
+  controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
@@ -53,16 +62,16 @@ UIActionForm {
         from : 0
         to : 1
         stepSize : 1
-        value : root.state
+        value : root.tState
 
         onMoved : {
-          root.state = value
+          root.tState = value
           if ( root.active )
               root.active = false;
         }
       }
       Label {
-        text : "%1".arg(root.state_str )
+        text : "%1".arg(root.tState_str )
       }
     
       // Column 3
@@ -123,7 +132,184 @@ UIActionForm {
       }
     }
   }// End Details Component
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 3
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        compartmentCombo.currentIndex = -1
+        root.compartment = ""
+        root.tState = -1
+        stateRadioGroup.radioGroup.checkState = Qt.Unchecked
+        startTimeLoader.item.clear()
+        durationLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 4
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType) + "[%1]".arg(root.compartment)
+      }    
+      //Row 2
+      RowLayout {
+        id : compartmentInput
+        Layout.row : 1
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.maximumWidth : grid.Width / 3
+        Layout.preferredHeight : 40
+        Layout.fillHeight : true
+        spacing : 15
+        Label {
+          leftPadding : 5
+          text : "Compartment"
+          font.pixelSize : 15
+        }      
+        ComboBox {
+          id : compartmentCombo
+          currentIndex : setCurrentIndex()    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
+          function setCurrentIndex(){
+            for (let i = 0; i < model.length; ++i){
+              if (model[i]===root.compartment){
+                return i;
+              }
+            }
+            return -1;
+          }
+          model : ['Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']
+          onActivated : {
+            compartment = textAt(index)
+            console.log(compartment)
+          }
+        }
+      }
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Start Time"
+          Layout.row = 1
+          Layout.column = 1
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          console.log(actionStartTime_s)
+        }
+      }
+      Loader {
+        id : durationLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          Layout.row = 1
+          Layout.column = 2
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          if (actionDuration_s > 0.0){
+            item.reload(actionDuration_s)
+          }
+        }
+      }
+      Connections {
+        target : durationLoader.item
+        onTimeUpdated : {
+          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      //Row 3
+      UIRadioButtonForm {
+        id : stateRadioGroup
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.alignment : Qt.AlignVCenter
+        prefWidth : grid.width / 3
+        prefHeight : 50
+        elementRatio : 0.4
+        radioGroup.checkedButton : setButtonState()
+        label.text : "State"
+        label.font.pointSize : 11
+        label.horizontalAlignment : Text.AlignLeft
+        label.padding : 5
+        buttonModel : ['Applied', 'Misapplied']
+        radioGroup.onClicked : {
+          tState = button.buttonIndex
+        }
+        function setButtonState(){
+          //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
+          if (root.tState == -1){
+            return null
+          } else {
+            return radioGroup.buttons[tState]
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 2
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.maximumWidth : grid.width / 3
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+    }
+  } //end builder details component
 
-  onActivate:   { scenario.create_tourniquet_action(compartment, state)  }
-  onDeactivate: { scenario.create_tourniquet_action(compartment, 2)  }
 }

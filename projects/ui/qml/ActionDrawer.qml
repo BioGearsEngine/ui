@@ -390,6 +390,16 @@ ActionDrawerForm {
     }
 
     //----------------------------------------------------------------------------------------
+    /// Set up arguments for acute respiratory distress action, including severity property 
+    /// and spin box arguments to track severity value
+    /// Calls to generic setup_severityAction function to complete dialog instantiation
+    function setup_ards(actionItem){
+      let severityProps = {elementRatio : 0.5, spinScale : 100, spinMax : 100, spinStep : 5}
+      add_single_range_action("Acute Respiratory Distress", "Severity", severityProps, 
+      function(props) {actionModel.add_single_range_action("UIAcuteRespiratoryDistress.qml" , props)} )
+    }
+
+    //----------------------------------------------------------------------------------------
     /// Set up arguments for apnea action, including severity property and spin box arguments
     /// to track severity value
     /// Calls to generic setup_severityAction function to complete dialog instantiation

@@ -9,12 +9,20 @@ UIActionForm {
   id: root
   color: "transparent"
   border.color: "black"
+  property bool validBuildConfig : (actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Cardiac Arrest"
   fullName  : "<b>%1</b>".arg(actionType)
   shortName : "<b>%1</b>".arg(actionType)
 
-  details : Component {
+  //Builder mode data -- data passed to scenario builder
+  activateData : builderMode ? {"name" : "CardiacArrest", "time" : actionStartTime_s, "state" : "On"} : ({})
+  deactivateData : builderMode ? {"name" : "CardiacArrest", "time" : actionStartTime_s + actionDuration_s, "state" : "off"} : ({})
+  //Interactive mode -- apply action immediately while running
+  onActivate:   { scenario.create_cardiac_arrest_action(true)  }
+  onDeactivate: { scenario.create_cardiac_arrest_action(false)  }
+
+  controlsDetails : Component {
     RowLayout {
       id : actionRow
       spacing : 5
@@ -110,7 +118,126 @@ UIActionForm {
       }
     }
   } // End Summary dETAILS
-
-  onActivate:   { scenario.create_cardiac_arrest_action(true)  }
-  onDeactivate: { scenario.create_cardiac_arrest_action(false)  }
+  builderDetails : Component {
+    id : builderDetails
+    GridLayout {
+      id: grid
+      columns : 2
+      rows : 3 
+      width : root.width -5
+      anchors.centerIn : parent
+      signal clear()
+      onClear : {
+        startTimeLoader.item.clear()
+        durationLoader.item.clear()
+      }
+      Label {
+        id : actionLabel
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 2
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.preferredWidth : grid.width * 0.5
+        font.pixelSize : 20
+        font.bold : true
+        color : "blue"
+        leftPadding : 5
+        text : "%1".arg(actionType)
+      }    
+      //Row 2
+      Loader {
+        id : startTimeLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Start Time"
+          Layout.row = 1
+          Layout.column = 0
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          Layout.preferredHeight = item.height
+          if (actionStartTime_s > 0.0){
+            item.reload(actionStartTime_s)
+          }
+        }
+      }
+      Connections {
+        target : startTimeLoader.item
+        onTimeUpdated : {
+          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      Loader {
+        id : durationLoader
+        sourceComponent : timeEntry
+        onLoaded : {
+          item.entryName = "Duration"
+          Layout.row = 1
+          Layout.column = 1
+          Layout.alignment = Qt.AlignHCenter
+          Layout.fillWidth = true
+          Layout.fillHeight = true
+          Layout.maximumWidth = grid.width / 5
+          Layout.preferredHeight = item.height
+          if (actionDuration_s > 0.0){
+            item.reload(actionDuration_s)
+          }
+        }
+      }
+      Connections {
+        target : durationLoader.item
+        onTimeUpdated : {
+          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+        }
+      }
+      
+      //Row 3
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.preferredHeight : startTimeLoader.item.height
+        Layout.maximumWidth : grid.width / 2
+        Layout.alignment : Qt.AlignHCenter
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Set Action"
+          opacity : validBuildConfig ? 1 : 0.4
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            if (validBuildConfig){
+              viewLoader.state = "collapsed"
+              root.buildSet(root)
+            }
+          }
+        }
+      }
+      Rectangle {
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        Layout.preferredHeight : startTimeLoader.item.height
+        Layout.maximumWidth : grid.width / 2
+        Layout.alignment : Qt.AlignHCenter
+        color : "transparent"
+        border.width : 0
+        Button {
+          text : "Clear Fields"
+          anchors.centerIn : parent
+          height : parent.height
+          width : parent.width / 2
+          onClicked : {
+            grid.clear()
+          }
+        }
+      }
+    }
+  } //end builder details component
 }

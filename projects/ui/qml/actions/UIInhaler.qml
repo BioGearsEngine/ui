@@ -14,7 +14,7 @@ UIActionForm {
   fullName  : "<b>%1</b>".arg(actionType)
   shortName : "<b>%1</b>".arg(actionType)
 
-  details : Component {
+  controlsDetails : Component {
     RowLayout {
       id : actionRow
       spacing : 5
