@@ -74,6 +74,7 @@ void BioGearsData::initialize()
   _vitals->append(QString("Vitals"), QString("Oxygen Saturation"));
   _vitals->append(QString("Vitals"), QString("Blood Volume"));
   _vitals->append(QString("Vitals"), QString("Central Venous Pressure"));
+  _vitals->append(QString("Vitals"), QString("Heart Rate"));
 
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Cerebral Perfusion Pressure"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Intracranial Pressure"));
@@ -111,6 +112,12 @@ void BioGearsData::initialize()
   }
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption Rate"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("CO2 Production Rate"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Fatigue"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Dehydration Fraction"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Ambient Temperature"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Relative Humidity"));
+
 
   _renal_fluid_balance->append(QString("Renal"), QString("Mean Urine Output"));
   _renal_fluid_balance->append(QString("Renal"), QString("Urine ProductionRate"));

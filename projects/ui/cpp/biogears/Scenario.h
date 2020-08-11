@@ -117,7 +117,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_blood_transfusion_action(QString compound, double bagVolume_mL, double rate_mL_Per_min);
   Q_INVOKABLE void create_burn_action(double tbsa);
   Q_INVOKABLE void create_infection_action(QString compartment, int severity, double mic_mg_Per_L);
-  Q_INVOKABLE void create_exercise_action(int type, double property_1, double property_2, double weight_kg);
+  Q_INVOKABLE void create_exercise_action(int type, double weight_kg, double property_1, double property_2);
   Q_INVOKABLE void create_pain_stimulus_action(double severity, QString location);
   Q_INVOKABLE void create_tension_pneumothorax_action(double severity, int type, int side);
   Q_INVOKABLE void create_airway_obstruction_action(double severity);

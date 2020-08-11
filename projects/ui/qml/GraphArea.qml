@@ -28,7 +28,7 @@ GraphAreaForm {
   property ObjectModel renalFluidBalanceModel : renalFluidBalanceObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ObjectModel customModel : customObjectModel
-
+  
   property double currentTime_s
 
 
@@ -71,6 +71,8 @@ GraphAreaForm {
 
   onNewPhysiologyModel : {
     physiologyRequestModel = model;
+	energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
+	energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
   }
 
   onStart : {
@@ -79,6 +81,7 @@ GraphAreaForm {
     tenHzPlotTimer.start();
     everyFiveSecondsPlotTimer.start();
     everyTenSecondsPlotTimer.start();
+	energyTimer.start();
   }
 
   onRestart : {
@@ -87,6 +90,8 @@ GraphAreaForm {
     tenHzPlotTimer.stop();
     everyFiveSecondsPlotTimer.stop();
     everyTenSecondsPlotTimer.stop();
+	energyTimer.stop();
+
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
@@ -103,12 +108,14 @@ GraphAreaForm {
       tenHzPlotTimer.stop();
       everyFiveSecondsPlotTimer.stop();
       everyTenSecondsPlotTimer.stop();
+	  energyTimer.stop();
     } else {
       oneHzPlotTimer.start();
       fiveHzPlotTimer.start();
       tenHzPlotTimer.start();
       everyFiveSecondsPlotTimer.start();
       everyTenSecondsPlotTimer.start();
+	  energyTimer.start();
     }
   }
 

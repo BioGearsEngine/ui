@@ -258,52 +258,96 @@ ActionDrawerForm {
         let exerciseListData = { type : 'ListModel', role : 'type', elements : ['Generic', 'Cycling', 'Running', 'Strength']}
         let exerciseComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3}
         let exerciseCombo = exerciseDialog.addComboBox('Exercise Type', 'exerciseType', exerciseListData, exerciseComboProps)
+		
+		let genericListData = { type : 'ListModel', role : 'type', elements : ['Work Rate (W)', 'Intensity']}
+        let genericComboProps = {prefHeight : itemHeight, prefWidth : itemWidth1, elementRatio : 0.4, colSpan : 3, available: false, opacity: 0}
+        let genericCombo = exerciseDialog.addComboBox('Generic Type', 'generictype', genericListData, genericComboProps)
         
-        let weightPackCycleField = exerciseDialog.addTextField('Optional Pack (kg)', 'weightPack', {prefHeight : itemHeight, prefWidth : itemWidth2, editable : false, colSpan : 3})
-        //fields
+        //let spacer = exerciseDialog.addTextField('Optional Pack (kg)', 'weightPack', {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 3})
+		//spacer.opacity = 0.0
         let field_1 = exerciseDialog.addTextField('field_1', 'field_1',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
-        let field_2 = exerciseDialog.addTextField('field_2', 'field_2',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
-        let field_3 = exerciseDialog.addTextField('field_3', 'field_3',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
+		let field_3 = exerciseDialog.addTextField('field_3', 'field_3',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
+        let weightPackField = exerciseDialog.addTextField('Optional Pack (kg)', 'weightPack',  {prefHeight : itemHeight, prefWidth : itemWidth2, available : false, colSpan : 2})
 
         exerciseCombo.comboUpdate.connect(function (value) {
-          field_1.available = false
-          field_2.available = false
+          genericCombo.opacity = 0.0
+		  genericCombo.available = false
+		  field_1.available = false
           field_3.available = false
-          weightPackCycleField.available = false
+          weightPackField.available = false
           switch (value) {
             case 'Generic' : 
               //Generic
-              field_1.available = true
-              field_3.available = true
-              field_1.textField.placeholderText = "Work Rate (W)"
+			  genericCombo.opacity = 1.0
+			  genericCombo.available = true
+			  field_1.available = false
+              field_3.available = false
+			  field_1.textField.placeholderText = "Work Rate (W)"
               field_3.textField.placeholderText = "Intensity"
+			  genericCombo.comboUpdate.connect(function (value) {
+				  field_1.available = false
+				  field_3.available = false
+				  weightPackField.available = false
+				  switch (value) {
+					case 'Work Rate (W)' :
+						// Desired Work Rate
+					    field_1.available = true
+					    field_3.available = false
+						break;
+					case 'Intensity' :
+						// Intensity
+					    field_1.available = false
+					    field_3.available = true
+						break;
+					default: 
+						field_1.available = false
+					    field_3.available = false
+						break;
+			      }
+			  })
+			 			  
               break;
             case 'Cycling' :  
               //Cycling
-              //add checkbox for weight pack
-              field_1.available = true
+              genericCombo.available = false
+			  genericCombo.required = false
+			  field_1.available = true
               field_3.available = true
               field_1.textField.placeholderText = "Cadence (Hz)"
               field_3.textField.placeholderText = "PowerCycle (W)"
-              weightPackCycleField.available = true
+			  weightPackField.required = false
+              weightPackField.available = true
 
               break;
             case 'Running' :  
               //Running
-              //add checkbox for weight pack 
-              field_1.available = true
+              genericCombo.available = false
+			  genericCombo.required = false
+			  field_1.available = true
               field_3.available = true
               field_1.textField.placeholderText = "Velocity (m/s)"
-              field_3.textField.placeholderText = "Incline (%)"
-              weightPackCycleField.available = true
+              field_3.textField.placeholderText = "Incline (fraction)"
+			  weightPackField.required = false
+              weightPackField.available = true
+				
               break;
             case 'Strength' :  
               // Strength
-              field_1.available = true
+              genericCombo.available = false
+			  genericCombo.required = false
+			  field_1.available = true
               field_3.available = true
               field_1.textField.placeholderText = "Weight (Kg)"
               field_3.textField.placeholderText = "Repititions"
+				
               break;
+			default :
+				genericCombo.opacity = 0.0
+				genericCombo.available = false
+				genericCombo.required = false
+				field_1.available = false
+			    field_3.available = false
+			    weightPackField.available = false
           }
         })
         exerciseDialog.applyProps.connect(function (props) {actionModel.add_exercise_action(props)})

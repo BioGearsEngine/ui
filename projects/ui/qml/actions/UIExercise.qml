@@ -18,8 +18,24 @@ UIActionForm {
   
 
   actionType : "Exercise"
-  fullName  :  "<b>%1 %2</b><br>".arg(type).arg(actionType)
-
+  //fullName  :  "<b>%1 %2</b><br>".arg(type).arg(actionType)
+  fullName  : {
+    let tmp =  "<b>%1 %2</b><br>".arg(type).arg(actionType)
+    if (root.type == 'Generic') {
+      if (root.property_1 > 0) {
+		tmp += "<br> Desired Work Rate  %1 W".arg(root.property_1)
+	  } else {
+		tmp += "<br> Intensity  %1".arg(root.property_2)
+	  }
+    } else if ( root.type == 'Cycling') {
+      tmp += "<br> Cadence %1 Hz<br> Power %2 W<br> WeightPack %3 kg".arg(root.property_1).arg(root.property_2).arg(root.weight)
+    } else if ( root.type == 'Running') {
+      tmp += "<br> Velocity %1 m/s<br> Incline %2 <br> WeightPack %3 kg".arg(root.property_1).arg(root.property_2).arg(root.weight)
+    } else if ( root.type == 'Strength') {
+      tmp += "<br> Weight %1 kg<br> Repetitions %2".arg(root.property_1).arg(root.property_2)
+    }
+    return tmp
+  }
   shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(type)
 
   details : Component  {
@@ -48,7 +64,7 @@ UIActionForm {
         Layout.column : 0
         text : {
           if ( root.type == "Generic") {
-            return "Work Rate"
+			return "Work Rate"
           } else if ( root.type == "Cycling") {
             return "Cadence"
           } else if ( root.type == "Running" ) {
@@ -122,7 +138,7 @@ UIActionForm {
           } else if ( root.type == "Cycling") {
             return "%1 W".arg(root.property_2)
           } else if ( root.type == "Running" ) {
-            return "%1 \%".arg(root.property_2)
+            return "%1".arg(root.property_2)
           } else {
             return "%1".arg(root.property_2)
           }

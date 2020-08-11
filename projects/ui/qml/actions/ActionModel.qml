@@ -346,7 +346,10 @@ import com.biogearsengine.ui.scenario 1.0
     function add_exercise_action(props) {
       var compartment = Qt.createComponent("UIExercise.qml");
       if ( compartment.status == Component.Ready)  {
-        console.log(props.type)
+        if (props.exerciseType == "Running") {
+			props.field_3 = props.field_3 / 100.0;
+		  }
+		console.log(props.type)
         var action = compartment.createObject(actionSwitchView,{ "type" : props.exerciseType, "weight" : props.weightPack,
                                                                  "property_1" : props.field_1, "property_2" : props.field_3,  
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,

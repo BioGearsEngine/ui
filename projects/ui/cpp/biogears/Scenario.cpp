@@ -361,6 +361,7 @@ Scenario& Scenario::load_patient(QString file)
       vitals->child(2)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
       vitals->child(3)->unit_scalar(&_engine->GetCardiovascular().GetBloodVolume());
       vitals->child(4)->unit_scalar(&_engine->GetCardiovascular().GetCentralVenousPressure());
+      vitals->child(5)->unit_scalar(&_engine->GetCardiovascular().GetHeartRate());
     }
 
     auto cardiopulmonary = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());
@@ -405,8 +406,16 @@ Scenario& Scenario::load_patient(QString file)
         stomach_contents->child(4)->unit_scalar(&neutrition.GetSodium());
         stomach_contents->child(5)->unit_scalar(&neutrition.GetWater());
       }
-      energy_and_metabolism->child(4)->unit_scalar(&_engine->GetTissue().GetOxygenConsumptionRate());
-      energy_and_metabolism->child(5)->unit_scalar(&_engine->GetTissue().GetCarbonDioxideProductionRate());
+      energy_and_metabolism->child(5)->unit_scalar(&_engine->GetTissue().GetOxygenConsumptionRate());
+      energy_and_metabolism->child(6)->unit_scalar(&_engine->GetTissue().GetCarbonDioxideProductionRate());
+      energy_and_metabolism->child(7)->scalar(&_engine->GetEnergy().GetFatigueLevel());
+      energy_and_metabolism->child(8)->unit_scalar(&_engine->GetTissue().GetOxygenConsumptionRate());
+      energy_and_metabolism->child(9)->scalar(&_engine->GetTissue().GetDehydrationFraction());
+      biogears::BioGears* engine_as_bg = dynamic_cast<biogears::BioGears*>(_engine.get());
+      biogears::SEEnvironment& env = engine_as_bg->GetEnvironment();
+      biogears::SEEnvironmentalConditions& cond = env.GetConditions();
+      energy_and_metabolism->child(10)->unit_scalar(&cond.GetAmbientTemperature());
+      energy_and_metabolism->child(11)->scalar(&cond.GetRelativeHumidity()); 
     }
 
     auto renal_fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_FLUID_BALANCE, 0, QModelIndex()).internalPointer());
@@ -2650,7 +2659,7 @@ void Scenario::create_infection_action(QString location, int severity, double mi
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_exercise_action(int type, double property_1, double property_2, double weight_kg)
+void Scenario::create_exercise_action(int type, double weight_kg, double property_1, double property_2)
 {
   auto action = std::make_unique<biogears::SEExercise>();
 
@@ -2659,7 +2668,7 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
   auto running = biogears::SEExercise::SERunning{};
   auto strength = biogears::SEExercise::SEStrengthTraining{};
   switch (type) {
-  case 0:
+  case 0: // Generic Exercise
     if (property_1 > 0) {
       generic.DesiredWorkRate.SetValue(property_1, biogears::PowerUnit::W);
     } else {
@@ -2667,22 +2676,19 @@ void Scenario::create_exercise_action(int type, double property_1, double proper
     }
     action->SetGenericExercise(generic);
     break;
-  case 1:
-    if (property_1 > 0) {
-      cycling.CadenceCycle.SetValue(property_1, biogears::FrequencyUnit::Hz);
-    } else {
-      cycling.PowerCycle.SetValue(property_2, biogears::PowerUnit::W);
-    }
+  case 1: // Cycling Exercise
+    cycling.CadenceCycle.SetValue(property_1, biogears::FrequencyUnit::Hz);
+    cycling.PowerCycle.SetValue(property_2, biogears::PowerUnit::W);
     cycling.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
     action->SetCyclingExercise(cycling);
     break;
-  case 2:
+  case 2: // Running Exercise
     running.SpeedRun.SetValue(property_1, biogears::LengthPerTimeUnit::m_Per_s);
     running.InclineRun.SetValue(property_2);
     running.AddedWeight.SetValue(weight_kg, biogears::MassUnit::kg);
     action->SetRunningExercise(running);
     break;
-  case 3:
+  case 3: // Strength Training Exercise
     strength.WeightStrength.SetValue(property_1, biogears::MassUnit::kg);
     strength.RepsStrength.SetValue(property_2);
     action->SetStrengthExercise(strength);

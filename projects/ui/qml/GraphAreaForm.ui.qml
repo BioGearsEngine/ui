@@ -1,6 +1,8 @@
 import QtQuick 2.4
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
+import QtQuick.Extras 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.3
 import QtCharts 2.3
 import QtQml.Models 2.2
@@ -13,14 +15,17 @@ Page {
     property bool initialized : false
 
     property PhysiologyModel physiologyRequestModel
+	property alias energyMetabolismSeries : energyMetabolismSeries
+	
     property alias vitalsGridView : vitalsGridView
     property alias cardiopulmonaryGridView : cardiopulmonaryGridView
     property alias bloodChemistryGridView : bloodChemistryGridView
-    property alias energyMetabolismGridView : energyMetabolismGridView
+	property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
     property alias renalFluidBalanceGridView : renalFluidBalanceGridView
     property alias substanceGridView : substanceGridView
     property alias customGridView : customGridView
-
+	
+	property alias energyTimer : energyMetabolismSeries.energyTimer
     property alias tenHzPlotTimer : tenHzPlotTimer
     property alias fiveHzPlotTimer : fiveHzPlotTimer
     property alias oneHzPlotTimer : oneHzPlotTimer
@@ -311,32 +316,12 @@ Page {
                 }
             }
         }
-        Item {
+        EnergyPanel {
             id : energyMetabolismSeries
             Layout.fillWidth : true
             Layout.fillHeight : true
-
-            Rectangle {
-                id : energyMetabolismBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : energyMetabolismGridView
-                anchors.fill : parent
-                clip : true
-                width : parent.width
-                cellWidth : plots.width / 2
-                cellHeight : plots.height / 2
-                model : energyMetabolismModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : energyMetabolismGridView.parent
-                    anchors.top : energyMetabolismGridView.top
-                    anchors.right : energyMetabolismGridView.right
-                    anchors.bottom : energyMetabolismGridView.bottom
-                }
-            }
-        }
+			
+		}
         Item {
             id : renalFluidBalanceSeries
             Layout.fillWidth : true

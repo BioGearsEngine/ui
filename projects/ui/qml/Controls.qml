@@ -131,6 +131,7 @@ ControlsForm {
   ActionModel {
     id : actionSwitchModel
     actionSwitchView : root.actionSwitchView
+    
   }
   
   playback.onRestartClicked: {
