@@ -22,6 +22,7 @@ Page {
     property alias bloodChemistryGridView : bloodChemistryGridView
 	property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
     property alias renalFluidBalanceGridView : renalFluidBalanceGridView
+	property alias renalOverviewGridView : renalOverviewGridView
     property alias substanceGridView : substanceGridView
     property alias customGridView : customGridView
 	
@@ -344,6 +345,31 @@ Page {
                     anchors.top : renalFluidBalanceGridView.top
                     anchors.right : renalFluidBalanceGridView.right
                     anchors.bottom : renalFluidBalanceGridView.bottom
+                }
+            }
+        }
+		Item {
+            id : renalOverviewSeries
+            Layout.fillWidth : true
+            Layout.fillHeight : true
+
+            Rectangle {
+                id : renalOverviewBackground
+                anchors.fill : parent
+                color : "#7CB342"
+            }
+            GridView {
+                id : renalOverviewGridView
+                anchors.fill : parent
+                clip : true
+                cellWidth : plots.width / 2
+                cellHeight : plots.height / 2
+                model : renalOverviewModel
+                ScrollBar.vertical : ScrollBar {
+                    parent : renalOverviewGridView.parent
+                    anchors.top : renalOverviewGridView.top
+                    anchors.right : renalOverviewGridView.right
+                    anchors.bottom : renalOverviewGridView.bottom
                 }
             }
         }

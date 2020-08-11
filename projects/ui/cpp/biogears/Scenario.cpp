@@ -430,6 +430,12 @@ Scenario& Scenario::load_patient(QString file)
       renal_fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
     }
 
+    auto renal_overview = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_OVERVIEW, 0, QModelIndex()).internalPointer());
+    {
+
+      renal_overview->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+    }
+
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
     setup_physiology_substances(substances);
 

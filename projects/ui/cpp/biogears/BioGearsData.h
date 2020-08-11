@@ -21,6 +21,7 @@ public:
     BLOOD_CHEMISTRY,
     ENERGY_AND_METABOLISM,
     RENAL_FLUID_BALANCE,
+    RENAL_OVERVIEW,
     SUBSTANCES,
     CUSTOM,
     TOTAL_CATEGORIES
@@ -110,6 +111,7 @@ private:
   BioGearsData* _blood_chemistry = nullptr;
   BioGearsData* _energy_and_metabolism = nullptr;
   BioGearsData* _renal_fluid_balance = nullptr;
+  BioGearsData* _renal_overview = nullptr;
   BioGearsData* _substances = nullptr;
   BioGearsData* _customs = nullptr;
 

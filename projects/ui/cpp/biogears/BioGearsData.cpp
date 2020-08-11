@@ -44,6 +44,8 @@ BioGearsData* BioGearsData::category(int category)
     return _energy_and_metabolism;
   case RENAL_FLUID_BALANCE:
     return _renal_fluid_balance;
+  case RENAL_OVERVIEW:
+    return _renal_overview;
   case SUBSTANCES:
     return _substances;
   case CUSTOM:
@@ -60,6 +62,7 @@ void BioGearsData::initialize()
   _blood_chemistry = new BioGearsData("Blood Chemistry", this);
   _energy_and_metabolism = new BioGearsData("Energy and Metabolism", this);
   _renal_fluid_balance = new BioGearsData("Renal Fluid Balance", this);
+  _renal_overview = new BioGearsData("Renal Overview", this);
   _substances = new BioGearsData("Substances", this);
   _customs = new BioGearsData("Custom", this);
 
@@ -131,6 +134,8 @@ void BioGearsData::initialize()
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("IntracellularFluidVolume"));
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
 
+  _renal_overview->append(QString("Renal"), QString("Mean Urine Output"));
+
   _customs->append(QString("Plots"), QString("Respiratory PV Curve"));
   auto custom = _customs->child(0);
   {
@@ -182,6 +187,8 @@ int BioGearsData::rowCount(const QModelIndex& index) const
         return _energy_and_metabolism->_rootRequest.rows();
       } else if (_renal_fluid_balance && _renal_fluid_balance == index.internalPointer()) {
         return _renal_fluid_balance->_rootRequest.rows();
+      } else if (_renal_overview && _renal_overview == index.internalPointer()) {
+        return _renal_overview->_rootRequest.rows();
       } else if (_substances && _substances == index.internalPointer()) {
         return _substances->_rootRequest.rows();
       } else if (_customs && _customs == index.internalPointer()) {
@@ -210,6 +217,8 @@ int BioGearsData::columnCount(const QModelIndex& index) const
       return _energy_and_metabolism->_rootRequest.columns();
     } else if (_renal_fluid_balance == index.internalPointer()) {
       return _renal_fluid_balance->_rootRequest.columns();
+    } else if (_renal_overview == index.internalPointer()) {
+      return _renal_overview->_rootRequest.columns();
     } else if (_substances == index.internalPointer()) {
       return _substances->_rootRequest.columns();
     } else if (_customs == index.internalPointer()) {
@@ -251,6 +260,8 @@ QVariant BioGearsData::data(const QModelIndex& index, int role) const
       return _energy_and_metabolism->data(role);
     } else if (_renal_fluid_balance == index.internalPointer()) {
       return _renal_fluid_balance->data(role);
+    } else if (_renal_overview == index.internalPointer()) {
+      return _renal_overview->data(role);
     } else if (_substances == index.internalPointer()) {
       return _substances->data(role);
     } else if (_customs == index.internalPointer()) {
@@ -320,6 +331,9 @@ QModelIndex BioGearsData::index(int row, int column, const QModelIndex& parent) 
       case RENAL_FLUID_BALANCE:
         childItem = _renal_fluid_balance;
         break;
+      case RENAL_OVERVIEW:
+        childItem = _renal_overview;
+        break;
       case SUBSTANCES:
         childItem = _substances;
         break;
@@ -341,6 +355,8 @@ QModelIndex BioGearsData::index(int row, int column, const QModelIndex& parent) 
     return _energy_and_metabolism->createIndex(row, column, _energy_and_metabolism->child(row));
   } else if (_renal_fluid_balance && _renal_fluid_balance == parent.internalPointer()) {
     return _renal_fluid_balance->createIndex(row, column, _renal_fluid_balance->child(row));
+  } else if (_renal_overview && _renal_overview == parent.internalPointer()) {
+    return _renal_overview->createIndex(row, column, _renal_overview->child(row));
   } else if (_substances && _substances == parent.internalPointer()) {
     return _substances->createIndex(row, column, _substances->child(row));
   } else if (_customs && _customs == parent.internalPointer()) {
@@ -377,6 +393,8 @@ QModelIndex BioGearsData::index(QAbstractItemModel const* model) const
     return createIndex(ENERGY_AND_METABOLISM, 0, _energy_and_metabolism);
   } else if (_renal_fluid_balance == model) {
     return createIndex(RENAL_FLUID_BALANCE, 0, _renal_fluid_balance);
+  } else if (_renal_overview == model) {
+    return createIndex(RENAL_OVERVIEW, 0, _renal_overview);
   } else if (_substances == model) {
     return createIndex(SUBSTANCES, 0, _substances);
   } else if (_customs == model) {
