@@ -14,7 +14,7 @@ Item {
 	
 	property PhysiologyModel physiologyRenalModel
 	
-	property alias energyRenalGridView:energyRenalGridView
+	property alias renalOverviewGridView:renalOverviewGridView
 	property alias renalTimer : renalTimer
 		
 	property string uaColor: ""
@@ -29,7 +29,7 @@ Item {
 	property bool uaProtein: false
 	property bool uaNitrite: false
 	property bool uaLE: false
-	propery double urineProductionRate: 0.0
+	property double urineProductionRate: 0.0
 	property double glomerularFiltrationRate: 0.0
 	property double renalBloodFlow: 0.0
 	property double reabsorptionRate: 0.0
@@ -42,16 +42,7 @@ Item {
 	// Based on BioGearsData
 	// 0 - Mean Urine Output
 	// 1 - Urine Production Rate
-	// 2 - Urine Volume
-	// 3 - Urine Osmolality
-	// 4 - Urine Osmolarity
-	// 5 - Glomerular Filtration Rate
-	// 6 - Renal Blood Flow
-	// 7 - Total Body Fluid Volume
-	// 8 - Extracell Fluid Volume
-	// 9 - Intracell Fluid Volume
-	// 10 - Extravascular Fluid Volume
-	// Check ua and reabsorption rate
+
 	
 	Timer {
         id : renalTimer
@@ -70,8 +61,23 @@ Item {
 		id : renalBackground
 		anchors.fill : parent
 		color : Qt.rgba(0, 0.15, 0, 0.7)
-		
-		GridLayout {
+
+		GridView {
+			id : renalOverviewGridView
+			anchors.fill : parent
+			clip : true
+			cellWidth : plots.width / 2
+			cellHeight : plots.height / 2
+			model : renalOverviewModel
+			ScrollBar.vertical : ScrollBar {
+				parent : renalOverviewGridView.parent
+				anchors.top : renalOverviewGridView.top
+				anchors.right : renalOverviewGridView.right
+				anchors.bottom : renalOverviewGridView.bottom
+			}
 		}
+		
+		//GridLayout {	
+		//}
 	}
 }

@@ -74,6 +74,7 @@ GraphAreaForm {
     physiologyRequestModel = model;
 	energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
 	energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
+	renalOverviewSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW))
   }
 
   onStart : {
@@ -83,6 +84,7 @@ GraphAreaForm {
     everyFiveSecondsPlotTimer.start();
     everyTenSecondsPlotTimer.start();
 	energyTimer.start();
+	renalTimer.start();
   }
 
   onRestart : {
@@ -92,7 +94,7 @@ GraphAreaForm {
     everyFiveSecondsPlotTimer.stop();
     everyTenSecondsPlotTimer.stop();
 	energyTimer.stop();
-
+	renalTimer.stop();
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
@@ -111,6 +113,7 @@ GraphAreaForm {
       everyFiveSecondsPlotTimer.stop();
       everyTenSecondsPlotTimer.stop();
 	  energyTimer.stop();
+	  renalTimer.stop();
     } else {
       oneHzPlotTimer.start();
       fiveHzPlotTimer.start();
@@ -118,6 +121,7 @@ GraphAreaForm {
       everyFiveSecondsPlotTimer.start();
       everyTenSecondsPlotTimer.start();
 	  energyTimer.start();
+	  renalTimer.start();
     }
   }
 

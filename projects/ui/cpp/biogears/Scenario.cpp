@@ -432,8 +432,8 @@ Scenario& Scenario::load_patient(QString file)
 
     auto renal_overview = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_OVERVIEW, 0, QModelIndex()).internalPointer());
     {
-
       renal_overview->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+      renal_overview->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
     }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());

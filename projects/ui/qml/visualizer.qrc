@@ -20,6 +20,7 @@
         <file>PatientMenu.qml</file>
         <file>PatientMenuForm.ui.qml</file>
         <file alias="EnergyPanel.qml">dashboards/EnergyPanel.qml</file>
+		<file alias="RenalPanel.qml">dashboards/RenalPanel.qml</file>
         <file alias="UISubstanceWizard.qml">elements/UISubstanceWizard.qml</file>
         <file alias="UISubstanceWizardForm.ui.qml">elements/UISubstanceWizardForm.ui.qml</file>
         <file alias="UIActionSwitch.qml">elements/UIActionSwitch.qml</file>

@@ -123,7 +123,7 @@ void BioGearsData::initialize()
 
 
   _renal_fluid_balance->append(QString("Renal"), QString("Mean Urine Output"));
-  _renal_fluid_balance->append(QString("Renal"), QString("Urine ProductionRate"));
+  _renal_fluid_balance->append(QString("Renal"), QString("Urine Production Rate"));
   _renal_fluid_balance->append(QString("Renal"), QString("Urine Volume"));
   _renal_fluid_balance->append(QString("Renal"), QString("Urine Osmolality"));
   _renal_fluid_balance->append(QString("Renal"), QString("Urine Osmolarity"));
@@ -135,6 +135,7 @@ void BioGearsData::initialize()
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
 
   _renal_overview->append(QString("Renal"), QString("Mean Urine Output"));
+  _renal_overview->append(QString("Renal"), QString("Urine Production Rate"));
 
   _customs->append(QString("Plots"), QString("Respiratory PV Curve"));
   auto custom = _customs->child(0);
