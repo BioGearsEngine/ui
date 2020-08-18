@@ -136,6 +136,7 @@ void BioGearsData::initialize()
 
   _renal_overview->append(QString("Renal"), QString("Mean Urine Output"));
   _renal_overview->append(QString("Renal"), QString("Urine Production Rate"));
+  _renal_overview->append(QString("Renal"), QString("Glomerular Filtration Rate"));
 
   _customs->append(QString("Plots"), QString("Respiratory PV Curve"));
   auto custom = _customs->child(0);

@@ -1,5 +1,6 @@
 import QtQuick 2.4
 import QtQuick.Controls 2.12
+import QtQuick.Controls 1.4
 import QtQuick.Controls.Material 2.12
 import QtQuick.Extras 1.4
 import QtQuick.Controls.Styles 1.4
@@ -107,7 +108,175 @@ Item {
 				Layout.rowSpan: 4
 				Layout.preferredHeight: renalPanelGrid.prefHeight(this)
 				Layout.preferredWidth: renalPanelGrid.prefWidth(this) 
-				color : Qt.rgba(1, 0, 0, 0.5)
+				color : Qt.rgba(0.75, 0.75, 0.75, 1)
+				
+				ColumnLayout {
+					id: columnLayout
+					spacing: urinalysisConsole.height/50
+					anchors.horizontalCenter : parent.horizontalCenter
+					anchors.verticalCenter : parent.verticalCenter
+					Text {
+						id: uaText
+						text: "Urinalysis"
+						font.pointSize: 13
+						Layout.alignment: Qt.AlignHCenter
+						color: "black"
+					}
+					
+					RowLayout {
+						id: colorItems
+						spacing: urinalysisConsole.width/10
+						Layout.alignment: Qt.AlignHCenter
+						//anchors.verticalCenter: parent.verticalCenter
+						Rectangle {
+							id: uaColorBox
+							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredWidth: urinalysisConsole.width * 0.35
+							color : "yellow"
+							Text {
+								id: uaColorText
+								text: "Color"
+								anchors.horizontalCenter: parent.horizontalCenter
+								anchors.verticalCenter: parent.verticalCenter
+								color: "black"
+							}
+						}
+						Rectangle {
+							id: uaClarityBox
+							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredWidth: urinalysisConsole.width * 0.35
+							color : "beige"
+							Text {
+								id: uaClarityText
+								text: "Clarity"
+								anchors.horizontalCenter: parent.horizontalCenter
+								anchors.verticalCenter: parent.verticalCenter
+								color: "black"
+							}
+						}
+					}
+					RowLayout {
+						id: valueItems1
+						spacing: urinalysisConsole.width/20
+						Layout.alignment: Qt.AlignHCenter
+						//anchors.verticalCenter: parent.verticalCenter
+						Rectangle {
+							id: uaBilirubinBox
+							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredWidth: urinalysisConsole.width * 0.425
+							color : "white"
+							border.color: "blue"
+							border.width: 2
+							Text {
+								id: uaBilirubinText
+								text: "Bilirubin: "
+								anchors.horizontalCenter: parent.horizontalCenter
+								anchors.verticalCenter: parent.verticalCenter
+								color: "black"
+							}
+						}
+						Rectangle {
+							id: uaSpecificGBox
+							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredWidth: urinalysisConsole.width * 0.425
+							color : "white"
+							border.color: "blue"
+							border.width: 2
+							Text {
+								id: uaSpecificGravText
+								text: "Specific Gravity: "
+								anchors.horizontalCenter: parent.horizontalCenter
+								anchors.verticalCenter: parent.verticalCenter
+								color: "black"
+							}
+						}
+					}
+					RowLayout {
+						id: valueItems2
+						spacing: urinalysisConsole.width/20
+						Layout.alignment: Qt.AlignHCenter
+						//anchors.verticalCenter: parent.verticalCenter
+						Rectangle {
+							id: uapHBox
+							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredWidth: urinalysisConsole.width * 0.425
+							color : "white"
+							border.color: "blue"
+							border.width: 2
+							Text {
+								id: uapHText
+								text: "pH: "
+								anchors.horizontalCenter: parent.horizontalCenter
+								anchors.verticalCenter: parent.verticalCenter
+								color: "black"
+							}
+						}
+						Rectangle {
+							id: uaUrobilBox
+							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredWidth: urinalysisConsole.width * 0.425
+							color : "white"
+							border.color: "blue"
+							border.width: 2
+							Text {
+								id: uaUrobilText
+								text: "Urobilirubin: "
+								anchors.horizontalCenter: parent.horizontalCenter
+								anchors.verticalCenter: parent.verticalCenter
+								color: "black"
+							}
+						}
+					}
+					
+					ListModel {
+						id: uaPresentModel
+						ListElement {
+							sub: "Glucose"
+							present: "false"
+						}
+						ListElement {
+							sub: "Ketone"
+							present: "false"
+						}
+						ListElement {
+							sub: "Blood"
+							present: "false"
+						}
+						ListElement {
+							sub: "Protein"
+							present: "false"
+						}
+						ListElement {
+							sub: "Nitrite"
+							present: "false"
+						}
+						ListElement {
+							sub: "LE"
+							present: "false"
+						}
+					}
+					TableView {
+						alternatingRowColors : true
+						Layout.alignment: Qt.AlignHCenter
+						TableViewColumn {
+							role: "sub"
+							title: "Substance"
+							width: urinalysisConsole.width*0.45
+						}
+						TableViewColumn {
+							role: "present"
+							title: "Present?"
+							width: urinalysisConsole.width*0.45
+						}
+						model: uaPresentModel
+					}
+					
+					Button {
+						Layout.alignment: Qt.AlignHCenter
+						text: "Update"
+					}
+					
+				}
 			}
 			
 			Rectangle {
@@ -143,7 +312,123 @@ Item {
 				Layout.rowSpan: 4
 				Layout.preferredHeight: renalPanelGrid.prefHeight(this)
 				Layout.preferredWidth: renalPanelGrid.prefWidth(this) 
-				color : Qt.rgba(0, 0, 1, 0.5)
+				color : Qt.rgba(1, 1, 1, 0)
+				
+					Image {
+						id: nephron_image
+						source : "qrc:/icons/renalPanelNephron.png"
+						width : nephronConsole.width
+						height: nephronConsole.height
+						fillMode: Image.Stretch
+					}
+					Rectangle {
+						id: renalFlowBox
+						width: nephronConsole.width*0.5
+						height: nephronConsole.height*0.05
+						anchors.left: nephronConsole.left 
+						anchors.topMargin: nephronConsole.height*0.25
+						anchors.top: nephronConsole.top
+						color :  "white"
+						border.color: "blue"
+						border.width: 2
+						Text {
+							id: textRenalFlow
+							font.bold: true
+							text: "RBF (mL/s): "
+							anchors.verticalCenter: renalFlowBox.verticalCenter
+							anchors.horizontalCenter: renalFlowBox.horizontalCenter
+							color: "black"
+						}
+						Text {
+							id: valueRenalFlow
+							font.bold: true
+							text: root.renalBloodFlow
+							anchors.left: textRenalFlow.right
+							anchors.verticalCenter: renalFlowBox.verticalCenter
+							color: "black"
+						}
+					}
+					Rectangle {
+						id: renalUrineProdBox
+						width: nephronConsole.width*0.5
+						height: nephronConsole.height*0.05
+						anchors.right: nephronConsole.right
+						anchors.bottomMargin: nephronConsole.height*0.15
+						anchors.bottom: nephronConsole.bottom
+						color : "white"
+						border.color: "blue"
+						border.width: 2
+						Text {
+							id: textUrineProd
+							font.bold: true
+							text: "UPR (mL/s): "
+							anchors.verticalCenter: renalUrineProdBox.verticalCenter
+							anchors.horizontalCenter: renalUrineProdBox.horizontalCenter
+							color: "black"
+						}
+						Text {
+							id: valueUrineProd
+							font.bold: true
+							text: root.urineProductionRate
+							anchors.left: textUrineProd.right
+							anchors.verticalCenter: renalUrineProdBox.verticalCenter
+							color: "black"
+						}
+					}
+					Rectangle {
+						id: renalGlomFiltBox
+						width: nephronConsole.width*0.5
+						height: nephronConsole.height*0.05
+						anchors.right: nephronConsole.right
+						anchors.topMargin: nephronConsole.height*0.15
+						anchors.top: nephronConsole.top
+						color :  "white"
+						border.color: "blue"
+						border.width: 2
+						Text {
+							id: textGlomFilt
+							font.bold: true
+							text: "GFR (mL/s): "
+							anchors.verticalCenter: renalGlomFiltBox.verticalCenter
+							anchors.horizontalCenter: renalGlomFiltBox.horizontalCenter
+							color: "black"
+						}
+						Text {
+							id: valueGlomFilt
+							font.bold: true
+							text: root.glomerularFiltrationRate
+							anchors.left: textGlomFilt.right
+							anchors.verticalCenter: renalGlomFiltBox.verticalCenter
+							color: "black"
+						}
+					}
+					Rectangle {
+						id: renalReabsBox
+						width: nephronConsole.width*0.5
+						height: nephronConsole.height*0.05
+						anchors.right: nephronConsole.right
+						anchors.verticalCenter: nephronConsole.verticalCenter
+						color :  "white"
+						border.color: "blue"
+						border.width: 2
+						Text {
+							id: textReabs
+							font.bold: true
+							text: "Reabs. (mL/s): "
+							anchors.verticalCenter: renalReabsBox.verticalCenter
+							anchors.horizontalCenter: renalReabsBox.horizontalCenter
+							color: "black"
+						}
+						Text {
+							id: valueReabs
+							font.bold: true
+							text: root.reabsorptionRate
+							anchors.left: textReabs.right
+							anchors.verticalCenter: renalReabsBox.verticalCenter
+							color: "black"
+						}
+					}
+					
 			}
 		}
 	}

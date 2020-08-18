@@ -102,5 +102,6 @@
         <file alias="add.png">img/add.png</file>
         <file alias="move-down.png">img/DownArrow.png</file>
         <file alias="move-up.png">img/UpArrow.png</file>
+		<file alias="renalPanelNephron.png">img/renalPanelNephron.png</file>
     </qresource>
 </RCC>
