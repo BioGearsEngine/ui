@@ -334,17 +334,9 @@ Item {
 						Text {
 							id: textRenalFlow
 							font.bold: true
-							text: "RBF (mL/s): "
+							text: qsTr("RBF (mL/s): ") + root.renalBloodFlow
 							anchors.verticalCenter: renalFlowBox.verticalCenter
 							anchors.horizontalCenter: renalFlowBox.horizontalCenter
-							color: "black"
-						}
-						Text {
-							id: valueRenalFlow
-							font.bold: true
-							text: root.renalBloodFlow
-							anchors.left: textRenalFlow.right
-							anchors.verticalCenter: renalFlowBox.verticalCenter
 							color: "black"
 						}
 					}
@@ -361,17 +353,9 @@ Item {
 						Text {
 							id: textUrineProd
 							font.bold: true
-							text: "UPR (mL/s): "
+							text: qsTr("UPR (mL/s): ") + root.urineProductionRate
 							anchors.verticalCenter: renalUrineProdBox.verticalCenter
 							anchors.horizontalCenter: renalUrineProdBox.horizontalCenter
-							color: "black"
-						}
-						Text {
-							id: valueUrineProd
-							font.bold: true
-							text: root.urineProductionRate
-							anchors.left: textUrineProd.right
-							anchors.verticalCenter: renalUrineProdBox.verticalCenter
 							color: "black"
 						}
 					}
@@ -388,17 +372,9 @@ Item {
 						Text {
 							id: textGlomFilt
 							font.bold: true
-							text: "GFR (mL/s): "
+							text: qsTr("GFR (mL/s): ") + root.glomerularFiltrationRate
 							anchors.verticalCenter: renalGlomFiltBox.verticalCenter
 							anchors.horizontalCenter: renalGlomFiltBox.horizontalCenter
-							color: "black"
-						}
-						Text {
-							id: valueGlomFilt
-							font.bold: true
-							text: root.glomerularFiltrationRate
-							anchors.left: textGlomFilt.right
-							anchors.verticalCenter: renalGlomFiltBox.verticalCenter
 							color: "black"
 						}
 					}
@@ -414,19 +390,12 @@ Item {
 						Text {
 							id: textReabs
 							font.bold: true
-							text: "Reabs. (mL/s): "
+							text: qsTr("Reabs. (mL/s): ") + root.reabsorptionRate
 							anchors.verticalCenter: renalReabsBox.verticalCenter
 							anchors.horizontalCenter: renalReabsBox.horizontalCenter
 							color: "black"
 						}
-						Text {
-							id: valueReabs
-							font.bold: true
-							text: root.reabsorptionRate
-							anchors.left: textReabs.right
-							anchors.verticalCenter: renalReabsBox.verticalCenter
-							color: "black"
-						}
+
 					}
 					
 			}
