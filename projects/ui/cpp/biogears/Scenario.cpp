@@ -9,24 +9,33 @@
 
 #include "Models/PhysiologyRequest.h"
 
+//#include <biogears/version.h>
 #include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
 #include <biogears/cdm/patient/SEPatient.h>
 #include <biogears/cdm/properties/SEScalar.h>
 #include <biogears/cdm/properties/SEScalarInversePressure.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
+#include <biogears/cdm/properties/SEScalarTimeMassPerVolume.h>
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/properties/SEScalarVolumePerTimeMass.h>
+#include <biogears/cdm/properties/SEUnitScalar.h>
 #include <biogears/cdm/substance/SESubstanceClearance.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/substance/SESubstanceConcentration.h>
 #include <biogears/cdm/substance/SESubstanceFraction.h>
+#include <biogears/cdm/system/SESystem.h>
 #include <biogears/cdm/system/environment/SEEnvironment.h>
 #include <biogears/cdm/system/environment/SEEnvironmentalConditions.h>
 #include <biogears/cdm/system/equipment/ElectroCardioGram/SEElectroCardioGram.h>
+#include <biogears/container/Tree.tci.h>
 #include <biogears/container/concurrent_queue.tci.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
+
+#include <biogears/cdm/patient/assessments/SEComprehensiveMetabolicPanel.h>
+#include <biogears/cdm/patient/assessments/SEPatientAssessment.h>
+#include <biogears/cdm/patient/assessments/SEUrinalysis.h>
 
 #include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/cdm/scenario/SEScenarioInitialParameters.h>
@@ -340,6 +349,8 @@ Scenario& Scenario::load_patient(QString file)
   _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
   _engine = std::make_unique<biogears::BioGearsEngine>(&_logger);
+  _urinalysis = std::make_unique<biogears::SEUrinalysis>(&_logger);
+  _blood_panel = std::make_unique<biogears::SEComprehensiveMetabolicPanel>(&_logger);
   _logger.SetForward(_consoleLog);
 
   if (_engine->LoadState(path)) {
@@ -501,6 +512,17 @@ inline void Scenario::physiology_thread_step()
 
     if (_action_queue.size()) {
       _engine->ProcessAction(*_action_queue.consume());
+    }
+    if (_assessment_queue.size()) {
+      auto assessment = _assessment_queue.consume();
+      _engine->GetPatientAssessment(*assessment);
+      if (dynamic_cast<biogears::SEUrinalysis*>(assessment)) {
+        std::cout << "Urinalysis completed classname(" << assessment->classname() << ")\n";
+      } else if (dynamic_cast<biogears::SEComprehensiveMetabolicPanel*>(assessment)) {
+        std::cout << "ComprehensiveMetabolicPanel completed classname(" << assessment->classname() << ")\n";
+      } else {
+        std::cout << "Unable to determine RTTI of the assessment " << assessment->classname() << "\n";
+      }
     }
     _engine->AdvanceModelTime(0.1, biogears::TimeUnit::s);
     _engine_mutex.unlock();
@@ -1095,9 +1117,8 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
       //Only add action if needed (i.e. > 0)
       if (nextEvent.duration != 0.0) {
         action = eventTree->decode_action(nextEvent, _engine->GetSubstances());
-        buildScenario->AddAction(*action); 
+        buildScenario->AddAction(*action);
       }
-      
     }
   }
 
@@ -3015,4 +3036,17 @@ QString Scenario::get_patient_state_files(QString patient)
   return QString::fromStdString(contents);
 }
 
-} //namespace ui
+} // namespace ui
+
+namespace bio {
+void Scenario::request_urinalysis()
+{
+  _assessment_queue.as_source().insert(_urinalysis.get());
+}
+//---------------------------------------------------------------------------------
+void Scenario::request_blood_panel()
+{
+  _assessment_queue.as_source().insert(_blood_panel.get());
+}
+
+} //namespace bio

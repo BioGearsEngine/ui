@@ -48,6 +48,9 @@ ControlsForm {
         root.oxygenSaturation.value.text      = metrics.OxygenSaturation
         root.systolicBloodPressure.value.text = metrics.SystolicBloodPressure
         root.dystolicBloodPressure.value.text = metrics.DiastolicBloodPressure
+
+       request_urinalysis();
+       request_blood_panel();
     }
 
     onPatientStateChanged: {

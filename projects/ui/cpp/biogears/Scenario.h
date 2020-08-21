@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
+#include <QFileDialog>
 #include <QString>
 #include <QVariant>
 #include <QtQuick>
-#include <QFileDialog>
 
 #include <dirent.h>
 
@@ -34,10 +34,11 @@ class SEScalar;
 class SEUnitScalar;
 class SESubstance;
 class SESubstanceCompound;
+class SEUrinalysis;
+class SEComprehensiveMetabolicPanel;
 }
 
 namespace bio {
-
 
 class Scenario : public QObject, public biogears::Runnable {
 
@@ -54,8 +55,12 @@ public:
   virtual ~Scenario();
 
   using ActionQueue = biogears::ConcurrentQueue<std::unique_ptr<biogears::SEAction>>;
-  using Channel = biogears::scmp::Channel<ActionQueue>;
-  using Source = biogears::scmp::Source<ActionQueue>;
+  using ActionChannel = biogears::scmp::Channel<ActionQueue>;
+  using ActionSource = biogears::scmp::Source<ActionQueue>;
+
+  using AssessmentQueue = biogears::ConcurrentQueue<biogears::SEPatientAssessment*>;
+  using AssessmentChannel = biogears::scmp::Channel<AssessmentQueue>;
+  using AssessmentSource = biogears::scmp::Source<AssessmentQueue>;
 
   Q_INVOKABLE QString patient_name();
   Q_INVOKABLE QString environment_name();
@@ -84,7 +89,7 @@ public:
   Q_INVOKABLE void export_substance();
   Q_INVOKABLE void export_state(bool saveAs);
   Q_INVOKABLE void load_state();
-  
+
   Q_INVOKABLE double get_simulation_time();
 
   Q_INVOKABLE void restart(QString patient_file);
@@ -143,6 +148,9 @@ public: //Action Factory Interface;
   Q_INVOKABLE bool file_exists(QString file);
   Q_INVOKABLE bool file_exists(std::string file);
 
+  Q_INVOKABLE void request_urinalysis();
+  Q_INVOKABLE void request_blood_panel();
+
 signals:
   void patientMetricsChanged(PatientMetrics* metrics);
   void patientStateChanged(PatientState patientState);
@@ -167,7 +175,6 @@ protected:
   void add_physiology_substance(biogears::SESubstance* newSub);
   void setup_physiology_lists();
 
-
   void physiology_thread_main();
   void physiology_thread_step();
 
@@ -176,13 +183,17 @@ protected:
   void export_nutrition(const biogears::SENutrition* nutrition);
   void export_patient(const biogears::SEPatient* patient);
   void export_substance(const biogears::SESubstance* substance);
-  
 
 private:
   std::thread _thread;
   biogears::Logger _logger;
   std::unique_ptr<biogears::BioGearsEngine> _engine;
-  Channel _action_queue;
+  std::shared_ptr<biogears::SEUrinalysis> _urinalysis;
+  std::shared_ptr<biogears::SEComprehensiveMetabolicPanel> _blood_panel;
+
+  ActionChannel _action_queue;
+  AssessmentChannel _assessment_queue;
+
   std::vector<biogears::SESubstance*> _substance_queue;
 
   std::mutex _engine_mutex;
@@ -195,16 +206,17 @@ private:
   std::atomic<bool> _paused;
   std::atomic<bool> _throttle;
 
-  QVector<QString> _drugs_list;             //Subs with PK/PD data
-  QVector<QString> _volatile_drugs_list;    //Gaseous subs with PK/PD that can be added to ventilator
-  QVector<QString> _compounds_list;         //Compounds
-  QVector<QString> _transfusions_list;      //Blood products
-  QVector<QString> _components_list;        //Subs that can be components of compounds
-  QVector<QString> _ambient_gas_list;       //Gases that can be added to environment
-  QVector<QString> _ambient_aerosol_list;   //Aerosolized liquids that can be added to environment
+  QVector<QString> _drugs_list; //Subs with PK/PD data
+  QVector<QString> _volatile_drugs_list; //Gaseous subs with PK/PD that can be added to ventilator
+  QVector<QString> _compounds_list; //Compounds
+  QVector<QString> _transfusions_list; //Blood products
+  QVector<QString> _components_list; //Subs that can be components of compounds
+  QVector<QString> _ambient_gas_list; //Gases that can be added to environment
+  QVector<QString> _ambient_aerosol_list; //Aerosolized liquids that can be added to environment
   QVector<QString> _nutrition_list;
 
   BioGearsData* _physiology_model;
+
 
   QtLogForward* _consoleLog;
 
