@@ -13,10 +13,9 @@ Window {
   property alias actionView : actionListView
   property alias scenarioView : scenarioListView
   property alias builderModel : builderActionModel
+  property alias eventModel : eventModel
 
   property Scenario bg_scenario
-
-  property var drugData : ({"route" : "bolus", "concentration" : 0.0,"dose" : 0.0})
 
   GridLayout {
     anchors.fill : parent
@@ -102,7 +101,7 @@ Window {
         clip : true
         currentIndex : -1
         spacing : 5
-        model : builderModel //scenarioObjectModel
+        model : builderModel
         ScrollBar.vertical : ScrollBar {
           id : scenarioScroll
           policy : ScrollBar.AlwaysOn
@@ -149,7 +148,7 @@ Window {
           text : "Remove"
           onClicked : {
             if (scenarioView.currentIndex !== -1){
-              scenarioModel.remove(scenarioView.currentIndex, 1)
+              builderModel.remove(scenarioView.currentIndex, 1)
               scenarioView.currentIndex = -1
             }
           }
@@ -181,6 +180,7 @@ Window {
         width : parent.width / 3
         onClicked : {
           builderModel.setActionQueue()
+          root.close()
         }
       }
     }
@@ -194,7 +194,7 @@ Window {
     ListElement { name : "Consume Meal"; section : "Patient Actions"; property var makeAction : function (props, scenario) {return builderModel.add_consume_meal_builder(props, scenario)}; property var genProps : function() {return {"carbs_g" : 0.0, "fat_g" : 0.0, "protein_g" : 0.0, "calcium_mg" : 0.0, "sodium_mg" : 0.0, "water_mL" : 0.0} } }
     ListElement { name : "Cycling"; section : "Exercise"; property var makeAction : function (props, scenario) {return builderModel.add_exercise_builder(props, scenario)}; property var genProps : function() {return {"type" : "Cycling", "cadence" : 0.0, "power" : 0.0, "weight" : 0.0} } }
     ListElement { name : "Running"; section : "Exercise"; property var makeAction : function (props, scenario) {return builderModel.add_exercise_builder(props, scenario)}; property var genProps : function() {return {"type" : "Running", "velocity" : 0.0, "incline" : 0.0, "weight" : 0.0} } }
-    ListElement { name : "Strenth Training"; section : "Exercise"; property var makeAction : function (props, scenario) {return builderModel.add_exercise_builder(props, scenario)}; property var genProps : function() {return {"type" : "Strength", "weight" : 0.0, "repetitions" : 0.0} } }
+    ListElement { name : "Strength Training"; section : "Exercise"; property var makeAction : function (props, scenario) {return builderModel.add_exercise_builder(props, scenario)}; property var genProps : function() {return {"type" : "Strength", "weight" : 0.0, "repetitions" : 0.0} } }
     ListElement { name : "Other Exercise"; section : "Exercise"; property var makeAction : function (props, scenario) {return builderModel.add_exercise_builder(props, scenario)}; property var genProps : function() {return {"type" : "Generic", "intensity" : 0.0, "power" : 0.0} } }
     ListElement { name : "Acute Respiratory Distress"; section : "Acute Injuries"; property var makeAction : function(props, scenario) { return builderModel.add_single_range_builder("UIAcuteRespiratoryDistress.qml", props, scenario)}; property var genProps : function () {return {"spinnerValue" : 0.0} } }
     ListElement { name : "Acute Stress"; section : "Acute Injuries"; property var makeAction : function(props, scenario) {return builderModel.add_single_range_builder("UIAcuteStress.qml", props, scenario)}; property var genProps : function() { return {"spinnerValue" : 0} } }
@@ -247,6 +247,10 @@ Window {
     }
   }
 
+  EventModel {
+    id : eventModel
+  }
+
   ActionModel {
     id : builderActionModel
     actionSwitchView : scenarioView
@@ -263,7 +267,6 @@ Window {
       newAction.state = Qt.binding(function() { return actionSwitchView.currentIndex === newAction.ObjectModel.index ? 'selected' : 'unselected'} )
       newAction.selected.connect(function() {actionSwitchView.currentIndex = newAction.ObjectModel.index})
       newAction.buildSet.connect(builderActionModel.setViewIndex)
-      console.log(newAction)
     }
     function setViewIndex(action){
       //When we edit an action (in particular it's start time) we need to make sure that we percolate it up/down to the right location in the view area
@@ -271,9 +274,9 @@ Window {
         return; //this is the only action in the view
       }
       let actionIndex = action.ObjectModel.index;  //where the action currently resides in the view
-      let actionTime = action.activateData.time;   //the time the action is to be applied
+      let actionTime = action.actionStartTime_s;   //the time the action is to be applied
       let newIndex = 0;   //Where we will put the action to make sure we are ordered by time
-      while (actionTime < builderActionModel.get(newIndex + 1).activateData.time){
+      while (actionTime < builderActionModel.get(newIndex + 1).actionStartTime_s){
         ++newIndex;
         if (newIndex===builderActionModel.count-1){
           break;
@@ -284,38 +287,13 @@ Window {
     function setActionQueue(){
       //Add actions to queue.  They are in reverse chronological order, so count backwards (seems more efficient than trying to put in front and forcing array to shift elements on every addition)
       for (let i = builderActionModel.count-1; i >= 0; --i){
-        builderActionModel.actionQueue.push(builderActionModel.get(i).activateData);
+        //builderActionModel.actionQueue.push(builderActionModel.get(i).buildActionData);
+        let action = builderActionModel.get(i)
+        eventModel.add_event(action.actionType, action.actionClass, action.actionSubClass, action.buildParams, action.actionStartTime_s, action.actionDuration_s)
       }
-      //Now we need to add any deactivate actions that are present. Loop over model again.  If there is a deactivate action, use binary search to figure out where to place it
-      for (let i = 0; i < builderActionModel.count; ++i){
-        let entry = builderActionModel.get(i);
-        if (entry.deactivateData){
-          let dIndex = binarySearch(entry.deactivateData, 0, actionQueue.length); //Not worrying about possibility of < element 0 since any deactivate action would have to happen after first action
-          console.log(dIndex)
-          builderActionModel.actionQueue.splice(dIndex, 0, entry.deactivateData);   //Splice(i, j, var) adds var at index i and removes j items
-        }
-      }
-      //Test
-      for (let i = 0; i < builderActionModel.actionQueue.length; ++i){
-        console.log(actionQueue[i].name + " : " + actionQueue[i].time);
-      }
-    }
-    function binarySearch(action, left, right){
-      console.log(left, right)
-      if (right - left === 1){
-        return right    //item is > left and < right, so it will take the index of right
-      } else {
-        let compIndex = left + Math.floor((right-left)/2);
-        let compAction = builderActionModel.actionQueue[compIndex];
-        if (action.time < compAction.time){
-          return binarySearch(action, left, compIndex);
-        } else {
-          return binarySearch(action, compIndex, right);
-        }
-      }  
+      bg_scenario.create_scenario(eventModel);
     }
   }
-
 }
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

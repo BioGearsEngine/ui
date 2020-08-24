@@ -17,6 +17,7 @@ UIActionForm {
   property bool validBuildConfig : (severity !== -1 && location !=="" && mic > 0.0 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Bacterial Infection"
+  actionClass : EventModel.Infection
   fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Severity = %3 <br> MIC = %4".arg(actionType)
              .arg(location)
              .arg(severity_str)
@@ -24,7 +25,7 @@ UIActionForm {
   shortName : " [<font color=\"lightsteelblue\"> %3</font>] <b>%1</b>  <font color=\"lightsteelblue\">%2</font>".arg(actionType).arg(location).arg(severity_str)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "Infection", "time" : actionStartTime_s, "location" : location, "severity" : severity, "mic" : mic} : ({})
+  buildParams : "Location:" + location + ";Severity:" + severity + ";MinimumInhibitoryConcentration:" + mic + ",mg/L;"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_infection_action(location, severity, mic)  }
   onDeactivate: { scenario.create_infection_action(location, 0, 0 )  }

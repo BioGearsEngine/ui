@@ -1,4 +1,4 @@
-#include "Timeline.h"
+#include "EventTree.h"
 
 #include <fstream>
 #include <istream>
@@ -10,7 +10,7 @@
 namespace bio {
 
 //!
-//!  Timeline is a data structure for storing events and converting between XSD <--> QML
+//!  EventTree is a data structure for storing events and converting between XSD <--> QML
 //!  It currently only affords Scenario 1.0 from BioGears 6.0 once integrated we will
 //!  add support for Scenario 2.0 where events have Durations and Occurance Times.
 //!
@@ -21,9 +21,39 @@ namespace bio {
 //!       For debugging reasons we need to add a lot of extra if statments and asserts to avoid
 //!       poorly formated Scenario files.
 
-Timeline::Timeline(QString path, QString name)
+EventTree::EventTree(QObject* parent)
+  : QObject(parent)
 {
-  std::ifstream stream{ (path + "/" + name).toStdString() };
+}
+//-----------------------------------------------------------------------------
+EventTree::EventTree(QString path, QString name, QObject* parent)
+  : QObject(parent)
+{
+  _validity = load(path + "/" + name);
+}
+//-----------------------------------------------------------------------------
+bool EventTree::isValid() const
+{
+  return _validity;
+};
+//-----------------------------------------------------------------------------
+QString EventTree::Source() const
+{
+  return _source;
+}
+//-----------------------------------------------------------------------------
+void EventTree::Source(QString source)
+{
+  if (load(source)) {
+    _source = source;
+    emit sourceChanged(source);
+  }
+  std::cout << *this;
+}
+//-----------------------------------------------------------------------------
+bool EventTree::load(QString source)
+{
+  std::ifstream stream{ source.toStdString() };
 
   stream.clear(); // clear fail and eof bits
   stream.seekg(0, std::ios::beg); // back to the start!
@@ -37,7 +67,7 @@ Timeline::Timeline(QString path, QString name)
       for (auto& action : scenario->Action()) {
         Event ev;
 
-        ev.eType = Event::UnknownAction;
+        ev.eType = EventTypes::UnknownAction;
         ev.typeName = "Unknown Action";
         ev.comment = (action.Comment().present()) ? action.Comment().get().c_str() : "";
 
@@ -45,7 +75,7 @@ Timeline::Timeline(QString path, QString name)
         ///!                   An Event with Occurs starts at the time specified.  If duration < action.Occurs() + action.Duration();
         ///!                   TimeAdvance Events have no extra fields
 
-        ev.startTime = (action.Occurs().present()) ? action.Occurs().get() : duration;
+        ev.startTime = (action.Occurs().present()) ? action.Occurs().get() : _duration;
         ev.duration = (action.Duration().present()) ? action.Duration().get() : 0.;
 
         if (process_action(ev, action)) {
@@ -54,19 +84,34 @@ Timeline::Timeline(QString path, QString name)
           }
           _events.push_back(ev);
         } else {
+          _validity = false;
+          emit validityChanged(_validity);
+          emit loadFailure();
           std::cerr << "Error processing the " << ev.typeName.toStdString() << "\n";
         }
       }
     } catch (::xsd::cxx::tree::parsing<char> e) {
       std::cout << e << std::endl;
+      _validity = false;
+      emit validityChanged(_validity);
+      emit loadFailure();
+      return false;
     }
+    _validity = true;
+    emit validityChanged(_validity);
+    emit loadSuccess();
+  } else {
+    _validity = false;
+    emit validityChanged(_validity);
+    emit loadFailure();
   }
+  return _validity;
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::ActionData& action)
+bool EventTree::process_action(Event& ev, CDM::ActionData& action)
 {
   CDM::ActionData* actionPtr = &action;
-  ev.eType = Event::UnknownAction;
+  ev.eType = EventTypes::UnknownAction;
   ev.typeName = "Unknown Supported Action Type";
   if (auto patientActionPtr = dynamic_cast<CDM::PatientActionData*>(actionPtr)) {
     return process_action(ev, patientActionPtr);
@@ -85,51 +130,55 @@ bool Timeline::process_action(Event& ev, CDM::ActionData& action)
   }
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
+bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
 {
   using namespace biogears;
 
-  ev.eType = Event::PatientAction;
+  ev.eType = EventTypes::PatientAction;
   ev.typeName = "Patient Events\n";
 
-  if (auto aStress = dynamic_cast<const CDM::AcuteStressData*>(action)) {
-    ev.eType = Event::AcuteStress;
+  if (auto ards = dynamic_cast<const CDM::AcuteRespiratoryDistressData*>(action)) {
+    ev.eType = EventTypes::AcuteRespiratoryDistress;
+    ev.typeName = "Acute Respiratory Distress";
+    ev.description = "Applies Acute Respiratory Distress insult";
+    ev.params = "";
+
+    ev.params.append(asprintf("Severity=%f;", ards->Severity().value()).c_str());
+    return true;
+  } else if (auto aStress = dynamic_cast<const CDM::AcuteStressData*>(action)) {
+    ev.eType = EventTypes::AcuteStress;
     ev.typeName = "Acute Stress";
     ev.description = "Applies Acute Stress insult";
     ev.params = "";
 
     ev.params.append(asprintf("Severity=%f;", aStress->Severity().value()).c_str());
     return true;
-  }
-  else if (auto airwayObst = dynamic_cast<const CDM::AirwayObstructionData*>(action)) {
-    ev.eType = Event::AirwayObstructionData;
+  } else if (auto airwayObst = dynamic_cast<const CDM::AirwayObstructionData*>(action)) {
+    ev.eType = EventTypes::AirwayObstruction;
     ev.typeName = "Airway Obstruction";
     ev.description = "Applies an airway obstruction";
     ev.params = "";
 
     ev.params.append(asprintf("Severity=%f;", airwayObst->Severity().value()).c_str());
     return true;
-  }
-  else if (auto apnea = dynamic_cast<const CDM::ApneaData*>(action)) {
-    ev.eType = Event::Apnea;
+  } else if (auto apnea = dynamic_cast<const CDM::ApneaData*>(action)) {
+    ev.eType = EventTypes::Apnea;
     ev.typeName = "Apnea";
     ev.description = "Applies an apnea insult";
     ev.params = "";
 
     ev.params.append(asprintf("Severity=%f;", apnea->Severity().value()).c_str());
     return true;
-  }
-  else if (auto asthmaattack = dynamic_cast<const CDM::AsthmaAttackData*>(action)) {
-    ev.eType = Event::AsthmaAttack;
+  } else if (auto asthmaattack = dynamic_cast<const CDM::AsthmaAttackData*>(action)) {
+    ev.eType = EventTypes::AsthmaAttack;
     ev.typeName = "Asthma Attack";
     ev.description = "Applies Asthma Attack Insult";
     ev.params = "";
 
     ev.params.append(asprintf("Severity=%f;", asthmaattack->Severity().value()).c_str());
     return true;
-  }
-  else if (auto brainInjury = dynamic_cast<const CDM::BrainInjuryData*>(action)) {
-    ev.eType = Event::BrainInjury;
+  } else if (auto brainInjury = dynamic_cast<const CDM::BrainInjuryData*>(action)) {
+    ev.eType = EventTypes::BrainInjury;
     ev.typeName = "Brain Injury";
     ev.description = "Applies a brain injury insults";
     ev.params = "";
@@ -148,43 +197,39 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     ev.params.append(asprintf("Severity=%f;", brainInjury->Severity().value()).c_str());
     return true;
-  }
-  else if (auto bronchoconstr = dynamic_cast<const CDM::BronchoconstrictionData*>(action)) {
-    ev.eType = Event::Bronchoconstriction;
+  } else if (auto bronchoconstr = dynamic_cast<const CDM::BronchoconstrictionData*>(action)) {
+    ev.eType = EventTypes::Bronchoconstriction;
     ev.typeName = "Bronchoconstriction";
     ev.description = "Applies a bronchoconstriction insult";
     ev.params = "";
 
     ev.params.append(asprintf("Severity=%f;", bronchoconstr->Severity().value()).c_str());
     return true;
-  }
-  else if (auto burn = dynamic_cast<const CDM::BurnWoundData*>(action)) {
-    ev.eType = Event::BurnWound;
+  } else if (auto burn = dynamic_cast<const CDM::BurnWoundData*>(action)) {
+    ev.eType = EventTypes::BurnWound;
     ev.typeName = "Burn Wound";
     ev.description = "Applies a burn wound insult";
     ev.params = "";
 
     ev.params.append(asprintf("State=%s;", burn->TotalBodySurfaceArea().value(), burn->TotalBodySurfaceArea().unit()->c_str()).c_str());
     return true;
-  }
-  else if (auto cardiacarrest = dynamic_cast<const CDM::CardiacArrestData*>(action)) {
-    ev.eType = Event::CardiacArrest;
+  } else if (auto cardiacarrest = dynamic_cast<const CDM::CardiacArrestData*>(action)) {
+    ev.eType = EventTypes::CardiacArrest;
     ev.typeName = "Cardiac Arrest";
     ev.description = "Applies a cardiac arrest insult to the patient";
     ev.params = "";
 
     ev.params.append(asprintf("State=%s;", cardiacarrest->State() == CDM::enumOnOff::On ? "On" : "Off").c_str());
     return true;
-  }
-  else if (auto chestcomp = dynamic_cast<const CDM::ChestCompressionData*>(action)) {
-    ev.eType = Event::ChestCompression;
+  } else if (auto chestcomp = dynamic_cast<const CDM::ChestCompressionData*>(action)) {
+    ev.eType = EventTypes::ChestCompression;
     ev.typeName = "Chest Compression";
     ev.description = "Manual Chest Compression";
     ev.params = "";
-    ev.eType = Event::ChestCompression;
+    ev.eType = EventTypes::ChestCompression;
     ev.typeName = "Chest Compression Action\n";
     if (auto cprForce = dynamic_cast<const CDM::ChestCompressionForceData*>(chestcomp)) {
-      ev.eType = Event::ChestCompressionForce;
+      ev.eType = EventTypes::ChestCompressionForce;
       ev.typeName = "Chest Compression Force";
       ev.description = "Chest Compression Force?";
       ev.params = "";
@@ -192,7 +237,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
       ev.params.append(asprintf("Force=%f,%s;", cprForce->Force().value(), cprForce->Force().unit()->c_str()).c_str());
       return true;
     } else if (auto cprScale = dynamic_cast<const CDM::ChestCompressionForceScaleData*>(chestcomp)) {
-      ev.eType = Event::ChestCompressionForceScale;
+      ev.eType = EventTypes::ChestCompressionForceScale;
       ev.typeName = "Chest Compression Force Scale";
       ev.description = "Chest Compression Force Scale?";
       ev.params = "";
@@ -203,7 +248,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     return false;
   } else if (auto chestOccl = dynamic_cast<const CDM::ChestOcclusiveDressingData*>(action)) {
-    ev.eType = Event::ChestOcclusiveDressing;
+    ev.eType = EventTypes::ChestOcclusiveDressing;
     ev.typeName = "Chest Occlusive Dressing";
     ev.description = "Applies a occlusive dressing to the chest";
     ev.params = "";
@@ -213,7 +258,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return true;
   } else if (auto conResp = dynamic_cast<const CDM::ConsciousRespirationData*>(action)) {
-    ev.eType = Event::ConsciousRespiration;
+    ev.eType = EventTypes::ConsciousRespiration;
     ev.typeName = "Conscious Respiration";
     ev.description = "Manually Respirate the patient";
     ev.params = "";
@@ -237,7 +282,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return true;
   } else if (auto consume = dynamic_cast<const CDM::ConsumeNutrientsData*>(action)) {
-    ev.eType = Event::ConsumeNutrients;
+    ev.eType = EventTypes::ConsumeNutrients;
     ev.typeName = "Consume Nutrients";
     ev.description = "Force the patient to consume nutrients";
     ev.params = "";
@@ -274,14 +319,14 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     return true;
 
   } else if (auto exercise = dynamic_cast<const CDM::ExerciseData*>(action)) {
-    ev.eType = Event::Exercise;
+    ev.eType = EventTypes::Exercise;
     ev.typeName = "Exercise";
     ev.description = "Force the patient in to an exercise state";
     ev.params = "";
 
     if (exercise->GenericExercise().present()) {
       auto& generic = exercise->GenericExercise().get();
-      ev.eType = Event::GeneralExercise;
+      ev.eSubType = EventTypes::GenericExercise;
       ev.typeName = "General Exercise";
       ev.description = "Generic Exercise Action";
 
@@ -294,7 +339,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     if (exercise->CyclingExercise().present()) {
       auto& cycling = exercise->CyclingExercise().get();
-      ev.eType = Event::CyclingExercise;
+      ev.eSubType = EventTypes::CyclingExercise;
       ev.typeName = "Cycling Exercise";
       ev.description = "Cycling Exercise Action";
 
@@ -306,7 +351,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     if (exercise->RunningExercise().present()) {
       auto& running = exercise->RunningExercise().get();
-      ev.eType = Event::RunningExercise;
+      ev.eSubType = EventTypes::RunningExercise;
       ev.typeName = "Running Exercise";
       ev.description = "Running Exercise Action";
 
@@ -318,7 +363,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     if (exercise->StrengthExercise().present()) {
       auto& strength = exercise->StrengthExercise().get();
-      ev.eType = Event::StengthExercise;
+      ev.eSubType = EventTypes::StengthExercise;
       ev.typeName = "Strength Exercise";
       ev.description = "Strength Exercise Action";
 
@@ -328,7 +373,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return true;
   } else if (auto hem = dynamic_cast<const CDM::HemorrhageData*>(action)) {
-    ev.eType = Event::Hemorrhage;
+    ev.eType = EventTypes::Hemorrhage;
     ev.typeName = "Hemorrhage";
     ev.description = "Applies a hemorrhage insult to the patient for a given compartment";
     ev.params = "";
@@ -337,7 +382,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     ev.params.append(asprintf("InitialRate=%f,%s;", hem->InitialRate().value(), hem->InitialRate().unit()->c_str()).c_str());
     return true;
   } else if (auto infect = dynamic_cast<const CDM::InfectionData*>(action)) {
-    ev.eType = Event::Infection;
+    ev.eType = EventTypes::Infection;
     ev.typeName = "Infection";
     ev.description = "Applies an bacterial infection to the patient";
     ev.params = "";
@@ -361,7 +406,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return true;
   } else if (auto intubation = dynamic_cast<const CDM::IntubationData*>(action)) {
-    ev.eType = Event::Intubation;
+    ev.eType = EventTypes::Intubation;
     ev.typeName = "Intubation";
     ev.description = "Intubate the Patient";
     ev.params = "";
@@ -385,7 +430,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     return true;
   } else if (auto mvData = dynamic_cast<const CDM::MechanicalVentilationData*>(action)) {
-    ev.eType = Event::MechanicalVentilation;
+    ev.eType = EventTypes::MechanicalVentilation;
     ev.typeName = "Mechanical Ventilation";
     ev.description = "Mechanical Ventilation the patient";
     ev.params = "";
@@ -400,9 +445,8 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     ev.params.append(asprintf("Pressure=%f,%s;", mvData->Pressure()->value(), mvData->Pressure()->unit()->c_str()).c_str());
 
     return true;
-  }
-  else if (auto needleDecomp = dynamic_cast<const CDM::NeedleDecompressionData*>(action)) {
-    ev.eType = Event::NeedleDecompression;
+  } else if (auto needleDecomp = dynamic_cast<const CDM::NeedleDecompressionData*>(action)) {
+    ev.eType = EventTypes::NeedleDecompression;
     ev.typeName = "Needle Decompression";
     ev.description = "Applies a needle decompression";
     ev.params = "";
@@ -411,7 +455,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     ev.params.append(asprintf("State=%s;", needleDecomp->State() == CDM::enumOnOff::On ? "On" : "Off").c_str());
     return true;
   } else if (auto pain = dynamic_cast<const CDM::PainStimulusData*>(action)) {
-    ev.eType = Event::PainStimulus;
+    ev.eType = EventTypes::PainStimulus;
     ev.typeName = "Pain Stimulus";
     ev.description = "Applies pain stimulus to a compartment";
     ev.params = "";
@@ -424,7 +468,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return true;
   } else if (auto pericardialEff = dynamic_cast<const CDM::PericardialEffusionData*>(action)) {
-    ev.eType = Event::PericardialEffusion;
+    ev.eType = EventTypes::PericardialEffusion;
     ev.typeName = "Pericardial Effusion";
     ev.description = "Pericardial Effusion Insult";
     ev.params = "";
@@ -432,13 +476,13 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     ev.params.append(asprintf("EffusionRate=%f,%s", pericardialEff->EffusionRate().value(), pericardialEff->EffusionRate().unit()->c_str()).c_str());
     return true;
   } else if (auto admin = dynamic_cast<const CDM::SubstanceAdministrationData*>(action)) {
-    ev.eType = Event::SubstanceAdministration;
+    ev.eType = EventTypes::SubstanceAdministration;
     ev.typeName = "Substance Administration";
     ev.description = "Apply a substance to the patient";
     ev.params = "";
 
     if (auto bolusData = dynamic_cast<const CDM::SubstanceBolusData*>(admin)) {
-      ev.eType = Event::SubstanceBolus;
+      ev.eType = EventTypes::SubstanceBolus;
       ev.typeName = "Substance Administration by Bolus";
       ev.description = "Apply a substance bolus to the patient";
       ev.params = "";
@@ -464,7 +508,8 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
       return true;
     }
     if (auto oralData = dynamic_cast<const CDM::SubstanceOralDoseData*>(admin)) {
-      ev.eType = Event::SubstanceOralDose;
+      ev.eType = EventTypes::SubstanceAdministration;
+      ev.eSubType = EventTypes::SubstanceOralDose;
       ev.typeName = "Substance Administration by Oral Dose";
       ev.description = "Apply an oral dose of a substance to the patient";
       ev.params = "";
@@ -475,7 +520,8 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
       return true;
     }
     if (auto subInfuzData = dynamic_cast<const CDM::SubstanceInfusionData*>(admin)) {
-      ev.eType = Event::SubstanceInfusion;
+      ev.eType = EventTypes::SubstanceAdministration;
+      ev.eSubType = EventTypes::SubstanceInfusion;
       ev.typeName = "Substance Administration by Infusion";
       ev.description = "Apply a substance infusion to the patient";
       ev.params = "";
@@ -486,7 +532,8 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
       return true;
     }
     if (auto subCInfuzData = dynamic_cast<const CDM::SubstanceCompoundInfusionData*>(admin)) {
-      ev.eType = Event::SubstanceCompoundInfusion;
+      ev.eType = EventTypes::SubstanceAdministration;
+      ev.eSubType = EventTypes::SubstanceCompoundInfusion;
       ev.typeName = "Substance Compound Administration by Infusion";
       ev.description = "Apply a substance compound infusion to the patient";
       ev.params = "";
@@ -499,7 +546,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return false;
   } else if (auto pneumo = dynamic_cast<const CDM::TensionPneumothoraxData*>(action)) {
-    ev.eType = Event::TensionPneumothorax;
+    ev.eType = EventTypes::TensionPneumothorax;
     ev.typeName = "Tension Pneumothorax";
     ev.description = "Application of a Tension Pneumothorax insult";
     ev.params = "";
@@ -510,7 +557,7 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
 
     return true;
   } else if (auto tournData = dynamic_cast<const CDM::TourniquetData*>(action)) {
-    ev.eType = Event::Tourniquet;
+    ev.eType = EventTypes::Tourniquet;
     ev.typeName = "Tourniquet";
     ev.description = "Tourniquet application to a compartment";
     ev.params = "";
@@ -530,14 +577,13 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     }
     return true;
   } else if (auto urinate = dynamic_cast<const CDM::UrinateData*>(action)) {
-    ev.eType = Event::Urinate;
+    ev.eType = EventTypes::Urinate;
     ev.typeName = "Force Urination";
     ev.description = "Causes patient to to empty bladder";
     ev.params = "";
     return true;
-  }
-  else if (auto orData = dynamic_cast<const CDM::OverrideData*>(action)) {
-    ev.eType = Event::Override;
+  } else if (auto orData = dynamic_cast<const CDM::OverrideData*>(action)) {
+    ev.eType = EventTypes::Override;
     ev.typeName = "Value Override";
     ev.description = "Configure the current value override values";
     ev.params = "";
@@ -545,14 +591,14 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
     //TODO: Implement OverrideData
     return true;
   } else if (auto assessment = dynamic_cast<const CDM::PatientAssessmentRequestData*>(action)) {
-    ev.eType = Event::PatientAssessmentRequest;
+    ev.eType = EventTypes::PatientAssessmentRequest;
     ev.typeName = "Patient Assessment";
     ev.description = "Perform a Patient Assessment";
     ev.params = "";
 
     switch (assessment->Type()) {
     case CDM::enumPatientAssessment::CompleteBloodCount:
-      ev.params.append(asprintf("Type=CompleteBloodCount").c_str());   
+      ev.params.append(asprintf("Type=CompleteBloodCount").c_str());
       break;
     case CDM::enumPatientAssessment::ComprehensiveMetabolicPanel:
       ev.params.append(asprintf("Type=ComprehensiveMetabolicPanel").c_str());
@@ -567,20 +613,20 @@ bool Timeline::process_action(Event& ev, CDM::PatientActionData* action)
       ev.params.append(asprintf("Type=Urinalysis").c_str());
       break;
     }
-    
+
     //TODO: Implement OverrideData
-    return true; 
+    return true;
   }
   return false;
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::EnvironmentActionData* action)
+bool EventTree::process_action(Event& ev, CDM::EnvironmentActionData* action)
 {
   using namespace biogears;
-  ev.eType = Event::EnvironmentAction;
+  ev.eType = EventTypes::EnvironmentAction;
   ev.typeName = "Environment Action";
   if (auto change = dynamic_cast<const CDM::EnvironmentChangeData*>(action)) {
-    ev.eType = Event::EnvironmentChange;
+    ev.eType = EventTypes::EnvironmentChange;
     ev.typeName = "EnvironmentChange";
     ev.description = "Modify the current environment";
     ev.params = "";
@@ -639,9 +685,8 @@ bool Timeline::process_action(Event& ev, CDM::EnvironmentActionData* action)
       }
     }
     return true;
-  }
-  else if (auto thermal = dynamic_cast<const CDM::ThermalApplicationData*>(action)) {
-    ev.eType = Event::ThermalApplication;
+  } else if (auto thermal = dynamic_cast<const CDM::ThermalApplicationData*>(action)) {
+    ev.eType = EventTypes::ThermalApplication;
     ev.typeName = "Thermal Application";
     ev.description = "Apply active heating/cooling";
     ev.params = "";
@@ -691,14 +736,14 @@ bool Timeline::process_action(Event& ev, CDM::EnvironmentActionData* action)
   return false;
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* action)
+bool EventTree::process_action(Event& ev, CDM::AnesthesiaMachineActionData* action)
 {
   using namespace biogears;
 
-  ev.eType = Event::AnesthesiaMachineAction;
+  ev.eType = EventTypes::AnesthesiaMachineAction;
   ev.typeName = "Anesthesia Machine Action";
   if (auto anConfig = dynamic_cast<CDM::AnesthesiaMachineConfigurationData*>(action)) {
-    ev.eType = Event::AnesthesiaMachineConfiguration;
+    ev.eType = EventTypes::AnesthesiaMachineConfiguration;
     ev.typeName = "Anesthesia Machine Configuration";
     ev.description = "Change the configuration of a Anesthesia Machine";
     ev.params = "";
@@ -815,86 +860,74 @@ bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* actio
       }
     }
     return true;
-  }
-  else if (auto anO2WallLoss = dynamic_cast<CDM::OxygenWallPortPressureLossData*>(action)) {
-    ev.eType = Event::OxygenWallPortPressureLoss;
+  } else if (auto anO2WallLoss = dynamic_cast<CDM::OxygenWallPortPressureLossData*>(action)) {
+    ev.eType = EventTypes::OxygenWallPortPressureLoss;
     ev.typeName = "Oxygen Wall Port Pressure Loss";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and the wall connection";
     ev.params = asprintf("State=%s;", (anO2WallLoss->State() == CDM::enumOnOff::On ? "On" : "Off")).c_str();
     return true;
-  }
-  else if (auto anO2TankLoss = dynamic_cast<CDM::OxygenTankPressureLossData*>(action)) {
-    ev.eType = Event::OxygenTankPressureLoss;
+  } else if (auto anO2TankLoss = dynamic_cast<CDM::OxygenTankPressureLossData*>(action)) {
+    ev.eType = EventTypes::OxygenTankPressureLoss;
     ev.typeName = "Oxygen tank pressure loss";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and the oxygen tank";
     ev.params = asprintf("State=%s;", (anO2TankLoss->State() == CDM::enumOnOff::On ? "On" : "Off")).c_str();
     return true;
-  }
-  else if (auto anExLeak = dynamic_cast<CDM::ExpiratoryValveLeakData*>(action)) {
-    ev.eType = Event::ExpiratoryValveLeak;
+  } else if (auto anExLeak = dynamic_cast<CDM::ExpiratoryValveLeakData*>(action)) {
+    ev.eType = EventTypes::ExpiratoryValveLeak;
     ev.typeName = "Expiratory valve leak";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and the expiratory valve";
     ev.params = asprintf("Severity=%f,%s;", anExLeak->Severity().value(), anExLeak->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anExObs = dynamic_cast<CDM::ExpiratoryValveObstructionData*>(action)) {
-    ev.eType = Event::ExpiratoryValveObstruction;
+  } else if (auto anExObs = dynamic_cast<CDM::ExpiratoryValveObstructionData*>(action)) {
+    ev.eType = EventTypes::ExpiratoryValveObstruction;
     ev.typeName = "Expiratory valve obstruction";
     ev.description = "Modify the value of any obstruction in the expiratory valve";
     ev.params = asprintf("Severity=%f,%s;", anExObs->Severity().value(), anExObs->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anInLeak = dynamic_cast<CDM::InspiratoryValveLeakData*>(action)) {
-    ev.eType = Event::InspiratoryValveLeak;
+  } else if (auto anInLeak = dynamic_cast<CDM::InspiratoryValveLeakData*>(action)) {
+    ev.eType = EventTypes::InspiratoryValveLeak;
     ev.typeName = "Inspiratory valve pressure loss";
     ev.description = "Modify the value of any pressure loss between the anesthesia machine and inspiratory valve";
     ev.params = asprintf("Severity=%f,%s;", anInLeak->Severity().value(), anInLeak->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anInObs = dynamic_cast<CDM::InspiratoryValveObstructionData*>(action)) {
-    ev.eType = Event::InspiratoryValveObstruction;
+  } else if (auto anInObs = dynamic_cast<CDM::InspiratoryValveObstructionData*>(action)) {
+    ev.eType = EventTypes::InspiratoryValveObstruction;
     ev.typeName = "Inspiratory valve obstruction";
     ev.description = "Modify the value of any obstruction in the inspiratory valve";
     ev.params = asprintf("Severity=%f,%s;", anInObs->Severity().value(), anInObs->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anMskLeak = dynamic_cast<CDM::MaskLeakData*>(action)) {
-    ev.eType = Event::MaskLeak;
+  } else if (auto anMskLeak = dynamic_cast<CDM::MaskLeakData*>(action)) {
+    ev.eType = EventTypes::MaskLeak;
     ev.typeName = "Leak in the Mask Seal";
     ev.description = "Modify the severity and occurence of a mask seal ";
     ev.params = asprintf("Severity=%f,%s;", anMskLeak->Severity().value(), anMskLeak->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anSodaFail = dynamic_cast<CDM::SodaLimeFailureData*>(action)) {
-    ev.eType = Event::SodaLimeFailure;
+  } else if (auto anSodaFail = dynamic_cast<CDM::SodaLimeFailureData*>(action)) {
+    ev.eType = EventTypes::SodaLimeFailure;
     ev.typeName = "A failure in the Soda Lime";
     ev.description = "Modifies the delivery of f NaOH & CaO chemicals";
     ev.params = asprintf("Severity=%f,%s;", anSodaFail->Severity().value(), anSodaFail->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anTubLeak = dynamic_cast<CDM::TubeCuffLeakData*>(action)) {
-    ev.eType = Event::TubeCuffLeak;
+  } else if (auto anTubLeak = dynamic_cast<CDM::TubeCuffLeakData*>(action)) {
+    ev.eType = EventTypes::TubeCuffLeak;
     ev.typeName = "Leak in the tube cuff";
     ev.description = "Modify the occurence and severity of the tub cuff";
     ev.params = asprintf("Severity=%f,%s;", anTubLeak->Severity().value(), anTubLeak->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anVapFail = dynamic_cast<CDM::VaporizerFailureData*>(action)) {
-    ev.eType = Event::VaporizerFailure;
+  } else if (auto anVapFail = dynamic_cast<CDM::VaporizerFailureData*>(action)) {
+    ev.eType = EventTypes::VaporizerFailure;
     ev.typeName = "A failure of the vaporizer";
     ev.description = "Modifies the delivery of f NaOH & CaO chemicals";
     ev.params = asprintf("Severity=%f,%s;", anVapFail->Severity().value(), anVapFail->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anVentLoss = dynamic_cast<CDM::VentilatorPressureLossData*>(action)) {
-    ev.eType = Event::VentilatorPressureLoss;
+  } else if (auto anVentLoss = dynamic_cast<CDM::VentilatorPressureLossData*>(action)) {
+    ev.eType = EventTypes::VentilatorPressureLoss;
     ev.typeName = "Loss of ventilator pressure";
     ev.description = "Modify the severity of a loss in ventilator pressure";
     ev.params = asprintf("Severity=%f,%s;", anVentLoss->Severity().value(), anVentLoss->Severity().unit()->c_str()).c_str();
     return true;
-  }
-  else if (auto anYDisc = dynamic_cast<CDM::YPieceDisconnectData*>(action)) {
-    ev.eType = Event::YPieceDisconnect;
+  } else if (auto anYDisc = dynamic_cast<CDM::YPieceDisconnectData*>(action)) {
+    ev.eType = EventTypes::YPieceDisconnect;
     ev.typeName = "Disconnection of the Y piece";
     ev.description = "Modifies the occurence of a Y piece disconnection";
     ev.params = asprintf("Severity=%f,%s;", anYDisc->Severity().value(), anYDisc->Severity().unit()->c_str()).c_str();
@@ -904,13 +937,13 @@ bool Timeline::process_action(Event& ev, CDM::AnesthesiaMachineActionData* actio
   return false;
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::InhalerActionData* action)
+bool EventTree::process_action(Event& ev, CDM::InhalerActionData* action)
 {
   using namespace biogears;
-  ev.eType = Event::InhalerAction;
+  ev.eType = EventTypes::InhalerAction;
   ev.typeName = "Inhaler Action";
   if (auto inhalerConfig = dynamic_cast<const CDM::InhalerConfigurationData*>(action)) {
-    ev.eType = Event::InhalerConfiguration;
+    ev.eType = EventTypes::InhalerConfiguration;
     ev.typeName = "Inhaler Configuration";
     ev.description = "Change the configuration of the Inhaler Machine";
     if (inhalerConfig->ConfigurationFile().present()) {
@@ -943,11 +976,11 @@ bool Timeline::process_action(Event& ev, CDM::InhalerActionData* action)
   ;
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::AdvanceTimeData* action)
+bool EventTree::process_action(Event& ev, CDM::AdvanceTimeData* action)
 {
   using namespace biogears;
 
-  ev.eType = Event::AdvanceTime;
+  ev.eType = EventTypes::AdvanceTime;
   ev.typeName = "Time Advancement";
   ev.description = "Advances the time of the simulation by the given duration";
   ev.params = asprintf("Time=%f,%s", action->Time().value(), action->Time().unit()->c_str()).c_str();
@@ -955,11 +988,11 @@ bool Timeline::process_action(Event& ev, CDM::AdvanceTimeData* action)
   return true;
 }
 //-----------------------------------------------------------------------------
-bool Timeline::process_action(Event& ev, CDM::SerializeStateData* action)
+bool EventTree::process_action(Event& ev, CDM::SerializeStateData* action)
 {
   using namespace biogears;
-  
-  ev.eType = Event::SerializeState;
+
+  ev.eType = EventTypes::SerializeState;
   ev.typeName = asprintf("%s %s", (action->Type() == CDM::enumSerializationType::Load) ? "Load" : "Save", "State").c_str();
   ev.description = "Serializes the current simulation state to disk";
 
@@ -971,7 +1004,647 @@ bool Timeline::process_action(Event& ev, CDM::SerializeStateData* action)
   return true;
 }
 //-----------------------------------------------------------------------------
-void Timeline::add_event(Event ev)
+void EventTree::add_event(Event ev)
 {
+  _events.push_back(ev);
+}
+//-----------------------------------------------------------------------------
+void EventTree::add_event(QString name, int type, int subType, QString params, double startTime_s, double duration_s)
+{
+  Event ev;
+  ev.typeName = name;
+  ev.eType = (EventTypes)type;
+  ev.eSubType = (EventTypes)subType;
+  ev.params = params;
+  ev.startTime = startTime_s;
+  ev.duration = duration_s;
+  add_event(ev);
+  //Handle "off" action
+  if (duration_s > 0.0) {
+    Event offEvent;
+    QString offParams = params;
+    int startLoc;
+    int endLoc;
+    //Most actions are severity based -- set severity to 0 to turn off
+    if (offParams.contains("Severity")) {
+      startLoc = params.indexOf("Severity");
+      endLoc = params.indexOf(";", startLoc);
+      offParams.replace(startLoc, endLoc - startLoc, "Severity:0");
+    } else if (offParams.contains("Rate")) {
+      //Actions like hemorrhage and drug infusion are deactivated by setting a rate to 0
+      startLoc = params.indexOf("Rate");
+      endLoc = params.indexOf(",", startLoc); //Replace up to unit (demarcated by , )
+      offParams.replace(startLoc, endLoc - startLoc, "Rate:0");
+    } else if (name.contains("Exercise")) {
+      //Exercise is the oddball and there are about a zillion ways to deactivate it depending on the type
+      if (offParams.contains("Intensity")) {
+        //Generic-Intensity based
+        startLoc = params.indexOf("Intensity");
+        endLoc = params.indexOf(";", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Intensity:0");
+      } else if (offParams.contains("DesiredWorkRate")) {
+        //Generic-Work rate based
+        startLoc = params.indexOf("DesiredWorkRate");
+        endLoc = params.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "DesiredWorkRate:0");
+      } else if (offParams.contains("Cadence")) {
+        //Cycling
+        startLoc = params.indexOf("Cadence");
+        endLoc = params.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Cadence:0");
+        startLoc = params.indexOf("Power");
+        endLoc = params.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Power:0");
+      } else if (offParams.contains("Speed")) {
+        //Running
+        startLoc = params.indexOf("Speed");
+        endLoc = params.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Speed:0");
+      }
+    } else if (params.contains("On")) {
+      //Action with on/off (Cardiac Arrest, Anesthesia Machine Connection)
+      startLoc = params.indexOf("On");
+      endLoc = params.indexOf(";", startLoc);
+      QString replaced = offParams.replace(startLoc, endLoc - startLoc, "Off");
+    } 
+    offEvent.typeName = name;
+    offEvent.eType = type;
+    offEvent.eSubType = subType;
+    offEvent.params = offParams;
+    offEvent.startTime = startTime_s + duration_s;
+    offEvent.duration = 0.0;
+    _events.push_back(offEvent);
+  }
+}
+//-----------------------------------------------------------------------------
+void EventTree::sort_events()
+{
+  //Implementing a fairly naive insertion sort.  The event list comring from scenario builder is mostly ordered (only "deactivate" actions
+  // are potentially out of order), so I don't think we'll hit the worst case number of comparisons.  Plus the list probably isn't going to be too long.
+  for (unsigned int i = 1; i < _events.size(); ++i) {
+    Event tempEvent = _events[i];
+    int compIndex = i - 1;
+    while (compIndex > -1 && _events[i].startTime < _events[compIndex].startTime) {
+      _events[compIndex + 1] = _events[compIndex];
+      --compIndex;
+    }
+    _events[compIndex + 1] = tempEvent;
+  }
+}
+//-----------------------------------------------------------------------------
+biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceManager& subMgr)
+{
+  biogears::SEAction* action = nullptr;
+  
+  switch (ev.eType) {
+  case EventTypes::AdvanceTime:
+    action = decode_advance_time(ev);
+    break;
+  case EventTypes::AcuteRespiratoryDistress:
+    action = decode_acute_respiratory_distress(ev);
+    break;
+  case EventTypes::AcuteStress:
+    action = decode_acute_stress(ev);
+    break;
+  case EventTypes::AirwayObstruction:
+    action = decode_airway_obstruction(ev);
+    break;
+  case EventTypes::AnesthesiaMachineConfiguration:
+    action = decode_anesthesia_machine_configuration(ev, subMgr);
+    break;
+  case EventTypes::Apnea:
+    action = decode_apnea(ev);
+    break;
+  case EventTypes::AsthmaAttack:
+    action = decode_asthma_attack(ev);
+    break;
+  case EventTypes::Bronchoconstriction:
+    action = decode_bronchoconstriction(ev);
+    break;
+  case EventTypes::BurnWound:
+    action = decode_burn_wound(ev);
+    break;
+  case EventTypes::CardiacArrest:
+    action = decode_cardiac_arrest(ev);
+    break;
+  case EventTypes::ConsumeNutrients:
+    action = decode_consume_nutrients(ev);
+    break;
+  case EventTypes::SubstanceAdministration:
+    action = decode_substance_administration(ev, subMgr);
+    break;
+  case EventTypes::Exercise:
+    action = decode_exercise(ev);
+    break;
+  case EventTypes::Hemorrhage:
+    action = decode_hemorrhage(ev);
+    break;
+  case EventTypes::Infection:
+    action = decode_infection(ev);
+    break;
+  case EventTypes::NeedleDecompression:
+    action = decode_needle_decompression(ev);
+    break;
+  case EventTypes::PainStimulus:
+    action = decode_pain_stimulus(ev);
+    break;
+  case EventTypes::TensionPneumothorax:
+    action = decode_tension_pneumothorax(ev);
+    break;
+  case EventTypes::Tourniquet:
+    action = decode_tourniquet(ev);
+    break;
+  case EventTypes::BrainInjury:
+    action = decode_traumatic_brain_injury(ev);
+    break;
+  }
+
+
+  return action;
+}
+//-----------------------------------------------------------------------------
+//Decode actions used to write scenario data from qml to SEAction types for write to Scenario xml file
+//-----------------------------------------------------------------------------
+biogears::SEAdvanceTime* EventTree::decode_advance_time(Event& ev)
+{
+  biogears::SEAdvanceTime* action = new biogears::SEAdvanceTime();
+  //Hanlding AdvanceTime differently from others:  All we need is length of time, so just use duration_s field of Event struct
+  action->GetTime().SetValue(ev.duration, biogears::TimeUnit::s);
+  return action;
+}
+biogears::SEAcuteRespiratoryDistress* EventTree::decode_acute_respiratory_distress(Event& ev)
+{
+  biogears::SEAcuteRespiratoryDistress* action = new biogears::SEAcuteRespiratoryDistress();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetSeverity().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEAcuteStress* EventTree::decode_acute_stress(Event& ev)
+{
+  biogears::SEAcuteStress* action = new biogears::SEAcuteStress();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetSeverity().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEAirwayObstruction* EventTree::decode_airway_obstruction(Event& ev)
+{
+  biogears::SEAirwayObstruction* action = new biogears::SEAirwayObstruction();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetSeverity().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEAnesthesiaMachineConfiguration* EventTree::decode_anesthesia_machine_configuration(Event& ev, biogears::SESubstanceManager& subMgr)
+{
+  biogears::SEAnesthesiaMachineConfiguration* action = new biogears::SEAnesthesiaMachineConfiguration(subMgr);
+  auto& config = action->GetConfiguration();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  std::string value;
+  //For substance fractions, we need to make sure that all data is present before we set up the config.  Store values while looping over inputs and then process later
+  std::string leftSubstance = "";
+  std::string rightSubstance = "";
+  double leftSubFraction = 0.0;
+  double rightSubFraction = 0.0;
+
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');   //e.g. separates name from input; eg: "Ventilator:10,cmH2O" --> ["Ventilator", "10,cmH2O"]
+    if (nameSplit.size() == 1) {
+      //Nothing after ":", so empty and do not parse
+      continue;
+    }
+    if (nameSplit[0] == "Connection") {
+      value = nameSplit[1];
+      int connection = value == "Off" ? 0 : value == "Mask" ? 1 : 2;
+      config.SetConnection((CDM::enumAnesthesiaMachineConnection::value)connection);
+    } else if (nameSplit[0] == "PrimaryGas") {
+      value = nameSplit[1];
+      int gas = value == "Air" ? 0 : 1;
+      config.SetPrimaryGas((CDM::enumAnesthesiaMachinePrimaryGas::value)gas);
+    } else if (nameSplit[0] == "OxygenSource") {
+      value = nameSplit[1];
+      int source = value == " Wall" ? 0 : value == "OxygenBottleOne" ? 1 : 2;
+      config.SetOxygenSource((CDM::enumAnesthesiaMachineOxygenSource::value)source);
+    } else if (nameSplit[0] == "VentilatorPressure") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      config.GetVentilatorPressure().SetValue(std::stod(valueUnitPair[0]), biogears::PressureUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "PositiveEndExpiredPressure") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      config.GetPositiveEndExpiredPressure().SetValue(std::stod(valueUnitPair[0]), biogears::PressureUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "InletFlow") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      config.GetInletFlow().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "RespirationRate") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      config.GetRespiratoryRate().SetValue(std::stod(valueUnitPair[0]), biogears::FrequencyUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "InspiratoryExpiratoryRatio") {
+      value = nameSplit[1];
+      config.GetInspiratoryExpiratoryRatio().SetValue(std::stod(value));
+    } else if (nameSplit[0] == "OxygenFraction") {
+      value = nameSplit[1];
+      config.GetOxygenFraction().SetValue(std::stod(value));
+    } else if (nameSplit[0] == "ReliefValvePressure") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      config.GetReliefValvePressure().SetValue(std::stod(valueUnitPair[0]), biogears::PressureUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "OxygenBottleOne") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      config.GetOxygenBottleOne().GetVolume().SetValue(std::stod(valueUnitPair[0]), biogears::VolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "OxygenBottleTwo") {
+      config.GetOxygenBottleTwo().GetVolume().SetValue(std::stod(valueUnitPair[0]), biogears::VolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "LeftChamberSubstance") {
+      leftSubstance = nameSplit[1];
+    } else if (nameSplit[0] == "RightChamberSubstance") {
+      rightSubstance = nameSplit[1];
+    } else if (nameSplit[0] == "LeftChamberSubstanceFraction") {
+      leftSubFraction = std::stod(nameSplit[1]);
+    } else if (nameSplit[0] == "RightChamberSubstanceFractin") {
+      rightSubFraction = std::stod(nameSplit[1]);
+    }
+  }
+  //Check to see if left/right chamber need to be set up
+  if (!leftSubstance.empty() && leftSubFraction > 0.0) {
+    config.GetLeftChamber().SetSubstance(*subMgr.GetSubstance(leftSubstance));
+    config.GetLeftChamber().GetSubstanceFraction().SetValue(leftSubFraction);
+    config.GetLeftChamber().SetState(CDM::enumOnOff::On);
+  }
+  if (!rightSubstance.empty() && rightSubFraction > 0.0) {
+    config.GetRightChamber().SetSubstance(*subMgr.GetSubstance(rightSubstance));
+    config.GetRightChamber().GetSubstanceFraction().SetValue(rightSubFraction);
+    config.GetRightChamber().SetState(CDM::enumOnOff::On);
+  }
+  
+  return action;
+}
+biogears::SEApnea* EventTree::decode_apnea(Event& ev)
+{
+  biogears::SEApnea* action = new biogears::SEApnea();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetSeverity().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEAsthmaAttack* EventTree::decode_asthma_attack(Event& ev)
+{
+  biogears::SEAsthmaAttack* action = new biogears::SEAsthmaAttack();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetSeverity().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEBronchoconstriction* EventTree::decode_bronchoconstriction(Event& ev)
+{
+  biogears::SEBronchoconstriction* action = new biogears::SEBronchoconstriction();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetSeverity().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEBurnWound* EventTree::decode_burn_wound(Event& ev)
+{
+  biogears::SEBurnWound* action = new biogears::SEBurnWound();
+  //Only one arg (severity), split at ":" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->GetTotalBodySurfaceArea().SetValue(input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SECardiacArrest* EventTree::decode_cardiac_arrest(Event& ev)
+{
+  biogears::SECardiacArrest* action = new biogears::SECardiacArrest();
+  //Only one arg (on/off), split at ":" --> e.g. State:On
+  std::string state = biogears::split(ev.params.toStdString(), ':')[1];
+  action->SetActive(state=="On");
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEConsumeNutrients* EventTree::decode_consume_nutrients(Event& ev)
+{
+  biogears::SEConsumeNutrients* action = new biogears::SEConsumeNutrients();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':'); //e.g. separates name from input; eg: "Ventilator:10,cmH2O" --> ["Ventilator", "10,cmH2O"]
+    if (nameSplit.size() == 1) {
+      //Nothing after ":", so empty and do not parse
+      continue;
+    }
+    if (nameSplit[0] == "Carbohydrate") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetNutrition().GetCarbohydrate().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Fat") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetNutrition().GetFat().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Protein") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetNutrition().GetProtein().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Calcium") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetNutrition().GetCalcium().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Sodium") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetNutrition().GetSodium().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Water") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetNutrition().GetWater().SetValue(std::stod(valueUnitPair[0]), biogears::VolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+    }
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SESubstanceAdministration* EventTree::decode_substance_administration(Event& ev, biogears::SESubstanceManager& subMgr)
+{
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  std::string value;
+  //Need to extract substance or substance compound name -- params string set up so that Substance/SubstanceCompound name is first element
+  std::string sub = biogears::split(inputs[0], ':')[1];
+  switch (ev.eSubType) {
+  case EventTypes::SubstanceBolus: {
+    biogears::SESubstanceBolus* bolus = new biogears::SESubstanceBolus(*subMgr.GetSubstance(sub));
+    for (unsigned int i = 1; i < inputs.size(); ++i) {
+      //Starting at i = 1 because sub name was index 0
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Concentration") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        bolus->GetConcentration().SetValue(std::stod(valueUnitPair[0]), biogears::MassPerVolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Dose") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        bolus->GetDose().SetValue(std::stod(valueUnitPair[0]), biogears::VolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Route") {
+        value = nameSplit[1];
+        int route = value == "Bolus-Intraarterial" ? 0 : value=="Bolus-Intramuscular" ? 1 : 2;
+        bolus->SetAdminRoute((CDM::enumBolusAdministration::value)route);
+      }
+    }
+    return bolus;
+  }
+  case EventTypes::SubstanceInfusion: {
+    biogears::SESubstanceInfusion* infuse = new biogears::SESubstanceInfusion(*subMgr.GetSubstance(sub));
+    for (unsigned int i = 1; i < inputs.size(); ++i) {
+      //Starting at i = 1 because sub name was index 0
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Concentration") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        infuse->GetConcentration().SetValue(std::stod(valueUnitPair[0]), biogears::MassPerVolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Rate") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+       infuse->GetRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
+      }
+    }
+    return infuse;
+  } 
+  case EventTypes::SubstanceOralDose: {
+    biogears::SESubstanceOralDose* oDose = new biogears::SESubstanceOralDose(*subMgr.GetSubstance(sub));
+    for (unsigned int i = 1; i < inputs.size(); ++i) {
+      //Starting at i = 1 because sub name was index 0
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Dose") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        oDose->GetDose().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Route") {
+        value = nameSplit[1];
+        int route = value == "Oral-Transmucosal" ? 0 : 1;
+        oDose->SetAdminRoute((CDM::enumOralAdministration::value)route);
+      }
+    }
+    return oDose;
+  }
+  case EventTypes::SubstanceCompoundInfusion: {
+    biogears::SESubstanceCompoundInfusion* infuse = new biogears::SESubstanceCompoundInfusion(*subMgr.GetCompound(sub));
+    for (unsigned int i = 1; i < inputs.size(); ++i) {
+      //Starting at i = 1 because compound name was index 0
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Rate") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        infuse->GetRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "BagVolume") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        infuse->GetBagVolume().SetValue(std::stod(valueUnitPair[0]), biogears::VolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+      }
+    }
+    return infuse;
+  }
+  default:
+    return nullptr;
+  }
+}
+//-----------------------------------------------------------------------------
+biogears::SEExercise* EventTree::decode_exercise(Event& ev)
+{
+  biogears::SEExercise* action = new biogears::SEExercise();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  std::string value;
+  switch (ev.eSubType) {
+  case EventTypes::GenericExercise: {
+    biogears::SEExercise::SEGeneric gen;
+    for (unsigned int i = 0; i < inputs.size(); ++i) {
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Intensity") {
+        gen.Intensity.SetValue(std::stod(nameSplit[1]));
+      } else if (nameSplit[0] == "DesiredWorkRate") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        gen.DesiredWorkRate.SetValue(std::stod(valueUnitPair[0]), biogears::PowerUnit::GetCompoundUnit(valueUnitPair[1]));
+      }
+    }
+    action->SetGenericExercise(gen);
+  } break;
+  case EventTypes::CyclingExercise: {
+    biogears::SEExercise::SECycling cycle;
+    for (unsigned int i = 0; i < inputs.size(); ++i) {
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Cadence") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        cycle.CadenceCycle.SetValue(std::stod(valueUnitPair[0]), biogears::FrequencyUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Power") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        cycle.PowerCycle.SetValue(std::stod(valueUnitPair[0]), biogears::PowerUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "AddedWeight") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        cycle.AddedWeight.SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+      }
+    }
+    action->SetCyclingExercise(cycle);
+  } break;
+  case EventTypes::RunningExercise: {
+    biogears::SEExercise::SERunning run;
+    for (unsigned int i = 0; i < inputs.size(); ++i) {
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Speed") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        run.SpeedRun.SetValue(std::stod(valueUnitPair[0]), biogears::LengthPerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Incline") {
+        run.InclineRun.SetValue(std::stod(nameSplit[1]));
+      } else if (nameSplit[0] == "AddedWeight") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        run.AddedWeight.SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+      }
+    }
+    action->SetRunningExercise(run);
+  } break;
+  case EventTypes::StengthExercise: {
+    biogears::SEExercise::SEStrengthTraining strength;
+    for (unsigned int i = 0; i < inputs.size(); ++i) {
+      nameSplit = biogears::split(inputs[i], ':');
+      if (nameSplit[0] == "Weight") {
+        valueUnitPair = biogears::split(nameSplit[1], ',');
+        strength.WeightStrength.SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
+      } else if (nameSplit[0] == "Repetitions") {
+        strength.RepsStrength.SetValue(std::stod(nameSplit[1]));
+      }
+    }
+    action->SetStrengthExercise(strength);
+  } break;
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEHemorrhage* EventTree::decode_hemorrhage(Event& ev)
+{
+  biogears::SEHemorrhage* action = new biogears::SEHemorrhage();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');
+    if (nameSplit[0] == "InitialRate") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetInitialRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Compartment") {
+      action->SetCompartment(nameSplit[1]);
+    }
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEInfection* EventTree::decode_infection(Event& ev)
+{
+  biogears::SEInfection* action = new biogears::SEInfection();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');
+    if (nameSplit[0] == "MinimumInhibitoryConcentration") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      action->GetMinimumInhibitoryConcentration().SetValue(std::stod(valueUnitPair[0]), biogears::MassPerVolumeUnit::GetCompoundUnit(valueUnitPair[1]));
+    } else if (nameSplit[0] == "Location") {
+      action->SetLocation(nameSplit[1]);
+    } else if (nameSplit[0] == "Severity") {
+      action->SetSeverity((CDM::enumInfectionSeverity::value)std::stoi(nameSplit[1]));
+    }
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SENeedleDecompression* EventTree::decode_needle_decompression(Event& ev)
+{
+  biogears::SENeedleDecompression* action = new biogears::SENeedleDecompression();
+  //Only one arg (side), split at ":" --> e.g. side:0
+  int input = std::stoi(biogears::split(ev.params.toStdString(), ':')[1]);
+  action->SetSide((CDM::enumSide::value)input);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEPainStimulus* EventTree::decode_pain_stimulus(Event& ev)
+{
+  biogears::SEPainStimulus* action = new biogears::SEPainStimulus();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');
+    if (nameSplit[0] == "Severity") {
+      action->GetSeverity().SetValue(std::stod(nameSplit[1]));
+    } else if (nameSplit[0] == "Location") {
+      action->SetLocation(nameSplit[1]);
+    }
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SETensionPneumothorax* EventTree::decode_tension_pneumothorax(Event& ev)
+{
+  biogears::SETensionPneumothorax* action = new biogears::SETensionPneumothorax();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');
+    if (nameSplit[0] == "Severity") {
+      action->GetSeverity().SetValue(std::stod(nameSplit[1]));
+    } else if (nameSplit[0] == "Side") {
+      action->SetSide((CDM::enumSide::value)std::stoi(nameSplit[1]));
+    } else if (nameSplit[0] == "Type") {
+      action->SetType((CDM::enumPneumothoraxType::value)std::stoi(nameSplit[1]));
+    }
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SETourniquet* EventTree::decode_tourniquet(Event& ev)
+{
+  biogears::SETourniquet* action = new biogears::SETourniquet();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');
+    if (nameSplit[0] == "Compartment") {
+      action->SetCompartment(nameSplit[1]);
+    } else if (nameSplit[0] == "TourniquetLevel") {
+      action->SetTourniquetLevel((CDM::enumTourniquetApplicationLevel::value)std::stoi(nameSplit[1]));
+    }
+  }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEBrainInjury* EventTree::decode_traumatic_brain_injury(Event& ev)
+{
+  biogears::SEBrainInjury* action = new biogears::SEBrainInjury();
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
+  //Re-usable variables
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (unsigned int i = 0; i < inputs.size(); ++i) {
+    nameSplit = biogears::split(inputs[i], ':');
+    if (nameSplit[0] == "Severity") {
+      action->GetSeverity().SetValue(std::stod(nameSplit[1]));
+    } else if (nameSplit[0] == "Type") {
+      action->SetType((CDM::enumBrainInjuryType::value)std::stoi(nameSplit[1]));
+    }
+  }
+  return action;
 }
 }

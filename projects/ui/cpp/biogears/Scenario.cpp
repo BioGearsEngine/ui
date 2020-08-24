@@ -1050,6 +1050,48 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   return;
 }
 
+void Scenario::create_scenario(EventTree* eventTree)
+{
+  eventTree->sort_events();        //Get actions in right order
+  std::cout << eventTree << "\n";
+
+  auto buildScenario = std::make_unique<biogears::SEScenario>(_engine->GetSubstances());
+  buildScenario->SetName("TestScenario.xml");
+
+  biogears::SEAction* action;
+  //Set up re-usable Advance Time event to apply between adjacent actions
+  bio::Event advanceTime;
+  advanceTime.typeName = "AdvanceTime";
+  advanceTime.eType = EventTree::EventTypes::AdvanceTime;
+
+  for (int i = 0; i < eventTree->get_events().size(); ++i) {
+    bio::Event thisEvent = eventTree->get_events()[i];
+    action = eventTree->decode_action(thisEvent, _engine->GetSubstances());
+    buildScenario->AddAction(*action);
+    //Add an advance time action between this action and the next one -- need to add sentinal "End Sim" event so we know how long the last Advance Time should be (and so we don't need to check loop size)
+    if (eventTree->get_events().size() > i + 1) {
+      bio::Event nextEvent = eventTree->get_events()[i + 1];
+      advanceTime.startTime = thisEvent.startTime;    //Start at same time as action we just applied
+      advanceTime.duration = nextEvent.startTime - advanceTime.startTime;
+      action = eventTree->decode_action(advanceTime, _engine->GetSubstances());
+      buildScenario->AddAction(*action);
+    }  
+  }
+
+  std::string fileLoc = "./Scenarios/" + buildScenario->GetName() + ".xml";
+  std::string fullPath = biogears::ResolvePath(fileLoc);
+  biogears::CreateFilePath(fullPath);
+  std::ofstream stream(fullPath);
+  xml_schema::namespace_infomap info;
+  info[""].name = "uri:/mil/tatrc/physiology/datamodel";
+
+  std::unique_ptr<CDM::ScenarioData> sceData(buildScenario->Unload());
+  CDM::Scenario(stream, *sceData, info);
+  stream.close();
+  _engine->GetLogger()->Info("Saved scenario: " + fullPath);
+
+}
+
 void Scenario::create_substance(QVariantMap substanceData)
 {
   biogears::SESubstance* newSubstance = new biogears::SESubstance(_engine->GetLogger());

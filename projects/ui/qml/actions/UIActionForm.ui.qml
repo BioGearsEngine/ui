@@ -5,7 +5,6 @@ import QtQuick.Layouts 1.12
 import QtQml.Models 2.2
 import com.biogearsengine.ui.scenario 1.0
 
-
 Rectangle {
   id: root
   color: "transparent"
@@ -20,16 +19,17 @@ Rectangle {
   signal buildSet(var action)
 
   property Scenario scenario
-  property var activateData : ({})    //Data that turns on action that is passed to serializer in builder mode
-  property var deactivateData : ({})  //Data that turns off action (e.g. bleeding rate = 0 for hemorrhage) that is passed to serializer in builder mode
+  property string buildParams : ""
   property bool queued : false        //Has the action been added to the scenario queue yet in build mode?
   property string actionType : "UnSet"
+  property int actionClass : -1
+  property int actionSubClass : -1
   property string uuid : ""
   property bool active : false
   property bool collapsed : true
   property bool builderMode : false
   property double actionStartTime_s : 0.0        //Time at which this action will be applied (in Scenario Builder)
-  property double actionDuration_s : 0.0          //Length of time over which action will be applied
+  property double actionDuration_s : -1          //Length of time over which action will be applied
   property Loader viewLoader : loader
   property alias timeEntry : timeEntry
 

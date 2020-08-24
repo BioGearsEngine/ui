@@ -12,12 +12,12 @@ UIActionForm {
   property bool validBuildConfig : (actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Cardiac Arrest"
+  actionClass : EventModel.CardiacArrest
   fullName  : "<b>%1</b>".arg(actionType)
   shortName : "<b>%1</b>".arg(actionType)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "CardiacArrest", "time" : actionStartTime_s, "state" : "On"} : ({})
-  deactivateData : builderMode ? {"name" : "CardiacArrest", "time" : actionStartTime_s + actionDuration_s, "state" : "off"} : ({})
+  buildParams : "State:On;"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_cardiac_arrest_action(true)  }
   onDeactivate: { scenario.create_cardiac_arrest_action(false)  }

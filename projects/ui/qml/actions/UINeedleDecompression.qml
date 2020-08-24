@@ -15,11 +15,12 @@ UIActionForm {
   property bool validBuildConfig : actionStartTime_s > 0.0
   
   actionType : "Needle Decompression"
+  actionClass : EventModel.NeedleDecompression
   fullName  : "<b>%1</b><br> Side = %2".arg(actionType).arg(side_str)
   shortName : "[<font color=\"lightsteelblue\">%2</font>] <b>%1</b>".arg(actionType).arg(side_str)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "NeedleDecompression", "time" : actionStartTime_s, "side" : side_str} : ({})
+  buildParams : "Side:" + side + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_needle_decompression_action(active, side)  }
   onDeactivate: { scenario.create_needle_decompression_action(0, side)  }

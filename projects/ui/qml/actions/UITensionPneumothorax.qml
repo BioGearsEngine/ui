@@ -19,12 +19,12 @@ UIActionForm {
   property bool validBuildConfig : (severity > 0.0 && type !== -1 && side !== -1 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Tension Pneumothorax"
+  actionClass : EventModel.TensionPneumothorax
   fullName  : "<b>%1</b><br> Side = %2<br> Type = %3<br> Severity = %4".arg(actionType).arg(side_str).arg(type_str).arg(severity)
   shortName : "[<font color=\"lightsteelblue\">%2</font>]<b>%1</b> <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(side_str).arg(type_str)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "TensionPneumothorax", "time" : actionStartTime_s, "severity" : severity, "type" : type, "side" : side} : ({})
-  deactivateData : builderMode ? {"name" : "TensionPneumothorax", "time" : actionStartTime_s + actionDuration_s, "severity" : 0.0, "type" : type, "side" : side} : ({})
+  buildParams : "Severity:" + severity + ";Type:" + type + ";Side:" + side + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_tension_pneumothorax_action(severity, type, side)  }
   onDeactivate: { scenario.create_tension_pneumothorax_action(0, type, side)  }

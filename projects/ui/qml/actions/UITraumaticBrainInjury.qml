@@ -13,15 +13,16 @@ UIActionForm {
   property double severity : 0.0
   property int type : -1
   property string type_str : (root.type == -1) ? "" : (root.type == 0) ? "Difuse" : ( root.type == 1) ? "Left Focal" : "Right Focal"
+  
   property bool validBuildConfig : (severity > 0.0 && type > -1 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Traumatic Brain Injury"
+  actionClass : EventModel.TraumaticBrainInjury
   fullName  : "<b>%1</b><br> Type = %2<br> Severity = %3".arg(actionType).arg(type_str).arg(severity)
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(type_str)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "TraumaticBrainInjury", "time" : actionStartTime_s, "severity" : severity, "type" : type} : ({})
-  deactivateData : builderMode ? {"name" : "TraumaticBrainInjury", "time" : actionStartTime_s + actionDuration_s, "severity" : 0, "type" : type} : ({})
+  buildParams : "Severity:" + severity + ";Type:" + type + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_traumatic_brain_injury_action(severity, type)  }
   onDeactivate: { scenario.create_traumatic_brain_injury_action(0, type)  }

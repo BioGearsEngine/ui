@@ -15,12 +15,12 @@ UIActionForm {
   property bool validBuildConfig : (intensity > 0.0 && location !=="" && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
   
   actionType : "Pain Stimulus"
+  actionClass : EventModel.PainStimulus
   fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg(location).arg(intensity)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3</font>".arg(actionType).arg(location).arg(intensity)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "PainStimulus", "time" : actionStartTime_s, "intensity" : intensity, "location" : location} : ({})
-  deactivateData : builderMode ? {"name" : "PainStimulus", "time" : actionStartTime_s + actionDuration_s, "intensity" : 0, "location" : location} : ({}) 
+  buildParams : "Severity:" + intensity + ";Location:" + location + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_pain_stimulus_action(intensity/10.0,location)  }
   onDeactivate: { scenario.create_pain_stimulus_action(0,location)  }

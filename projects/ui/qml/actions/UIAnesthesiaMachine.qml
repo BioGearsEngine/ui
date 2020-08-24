@@ -31,6 +31,7 @@ UIActionForm {
   property bool rightSubCheck : true   //defining as property to connect to IsValid function of UISubstanceEntry used for right chamber
 
   actionType : "Anesthesia Machine"
+  actionClass : EventModel.AnesthesiaMachineConfiguration
   fullName  :  "<b>%1</b><br>".arg(description)
 
   shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(connection)
@@ -43,16 +44,10 @@ UIActionForm {
   }
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "AnesthesiaMachine", "time" : actionStartTime_s, "connection" : connection == "Mask" ? 1 : 2, "primaryGas" : primaryGas == "Air" ? 0 : 1,
-                                "o2Source" : o2Source =="Wall" ? 0 : o2Source =="Bottle One" ? 1 : 2, "pMax" : pMax_cmH2O, "peep" : peep_cmH2O, "inletFlow" : inletFlow_L_Per_min,
-                                "respirationRate" : respirationRate_Per_min, "ieRatio" : ieRatio, "o2Fraction" : o2Fraction, "bottle1" : bottle1_mL, "bottle2" : bottle2_mL,
-                                "leftChamberSubstance" : leftChamberSub, "leftChamberFraction" : leftChamberFraction, "rightChamberSubstance" : rightChamberSub, "rightChamberFraction" : rightChamberFraction}
-                                : ({})
-  deactivateData : builderMode ? {"name" : "AnesthesiaMachine", "time" : actionStartTime_s, "connection" : 0, "primaryGas" : primaryGas == "Air" ? 0 : 1,
-                                "o2Source" : o2Source =="Wall" ? 0 : o2Source =="Bottle One" ? 1 : 2, "pMax" : pMax_cmH2O, "peep" : peep_cmH2O, "inletFlow" : inletFlow_L_Per_min,
-                                "respirationRate" : respirationRate_Per_min, "ieRatio" : ieRatio, "o2Fraction" : o2Fraction, "bottle1" : bottle1_mL, "bottle2" : bottle2_mL,
-                                "leftChamberSubstance" : leftChamberSub, "leftChamberFraction" : leftChamberFraction, "rightChamberSubstance" : rightChamberSub, "rightChamberFraction" : rightChamberFraction}
-                                : ({})
+  buildParams : "Connection:" + connection + ";PrimaryGas:" + primaryGas + ";OxygenSource:" + o2Source + ";VentilatorPressure:" + pMax_cmH2O + ",cmH2O;PositiveEndExpiredPressure:" + peep_cmH2O + ",cmH2O;InletFlow:"
+          +  inletFlow_L_Per_min + ",L/min; RespirationRate:" + respirationRate_Per_min + ",1/min;InspiratoryExpiratoryRatio:" + ieRatio + ";OxygenFraction:" + o2Fraction + ";ReliefValvePressure:" + reliefPressure_cmH2O + ",cmH2O;"
+          + "OxygenBottleOne:" +  bottle1_mL + ",mL;OxygenBottleTwo:" + bottle2_mL + ",mL;LeftChamberSubstance:" + leftChamberSub + ";LeftChamberSubstanceFraction:" + leftChamberFraction + ";RightChamberSubstance:"
+          +  rightChamberSub + ";RightChamberSubtanceFraction:" + rightChamberFraction + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   {
     let connectEnum = root.connection == "Mask" ? 1 : (root.connection == "Tube" ? 2 : 0)

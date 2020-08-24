@@ -14,11 +14,11 @@ UIActionForm {
   property bool validBuildConfig : (severity > 0.0 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
 
   actionType : "Acute Respiratory Distress"
+  actionClass : EventModel.AcuteRespiratoryDistress
   fullName  : "<b>%1</b> Severity = %2".arg(actionType).arg(severity)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "AcuteRespiratoryDistress", "time" : actionStartTime_s, "severity" : severity} : ({})
-  deactivateData : builderMode ? {"name" : "AcuteRespiratoryDistress", "time" : actionStartTime_s + actionDuration_s, "severity" : 0} : ({})
+  buildParams : "Severity:" + severity + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_ards_action(severity)  }
   onDeactivate: { scenario.create_ards_action(0)  }

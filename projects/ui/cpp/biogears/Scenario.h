@@ -13,6 +13,7 @@
 
 #include <biogears/cdm/Serializer.h>
 #include <biogears/cdm/scenario/SEAction.h>
+#include <biogears/cdm/scenario/SEScenario.h>
 #include <biogears/container/concurrent_queue.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/engine/Controller/BioGearsEngine.h>
@@ -21,6 +22,7 @@
 #include <biogears/threading/steppable.h>
 
 #include "BioGearsData.h"
+#include "EventTree.h"
 #include "Logger.h"
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
@@ -76,6 +78,7 @@ public:
   Q_INVOKABLE QVariantMap edit_patient();
   Q_INVOKABLE void export_patient(); //Export current patient (uses save_patient)
   Q_INVOKABLE Scenario& load_patient(QString);
+  Q_INVOKABLE void create_scenario(EventTree* events);
   Q_INVOKABLE void create_substance(QVariantMap substanceData);
   Q_INVOKABLE QVariantMap edit_substance();
   Q_INVOKABLE void export_substance();

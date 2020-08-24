@@ -11,9 +11,15 @@ UIScenarioBuilderForm {
 	signal loadScenario()
 	signal nameEdited ()
 
-	function launch(){
-		root.showNormal()
+	onClosing : {
+		clear();
 	}
-	
+
+	function launch(){
+		root.showNormal();
+	}
+	function clear(){
+		builderModel.clear();
+	}
 	
 }

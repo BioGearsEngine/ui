@@ -16,11 +16,13 @@ UIActionForm {
   property bool validBuildConfig : compound !== "" && rate > 0.0 && volume > 0.0 && actionStartTime_s > 0.0
   
   actionType : "Administer Fluids"
+  actionClass : EventModel.SubstanceAdministration
+  actionSubClass : EventModel.SubstanceCompoundInfusion
   fullName  : "<b>%1</b><br> Compound = %2<br> Volume = %3<br> Rate = %4".arg(actionType).arg(compound).arg(volume).arg(rate)
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(compound)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "SubstanceCompoundInfusion", "time" : actionStartTime_s, "compound" : compound, "rate" : rate, "volume" : volume} : ({})
+  buildParams: "SubstanceCompound:" + compound + ";BagVolume:" + volume + ",mL;Rate:" + rate + ",mL/min;"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_substance_compound_infusion_action(compound, volume, rate)  }
   onDeactivate: { scenario.create_substance_compound_infusion_action(compound, 0, 0)  }

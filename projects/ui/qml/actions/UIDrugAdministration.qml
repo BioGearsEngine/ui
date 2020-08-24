@@ -26,6 +26,16 @@ UIActionForm {
     }
   }
   actionType : "Administration"
+  actionClass : EventModel.SubstanceAdministration
+  actionSubClass : {
+    if (root.adminRoute.includes("Bolus")){
+      return EventModel.SubstanceBolus
+    } else if (root.adminRoute.includes("Infusion")){
+      return EventModel.SubstanceInfusion
+    } else {
+      return EventModel.SubstanceOralDose
+    }
+  }
   fullName  : {
     let tmp =  "<b>%1 %2</b><br>".arg(adminRoute).arg(actionType)
     if (root.adminRoute == 'Bolus-Intraarterial' ||
@@ -43,30 +53,15 @@ UIActionForm {
   shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(drug)
  
   //Builder mode data -- data passed to scenario builder
-  activateData : {
-    if (builderMode){
-      if (root.adminRoute.includes("Bolus") !== -1){
-        return {"name" : root.adminRoute, "time" : actionStartTime_s, "drug" : drug, "dose" : dose, "concentration" : concentration};
-      } else if (root.adminRoute.includes("Infusion")){
-        return {"name" : root.adminRoute, "time" : actionStartTime_s, "drug" : drug, "rate" : rate, "concentration" : concentration};
-      } else {
-        return {"name" : root.adminRoute, "time" : actionStartTime_s, "drug" : drug, "dose" : dose};
-      }
+  buildParams : {
+    if (root.adminRoute.includes("Bolus")){
+      return "Substance:" + drug + ";Route:" + adminRoute + ";Concentration:" + concentration + ",ug/mL;Dose:" + dose + ",mL;";
+    } else if (root.adminRoute.includes("Infusion")){
+      return "Substance:" + drug + ";Concentration:" + concentration + ",ug/mL;Rate:" + rate + ",mL/min;";
+    } else if (root.adminRoute.includes("Transmucosal")) {
+      return "Substance:" + drug + ";Dose:" + dose + ",ug;Route:" + root.adminRoute + ";";
     } else {
-      return ({})
-    }
-  }
-  deactivateData : {
-    if (builderMode){
-      if (root.adminRoute.includes("Bolus") !== -1){
-        return null;
-      } else if (root.adminRoute.includes("Infusion")){
-        return {"name" : root.adminRoute, "time" : actionStartTime_s + actionDuration_s, "drug" : drug, "rate" : 0.0, "concentration" : 0.0};
-      } else {
-        return null;
-      }
-    } else {
-      return ({})
+      return "Substance:" + drug + ";Dose:" + dose + ",mg;Route:" + root.adminRoute + ";";
     }
   }
   //Interactive mode -- apply action immediately while running

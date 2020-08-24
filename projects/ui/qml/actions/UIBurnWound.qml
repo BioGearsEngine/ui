@@ -15,12 +15,12 @@ UIActionForm {
   property bool validBuildConfig : (severity > 0.0 && actionStartTime_s > 0.0)
 
   actionType : "Burn Wound"
+  actionClass : EventModel.BurnWound
   fullName  : "<b>%1</b> Total Burn Sufrace Area = %2".arg(actionType).arg(tbsa)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(tbsa)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "BurnWound", "time" : actionStartTime_s, "severity" : severity} : ({})
-  //deactivateData : builderMode ? {"name" : "BurnWound", "time" : actionStartTime_s + actionDuration_s, "severity" : 0} : ({})
+  buildParams : "TotalBodySurfaceArea:" + tbsa + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_burn_action(tbsa)  }
   onDeactivate: { scenario.create_burn_action(0)  }

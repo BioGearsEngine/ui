@@ -17,11 +17,13 @@ UIActionForm {
   property bool validBuildConfig : blood_type !=="" && rate > 0.0 && volume > 0.0 && actionStartTime_s > 0.0
   
   actionType : "Transfusion"
+  actionClass : EventModel.SubstanceAdministration
+  actionSubClass : EventModel.SubstanceCompoundInfusion
   fullName  : "<b>%1</b><br> Volume = %2<br> Rate = %3".arg(actionType).arg(volume).arg(rate)
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b>".arg(actionType).arg(blood_type)
 
   //Builder mode data -- data passed to scenario builder
-  activateData : builderMode ? {"name" : "BloodTransfusion", "time" : actionStartTime_s, "blood_type" : blood_type, "rate" : rate, "volume" : volume} : ({})
+  buildParams: "SubstanceCompound:" + blood_type + ";BagVolume:" + volume + ",mL;Rate:" + rate + ",mL/min;"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_blood_transfusion_action(blood_type, volume, rate)  }
   onDeactivate: { scenario.create_blood_transfusion_action(blood_type, 0, 0)  }

@@ -24,42 +24,19 @@ UIActionForm {
     }
   }
     //Builder mode data -- data passed to scenario builder
-  activateData : {
-    if (builderMode){
-      if (root.type==="Generic"){
-        if (property_1 > 0.0){
-          return {"name" : "Exercise-Generic", "time" : actionStartTime_s, "intensity" : property_1};
-        } else {
-          return {"name" : "Exercise-Generic", "time" : actionStartTime_s, "workRate" : property_2};
-        }
-      } else if (root.type==="Cycling"){
-        return {"name" : "Exercise-Cycling", "time" : actionStartTime_s, "cadence" : property_1, "power" : property_2, "weight" : weight};
-      } else if (root.type==="Running") {
-        return {"name" : "Exercise-Running", "time" : actionStartTime_s, "velocity" : property_1, "incline" : property_2, "weight" : weight};
-      } else { 
-        return ({});
+  buildParams : {
+    if (root.type==="Generic"){
+      if (property_1 > 0.0){
+        return "Intensity:" + property_1 + ";";
+      } else {
+        return "DesiredWorkRate:" + property_2 + ";";
       }
-    } else {
-      return ({})
-    }
-  }
-  deactivateData : {
-    if (builderMode){
-      if (root.type==="Generic"){
-        if (property_1 > 0.0){
-          return {"name" : "Exercise-Generic", "time" : actionStartTime_s + actionDuration_s, "intensity" : 0.0};
-        } else {
-          return {"name" : "Exercise-Generic", "time" : actionStartTime_s + actionDuration_s, "workRate" : 0.0};
-        }
-      } else if (root.type==="Cycling"){
-        return {"name" : "Exercise-Cycling", "time" : actionStartTime_s + actionDuration_s, "cadence" : 0.0, "power" : 0.0, "weight" : 0.0};
-      } else if (root.type==="Running") {
-        return {"name" : "Exercise-Running", "time" : actionStartTime_s + actionDuration_s, "velocity" : 0.0, "incline" : 0.0, "weight" : 0.0};
-      } else { 
-        return {"name" : "Exercise-Strength", "time" : actionStartTime_s + actionDuration_s, "weight" : 0.0, "repetitions" : 0.0};
-      }
-    } else {
-      return ({})
+    } else if (root.type==="Cycling"){
+      return "Cadence:" + property_1 + ",1/min;Power:" + property_2 + ",W;AddedWeight:" + weight + ",kg;"
+    } else if (root.type==="Running") {
+      return "Speed:" + property_1 + ",m/s;Incline:" + property_2+";AddedWeight:" + weight+",kg;"
+    } else { 
+      return "Weight:" + weight + ",kg;Repetitions:" + property_2 + ";";
     }
   }
   //Interactive mode -- apply action immediately while running
@@ -82,7 +59,18 @@ UIActionForm {
   }
 
   actionType : "Exercise"
-  //fullName  :  "<b>%1 %2</b><br>".arg(type).arg(actionType)
+  actionClass : EventModel.Exercise
+  actionSubClass :  {
+    if (root.type == 'Generic') {
+      return EventModel.GenericExercise
+    } else if ( root.type == 'Cycling') {
+      return EventModel.CyclingExercise
+    } else if ( root.type == 'Running') {
+      return EventModel.RunningExercise
+    } else {
+      return EventModel.StrengthExercise
+    }
+  }
   fullName  : {
     let tmp =  "<b>%1 %2</b><br>".arg(type).arg(actionType)
     if (root.type == 'Generic') {
