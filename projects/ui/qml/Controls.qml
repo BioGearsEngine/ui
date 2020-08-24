@@ -15,6 +15,7 @@ ControlsForm {
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
+  //signal urinalysisUpdated(Urinalysis urinalysis)
   // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
@@ -27,6 +28,10 @@ ControlsForm {
   property PhysiologyModel bgData
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
+  
+  function requestUrinalysis() {
+	root.scenario.request_urinalysis_assessment();
+  }
 
   function seconds_to_clock_time(SimulationTime_s) {
         var v_seconds = SimulationTime_s % 60
@@ -65,6 +70,11 @@ ControlsForm {
 
       root.patientStateChanged(patientState)
     }
+	
+	onUrinalysisFinished: {
+		console.log("completed as desired")
+		//root.urinalysisUpdated(urinalysis)
+	}
 
     onPhysiologyChanged:  {
       bgData = model

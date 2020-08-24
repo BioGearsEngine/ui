@@ -28,6 +28,7 @@
 #include "PatientMetrics.h"
 #include "PatientState.h"
 #include "Substance.h"
+#include "Urinalysis.h"
 
 namespace biogears {
 class SEScalar;
@@ -139,6 +140,8 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
   Q_INVOKABLE void create_inhaler_action(bool active);
   Q_INVOKABLE void create_anesthesia_machine_action(int connection, int primaryGas, int source, double pMax_cmH2O, double peep_cmH2O, double reliefPressure_cmH2O, double inletFlow_L_Per_min, double respirationRate_Per_min, double ieRatio, double o2Fraction, double bottle1_mL, double bottle2_mL, QString leftSub, double leftSubFraction, QString rightSub, double rightSubFraction);
+  Q_INVOKABLE void request_urinalysis_assessment();
+  Q_INVOKABLE void request_blood_panel_assessment();
 
   Q_INVOKABLE QString patient_name_and_time();
   Q_INVOKABLE QString get_patient_state_files();
@@ -155,6 +158,7 @@ signals:
   void patientMetricsChanged(PatientMetrics* metrics);
   void patientStateChanged(PatientState patientState);
   void patientConditionsChanged(PatientConditions conditions);
+  void urinalysisFinished(Urinalysis urinalysisData);
 
   void timeAdvance(double time_s);
   void physiologyChanged(BioGearsData* model);
@@ -217,10 +221,8 @@ private:
 
   BioGearsData* _physiology_model;
 
-
   QtLogForward* _consoleLog;
 
   std::unique_ptr<biogears::SEScalar> _new_respiratory_cycle;
 };
-
 }

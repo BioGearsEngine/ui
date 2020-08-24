@@ -35,6 +35,8 @@ Page {
     property alias oneHzPlotTimer : oneHzPlotTimer
     property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
     property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer
+	
+	signal urinalysisRequest()
 
     state : "realTime"
 
@@ -355,6 +357,11 @@ Page {
             id : renalOverviewSeries
             Layout.fillWidth : true
             Layout.fillHeight : true
+			
+			onUrinalysisRequest: {
+			  root.urinalysisRequest();
+			  //physiologyRequestModel.request_urinalysis_assessment();
+			}
         }
         Item {
             id : substanceSeries

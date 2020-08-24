@@ -77,6 +77,10 @@ GraphAreaForm {
 	renalOverviewSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW))
 	renalOverviewSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE))
   }
+  
+  //onNewUrinalysis : {
+	//renalOverviewSeries.urinalysisData = urinalysis;
+ //}
 
   onStart : {
     oneHzPlotTimer.start();

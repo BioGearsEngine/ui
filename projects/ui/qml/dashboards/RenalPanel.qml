@@ -15,12 +15,15 @@ Item {
 	
 	property PhysiologyModel physiologyRenalModel
 	property PhysiologyModel physiologyRenalFluidModel
+	//property Urinalysis urinalysisData
+	
+	signal urinalysisRequest()
 	
 	property alias renalOverviewGridView:renalOverviewGridView
 	property alias renalTimer : renalTimer
 		
-	property string uaColor: ""
-	property string uaAppearance: ""
+	property string uaColor: "Pink"
+	property string uaAppearance: "Cloudy"
 	property bool uaGlucose: false
 	property bool uaKetone: false
 	property double uaBilirubin: 0.0
@@ -35,10 +38,7 @@ Item {
 	property double glomerularFiltrationRate: 0.0
 	property double renalBloodFlow: 0.0
 	property double reabsorptionRate: 0.0
-	
-	property string goodBorderColor: "green"
-	property string warningBorderColor: "yellow"
-	property string criticalBorderColor: "red"
+
 	
 	
 	// Based on BioGearsData for RENAL_OVERVIEW (physiologyRenalModel)
@@ -58,8 +58,6 @@ Item {
     // 9 - Intracell Fluid Volume
     // 10 - Extravascular Fluid Volume
     // Check ua and reabsorption rate
-
-
 	
 	Timer {
         id : renalTimer
@@ -127,15 +125,27 @@ Item {
 						id: colorItems
 						spacing: urinalysisConsole.width/10
 						Layout.alignment: Qt.AlignHCenter
-						//anchors.verticalCenter: parent.verticalCenter
 						Rectangle {
 							id: uaColorBox
-							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredHeight: urinalysisConsole.height * 0.05
 							Layout.preferredWidth: urinalysisConsole.width * 0.35
-							color : "yellow"
+							function uaColorFunct() { // Options: PaleYellow, Yellow, DarkYellow, Pink
+								var uaColorVisual = "white"
+								if (root.uaColor == "PaleYellow") {
+									uaColorVisual = "lightyellow"
+								} else if (root.uaColor == "Yellow") {
+									uaColorVisual = "yellow"
+								} else if (root.uaColor == "DarkYellow") {
+									uaColorVisual = "goldenrod"
+								} else if (root.uaColor == "Pink") {
+									uaColorVisual = "pink"
+								}
+								return uaColorVisual
+							}
+							color : uaColorFunct()
 							Text {
 								id: uaColorText
-								text: "Color"
+								text: root.uaColor
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"
@@ -143,12 +153,25 @@ Item {
 						}
 						Rectangle {
 							id: uaClarityBox
-							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredHeight: urinalysisConsole.height * 0.05
 							Layout.preferredWidth: urinalysisConsole.width * 0.35
-							color : "beige"
+							function uaClarityColorFunct() { // Options: Clear, SlightlyCloudy, Cloudy, Turbid
+								var uaClarityColor = "white"
+								if (root.uaAppearance == "Clear") {
+									uaClarityColor = "white"
+								} else if (root.uaAppearance == "SlightlyCloudy") {
+									uaClarityColor = "ivory"
+								} else if (root.uaAppearance == "Cloudy") {
+									uaClarityColor = "beige"
+								} else if (root.uaAppearance == "Turbid") {
+									uaClarityColor = "chocolate"
+								}
+								return uaClarityColor
+							}
+							color : uaClarityColorFunct()
 							Text {
 								id: uaClarityText
-								text: "Clarity"
+								text: root.uaAppearance
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"
@@ -159,17 +182,16 @@ Item {
 						id: valueItems1
 						spacing: urinalysisConsole.width/20
 						Layout.alignment: Qt.AlignHCenter
-						//anchors.verticalCenter: parent.verticalCenter
 						Rectangle {
 							id: uaBilirubinBox
-							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredHeight: urinalysisConsole.height * 0.05
 							Layout.preferredWidth: urinalysisConsole.width * 0.425
 							color : "white"
 							border.color: "blue"
 							border.width: 2
 							Text {
 								id: uaBilirubinText
-								text: "Bilirubin: "
+								text: qsTr("Bilirubin: ")+ root.uaBilirubin
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"
@@ -177,14 +199,14 @@ Item {
 						}
 						Rectangle {
 							id: uaSpecificGBox
-							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredHeight: urinalysisConsole.height * 0.05
 							Layout.preferredWidth: urinalysisConsole.width * 0.425
 							color : "white"
 							border.color: "blue"
 							border.width: 2
 							Text {
 								id: uaSpecificGravText
-								text: "Specific Gravity: "
+								text: qsTr("s.g.: ")+ root.uaSpecificG
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"
@@ -198,14 +220,14 @@ Item {
 						//anchors.verticalCenter: parent.verticalCenter
 						Rectangle {
 							id: uapHBox
-							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredHeight: urinalysisConsole.height * 0.05
 							Layout.preferredWidth: urinalysisConsole.width * 0.425
 							color : "white"
 							border.color: "blue"
 							border.width: 2
 							Text {
 								id: uapHText
-								text: "pH: "
+								text: qsTr("pH: ")+ root.uapH
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"
@@ -213,14 +235,14 @@ Item {
 						}
 						Rectangle {
 							id: uaUrobilBox
-							Layout.preferredHeight: urinalysisConsole.height * 0.1
+							Layout.preferredHeight: urinalysisConsole.height * 0.05
 							Layout.preferredWidth: urinalysisConsole.width * 0.425
 							color : "white"
 							border.color: "blue"
 							border.width: 2
 							Text {
 								id: uaUrobilText
-								text: "Urobilirubin: "
+								text: qsTr("Urobilirubin: ")+ root.uaUrobilinogen
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"
@@ -256,17 +278,19 @@ Item {
 						}
 					}
 					TableView {
+						id: uaTablePresent
 						alternatingRowColors : true
 						Layout.alignment: Qt.AlignHCenter
+						Layout.preferredWidth: urinalysisConsole*0.8
 						TableViewColumn {
 							role: "sub"
 							title: "Substance"
-							width: urinalysisConsole.width*0.45
+							width: uaTablePresent.width*0.5
 						}
 						TableViewColumn {
 							role: "present"
 							title: "Present?"
-							width: urinalysisConsole.width*0.45
+							width: uaTablePresent.width*0.5
 						}
 						model: uaPresentModel
 					}
@@ -274,6 +298,9 @@ Item {
 					Button {
 						Layout.alignment: Qt.AlignHCenter
 						text: "Update"
+						onClicked : {
+							urinalysisRequest();
+						}
 					}
 					
 				}

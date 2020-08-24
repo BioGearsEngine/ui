@@ -49,6 +49,11 @@ GridLayout {
           console.log ("physiology changed %1".arg(model))
           graphArea.newPhysiologyModel(model)
       }
+	  
+	  //onUrinalysisUpdated : {
+		//  console.log ("Urinalysis Complete")
+		//  graphArea.newUrinalysis(urinalysis)
+	  //}
     }
 
     GraphArea {
@@ -60,6 +65,11 @@ GridLayout {
       Layout.fillWidth: true
       Layout.fillHeight: false
       Layout.margins:0
+	  
+	  onUrinalysisRequest : {
+	    console.log ("Urinalysis request instantiated")
+		controls.requestUrinalysis()
+	  }
     }
     LuaConsole {
       id:consoleArea

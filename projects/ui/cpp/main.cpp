@@ -37,6 +37,11 @@ int main(int argc, char* argv[])
   QMetaType::registerEqualsComparator<PatientState>();
   qmlRegisterUncreatableType<PatientState>("com.biogearsengine.ui.scenario", 1, 0, "PatientState", "State of the Patient");
 
+  qRegisterMetaType<Urinalysis>();
+  QMetaType::registerEqualsComparator<Urinalysis>();
+  qmlRegisterUncreatableType<Urinalysis>("com.biogearsengine.ui.scenario", 1, 0, "Urinalysis", "Urinalysis Patient Assessment Request");
+
+
   qRegisterMetaType<PatientConditions>();
   QMetaType::registerEqualsComparator<PatientConditions>();
   qmlRegisterUncreatableType<PatientConditions>("com.biogearsengine.ui.scenario", 1,  0, "PatientConditions", "Conditions of the Patient");
