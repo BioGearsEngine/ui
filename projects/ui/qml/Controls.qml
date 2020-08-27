@@ -42,23 +42,23 @@ ControlsForm {
     id: biogears_scenario
 
     onPatientMetricsChanged: {
-        root.respiratoryRate.value       = metrics.RespiratoryRate
-        root.heartRate.value             = metrics.HeartRate 
-        root.core_temp_c.value           = metrics.CoreTemp + "c"
-        root.oxygenSaturation.value      = metrics.OxygenSaturation
-        root.systolicBloodPressure.value = metrics.SystolicBloodPressure
-        root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
+        root.respiratoryRate.value.text       = metrics.RespiratoryRate
+        root.heartRate.value.text             = metrics.HeartRate 
+        root.core_temp_c.value.text           = metrics.CoreTemp + "c"
+        root.oxygenSaturation.value.text      = metrics.OxygenSaturation
+        root.systolicBloodPressure.value.text = metrics.SystolicBloodPressure
+        root.dystolicBloodPressure.value.text = metrics.DiastolicBloodPressure
     }
 
     onPatientStateChanged: {
-      root.age_yr.value    = patientState.Age
-      root.gender.value    = patientState.Gender
-      root.height_cm.value = patientState.Height + " cm"
-      root.weight_kg.value = patientState.Weight + " kg"
-      root.condition.value = patientState.ExerciseState
-      root.bodySufaceArea.value       = patientState.BodySurfaceArea
-      root.bodyMassIndex.value        = patientState.BodyMassIndex
-      root.fat_pct.value              = patientState.BodyFat
+      root.age_yr.value.text    = patientState.Age
+      root.gender.value.text    = patientState.Gender
+      root.height_cm.value.text = patientState.Height + " cm"
+      root.weight_kg.value.text = patientState.Weight + " kg"
+      root.condition.value.text = patientState.ExerciseState
+      root.bodySufaceArea.value.text       = patientState.BodySurfaceArea
+      root.bodyMassIndex.value.text        = patientState.BodyMassIndex
+      root.fat_pct.value.text              = patientState.BodyFat
 
       root.patientStateChanged(patientState)
     }

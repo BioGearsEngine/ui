@@ -47,26 +47,26 @@ ColumnLayout {
     Layout.alignment: Qt.AlignHCenter
       UITextInputForm {
         id: age
-        name: "Age:"
-        value: "21"
+        name.text: "Age:"
+        value.text: "21"
         Layout.alignment: Qt.AlignHCenter
       }
       UITextInputForm {
         id: gender
-        name: "Gender:"
-        value: "Female"
+        name.text: "Gender:"
+        value.text: "Female"
         Layout.alignment: Qt.AlignHCenter
       }
       UITextInputForm {
         id: fat_pct
-        name: "Fat%:"
-        value: "0.0%"
+        name.text: "Fat%:"
+        value.text: "0.0%"
         Layout.alignment: Qt.AlignHCenter
       }
       UITextInputForm {
         id: core_temp
-        name: "Temp:"
-        value: "100.0"
+        name.text: "Temp:"
+        value.text: "100.0"
         Layout.alignment: Qt.AlignHCenter
       }
   }
@@ -76,26 +76,26 @@ ColumnLayout {
     Layout.alignment: Qt.AlignHCenter
     UITextInputForm {
       id: height_cm
-      name: "Height:"
-      value: "160"
+      name.text: "Height:"
+      value.text: "160"
       Layout.alignment: Qt.AlignHCenter
     }
     UITextInputForm {
       id: weight
-      name: "Weight:"
-      value: "Male"
+      name.text: "Weight:"
+      value.text: "Male"
       Layout.alignment: Qt.AlignHCenter
     }
     UITextInputForm {
       id: bodySurfaceArea
-      name: "BSA:"
-      value: "1.55"
+      name.text: "BSA:"
+      value.text: "1.55"
       Layout.alignment: Qt.AlignHCenter
     }
     UITextInputForm {
       id: bodyMassIndex
-      name: "BMI:"
-      value: "36.2"
+      name.text: "BMI:"
+      value.text: "36.2"
       Layout.alignment: Qt.AlignHCenter
     }
   }

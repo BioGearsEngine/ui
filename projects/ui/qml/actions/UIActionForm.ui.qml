@@ -28,8 +28,9 @@ Rectangle {
   property bool active : false
   property bool collapsed : true
   property bool builderMode : false
+  property bool currentSelection : false
   property double actionStartTime_s : 0.0        //Time at which this action will be applied (in Scenario Builder)
-  property double actionDuration_s : -1          //Length of time over which action will be applied
+  property double actionDuration_s : 0.0          //Length of time over which action will be applied
   property Loader viewLoader : loader
   property alias timeEntry : timeEntry
 
@@ -39,22 +40,25 @@ Rectangle {
 
   //This state controls whether the highlighting of the rectangle containing this action.  It is used in scenario builder to help users move actions up/down
   // queue and select action for removal.
-  state : "unselected"
+  //state : viewLoader.status==Loader.Ready ? viewLoader.item.state : "" 
   states : [
      State {
-        name: "unselected"
+        name: "expandedViewUnselected"; when : (builderMode && !currentSelection && !collapsed)
         PropertyChanges { target : root; border.color : "black"; border.width : 1}
       }
-
       ,State {
-        name: "selected"
+        name: "expandedViewSelected"; when : (builderMode && currentSelection && !collapsed)
         PropertyChanges { target : root; border.color : "green"; border.width : 2}
+      }
+      ,State {
+        name : "noBorder"; when : (builderMode && collapsed)
+        PropertyChanges { target : root; border.width : 0}
       }
   ]
 
   property Component controlsDetails
   property Component builderDetails
-  property Component summary : Component {
+  property Component controlsSummary : Component {
     RowLayout {
       id : actionRow
       spacing : 5
@@ -66,7 +70,7 @@ Rectangle {
         color : '#1A5276'
         text : root.shortName
         elide : Text.ElideRight
-        font.pointSize : builderMode ? 16 : 8
+        font.pointSize : 8
         font.bold : true
         horizontalAlignment  : Text.AlignLeft
         leftPadding : 5
@@ -127,7 +131,6 @@ Rectangle {
       }
       Rectangle {
         id: toggle
-        visible : !builderMode
         width  : 40
         height : 20
 
@@ -154,6 +157,86 @@ Rectangle {
     }
   } // End Summary Component
 
+  property Component builderSummary : Component {
+    Rectangle {
+      id : buildSummaryWrapper
+      width : root.width / 3
+      border.width : 2
+      height : 40
+      radius : 15
+      states : [
+      State {
+        name: "collapsedViewUnselected"; when : (root.builderMode && !root.currentSelection && root.collapsed)
+        PropertyChanges { target : buildSummaryWrapper; border.color : "black"}
+      }
+      ,State {
+        name: "collapsedViewSelected"; when : (root.builderMode && root.currentSelection && root.collapsed)
+        PropertyChanges { target : buildSummaryWrapper; border.color : "green"}
+      }
+    ]
+      Label {
+        id : buildSummaryLabel
+        height : buildSummaryWrapper.height
+        width : buildSummaryWrapper.width
+        horizontalAlignment : Text.AlignHCenter
+        verticalAlignment : Text.AlignVCenter
+        text : root.shortName
+        font.pixelSize : 18
+        background : Rectangle {
+          id : labelBackground
+          width : parent.width
+          height : buildSummaryWrapper.height
+          color : "transparent"
+        }
+      }
+    }
+      /*MouseArea {
+        id : buildSummaryMouseArea
+        anchors.fill : parent
+        hoverEnabled : true
+        propagateComposedEvents :true
+        Timer {
+          id : buildTimer
+          interval: 500; running: false; repeat: false
+          onTriggered:  actionTip.visible  = true
+        }
+        onClicked : {
+          selected()
+        }
+        onEntered: {
+          buildTimer.start()
+          buildTip.visible  = false
+        }
+        onPositionChanged : {
+          buildTimer.restart()
+          buildTip.visible  = false
+        }
+        onExited : {
+          buildTimer.stop()
+          buildTip.visible  = false
+        }
+      }
+      ToolTip {
+        id : buildTip
+        parent : buildSummaryWrapper
+        x : 0
+        y : parent.height + 5
+        visible : false
+        text : root.fullName
+        contentItem : Text {
+          text : buildTip.text
+          color : '#1A5276'
+          font.pointSize : 10
+        }
+        background : Rectangle {
+          color : "white"
+          border.color : "black"
+        }
+      }*/
+  }
+
+
+
   onActiveChanged : {
     if ( active) {
       console.log ("active")
@@ -167,21 +250,30 @@ Rectangle {
   Loader {
     id : loader
 
-    sourceComponent : summary
-    state  : "collapsed"
+    sourceComponent : controlsSummary
+    state  : "collapsedControls"
 
     states : [
       State {
         name: "expandedControls"
         PropertyChanges { target : loader; sourceComponent: controlsDetails}
+        PropertyChanges { target : root; collapsed : false}
       }
       ,State {
         name : "expandedBuilder"
         PropertyChanges {target : loader; sourceComponent : builderDetails}
+        PropertyChanges { target : root; collapsed : false}
       }
       ,State {
-        name: "collapsed"
-        PropertyChanges { target : loader; sourceComponent: summary}
+        name: "collapsedControls"
+        PropertyChanges { target : loader; sourceComponent: controlsSummary}
+        PropertyChanges { target : root; collapsed : true}
+      }
+      ,State {
+        name: "collapsedBuilder"
+        PropertyChanges { target : loader; sourceComponent : builderSummary}
+        PropertyChanges { target : root; collapsed : true}
+        AnchorChanges { target : loader; anchors.horizontalCenter : root.horizontalCenter}
       }
       ,State {
         name: "unset"
@@ -205,17 +297,17 @@ Rectangle {
       onDoubleClicked: { // Double Clicking Window
         if ( mouse.button === Qt.LeftButton ){
           if (builderMode){
-            if ( loader.state === "collapsed") {
+            if ( loader.state === "collapsedBuilder") {
               loader.state = "expandedBuilder"
             } else {
               //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
               //loader.state = "collapsed"
             }
           } else {
-            if ( loader.state === "collapsed") {
+            if ( loader.state === "collapsedControls") {
               loader.state = "expandedControls"
             } else {
-              loader.state = "collapsed"
+              loader.state = "collapsedControls"
             }
           }
         } else {
@@ -226,14 +318,14 @@ Rectangle {
       Menu {
         id : contextMenu
         MenuItem {
-          text : (loader.state === "collapsed")? "Configure" : "Collapse"
+          text : (loader.state === "collapsedControls")? "Configure" : "Collapse"
            onTriggered: {
             //Only using this in controls instance (not in builder mode)
             if (!builderMode) {
-              if ( loader.state === "collapsed") {
+              if ( loader.state === "collapsedControls") {
                 loader.state = "expandedControls"
               } else {
-                loader.state = "collapsed"
+                loader.state = "collapsedControls"
               }
             }
           }

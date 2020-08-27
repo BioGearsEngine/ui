@@ -277,16 +277,19 @@ UIActionForm {
  
  Loader {
   id : drugLoader
-  sourceComponent : root.summary
-  state : "collapsed"
+  sourceComponent : root.controlsSummary
+  state : "collapsedBuilder"
   states : [
      State {
         name : "expandedBuilder"
         PropertyChanges {target : drugLoader; sourceComponent : root.adminRoute.includes("Bolus") ? bolusBuilderDetails : root.adminRoute.includes("Infusion") ? infusionBuilderDetails : oralBuilderDetails}
+        PropertyChanges { target : root; collapsed : false}
       }
       ,State {
-        name: "collapsed"
-        PropertyChanges { target : drugLoader; sourceComponent: root.summary}
+        name: "collapsedBuilder"
+        PropertyChanges { target : drugLoader; sourceComponent: root.builderSummary}
+        PropertyChanges { target : root; collapsed : true}
+        AnchorChanges { target : drugLoader; anchors.horizontalCenter : root.horizontalCenter}
       }
     ]
     MouseArea {
@@ -297,7 +300,7 @@ UIActionForm {
       
       onDoubleClicked: { // Double Clicking Window
         if ( mouse.button === Qt.LeftButton ){
-          if (drugLoader.state === "collapsed") {
+          if (drugLoader.state === "collapsedBuilder") {
             drugLoader.state = "expandedBuilder"
           } else {
             //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
@@ -545,7 +548,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }
@@ -793,7 +796,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }
@@ -998,7 +1001,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }

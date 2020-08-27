@@ -20,7 +20,6 @@ UIActionForm {
 
   //Builder mode data -- data passed to scenario builder
   buildParams : "Severity:" + severity + ";"
-  deactivateData : builderMode ? {"name" : "Bronchoconstriction", "time" : actionStartTime_s + actionDuration_s, "severity" : 0} : ({})
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_bronchoconstriction_action(severity)  }
   onDeactivate: { scenario.create_bronchoconstriction_action(0)  }
@@ -251,7 +250,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }

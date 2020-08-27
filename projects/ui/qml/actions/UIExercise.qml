@@ -284,16 +284,16 @@ UIActionForm {
  
   Loader {
     id : exerciseLoader
-    sourceComponent : root.summary
-    state : "collapsed"
+    sourceComponent : root.builderSummary
+    state : "collapsedBuilder"
     states : [
        State {
           name : "expandedBuilder"
           PropertyChanges {target : exerciseLoader; sourceComponent : root.type==="Generic" ? genericBuilderDetails : (root.type==="Running" || root.type==="Cycling") ? cycleRunBuilderDetails : strengthBuilderDetails}
         }
         ,State {
-          name: "collapsed"
-          PropertyChanges { target : exerciseLoader; sourceComponent: root.summary}
+          name: "collapsedBuilder"
+          PropertyChanges { target : exerciseLoader; sourceComponent: root.builderSummary}
         }
       ]
       MouseArea {
@@ -304,7 +304,7 @@ UIActionForm {
       
         onDoubleClicked: { // Double Clicking Window
           if ( mouse.button === Qt.LeftButton ){
-            if (exerciseLoader.state === "collapsed") {
+            if (exerciseLoader.state === "collapsedBuilder") {
               exerciseLoader.state = "expandedBuilder"
             } else {
               //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
@@ -481,7 +481,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }
@@ -713,7 +713,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }
@@ -886,7 +886,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }

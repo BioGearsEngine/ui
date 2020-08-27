@@ -1020,7 +1020,7 @@ void EventTree::add_event(QString name, int type, int subType, QString params, d
   ev.duration = duration_s;
   add_event(ev);
   //Handle "off" action
-  if (duration_s > 0.0) {
+  if (duration_s > 0.0 && type != EventTypes::AdvanceTime) {
     Event offEvent;
     QString offParams = params;
     int startLoc;

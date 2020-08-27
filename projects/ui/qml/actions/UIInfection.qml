@@ -14,7 +14,7 @@ UIActionForm {
   property double mic : 0.0
   property string location : ""
   property string severity_str :  (severity == -1) ? "" : (severity == 0) ?"None" : (severity == 1) ?"Mild" : (severity == 2) ?"Moderate" : "Severe"
-  property bool validBuildConfig : (severity !== -1 && location !=="" && mic > 0.0 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+  property bool validBuildConfig : (severity !== -1 && location !=="" && mic > 0.0 && actionStartTime_s)
 
   actionType : "Bacterial Infection"
   actionClass : EventModel.Infection
@@ -326,7 +326,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }

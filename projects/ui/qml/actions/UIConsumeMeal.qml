@@ -47,7 +47,7 @@ UIActionForm {
     }
   }
 
-  summary : Component {
+  controlsSummary : Component {
     RowLayout {
       id : actionRow
       spacing : 5
@@ -702,7 +702,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }

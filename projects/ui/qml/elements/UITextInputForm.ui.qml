@@ -5,8 +5,8 @@ import QtQuick.Controls.Material 2.3
 
 RowLayout {
     id: root
-    property alias name: name.text
-    property alias value: value.text
+    property alias name: name
+    property alias value: value
     Label {
         id: name
         text: "Unset"

@@ -60,6 +60,7 @@ UIActionForm {
         stepSize : 1
         value : root.intensity
         Layout.alignment : Qt.AlignLeft
+        Layout.columnSpan : 2
         onMoved : {
           root.intensity = value
           if ( root.active )
@@ -277,7 +278,7 @@ UIActionForm {
           width : parent.width / 2
           onClicked : {
             if (validBuildConfig){
-              viewLoader.state = "collapsed"
+              viewLoader.state = "collapsedBuilder"
               root.buildSet(root)
             }
           }

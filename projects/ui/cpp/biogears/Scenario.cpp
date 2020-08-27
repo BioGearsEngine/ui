@@ -137,7 +137,7 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
   }
 }
 //-------------------------------------------------------------------------------
-//This function performs the same task as setup_physiology_substances, but it accepts 
+//This function performs the same task as setup_physiology_substances, but it accepts
 //a single substance (rather than a BioGearsData type) and adds it to physiology model.
 //In this way, new substances can be added during runtime without looping through all active subs.
 void Scenario::add_physiology_substance(biogears::SESubstance* newSub)
@@ -410,7 +410,7 @@ Scenario& Scenario::load_patient(QString file)
       biogears::SEEnvironment& env = engine_as_bg->GetEnvironment();
       biogears::SEEnvironmentalConditions& cond = env.GetConditions();
       energy_and_metabolism->child(10)->unit_scalar(&cond.GetAmbientTemperature());
-      energy_and_metabolism->child(11)->scalar(&cond.GetRelativeHumidity()); 
+      energy_and_metabolism->child(11)->scalar(&cond.GetRelativeHumidity());
     }
 
     auto renal_fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_FLUID_BALANCE, 0, QModelIndex()).internalPointer());
@@ -1050,13 +1050,13 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   return;
 }
 
-void Scenario::create_scenario(EventTree* eventTree)
+void Scenario::create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* eventTree)
 {
-  eventTree->sort_events();        //Get actions in right order
+  eventTree->sort_events(); //Get actions in right order
   std::cout << eventTree << "\n";
 
   auto buildScenario = std::make_unique<biogears::SEScenario>(_engine->GetSubstances());
-  buildScenario->SetName("TestScenario.xml");
+  buildScenario->SetName(name.toStdString());
 
   biogears::SEAction* action;
   //Set up re-usable Advance Time event to apply between adjacent actions
@@ -1064,18 +1064,30 @@ void Scenario::create_scenario(EventTree* eventTree)
   advanceTime.typeName = "AdvanceTime";
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
 
-  for (int i = 0; i < eventTree->get_events().size(); ++i) {
+  if (isPatientFile) {
+    buildScenario->SetPatientFile(initialParams.toStdString());
+  } else {
+    buildScenario->SetEngineStateFile(initialParams.toStdString());
+  }
+  for (int i = 0; i < eventTree->get_events().size() - 1; ++i) {
+    //Stopping before size-1 becasue eventTree[size -1] so that our final "next event" does not exceed loop bounds (last event, which is an advance time, is still processed)
     bio::Event thisEvent = eventTree->get_events()[i];
     action = eventTree->decode_action(thisEvent, _engine->GetSubstances());
     buildScenario->AddAction(*action);
-    //Add an advance time action between this action and the next one -- need to add sentinal "End Sim" event so we know how long the last Advance Time should be (and so we don't need to check loop size)
-    if (eventTree->get_events().size() > i + 1) {
-      bio::Event nextEvent = eventTree->get_events()[i + 1];
-      advanceTime.startTime = thisEvent.startTime;    //Start at same time as action we just applied
+    bio::Event nextEvent = eventTree->get_events()[i + 1];
+    //Place an advance time action between successive BG actions (unless the next action is the final advance time action in the scenario)
+    if (nextEvent.eType != EventTree::EventTypes::AdvanceTime) {
+      advanceTime.startTime = thisEvent.startTime; //Start at same time as action we just applied
       advanceTime.duration = nextEvent.startTime - advanceTime.startTime;
       action = eventTree->decode_action(advanceTime, _engine->GetSubstances());
       buildScenario->AddAction(*action);
-    }  
+    } else {
+      //Next event is our final advance time -- only add if duration > 0
+      if (nextEvent.duration > 0.0) {
+        action = eventTree->decode_action(nextEvent, _engine->GetSubstances());
+        buildScenario->AddAction(*action);
+      }
+    }
   }
 
   std::string fileLoc = "./Scenarios/" + buildScenario->GetName() + ".xml";
@@ -1089,7 +1101,6 @@ void Scenario::create_scenario(EventTree* eventTree)
   CDM::Scenario(stream, *sceData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved scenario: " + fullPath);
-
 }
 
 void Scenario::create_substance(QVariantMap substanceData)
