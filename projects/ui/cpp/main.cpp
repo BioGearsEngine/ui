@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
   qmlRegisterType<Substance>("com.biogearsengine.ui.scenario", 1, 0, "Substance");
   qmlRegisterType<BioGearsData>("com.biogearsengine.ui.scenario", 1, 0, "PhysiologyModel");
   qmlRegisterType<QtLogForward>("com.biogearsengine.ui.scenario", 1, 0, "LogForward");
+  qmlRegisterType<Urinalysis>("com.biogearsengine.ui.scenario", 1, 0, "Urinalysis");
 
   qmlRegisterType<bio::EventTree>("com.biogearsengine.ui.scenario", 1, 0, "EventModel");
 
@@ -37,10 +38,9 @@ int main(int argc, char* argv[])
   QMetaType::registerEqualsComparator<PatientState>();
   qmlRegisterUncreatableType<PatientState>("com.biogearsengine.ui.scenario", 1, 0, "PatientState", "State of the Patient");
 
-  qRegisterMetaType<Urinalysis>();
-  QMetaType::registerEqualsComparator<Urinalysis>();
-  qmlRegisterUncreatableType<Urinalysis>("com.biogearsengine.ui.scenario", 1, 0, "Urinalysis", "Urinalysis Patient Assessment Request");
-
+  //qRegisterMetaType<Urinalysis>();
+  //QMetaType::registerEqualsComparator<Urinalysis>();
+  //qmlRegisterUncreatableType<Urinalysis>("com.biogearsengine.ui.scenario", 1, 0, "Urinalysis", "Urinalysis Patient Assessment Request");
 
   qRegisterMetaType<PatientConditions>();
   QMetaType::registerEqualsComparator<PatientConditions>();

@@ -24,16 +24,16 @@ Item {
 		
 	property string uaColor: "Pink"
 	property string uaAppearance: "Cloudy"
-	property bool uaGlucose: false
-	property bool uaKetone: false
+	property string uaGlucose: "Negative"
+	property string uaKetone: "Negative"
 	property double uaBilirubin: 0.0
 	property double uaSpecificG: 0.0
-	property bool uaBlood: false
+	property string uaBlood: "Negative"
 	property double uapH: 0.0
 	property double uaUrobilinogen: 0.0
-	property bool uaProtein: false
-	property bool uaNitrite: false
-	property bool uaLE: false
+	property string uaProtein: "Negative"
+	property string uaNitrite: "Negative"
+	property string uaLE: "Negative"
 	property double urineProductionRate: 0.0
 	property double glomerularFiltrationRate: 0.0
 	property double renalBloodFlow: 0.0
@@ -90,6 +90,23 @@ Item {
 
 		}
     }
+	
+	onUrinalysisDataChanged: {
+		console.log("Finally Reached Full Update for Urinalysis")
+		root.uaColor = urinalysisData.Color
+		root.uaAppearance = urinalysisData.Appearance
+		root.uaBilirubin = urinalysisData.Bilirubin
+		root.uaSpecificG = urinalysisData.SpecificGravity
+		root.uapH = urinalysisData.pH
+		root.uaUrobilinogen = urinalysisData.Urobilinogen
+		root.uaGlucose = urinalysisData.Glucose
+		root.uaKetone = urinalysisData.Ketone
+		root.uaProtein = urinalysisData.Protein
+		root.uaBlood = urinalysisData.Blood
+		root.uaNitrite = urinalysisData.Nitrite
+		root.uaLE = urinalysisData.LeukocyteEsterase
+	}
+	
 	Rectangle {
 		id : renalBackground
 		anchors.fill : parent
@@ -563,8 +580,6 @@ Item {
 						onClicked : {
 							console.log("Renal Button completed as desired")
 							urinalysisRequest();
-							
-							root.uaAppearance = urinalysisData.Appearance
 						}
 					}
 					

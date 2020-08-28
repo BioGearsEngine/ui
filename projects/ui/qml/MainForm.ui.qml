@@ -44,16 +44,6 @@ GridLayout {
       Layout.alignment: Qt.AlignTop
       Layout.fillHeight: false
       Layout.rowSpan : 2
-
-      onPatientPhysiologyChanged : {
-          console.log ("physiology changed %1".arg(model))
-          graphArea.newPhysiologyModel(model)
-      }
-	  
-	  onUrinalysisUpdated : {
-		  console.log ("Urinalysis update received at MainForm")
-		  graphArea.urinalysis = urinalysis
-	  }
     }
 
     GraphArea {
@@ -65,11 +55,6 @@ GridLayout {
       Layout.fillWidth: true
       Layout.fillHeight: false
       Layout.margins:0
-	  
-	  onUrinalysisRequest : {
-	    console.log (" MainForm urinalysis request instantiated")
-		controls.requestUrinalysis()
-	  }
     }
     LuaConsole {
       id:consoleArea

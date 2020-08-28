@@ -3,7 +3,11 @@
 #include <QObject>
 #include <biogears/cdm/patient/assessments/SEUrinalysis.h>
 
-struct Urinalysis {
+struct Urinalysis : public QObject {
+
+  Urinalysis(QObject* parent = nullptr)
+    : QObject(parent){};
+
   QString Color(); // These are needed in UA.cpp...use if statements for enums
   QString Appearance();
   QString Bilirubin();
@@ -49,7 +53,7 @@ signals:
   //void leukocyteEsteraseChanged(QString);
 
 private:
-//public:
+  Q_OBJECT
   QString _color;
   QString _appearance;
   QString _bilirubin;
@@ -63,9 +67,7 @@ private:
   QString _nitrite;
   QString _leukocyteEsterase;
 
-//private:
 
-  Q_GADGET
   Q_PROPERTY(QString Color READ Color) //NOTIFY colorChanged)
   Q_PROPERTY(QString Appearance READ Appearance) // NOTIFY appearanceChanged)
   Q_PROPERTY(QString Bilirubin READ Bilirubin)
@@ -80,4 +82,3 @@ private:
   Q_PROPERTY(QString LeukocyteEsterase READ LeukocyteEsterase)
 
 };
-Q_DECLARE_METATYPE(Urinalysis)

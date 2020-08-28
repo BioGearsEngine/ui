@@ -15,7 +15,7 @@ ControlsForm {
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
-  signal urinalysisUpdated(Urinalysis urinalysis)
+  //signal urinalysisUpdated(Urinalysis urinalysisData)
   // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
@@ -26,6 +26,7 @@ ControlsForm {
   signal openActionDrawer()
 
   property PhysiologyModel bgData
+  property Urinalysis urinalysisData
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
   
@@ -74,8 +75,9 @@ ControlsForm {
 	
 	onUrinalysis_completed: {
 		console.log("Controls got the UA Done signal")
-		console.log(urinalysis.Appearance)
-		root.urinalysisUpdated(urinalysis)
+		console.log(urinalysis)
+		root.urinalysisData = urinalysis
+		//urinalysisUpdated(urinalysis)
 	}
 
     onPhysiologyChanged:  {

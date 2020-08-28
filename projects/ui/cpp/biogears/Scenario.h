@@ -157,7 +157,7 @@ signals:
   void patientStateChanged(PatientState patientState);
   void patientConditionsChanged(PatientConditions conditions);
   //void urinalysisFinished(Urinalysis urinalysisData);  ////////////////////////////////////
-  void urinalysis_completed(const Urinalysis urinalysis); //////////////////////////////////
+  void urinalysis_completed(Urinalysis* urinalysis); //////////////////////////////////
 
   void timeAdvance(double time_s);
   void physiologyChanged(BioGearsData* model);
@@ -192,6 +192,7 @@ private:
   biogears::Logger _logger;
   std::unique_ptr<biogears::BioGearsEngine> _engine;
   std::shared_ptr<biogears::SEUrinalysis> _urinalysis;
+  std::unique_ptr<Urinalysis> _urinalysis_qml;
   std::shared_ptr<biogears::SEComprehensiveMetabolicPanel> _blood_panel;
 
   ActionChannel _action_queue;

@@ -39,6 +39,20 @@ ApplicationWindow {
         controls.onOpenActionDrawer: {
           actionDrawer.openActionDrawer();
         }
+		controls.onPatientPhysiologyChanged : {
+			console.log ("physiology changed %1".arg(model))
+			graphArea.newPhysiologyModel(model)
+		}
+	  
+		controls.onUrinalysisDataChanged : {
+			console.log ("Urinalysis update received at MainForm")
+			console.log(controls.urinalysisData)
+			graphArea.urinalysis = controls.urinalysisData
+		}
+		graphArea.onUrinalysisRequest : {
+			console.log (" MainForm urinalysis request instantiated")
+			controls.requestUrinalysis()
+		}
     }
 
     Info {
