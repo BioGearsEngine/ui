@@ -158,6 +158,10 @@ Page {
                                 text :    _model.data(_item, PhysiologyModel.RequestRole) 
                                 onClicked : {
                                     if (checked) {
+										console.log ("Checked Item %1".arg(_item))
+										console.log ("Checked Index %1".arg(plots.currentIndex))
+										console.log ("Checked Model %1".arg(_model))
+										console.log ("Checked Titel %1".arg(_title))
                                         _model.setData(_item, true, PhysiologyModel.EnabledRole)
                                         createPlotView(plots.currentIndex, _model, _item, _title)
                                     } else {
@@ -165,6 +169,11 @@ Page {
                                         removePlotView(plots.currentIndex, _item.row, _title)
                                     }
                                 }
+								Component.onCompleted: {
+									if (checked) {
+									  createPlotView(plots.currentIndex, _model, _item, _title)
+									}
+								}
                             }
                         }
                     }
@@ -359,8 +368,9 @@ Page {
             Layout.fillHeight : true
 			
 			onUrinalysisRequest: {
+			  console.log("GraphAreaForm completed as desired")
 			  root.urinalysisRequest();
-			  //physiologyRequestModel.request_urinalysis_assessment();
+			  //physiologyRequestModel.request_urinalysis();
 			}
         }
         Item {

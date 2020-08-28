@@ -17,6 +17,7 @@ GraphAreaForm {
   signal conditionUpdates(PatientConditions conditions)
 
   signal newPhysiologyModel(PhysiologyModel model)
+  //signal newUrinalysis(Urinalysis urinalysis)
 
   property double count_1 : 0.0
   property double count_2 : 0.0
@@ -29,6 +30,8 @@ GraphAreaForm {
   property ObjectModel renalOverviewModel : renalOverviewObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ObjectModel customModel : customObjectModel
+  
+  property Urinalysis urinalysis
   
   property double currentTime_s
 
@@ -78,9 +81,11 @@ GraphAreaForm {
 	renalOverviewSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE))
   }
   
-  //onNewUrinalysis : {
-	//renalOverviewSeries.urinalysisData = urinalysis;
- //}
+  onUrinalysisChanged : {
+	console.log ("Urinalysis update received at GraphArea")
+	console.log(urinalysis.Appearance)
+	renalOverviewSeries.urinalysisData = urinalysis;
+  }
 
   onStart : {
     oneHzPlotTimer.start();
@@ -181,14 +186,14 @@ GraphAreaForm {
 	  var renalOverviewReq = physiologyRequestModel.category(5)
       for ( var i = 0; i < renalOverviewReq.count ; ++i){
         if(renalOverviewReq.get(i).active){
-          physiologyRequestModel.get(4).activeRequests.append({"request": renalOverviewReq.get(i).request})
+          physiologyRequestModel.get(5).activeRequests.append({"request": renalOverviewReq.get(i).request})
           renalOverviewModel.createPlotView(renalOverviewReq.get(i))
         }  
       }
       var customReq = physiologyRequestModel.category(6)
       for ( var i = 0; i < customReq.count ; ++i){
         if( customReq.get(i).active){
-          physiologyRequestModel.get(5).activeRequests.append({"request": customReq.get(i).request})
+          physiologyRequestModel.get(6).activeRequests.append({"request": customReq.get(i).request})
           customModel.createPlotView(customReq.get(i))
         }
       }
@@ -309,7 +314,7 @@ GraphAreaForm {
     renalFluidBalanceObjectModel.resizePlots(renalFluidBalanceGridView.cellWidth, renalFluidBalanceGridView.cellHeight)
   }
   
-  //Renal - Fluid Balance//
+  //Renal - Overview//
   ObjectModel {
     id: renalOverviewObjectModel
     function createPlotView (model, request, title) {

@@ -15,7 +15,7 @@ Item {
 	
 	property PhysiologyModel physiologyRenalModel
 	property PhysiologyModel physiologyRenalFluidModel
-	//property Urinalysis urinalysisData
+	property Urinalysis urinalysisData
 	
 	signal urinalysisRequest()
 	
@@ -37,7 +37,16 @@ Item {
 	property double urineProductionRate: 0.0
 	property double glomerularFiltrationRate: 0.0
 	property double renalBloodFlow: 0.0
-	property double reabsorptionRate: 0.0
+	property double leftReabsorptionRate: 0.0
+	property double rightReabsorptionRate: 0.0
+	property double meanReabsorptionRate: 0.0
+	
+	property double colTableUA : 0.0
+	property double rowTableUA : 0.0
+	property string headerTable: "deepskyblue"
+	property string lightTable: "white"
+	property string darkTable: "lightblue"
+	property string borderTable: "black"
 
 	
 	
@@ -69,6 +78,15 @@ Item {
 		onTriggered : {
 			let urineProdIndex = physiologyRenalModel.index(1, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
 			root.urineProductionRate = physiologyRenalModel.data(urineProdIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let glomFiltRateIndex = physiologyRenalFluidModel.index(5, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.glomerularFiltrationRate = physiologyRenalFluidModel.data(glomFiltRateIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let renalBloodFlowIndex = physiologyRenalFluidModel.index(6, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.renalBloodFlow = physiologyRenalFluidModel.data(renalBloodFlowIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let lReabsIndex = physiologyRenalFluidModel.index(11, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.leftReabsorptionRate = physiologyRenalFluidModel.data(lReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let rReabsIndex = physiologyRenalFluidModel.index(12, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.rightReabsorptionRate = physiologyRenalFluidModel.data(rReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
+			root.meanReabsorptionRate = (root.leftReabsorptionRate + root.rightReabsorptionRate) / 2;
 
 		}
     }
@@ -250,62 +268,309 @@ Item {
 						}
 					}
 					
-					ListModel {
-						id: uaPresentModel
-						ListElement {
-							sub: "Glucose"
-							present: "false"
-						}
-						ListElement {
-							sub: "Ketone"
-							present: "false"
-						}
-						ListElement {
-							sub: "Blood"
-							present: "false"
-						}
-						ListElement {
-							sub: "Protein"
-							present: "false"
-						}
-						ListElement {
-							sub: "Nitrite"
-							present: "false"
-						}
-						ListElement {
-							sub: "LE"
-							present: "false"
-						}
-					}
-					TableView {
-						id: uaTablePresent
-						alternatingRowColors : true
+					Rectangle {
+						id: uaTableSpace
+						Layout.preferredHeight: urinalysisConsole.height*0.45
+						Layout.preferredWidth : urinalysisConsole.width*0.8
 						Layout.alignment: Qt.AlignHCenter
-						Layout.preferredWidth: urinalysisConsole*0.8
-						TableViewColumn {
-							role: "sub"
-							title: "Substance"
-							width: uaTablePresent.width*0.5
+						//anchors.fill : parent
+						color : root.borderTable
+						
+						GridLayout {
+							id: uaTablePresence
+							// Percentage of size and centerIn parent provides margin buffer around grid
+							anchors.fill: parent
+							columnSpacing: 0
+							rowSpacing: 0
+							
+							columns: 2
+							rows: 7
+							
+							Rectangle {
+								id: subTableHeader
+								Layout.column: 0
+								Layout.row: 0
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.headerTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subHeaderText
+									text: "Substance"
+									font.bold: true
+									anchors.horizontalCenter: subTableHeader.horizontalCenter
+									anchors.verticalCenter: subTableHeader.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: presTableHeader
+								Layout.column: 1
+								Layout.row: 0
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.headerTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presHeaderText
+									text: "Present?"
+									font.bold: true
+									anchors.horizontalCenter: presTableHeader.horizontalCenter
+									anchors.verticalCenter: presTableHeader.verticalCenter
+									color: "black"
+								}
+							}
+							
+							Rectangle {
+								id: glucoseTableSub
+								Layout.column: 0
+								Layout.row: 1
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.lightTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subGlucoseText
+									text: "Glucose"
+									anchors.horizontalCenter: glucoseTableSub.horizontalCenter
+									anchors.verticalCenter: glucoseTableSub.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: glucTablePres
+								Layout.column: 1
+								Layout.row: 1
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.lightTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presGlucoseText
+									text: root.uaGlucose
+									anchors.horizontalCenter: glucTablePres.horizontalCenter
+									anchors.verticalCenter: glucTablePres.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: ketoneTableSub
+								Layout.column: 0
+								Layout.row: 2
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.darkTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subKetoneText
+									text: "Ketone"
+									anchors.horizontalCenter: ketoneTableSub.horizontalCenter
+									anchors.verticalCenter: ketoneTableSub.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: ketTablePres
+								Layout.column: 1
+								Layout.row: 2
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.darkTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presKetoneText
+									text: root.uaKetone
+									anchors.horizontalCenter: ketTablePres.horizontalCenter
+									anchors.verticalCenter: ketTablePres.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: bloodTableSub
+								Layout.column: 0
+								Layout.row: 3
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.lightTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subBloodText
+									text: "Blood"
+									anchors.horizontalCenter: bloodTableSub.horizontalCenter
+									anchors.verticalCenter: bloodTableSub.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: bloodTablePres
+								Layout.column: 1
+								Layout.row: 3
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.lightTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presBloodText
+									text: root.uaBlood
+									anchors.horizontalCenter: bloodTablePres.horizontalCenter
+									anchors.verticalCenter: bloodTablePres.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: proteinTableSub
+								Layout.column: 0
+								Layout.row: 4
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.darkTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subProteinText
+									text: "Protein"
+									anchors.horizontalCenter: proteinTableSub.horizontalCenter
+									anchors.verticalCenter: proteinTableSub.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: proteinTablePres
+								Layout.column: 1
+								Layout.row: 4
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.darkTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presProteinText
+									text: root.uaProtein
+									anchors.horizontalCenter: proteinTablePres.horizontalCenter
+									anchors.verticalCenter: proteinTablePres.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: nitriteTableSub
+								Layout.column: 0
+								Layout.row: 5
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.lightTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subNitriteText
+									text: "Nitrite"
+									anchors.horizontalCenter: nitriteTableSub.horizontalCenter
+									anchors.verticalCenter: nitriteTableSub.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: nitriteTablePres
+								Layout.column: 1
+								Layout.row: 5
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.lightTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presNitriteText
+									text: root.uaNitrite
+									anchors.horizontalCenter: nitriteTablePres.horizontalCenter
+									anchors.verticalCenter: nitriteTablePres.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: leTableSub
+								Layout.column: 0
+								Layout.row: 6
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.darkTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: subLEText
+									text: "LE"
+									anchors.horizontalCenter: leTableSub.horizontalCenter
+									anchors.verticalCenter: leTableSub.verticalCenter
+									color: "black"
+								}
+							}
+							Rectangle {
+								id: leTablePres
+								Layout.column: 1
+								Layout.row: 6
+								Layout.columnSpan: 1
+								Layout.rowSpan: 1
+								Layout.preferredHeight: uaTableSpace.height / uaTablePresence.rows
+								Layout.preferredWidth: uaTableSpace.width / uaTablePresence.columns
+								color : root.darkTable
+								border.color: root.borderTable
+								border.width: 2
+								Text {
+									id: presLEText
+									text: root.uaLE
+									anchors.horizontalCenter: leTablePres.horizontalCenter
+									anchors.verticalCenter: leTablePres.verticalCenter
+									color: "black"
+								}
+							}
 						}
-						TableViewColumn {
-							role: "present"
-							title: "Present?"
-							width: uaTablePresent.width*0.5
-						}
-						model: uaPresentModel
 					}
-					
 					Button {
 						Layout.alignment: Qt.AlignHCenter
 						text: "Update"
 						onClicked : {
+							console.log("Renal Button completed as desired")
 							urinalysisRequest();
+							
+							root.uaAppearance = urinalysisData.Appearance
 						}
 					}
 					
 				}
 			}
-			
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			Rectangle {
 				id : graphConsole
 				Layout.column: 5
@@ -417,7 +682,7 @@ Item {
 						Text {
 							id: textReabs
 							font.bold: true
-							text: qsTr("Reabs. (mL/s): ") + root.reabsorptionRate
+							text: qsTr("Reabs. (mL/s): ") + root.meanReabsorptionRate
 							anchors.verticalCenter: renalReabsBox.verticalCenter
 							anchors.horizontalCenter: renalReabsBox.horizontalCenter
 							color: "black"

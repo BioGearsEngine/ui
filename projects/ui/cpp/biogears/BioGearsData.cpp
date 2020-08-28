@@ -133,10 +133,27 @@ void BioGearsData::initialize()
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtracellularFluidVolume"));
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("IntracellularFluidVolume"));
   _renal_fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
+  _renal_fluid_balance->append(QString("Renal"), QString("Left Reabsorption Rate"));
+  _renal_fluid_balance->append(QString("Renal"), QString("Right Reabsorption Rate"));
 
   _renal_overview->append(QString("Renal"), QString("Mean Urine Output"));
   _renal_overview->append(QString("Renal"), QString("Urine Production Rate"));
+  _renal_overview->child(1)->active(true);
   _renal_overview->append(QString("Renal"), QString("Glomerular Filtration Rate"));
+  _renal_overview->child(2)->active(true);
+
+  _renal_overview->append(QString("Urinalysis"), QString("Color"));
+  _renal_overview->append(QString("Urinalysis"), QString("Appearance"));
+  _renal_overview->append(QString("Urinalysis"), QString("Glucose"));
+  _renal_overview->append(QString("Urinalysis"), QString("Ketone"));
+  _renal_overview->append(QString("Urinalysis"), QString("Bilirubin"));
+  _renal_overview->append(QString("Urinalysis"), QString("Specifc Gravity"));
+  _renal_overview->append(QString("Urinalysis"), QString("Blood"));
+  _renal_overview->append(QString("Urinalysis"), QString("pH"));
+  _renal_overview->append(QString("Urinalysis"), QString("Protein"));
+  _renal_overview->append(QString("Urinalysis"), QString("Urobilinogen"));
+  _renal_overview->append(QString("Urinalysis"), QString("Nitrite"));
+  _renal_overview->append(QString("Urinalysis"), QString("LeukocyteEsterase"));
 
   _customs->append(QString("Plots"), QString("Respiratory PV Curve"));
   auto custom = _customs->child(0);

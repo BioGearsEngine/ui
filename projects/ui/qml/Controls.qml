@@ -15,7 +15,7 @@ ControlsForm {
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
-  //signal urinalysisUpdated(Urinalysis urinalysis)
+  signal urinalysisUpdated(Urinalysis urinalysis)
   // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
@@ -30,7 +30,8 @@ ControlsForm {
   property ObjectModel actionModel : actionSwitchModel
   
   function requestUrinalysis() {
-	root.scenario.request_urinalysis_assessment();
+	console.log("Controls function called as desired")
+	root.scenario.request_urinalysis();
   }
 
   function seconds_to_clock_time(SimulationTime_s) {
@@ -54,8 +55,8 @@ ControlsForm {
         root.systolicBloodPressure.value.text = metrics.SystolicBloodPressure
         root.dystolicBloodPressure.value.text = metrics.DiastolicBloodPressure
 
-       request_urinalysis();
-       request_blood_panel();
+       //request_urinalysis();
+       //request_blood_panel();
     }
 
     onPatientStateChanged: {
@@ -71,9 +72,10 @@ ControlsForm {
       root.patientStateChanged(patientState)
     }
 	
-	onUrinalysisFinished: {
-		console.log("completed as desired")
-		//root.urinalysisUpdated(urinalysis)
+	onUrinalysis_completed: {
+		console.log("Controls got the UA Done signal")
+		console.log(urinalysis.Appearance)
+		root.urinalysisUpdated(urinalysis)
 	}
 
     onPhysiologyChanged:  {

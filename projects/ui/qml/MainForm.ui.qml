@@ -50,10 +50,10 @@ GridLayout {
           graphArea.newPhysiologyModel(model)
       }
 	  
-	  //onUrinalysisUpdated : {
-		//  console.log ("Urinalysis Complete")
-		//  graphArea.newUrinalysis(urinalysis)
-	  //}
+	  onUrinalysisUpdated : {
+		  console.log ("Urinalysis update received at MainForm")
+		  graphArea.urinalysis = urinalysis
+	  }
     }
 
     GraphArea {
@@ -67,7 +67,7 @@ GridLayout {
       Layout.margins:0
 	  
 	  onUrinalysisRequest : {
-	    console.log ("Urinalysis request instantiated")
+	    console.log (" MainForm urinalysis request instantiated")
 		controls.requestUrinalysis()
 	  }
     }

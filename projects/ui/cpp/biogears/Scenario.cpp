@@ -439,12 +439,17 @@ Scenario& Scenario::load_patient(QString file)
       renal_fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
       renal_fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
       renal_fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
+      renal_fluid_balance->child(11)->unit_scalar(&_engine->GetRenal().GetLeftReabsorptionRate());
+      renal_fluid_balance->child(12)->unit_scalar(&_engine->GetRenal().GetRightReabsorptionRate());
+
     }
 
     auto renal_overview = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_OVERVIEW, 0, QModelIndex()).internalPointer());
     {
       renal_overview->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
       renal_overview->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
+      renal_overview->child(2)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
+
     }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
@@ -518,6 +523,22 @@ inline void Scenario::physiology_thread_step()
       _engine->GetPatientAssessment(*assessment);
       if (dynamic_cast<biogears::SEUrinalysis*>(assessment)) {
         std::cout << "Urinalysis completed classname(" << assessment->classname() << ")\n";
+        Urinalysis analysis;
+        //analysis.Color(_urinalysis->GetColorResult());
+        analysis.Appearance(CDM::enumClarityIndicator::Turbid); // Using normal, not currently changed in BG engine
+        analysis.Appearance();
+        //analysis.Bilirubin(0.0); // Using normal, not currently changed in BG engine
+        //analysis.SpecificGravity(_urinalysis->GetSpecificGravityResult().GetValue());
+        //analysis.pH(6.7);
+        //analysis.Urobilinogen(0.6);
+        //analysis.Glucose(_urinalysis->GetGlucoseResult());
+        //analysis.Ketone(_urinalysis->GetKetoneResult());
+        //analysis.Protein(_urinalysis->GetProteinResult());
+        //analysis.Blood(_urinalysis->GetBloodResult());
+        //analysis.Nitrite(CDM::enumPresenceIndicator::Negative);
+        //analysis.LeukocyteEsterase(CDM::enumPresenceIndicator::Negative);
+
+        emit urinalysis_completed(analysis);
       } else if (dynamic_cast<biogears::SEComprehensiveMetabolicPanel*>(assessment)) {
         std::cout << "ComprehensiveMetabolicPanel completed classname(" << assessment->classname() << ")\n";
       } else {
