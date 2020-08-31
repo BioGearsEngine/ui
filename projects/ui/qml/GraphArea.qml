@@ -17,7 +17,6 @@ GraphAreaForm {
   signal conditionUpdates(PatientConditions conditions)
 
   signal newPhysiologyModel(PhysiologyModel model)
-  //signal newUrinalysis(Urinalysis urinalysis)
 
   property double count_1 : 0.0
   property double count_2 : 0.0
@@ -82,8 +81,6 @@ GraphAreaForm {
   }
   
   onUrinalysisChanged : {
-	console.log ("Urinalysis update received at GraphArea")
-	console.log(urinalysis.Appearance)
 	renalOverviewSeries.urinalysisData = urinalysis;
   }
 

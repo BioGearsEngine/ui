@@ -156,8 +156,7 @@ signals:
   void patientMetricsChanged(PatientMetrics* metrics);
   void patientStateChanged(PatientState patientState);
   void patientConditionsChanged(PatientConditions conditions);
-  //void urinalysisFinished(Urinalysis urinalysisData);  ////////////////////////////////////
-  void urinalysis_completed(Urinalysis* urinalysis); //////////////////////////////////
+  void urinalysis_completed(Urinalysis* urinalysis); 
 
   void timeAdvance(double time_s);
   void physiologyChanged(BioGearsData* model);

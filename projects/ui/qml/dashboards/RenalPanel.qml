@@ -22,7 +22,7 @@ Item {
 	property alias renalOverviewGridView:renalOverviewGridView
 	property alias renalTimer : renalTimer
 		
-	property string uaColor: "Pink"
+	property string uaColor: "Yellow"
 	property string uaAppearance: "Cloudy"
 	property string uaGlucose: "Negative"
 	property string uaKetone: "Negative"
@@ -92,7 +92,6 @@ Item {
     }
 	
 	onUrinalysisDataChanged: {
-		console.log("Finally Reached Full Update for Urinalysis")
 		root.uaColor = urinalysisData.Color
 		root.uaAppearance = urinalysisData.Appearance
 		root.uaBilirubin = urinalysisData.Bilirubin
@@ -578,14 +577,12 @@ Item {
 						Layout.alignment: Qt.AlignHCenter
 						text: "Update"
 						onClicked : {
-							console.log("Renal Button completed as desired")
 							urinalysisRequest();
 						}
 					}
 					
 				}
 			}
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			Rectangle {
 				id : graphConsole
 				Layout.column: 5

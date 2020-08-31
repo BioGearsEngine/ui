@@ -31,7 +31,6 @@ ControlsForm {
   property ObjectModel actionModel : actionSwitchModel
   
   function requestUrinalysis() {
-	console.log("Controls function called as desired")
 	root.scenario.request_urinalysis();
   }
 
@@ -55,9 +54,6 @@ ControlsForm {
         root.oxygenSaturation.value.text      = metrics.OxygenSaturation
         root.systolicBloodPressure.value.text = metrics.SystolicBloodPressure
         root.dystolicBloodPressure.value.text = metrics.DiastolicBloodPressure
-
-       //request_urinalysis();
-       //request_blood_panel();
     }
 
     onPatientStateChanged: {
@@ -74,10 +70,7 @@ ControlsForm {
     }
 	
 	onUrinalysis_completed: {
-		console.log("Controls got the UA Done signal")
-		console.log(urinalysis)
 		root.urinalysisData = urinalysis
-		//urinalysisUpdated(urinalysis)
 	}
 
     onPhysiologyChanged:  {

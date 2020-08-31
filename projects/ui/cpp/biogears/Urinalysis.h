@@ -8,7 +8,7 @@ struct Urinalysis : public QObject {
   Urinalysis(QObject* parent = nullptr)
     : QObject(parent){};
 
-  QString Color(); // These are needed in UA.cpp...use if statements for enums
+  QString Color(); 
   QString Appearance();
   QString Bilirubin();
   QString SpecificGravity();

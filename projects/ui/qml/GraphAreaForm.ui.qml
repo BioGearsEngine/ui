@@ -368,9 +368,7 @@ Page {
             Layout.fillHeight : true
 			
 			onUrinalysisRequest: {
-			  console.log("GraphAreaForm completed as desired")
 			  root.urinalysisRequest();
-			  //physiologyRequestModel.request_urinalysis();
 			}
         }
         Item {

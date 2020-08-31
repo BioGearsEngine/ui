@@ -45,12 +45,9 @@ ApplicationWindow {
 		}
 	  
 		controls.onUrinalysisDataChanged : {
-			console.log ("Urinalysis update received at MainForm")
-			console.log(controls.urinalysisData)
 			graphArea.urinalysis = controls.urinalysisData
 		}
 		graphArea.onUrinalysisRequest : {
-			console.log (" MainForm urinalysis request instantiated")
 			controls.requestUrinalysis()
 		}
     }
