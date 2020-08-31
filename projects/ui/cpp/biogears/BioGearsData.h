@@ -39,7 +39,11 @@ public:
     RowRole,
     NestedRole,
     ChildrenRole,
-    ColumnRole
+    ColumnRole,
+    AutoScaleRole,
+    YMaxRole,
+    YMinRole,
+    XIntervalRole
   };
   Q_ENUMS(PhysiologyRequestRoles)
 
@@ -88,6 +92,10 @@ public:
     roles[NestedRole] = "nested";
     roles[ChildrenRole] = "rows";
     roles[ColumnRole] = "columns";
+    roles[AutoScaleRole] = "autoscale";
+    roles[YMaxRole] = "ymax";
+    roles[YMinRole] = "ymin";
+    roles[XIntervalRole] = "xinterval";
     return roles;
   }
 

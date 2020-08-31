@@ -32,6 +32,18 @@ public:
   bool enabled() const;
   void enabled(bool);
 
+  bool auto_scale() const;
+  void auto_scale(bool value);
+
+  double y_max() const;
+  void y_max(double value);
+
+  double y_min() const;
+  void y_min(double value);
+
+  double x_interval() const;
+  void x_interval(double value);
+
   bool custom() const;
   void custom(std::function<double(void)>&& value, std::function<QString(void)>&& unit);
 
@@ -85,6 +97,10 @@ private:
   bool _custom = false;
   bool _nested = false;
   int _refresh_rate = 1;
+  bool _auto_scale;
+  double _y_max;
+  double _y_min;
+  double _x_interval;
   biogears::SEScalar const* _value = nullptr;
   biogears::SEUnitScalar const* _unit = nullptr;
 

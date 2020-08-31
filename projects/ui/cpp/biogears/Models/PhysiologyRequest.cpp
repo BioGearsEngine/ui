@@ -163,6 +163,18 @@ auto PhysiologyRequest::header(int section) const -> QString
   case 6:
     return "Nested";
     break;
+  case 7:
+    return "Auto Scale";
+    break;
+  case 8:
+    return "Y Max";
+    break;
+  case 9:
+    return "Y Min";
+    break;
+  case 10:
+    return "X Interval";
+    break;
   default:
     return "";
   }
@@ -244,6 +256,14 @@ QVariant PhysiologyRequest::data(int role) const
     return _children.size();
   case BioGearsData::ColumnRole:
     return 4;
+  case BioGearsData::AutoScaleRole:
+    return _auto_scale;
+  case BioGearsData::YMaxRole:
+    return _y_max;
+  case BioGearsData::YMinRole:
+    return _y_min;
+  case BioGearsData::XIntervalRole:
+    return _x_interval;
   default:
     return QVariant();
   }
