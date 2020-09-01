@@ -17,10 +17,6 @@ Item {
     visible: true
     width: 500
     height : 500
-    UIScenarioTimelineForm {
-      anchors.fill : parent
-      color:"blue"
-    }
    }
 
   Window {
@@ -28,10 +24,6 @@ Item {
     visible: true
     width: 500
     height : 500
-    UIScenarioTimelineForm {
-      anchors.fill : parent
-      color:"steelblue"
-    }
   }
 
   MenuBar {
