@@ -81,6 +81,46 @@ void PhysiologyRequest::enabled(bool value)
   _active = value;
 }
 //------------------------------------------------------------------------------------
+bool PhysiologyRequest::auto_scale() const
+{
+  return _auto_scale;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::auto_scale(bool value)
+{
+  _auto_scale = value;
+}
+//------------------------------------------------------------------------------------
+double PhysiologyRequest::y_max() const
+{
+  return _y_max;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::y_max(double value)
+{
+  _y_max = value;
+}
+//------------------------------------------------------------------------------------
+double PhysiologyRequest::y_min() const
+{
+  return _y_min;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::y_min(double value)
+{
+  _y_min = value;
+}
+//------------------------------------------------------------------------------------
+double PhysiologyRequest::x_interval() const
+{
+  return _x_interval;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::x_interval(double value)
+{
+  _x_interval = value;
+}
+//------------------------------------------------------------------------------------
 bool PhysiologyRequest::custom() const
 {
   return _custom;
@@ -214,7 +254,7 @@ void PhysiologyRequest::modify(int row, int refreshRate)
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::modify(int row, bool enabled)
 {
-  if (  0 <= row && row < _children.size()) {
+  if (0 <= row && row < _children.size()) {
     _children[row]._active = enabled;
   }
 }
