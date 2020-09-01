@@ -20,9 +20,8 @@ UIScenarioBuilderForm {
 		root.showNormal();
 	}
 	function clear(){
-		builderModel.clear();
+		builderModel.remove(1, builderModel.count -2); //Delete actions, leaving behind initial patient block and scenario length block
     builderModel.scenarioLength_s = 0.0
-    builderModel.finalAdvanceTime_s = 0.0
 	}
 	function seconds_to_clock_time(time_s) {
     var v_seconds = time_s % 60
@@ -87,7 +86,6 @@ UIScenarioBuilderForm {
     actionSwitchView : scenarioView
     property double scenarioLength_s : 0     //Time at which the scenario ends
     property double scenarioLengthOverride_s : 0 //User provided value
-    property double finalAdvanceTime_s : 0    //Time between final action and the end of the scenario
     property alias scenarioEndItem : scenarioEnd.item
     property alias initialPatientItem : initialPatient.item
     //The scenario end component and initial patient component are in the model at startup
@@ -152,8 +150,8 @@ UIScenarioBuilderForm {
         let action = builderModel.get(i)
         eventModel.add_event(action.actionType, action.actionClass, action.actionSubClass, action.buildParams, action.actionStartTime_s, action.actionDuration_s)
       }
-      //Push back last advance time action
-      eventModel.add_event("Advance Time", EventModel.AdvanceTime, -1, "", builderModel.scenarioLength_s - builderModel.finalAdvanceTime_s, builderModel.finalAdvanceTime_s)
+      //Push back last advance time action -- set its "start time" to scenario length so that it will be guaranteed to be at end of sorted queue (calculate duration in Scenario.cpp after "deactivate" actions are accounted for)
+      eventModel.add_event("Advance Time", EventModel.AdvanceTime, -1, "", builderModel.scenarioLength_s, 0.0)
     }
     function updateTimeComponents(){
       for (let i = 2; i < builderModel.count; i+=2){

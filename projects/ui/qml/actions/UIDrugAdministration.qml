@@ -278,7 +278,7 @@ UIActionForm {
  Loader {
   id : drugLoader
   sourceComponent : root.controlsSummary
-  state : "collapsedBuilder"
+  state : "unset"
   states : [
      State {
         name : "expandedBuilder"

@@ -152,6 +152,15 @@ Window {
             id : scenarioScroll
             policy : ScrollBar.AlwaysOn
           }
+          move : Transition {
+            NumberAnimation {properties: "x,y"; duration : 1000; easing.type: Easing.Linear}
+          }
+          moveDisplaced : Transition {
+            NumberAnimation {properties : "y"; duration : 1000; easing.type : Easing.Linear}
+          }
+          addDisplaced : Transition {
+            NumberAnimation {properties : "y"; duration : 200; easing.type : Easing.Linear}
+          }
         }
       }
       Item {
@@ -290,9 +299,8 @@ Window {
       width : parent.width / 3
       onClicked : {
         builderModel.setActionQueue()
-        let prefix = isPatientFile ? "patients/" : "states/"
+        let prefix = isPatientFile ? "" : "./states/"
         let initialParameters = prefix + scenarioInput
-        console.log(initialParameters)
         bg_scenario.create_scenario(root.scenarioName, isPatientFile, initialParameters + ".xml", eventModel);
         root.close()
       }
@@ -435,58 +443,75 @@ Window {
         border.color : "black"
         border.width : 2
         radius : 15
-        UITextInputForm {  
-          id : simLengthText
-          anchors.centerIn: parent
+        RowLayout {
+          id: simLength
           property bool editable : false
-          property int lastPosition : -1
-          name.text : "Scenario Length: "
-          name.font.pointSize : 14
-          value.text : root.seconds_to_clock_time(scenarioLength_s)
-          value.font.pixelSize : 18
-          value.enabled : editable
-          value.cursorVisible : false
-          value.overwriteMode : true
-          value.selectedTextColor : "white"
-          value.selectionColor : "blue"
-          value.maximumLength : 8
-          value.cursorDelegate : Rectangle {
-            visible : parent.cursorVisible
-            width :  parent.cursorRectangle.width
-            color : "blue"
+          property alias simLengthText : simLengthText
+          anchors.centerIn : parent
+          Label {
+            id: simLengthLabel
+            text: "Simluation Length: "
+            font.pixelSize : 18
+            font.weight: Font.DemiBold
+            font.bold: true
           }
-          value.onCursorPositionChanged : {
-            if (value.text[value.cursorPosition] == ':'){
-              if (value.cursorPosition > simLengthText.lastPosition){
-                //Moving left
-                ++value.cursorPosition;
-              }
-              else {
-                //Moving right
-                --value.cursorPosition
-              }
+          TextInput {
+            id: simLengthText
+            property int lastPosition : -1
+            text: root.seconds_to_clock_time(scenarioLength_s)
+            font.weight: Font.Medium
+            font.pixelSize: 18
+            enabled : parent.editable
+            cursorVisible : parent.editable
+            overwriteMode : true
+            selectedTextColor : "white"
+            selectionColor : "blue"
+            maximumLength : 8
+            cursorDelegate : Rectangle {
+              visible : parent.cursorVisible
+              width :  parent.cursorRectangle.width
+              color : "blue"
             }
-            simLengthText.lastPosition = value.cursorPosition
-          }
-          value.onEditingFinished : {
-            if (!simLengthText.editable){
-              return;  
-            }
-            let overrideLength_s = root.clock_time_to_seconds(value.text)
-            if (overrideLength_s){
-              console.log(builderModel.scenarioLength_s)
-              if (overrideLength_s > builderModel.scenarioLength_s){
-                builderModel.scenarioLengthOverride_s = overrideLength_s;
-                builderModel.refreshScenarioLength()
+            Keys.onPressed : {
+              //Prevent user from deleting time--only allow overwriting
+              if (event.key == Qt.Key_Backspace || event.key == Qt.Key_Delete){
+                event.accepted = true   //accepting swallows the key event and keeps it local to this Keys block, meaning it won't get propagated up to text input
               } else {
-                warningMessage.text = "New scenario length must be longer than the minimum length of " + root.seconds_to_clock_time(builderModel.scenarioLength_s) + " determined by current action durations.";
-                warningMessage.open();
+                event.accepted = false
               }
-            } else {
-              warningMessage.text = "Invalid time entry";
-              warningMessage.open()
             }
-            simLengthText.editable = false
+            onCursorPositionChanged : {
+              if (text[cursorPosition] == ':'){
+                if (cursorPosition > simLengthText.lastPosition){
+                  //Moving left
+                  ++cursorPosition;
+                }
+                else {
+                  //Moving right
+                  --cursorPosition
+                }
+              }
+              lastPosition = cursorPosition
+            }
+            onEditingFinished : {
+              if (!parent.editable){
+                return;  
+              }
+              let overrideLength_s = root.clock_time_to_seconds(text)
+              if (overrideLength_s){
+                if (overrideLength_s > builderModel.scenarioLength_s){
+                  builderModel.scenarioLengthOverride_s = overrideLength_s;
+                  builderModel.refreshScenarioLength()
+                } else {
+                  warningMessage.text = "New scenario length must be longer than the minimum length of " + root.seconds_to_clock_time(builderModel.scenarioLength_s) + " determined by current action durations.";
+                  warningMessage.open();
+                }
+              } else {
+                warningMessage.text = "Invalid time entry";
+                warningMessage.open()
+              }
+              parent.editable = false
+            }
           }
         }
         Image {
@@ -511,10 +536,9 @@ Window {
             cursorShape : Qt.PointingHandCursor
             acceptedButtons : Qt.LeftButton
             onClicked: {
-              simLengthText.editable = true
-              simLengthText.value.selectAll()
-              simLengthText.value.forceActiveFocus(0)
-              console.log(simLengthText.value.activeFocus)
+              simLength.editable = true
+              simLengthText.selectAll()
+              simLengthText.forceActiveFocus(0)
             }
           }
         }

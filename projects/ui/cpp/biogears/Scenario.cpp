@@ -29,6 +29,7 @@
 #include <biogears/framework/scmp/scmp_channel.tci.h>
 
 #include <biogears/cdm/scenario/SEAction.h>
+#include <biogears/cdm/scenario/SEScenarioInitialParameters.h>
 #include <chrono>
 namespace bio {
 Scenario::Scenario(QObject* parent)
@@ -1053,7 +1054,6 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
 void Scenario::create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* eventTree)
 {
   eventTree->sort_events(); //Get actions in right order
-  std::cout << eventTree << "\n";
 
   auto buildScenario = std::make_unique<biogears::SEScenario>(_engine->GetSubstances());
   buildScenario->SetName(name.toStdString());
@@ -1065,7 +1065,7 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
 
   if (isPatientFile) {
-    buildScenario->SetPatientFile(initialParams.toStdString());
+    buildScenario->GetInitialParameters().SetPatientFile(initialParams.toStdString());
   } else {
     buildScenario->SetEngineStateFile(initialParams.toStdString());
   }
@@ -1082,11 +1082,16 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
       action = eventTree->decode_action(advanceTime, _engine->GetSubstances());
       buildScenario->AddAction(*action);
     } else {
-      //Next event is our final advance time -- only add if duration > 0
-      if (nextEvent.duration > 0.0) {
+      //We stored end scenario time in "start time" of last advance time action to make sure it was at end of queue.
+      //Get time needed between scenario end and our last action
+      nextEvent.duration = nextEvent.startTime - (thisEvent.startTime + thisEvent.duration);
+      nextEvent.startTime = (thisEvent.startTime + thisEvent.duration); //reset start time to proper value
+      //Only add action if needed (i.e. > 0)
+      if (nextEvent.duration != 0.0) {
         action = eventTree->decode_action(nextEvent, _engine->GetSubstances());
-        buildScenario->AddAction(*action);
+        buildScenario->AddAction(*action); 
       }
+      
     }
   }
 

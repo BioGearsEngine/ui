@@ -190,60 +190,12 @@ Rectangle {
         }
       }
     }
-      /*MouseArea {
-        id : buildSummaryMouseArea
-        anchors.fill : parent
-        hoverEnabled : true
-        propagateComposedEvents :true
-        Timer {
-          id : buildTimer
-          interval: 500; running: false; repeat: false
-          onTriggered:  actionTip.visible  = true
-        }
-        onClicked : {
-          selected()
-        }
-        onEntered: {
-          buildTimer.start()
-          buildTip.visible  = false
-        }
-        onPositionChanged : {
-          buildTimer.restart()
-          buildTip.visible  = false
-        }
-        onExited : {
-          buildTimer.stop()
-          buildTip.visible  = false
-        }
-      }
-      ToolTip {
-        id : buildTip
-        parent : buildSummaryWrapper
-        x : 0
-        y : parent.height + 5
-        visible : false
-        text : root.fullName
-        contentItem : Text {
-          text : buildTip.text
-          color : '#1A5276'
-          font.pointSize : 10
-        }
-        background : Rectangle {
-          color : "white"
-          border.color : "black"
-        }
-      }*/
   }
-
-
-
   onActiveChanged : {
     if ( active) {
-      console.log ("active")
       root.activate()
     } else {
       root.deactivate();
-      console.log ("inactive")
     }
   }
 

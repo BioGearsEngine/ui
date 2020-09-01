@@ -285,15 +285,18 @@ UIActionForm {
   Loader {
     id : exerciseLoader
     sourceComponent : root.builderSummary
-    state : "collapsedBuilder"
+    state : "unset"
     states : [
        State {
           name : "expandedBuilder"
           PropertyChanges {target : exerciseLoader; sourceComponent : root.type==="Generic" ? genericBuilderDetails : (root.type==="Running" || root.type==="Cycling") ? cycleRunBuilderDetails : strengthBuilderDetails}
+          PropertyChanges { target : root; collapsed : false}
         }
         ,State {
           name: "collapsedBuilder"
           PropertyChanges { target : exerciseLoader; sourceComponent: root.builderSummary}
+          PropertyChanges { target : root; collapsed : true}
+          AnchorChanges { target : exerciseLoader; anchors.horizontalCenter : root.horizontalCenter}
         }
       ]
       MouseArea {
