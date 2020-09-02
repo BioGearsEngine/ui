@@ -20,7 +20,9 @@ UIScenarioBuilderForm {
 		root.showNormal();
 	}
 	function clear(){
-		builderModel.remove(1, builderModel.count -2); //Delete actions, leaving behind initial patient block and scenario length block
+    if (builderModel.count > 2){
+		  builderModel.remove(1, builderModel.count -2); //Delete actions, leaving behind initial patient block and scenario length block
+    }
     builderModel.scenarioLength_s = 0.0
 	}
 	function seconds_to_clock_time(time_s) {
@@ -208,4 +210,81 @@ UIScenarioBuilderForm {
     showDirs : false
   }
 
+  dataRequestModel : ListModel {
+    id : dataRequestModel
+    ListElement {
+      requestName : "Compartment";
+      collapsed : true
+      hasGrandchildren : true
+      _children_ : [
+        ListElement {
+          requestName : "Gas"
+          collapsed : true
+          hasGrandchildren : false
+          _children_ : [
+            ListElement {
+              requestName : "G1"
+            },
+            ListElement {
+              requestName : "G2"
+            }
+          ]
+        },
+        ListElement {
+          requestName : "Liquid"
+          collapsed : true
+          hasGrandchildren : false
+          _children_ : [
+            ListElement {
+              requestName : "L1"
+            },
+            ListElement {
+              requestName : "L2"
+            }
+          ]
+        },
+        ListElement {
+          requestName : "Thermal"
+          collapsed : true
+          hasGrandchildren : false
+          _children_ : [
+            ListElement {
+              requestName : "Th1"
+            },
+            ListElement {
+              requestName : "Th2"
+            }
+          ]
+        },
+        ListElement {
+          requestName : "Tissue"
+          collapsed : true
+          hasGrandChildren : false
+          _children_ : [
+            ListElement {
+              requestName : "Tis1"
+            },
+            ListElement {
+              requestName : "Tis2"
+            }
+          ]
+        }
+      ]
+    }
+    ListElement {
+      requestName : "Patient"; 
+      collapsed : true
+      hasChildren : false
+    }
+    ListElement {
+      requestName : "Physiology";
+      collapsed : true
+      hasChildren : false
+    }
+    ListElement {
+      requestName : "Substance";
+      collapsed : true
+      hasChildren : false
+    }
+  }
 }

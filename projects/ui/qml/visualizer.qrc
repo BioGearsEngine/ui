@@ -103,5 +103,7 @@
         <file alias="move-down.png">img/DownArrow.png</file>
         <file alias="move-up.png">img/UpArrow.png</file>
 		<file alias="renalPanelNephron.png">img/renalPanelNephron.png</file>
+        <file alias="collapsed.png">img/collapsedOption.png</file>
+        <file alias="expanded.png">img/expandedOption.png</file>
     </qresource>
 </RCC>

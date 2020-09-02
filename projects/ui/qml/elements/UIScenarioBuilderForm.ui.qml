@@ -14,12 +14,15 @@ Window {
   property alias actionView : actionListView
   property alias scenarioView : scenarioListView
   property alias warningMessage : warningMessage
+  property alias dataRequestNode: dataRequestNode
+  property alias dataRequestLeaf : dataRequestLeaf
   property string scenarioInput : "DefaultTemplateMale"
   property string scenarioName : "TestScenario"
   property bool isPatientFile : true     //false ---> input = engine state file
   property Scenario bg_scenario
   //Non-visual elements defined in UIScenarioBuilder.qml
   property ListModel actionModel
+  property ListModel dataRequestModel
   property ActionModel builderModel
   property EventModel eventModel
   property FolderListModel patientModel
@@ -205,18 +208,35 @@ Window {
             }
           }
         }
-        Item {
+        RowLayout {
           //Wrapping input in an item to break a binding loop (width of text input subcomponents depend on parent width, which depends on width of input subcomponents...)
           id : scenarioNameWrapper
-          Layout.preferredWidth : parent.width / 4
+          Layout.preferredWidth : parent.width / 3
           Layout.preferredHeight : parent.height
           Layout.alignment : Qt.AlignHCenter
-          UITextInputForm {
-            id : scenarioName
-            anchors.fill : parent
-            name.text : "Scenario Name:  "
-            name.font.pointSize : 14
-            value.font.pixelSize : 18
+          spacing : 0
+          Label {
+            id : nameLabel
+            text : "Scenario Name:  "
+            font.pixelSize : 18
+            bottomPadding : 8
+            Layout.fillHeight : true
+            Layout.preferredWidth : parent.width / 2
+            Layout.alignment : Qt.AlignRight
+            verticalAlignment : Text.AlignVCenter
+            horizontalAlignment : Text.AlignRight
+          }
+          TextField {
+            id : nameInput
+            placeholderText: "Name"
+            font.pixelSize : 18
+            Layout.fillHeight : true
+            Layout.preferredWidth : parent.width / 2
+            horizontalAlignment : Text.AlignCenter
+            Layout.alignment : Qt.AlignLeft
+            onEditingFinished : {
+              root.scenarioName = text
+            }
           }
         }
         Button {
@@ -231,21 +251,37 @@ Window {
           Menu {
             id : patientMenu
             closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
+            delegate : MenuItem {
+              font.pixelSize : 15
+              background : Rectangle {
+                color : "transparent"
+                border.color : "#1A5276"
+                border.width : highlighted ? 2 : 0
+              }
+            }
             Menu {
               title : "Patient"
               Repeater {
                 id : patientSubMenu
                 model : root.patientModel.status == FolderListModel.Ready ? root.patientModel : null
                 delegate : MenuItem {
-                  Button {
-                    text : model.fileBaseName
-                    flat : true
-                    highlighted : false
-                    onClicked : {
-                      root.scenarioInput = text
-                      root.isPatientFile = true
-                      patientMenu.close()
-                    }
+                  id : patientDelegate
+                  text : model.fileBaseName
+                  contentItem : Text {
+                    text : patientDelegate.text
+                    font.pixelSize : 15
+                    horizontalAlignment : Qt.AlignHCenter
+                  }
+                  width : parent.width
+                  onTriggered : {
+                    root.scenarioInput = text
+                    root.isPatientFile = true
+                    patientMenu.close()
+                  }
+                  background : Rectangle {
+                    color : "transparent"
+                    border.color : "#1A5276"
+                    border.width : patientDelegate.highlighted ? 2 : 0
                   }
                 }
               }
@@ -256,16 +292,24 @@ Window {
                 id : stateSubMenu
                 model : root.stateModel.status == FolderListModel.Ready ? root.patientModel : null
                 delegate : MenuItem {
-                  Button {
-                    text : model.fileBaseName
+                  id : stateDelegate
+                  text : model.fileBaseName
+                  contentItem : Text {
+                    text : stateDelegate.text
+                    font.pixelSize : 15
+                    horizontalAlignment : Qt.AlignHCenter
+                  }
+                  width : parent.width
+                  onTriggered : {
+                    root.scenarioInput = text
+                    root.isPatientFile = false
+                    patientMenu.close()
+                  }
+                  background : Rectangle {
                     anchors.fill : parent
-                    flat : true
-                    highlighted : false
-                    onClicked : {
-                      root.scenarioInput = text
-                      root.isPatientFile = false
-                      patientMenu.close()
-                    }
+                    color : "transparent"
+                    border.color : "#1A5276"
+                    border.width : stateDelegate.highlighted ? 2 : 0
                   }
                 }
               }
@@ -275,12 +319,53 @@ Window {
       }
     } //end first tab
     //------Second Tab-----------
-    Rectangle {
-      color : "blue"
+    GridLayout {
+      id : dataRequestLayout
+      rows : 1
+      columns : 2
       Layout.fillWidth : true
       Layout.fillHeight : true
       Layout.preferredHeight : parent.height
       Layout.preferredWidth : parent.width
+      columnSpacing : 0
+      Rectangle {
+        id : requestMenu
+        Layout.preferredHeight : parent.height
+        Layout.preferredWidth : parent.width / 2
+        ListView {
+          id : requestListView
+          anchors.fill : parent
+          property double scrollWidth : requestScroll.width
+          model : dataRequestModel
+          delegate : Component {
+            Loader {
+              sourceComponent : root.dataRequestNode
+              property var data : requestListView.model.get(index)
+              onStatusChanged : {
+                if (status == Loader.Ready){
+                  item._model = data
+                  item._index = index
+                  item.indentLevel = 0
+                }
+              }
+            }
+          }
+          currentIndex : -1
+          clip : true
+          ScrollBar.vertical : ScrollBar {
+            id : requestScroll
+            policy : ScrollBar.AlwaysOn
+          }
+          
+        }// end list view
+      } // end list view container
+      Rectangle { 
+        id : requestPanel
+        Layout.preferredHeight : parent.height
+        Layout.preferredWidth : parent.width / 2
+      }
+
+
     }//end second tab
   } //end stack layout
   Rectangle {
@@ -562,6 +647,128 @@ Window {
         width : 2
         height : parent.height / 5
         anchors.horizontalCenter : parent.horizontalCenter
+      }
+    }
+  }//end time component
+
+  //Component for data request delegates
+  Component {
+    id : dataRequestNode
+    Column {
+      id : requestColumn
+      property var _model
+      property int _index
+      property double indentLevel
+      property string imageSource : "icons/collapsed.png"
+      width : requestListView.width-requestListView.scrollWidth
+      Rectangle {
+        id : menuWrapper
+        property bool selected : false
+        width : parent.width
+        height : 30
+        border.color : "blue"
+        border.width : 0
+        Image {
+          id: toggleSubMenu
+          x : 15 + 45 * requestColumn.indentLevel
+          source : requestColumn.imageSource
+          sourceSize.width : 15
+          sourceSize.height: 15
+          anchors.verticalCenter : parent.verticalCenter
+          MouseArea {
+            id : toggleMouseArea
+            anchors.fill : parent
+            cursorShape : Qt.PointingHandCursor
+            acceptedButtons : Qt.LeftButton
+            onClicked: {
+              requestColumn._model.collapsed = !requestColumn._model.collapsed
+              console.log(requestColumn._model.requestName, requestColumn._model.collapsed)
+              if (requestColumn._model.collapsed){
+                subOptionLoader.sourceComponent = undefined
+                subOptionLoader.visible = false
+                requestColumn.imageSource = "icons/collapsed.png"
+              } else {
+                requestColumn.imageSource = "icons/expanded.png"
+                if (requestColumn._model.hasGrandchildren){
+                  subOptionLoader._childSource = dataRequestNode
+                }
+                else {
+                  subOptionLoader._childSource = dataRequestLeaf
+                }
+                subOptionLoader._data = requestColumn._model._children_
+                subOptionLoader._indent = requestColumn.indentLevel + 1
+                subOptionLoader.sourceComponent = subOption
+                subOptionLoader.visible = true
+              }
+            }
+          }
+        }
+        Text {
+          text : requestColumn._model.requestName
+          font.pixelSize : 16
+          height : parent.height
+          verticalAlignment : Text.AlignVCenter
+          anchors.left : toggleSubMenu.right
+          anchors.leftMargin : 15
+        }
+      }
+      Loader {
+        id : subOptionLoader
+        width : parent.width
+        property var _data
+        property double _indent
+        property var _childSource
+        onStatusChanged : {
+          if (status == Loader.Ready){
+            item.model = _data
+            item.indent = _indent
+            item.source = _childSource
+          }
+        }
+      }
+      Component {
+        id : subOption
+        Column {
+          id : subOptionRoot
+          property alias model : subOptionRepeater.model
+          property alias indent : subOptionRepeater.indent
+          property var source : undefined
+          Repeater {
+            id : subOptionRepeater
+            property double indent
+            delegate : Loader {
+              width : parent.width
+              sourceComponent : subOptionRoot.source
+              onStatusChanged : {
+                if (status == Loader.Ready){
+                  item._model = subOptionRoot.model.get(index)
+                  item.indentLevel = subOptionRoot.indent
+                }
+              }
+            }
+          }
+        }
+      }
+    }// end column
+  } // end delegate component
+  Component {
+    id : dataRequestLeaf
+    Rectangle {
+      id : leafWrapper
+      property double indentLevel
+      property var _model   //might rename this and var in dataRequestNode to "data"
+      width : parent.width 
+      height : 30
+      CheckBox {
+        x : 15 + indentLevel * 45
+        height : parent.height
+        text : leafWrapper._model.requestName
+        font.pixelSize : 18
+        checkable : true
+        checked : false
+        onClicked : {
+          console.log(text + " is " + checked)
+        }
       }
     }
   }
