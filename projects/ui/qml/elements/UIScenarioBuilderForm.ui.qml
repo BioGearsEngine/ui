@@ -11,6 +11,7 @@ Window {
   id : scenarioBuilder
   title : "Scenario Builder"
   property alias actionDelegate : actionListDelegate
+  property alias activeRequestView : activeRequestView
   property alias actionView : actionListView
   property alias scenarioView : scenarioListView
   property alias warningMessage : warningMessage
@@ -19,13 +20,13 @@ Window {
   property bool isPatientFile : true     //false ---> input = engine state file
   property Scenario bg_scenario
   //Non-visual elements defined in UIScenarioBuilder.qml
-  property DataRequestModel bgRequests
-  property ListModel actionModel
-  property ListModel dataRequestModel
   property ActionModel builderModel
+  property DataRequestModel bgRequests
   property EventModel eventModel
   property FolderListModel patientModel
   property FolderListModel stateModel
+  property ListModel actionModel
+  property ObjectModel activeRequests
   //Components used to create time-based object in builder model
   property Component timeGapComponent : timeGapComponent
   property Component timeStartComponent : timeStartComponent
@@ -366,7 +367,19 @@ Window {
         id : requestPanel
         Layout.preferredHeight : parent.height
         Layout.preferredWidth : parent.width / 2
-      }
+        ListView {
+          id : activeRequestView
+          anchors.fill : parent
+          property double scrollWidth : activeRequestScroll.width
+          model : activeRequests
+          currentIndex : -1
+          clip : true
+          ScrollBar.vertical : ScrollBar {
+            id : activeRequestScroll
+            policy : ScrollBar.AlwaysOn
+          }
+        }
+      }//end list view container
     }//end second tab
   } //end stack layout
   Rectangle {
@@ -743,12 +756,12 @@ Window {
                     }
                   }
                 }
-              }
-            }
-          }
-        }
-      }//end visual component
-    }// end column wrapper
+              } //end delegate model
+            } //end repeater
+          }// end nested node column
+        }//end nested node component
+      }//end nested node loader
+    }// end column wrapper (visual component)
   } // end data request node component
   Component {
     id : dataRequestLeaf
@@ -757,6 +770,7 @@ Window {
       property var model : _model_data   
       property var index : _node_index
       property int indentLevel : _indent_level
+      property string path : model.dataPath(index)
       width : parent.width 
       height : 30
       CheckBox {
@@ -767,11 +781,11 @@ Window {
         checkable : true
         checked : model.data(index, Qt.CheckStateRole)
         onClicked : {
-          let currentState = model.data(index, Qt.CheckStateRole)
-          if (currentState == Qt.Checked){
-            model.setData(index, Qt.Unchecked, Qt.CheckStateRole) 
+          model.setData(index, checkState, Qt.CheckStateRole)
+          if (checkState == Qt.Checked){
+            activeRequests.addRequest(path)
           } else {
-            model.setData(index, Qt.Checked, Qt.CheckStateRole)
+            activeRequests.remove(path)
           }
         }
       }

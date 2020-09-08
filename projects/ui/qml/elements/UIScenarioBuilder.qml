@@ -210,81 +210,38 @@ UIScenarioBuilderForm {
     showDirs : false
   }
 
-  dataRequestModel : ListModel {
-    id : dataRequestModel
-    ListElement {
-      requestName : "Compartment";
-      collapsed : true
-      hasGrandchildren : true
-      _children_ : [
-        ListElement {
-          requestName : "Gas"
-          collapsed : true
-          hasGrandchildren : false
-          _children_ : [
-            ListElement {
-              requestName : "G1"
-            },
-            ListElement {
-              requestName : "G2"
-            }
-          ]
-        },
-        ListElement {
-          requestName : "Liquid"
-          collapsed : true
-          hasGrandchildren : false
-          _children_ : [
-            ListElement {
-              requestName : "L1"
-            },
-            ListElement {
-              requestName : "L2"
-            }
-          ]
-        },
-        ListElement {
-          requestName : "Thermal"
-          collapsed : true
-          hasGrandchildren : false
-          _children_ : [
-            ListElement {
-              requestName : "Th1"
-            },
-            ListElement {
-              requestName : "Th2"
-            }
-          ]
-        },
-        ListElement {
-          requestName : "Tissue"
-          collapsed : true
-          hasGrandChildren : false
-          _children_ : [
-            ListElement {
-              requestName : "Tis1"
-            },
-            ListElement {
-              requestName : "Tis2"
-            }
-          ]
+  activeRequests : ObjectModel {
+    id : activeModel
+    function addRequest(path){
+      let splitPath = path.split(':')
+      var v_requestForm = Qt.createComponent("UIDataRequest.qml");
+      let requestRoot = splitPath.shift();    //removes first element in split path array and assigns to request type
+      let requestLeaf = splitPath.pop();        //removes last element in split path array and assign to request name
+      let requestBranches = splitPath;        //whatever is left over (maybe nothing) when we remove root and leaf
+      if ( v_requestForm.status == Component.Ready)  {
+        var v_request = v_requestForm.createObject(activeRequestView, { "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches,
+                                                                        "requestLeaf" : requestLeaf, "width" : activeRequestView.width-activeRequestView.scrollWidth
+                                                                })
+        activeModel.append(v_request)
+      } else {
+        if (v_requestForm.status == Component.Error){
+          console.log("Error : " + v_requestForm.errorString() );
+          return null;
         }
-      ]
+        console.log("Error : Data request component not ready");
+        return null;
+      }
     }
-    ListElement {
-      requestName : "Patient"; 
-      collapsed : true
-      hasChildren : false
-    }
-    ListElement {
-      requestName : "Physiology";
-      collapsed : true
-      hasChildren : false
-    }
-    ListElement {
-      requestName : "Substance";
-      collapsed : true
-      hasChildren : false
+    function removeRequest(path){
+      //Can't bind menu element to index in active request model because menu elements are destroyed when menu section is collapsed, which removes bindings.
+      //Instead, search for full path name that traverses tree from root to menu item (guaranteed to be unique)
+      for (let i = 0; i < activeModel.count; ++i){
+        let request = activeModel.get(i);
+        if (request.pathId = path){
+          activeModel.remove(i, 1);
+          return;
+        }
+      }
     }
   }
 }

@@ -25,6 +25,7 @@ public:
   ~DataRequestTree() override;
 
   Q_INVOKABLE QVariant data(const QModelIndex& index, int role) const override;
+  Q_INVOKABLE QString dataPath(const QModelIndex& index);
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   QModelIndex parent(const QModelIndex& index) const override;

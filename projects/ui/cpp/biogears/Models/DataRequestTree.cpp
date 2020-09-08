@@ -78,11 +78,26 @@ bool DataRequestTree::setData(const QModelIndex& index, const QVariant& value, i
 {
   if (role == Qt::CheckStateRole && index.internalPointer()) {
     static_cast<DataRequestNode*>(index.internalPointer())->checked(value.toBool());
+    return true;
   } else if (role == CollapsedRole && index.internalPointer()) {
     static_cast<DataRequestNode*>(index.internalPointer())->collapsed(value.toBool());
     return true;
   }
   return false;
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::dataPath(const QModelIndex& index)
+{
+  QString fullPath = data(index, Qt::DisplayRole).toString();
+  QModelIndex tempIndex = index;
+  while (parent(tempIndex) != QModelIndex()) {
+    QModelIndex parentIndex = parent(tempIndex);
+    QString nodeName = (data(parentIndex, Qt::DisplayRole).toString() + ":");
+    fullPath.prepend(nodeName);
+    tempIndex = parentIndex;
+  }
+  fullPath.replace(" ", "");
+  return fullPath;
 }
 //------------------------------------------------------------------------------------
 DataRequestNode* DataRequestTree::appendChild(QString name, QString type) 
@@ -177,7 +192,7 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
   auto pMaxWorkRate = patientTree->appendChild(QString("Maximum Work Rate"), QString("Power"));
   auto pMeanPressureBase = patientTree->appendChild(QString("Mean Arterial Pressure Baseline"), QString("Pressure"));
   auto pMuscleMass = patientTree->appendChild(QString("Muscle Mass"), QString("Mass"));
-  auto pPain = patientTree->appendChild(QString("Pain Susceptibility"), QString(""));
+  auto pPain = patientTree->appendChild(QString("Pain Susceptibility"));
   auto pResidual = patientTree->appendChild(QString("Residual Volume"), QString("Volume"));
   auto pRespiratoryBase = patientTree->appendChild(QString("Respiration Rate Baseline"), QString("Frequency"));
   auto pRightLungRatio = patientTree->appendChild(QString("Right Lung Ratio"), QString("Fraction"));
@@ -406,7 +421,7 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
   auto respEndCO2Frac = phyResp->appendChild(QString("End Tidal Carbon Dioxide Fraction"), QString("Fraction"));
   auto respEndCO2Pressure = phyResp->appendChild(QString("End Tidal Carbon Dioxide Pressure"), QString("Pressure"));
   auto respExpiratory = phyResp->appendChild(QString("Expiratory Flow"), QString("VolumePerTime"));
-  auto respIERatio = phyResp->appendChild(QString("Inspiratory Expiratory Ratio"), QString(""));
+  auto respIERatio = phyResp->appendChild(QString("Inspiratory Expiratory Ratio"));
   auto respInspiratory = phyResp->appendChild(QString("Inspiratory Flow"), QString("VolumePerTime"));
   auto respPleural = phyResp->appendChild(QString("Mean Pleural Pressure"), QString("Pressure"));
   auto respCompliance = phyResp->appendChild(QString("Pulmonary Compliance"), QString("FlowCompliance"));
