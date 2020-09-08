@@ -14,13 +14,12 @@ Window {
   property alias actionView : actionListView
   property alias scenarioView : scenarioListView
   property alias warningMessage : warningMessage
-  property alias dataRequestNode: dataRequestNode
-  property alias dataRequestLeaf : dataRequestLeaf
   property string scenarioInput : "DefaultTemplateMale"
   property string scenarioName : "TestScenario"
   property bool isPatientFile : true     //false ---> input = engine state file
   property Scenario bg_scenario
   //Non-visual elements defined in UIScenarioBuilder.qml
+  property DataRequestModel bgRequests
   property ListModel actionModel
   property ListModel dataRequestModel
   property ActionModel builderModel
@@ -336,16 +335,21 @@ Window {
           id : requestListView
           anchors.fill : parent
           property double scrollWidth : requestScroll.width
-          model : dataRequestModel
-          delegate : Component {
-            Loader {
-              sourceComponent : root.dataRequestNode
-              property var data : requestListView.model.get(index)
-              onStatusChanged : {
-                if (status == Loader.Ready){
-                  item._model = data
-                  item._index = index
-                  item.indentLevel = 0
+          model : DelegateModel {
+            id : requestModel
+            model : root.bgRequests
+            //rootIndex defaults to topmost node, which is what we want
+            delegate : Component {
+              Loader {
+                width : requestListView.width - requestListView.scrollWidth
+                sourceComponent : dataRequestNode
+                property var _model_data : root.bgRequests
+                property var _node_index : requestModel.modelIndex(index)
+                property int _indent_level : 0
+                onLoaded : {
+                  if (!_model_data.data(_node_index, DataRequestModel.CollapsedRole)){
+                    item.toggleCollapsedView(_model_data.data(_node_index, DataRequestModel.CollapsedRole))
+                  }
                 }
               }
             }
@@ -355,8 +359,7 @@ Window {
           ScrollBar.vertical : ScrollBar {
             id : requestScroll
             policy : ScrollBar.AlwaysOn
-          }
-          
+          }   
         }// end list view
       } // end list view container
       Rectangle { 
@@ -364,8 +367,6 @@ Window {
         Layout.preferredHeight : parent.height
         Layout.preferredWidth : parent.width / 2
       }
-
-
     }//end second tab
   } //end stack layout
   Rectangle {
@@ -655,14 +656,24 @@ Window {
   Component {
     id : dataRequestNode
     Column {
-      id : requestColumn
-      property var _model
-      property int _index
-      property double indentLevel
+      id : nodeWrapper
+      property var model : _model_data
+      property var index : _node_index
+      property int indentLevel : _indent_level
       property string imageSource : "icons/collapsed.png"
-      width : requestListView.width-requestListView.scrollWidth
+      function toggleCollapsedView(nextCollapsed){
+        model.setData(index, nextCollapsed, DataRequestModel.CollapsedRole)
+        if (nextCollapsed){
+          nestedNodeLoader.sourceComponent = undefined
+          nestedNodeLoader.visible = false
+          nodeWrapper.imageSource = "icons/collapsed.png"
+        } else {
+          nodeWrapper.imageSource = "icons/expanded.png"
+          nestedNodeLoader.sourceComponent = nestedComponent
+          nestedNodeLoader.visible = true
+        }
+      }
       Rectangle {
-        id : menuWrapper
         property bool selected : false
         width : parent.width
         height : 30
@@ -670,8 +681,8 @@ Window {
         border.width : 0
         Image {
           id: toggleSubMenu
-          x : 15 + 45 * requestColumn.indentLevel
-          source : requestColumn.imageSource
+          x : 15 + 45 * nodeWrapper.indentLevel
+          source : nodeWrapper.imageSource
           sourceSize.width : 15
           sourceSize.height: 15
           anchors.verticalCenter : parent.verticalCenter
@@ -681,30 +692,13 @@ Window {
             cursorShape : Qt.PointingHandCursor
             acceptedButtons : Qt.LeftButton
             onClicked: {
-              requestColumn._model.collapsed = !requestColumn._model.collapsed
-              console.log(requestColumn._model.requestName, requestColumn._model.collapsed)
-              if (requestColumn._model.collapsed){
-                subOptionLoader.sourceComponent = undefined
-                subOptionLoader.visible = false
-                requestColumn.imageSource = "icons/collapsed.png"
-              } else {
-                requestColumn.imageSource = "icons/expanded.png"
-                if (requestColumn._model.hasGrandchildren){
-                  subOptionLoader._childSource = dataRequestNode
-                }
-                else {
-                  subOptionLoader._childSource = dataRequestLeaf
-                }
-                subOptionLoader._data = requestColumn._model._children_
-                subOptionLoader._indent = requestColumn.indentLevel + 1
-                subOptionLoader.sourceComponent = subOption
-                subOptionLoader.visible = true
-              }
+              let nextCollapsed = !nodeWrapper.model.data(nodeWrapper.index, DataRequestModel.CollapsedRole)
+              nodeWrapper.toggleCollapsedView(nextCollapsed)  
             }
           }
         }
         Text {
-          text : requestColumn._model.requestName
+          text : model.data(index, DataRequestModel.NameRole)
           font.pixelSize : 16
           height : parent.height
           verticalAlignment : Text.AlignVCenter
@@ -712,62 +706,73 @@ Window {
           anchors.leftMargin : 15
         }
       }
+      //Nested nodes will appear below their parent
       Loader {
-        id : subOptionLoader
+        id: nestedNodeLoader
         width : parent.width
-        property var _data
-        property double _indent
-        property var _childSource
-        onStatusChanged : {
-          if (status == Loader.Ready){
-            item.model = _data
-            item.indent = _indent
-            item.source = _childSource
-          }
+        visible : false
+        property int _indent_level : nodeWrapper.indentLevel + 1
+        property var _nested_model : model
+        property var _root_index : index
+        onLoaded : {
+          item.active = visible
         }
-      }
-      Component {
-        id : subOption
-        Column {
-          id : subOptionRoot
-          property alias model : subOptionRepeater.model
-          property alias indent : subOptionRepeater.indent
-          property var source : undefined
-          Repeater {
-            id : subOptionRepeater
-            property double indent
-            delegate : Loader {
-              width : parent.width
-              sourceComponent : subOptionRoot.source
-              onStatusChanged : {
-                if (status == Loader.Ready){
-                  item._model = subOptionRoot.model.get(index)
-                  item.indentLevel = subOptionRoot.indent
+        Component {
+          id : nestedComponent
+          Column {
+            id : nestedNode
+            property int indentLevel : _indent_level
+            property var nestedModel : _nested_model
+            property var root : _root_index
+            property bool active : false   //Don't set true until component is loaded so that we make sure data further up in hierarchy is defined first
+            Repeater {
+              model : DelegateModel {
+                id : nestedDelegate
+                model : nestedNode.nestedModel
+                rootIndex : nestedNode.root
+                delegate : Loader {
+                  width : parent.width
+                  sourceComponent : active ? (model.hasModelChildren ? dataRequestNode : dataRequestLeaf ) : undefined
+                  visible : active
+                  property var _node_index : nestedDelegate.modelIndex(index)
+                  property var _model_data : nestedModel
+                  property int _indent_level : indentLevel
+                  onLoaded : {
+                    if (!_model_data.data(_node_index, DataRequestModel.CollapsedRole)){
+                      item.toggleCollapsedView(_model_data.data(_node_index, DataRequestModel.CollapsedRole))
+                    }
+                  }
                 }
               }
             }
           }
         }
-      }
-    }// end column
-  } // end delegate component
+      }//end visual component
+    }// end column wrapper
+  } // end data request node component
   Component {
     id : dataRequestLeaf
     Rectangle {
       id : leafWrapper
-      property double indentLevel
-      property var _model   //might rename this and var in dataRequestNode to "data"
+      property var model : _model_data   
+      property var index : _node_index
+      property int indentLevel : _indent_level
       width : parent.width 
       height : 30
       CheckBox {
         x : 15 + indentLevel * 45
         height : parent.height
-        text : leafWrapper._model.requestName
+        text : model.data(index, DataRequestModel.NameRole)
         font.pixelSize : 18
         checkable : true
-        checked : false
+        checked : model.data(index, Qt.CheckStateRole)
         onClicked : {
-          console.log(text + " is " + checked)
+          let currentState = model.data(index, Qt.CheckStateRole)
+          if (currentState == Qt.Checked){
+            model.setData(index, Qt.Unchecked, Qt.CheckStateRole) 
+          } else {
+            model.setData(index, Qt.Checked, Qt.CheckStateRole)
+          }
         }
       }
     }

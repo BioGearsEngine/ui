@@ -9,6 +9,7 @@
 
 #include "Models/PhysiologyRequest.h"
 
+
 //#include <biogears/version.h>
 #include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
@@ -58,7 +59,7 @@ Scenario::Scenario(QString name, QObject* parent)
   , _physiology_model(nullptr)
   , _new_respiratory_cycle(std::make_unique<biogears::SEScalar>(0.0))
   , _urinalysis_qml(std::make_unique<Urinalysis>())
-
+  , _data_request_tree(nullptr)
 {
   _consoleLog = new QtLogForward(this);
   _logger.SetForward(_consoleLog);
@@ -67,6 +68,7 @@ Scenario::Scenario(QString name, QObject* parent)
   engine->GetPatient().SetName(name.toStdString());
   load_patient("StandardMale@0s.xml");
 }
+//-------------------------------------------------------------------------------
 void Scenario::setup_physiology_model()
 {
   _physiology_model = std::make_unique<BioGearsData>(QString(_engine->GetPatient().GetName_cStr()), this).release();
@@ -294,6 +296,11 @@ Scenario& Scenario::load_patient(QString file)
   if (_engine->LoadState(path)) {
     if (!_physiology_model) {
       setup_physiology_model();
+    }
+    if (!_data_request_tree) {
+      _data_request_tree = new DataRequestTree();
+      _data_request_tree->initialize(const_cast<biogears::SECompartmentManager*>(&_engine->GetCompartments()), &_engine->GetSubstanceManager()); //Only need to initialize once, not at every patient reload
+      emit dataRequestModelChanged(_data_request_tree);
     }
     auto vitals = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::VITALS, 0, QModelIndex()).internalPointer());
     {

@@ -9,12 +9,12 @@ DataRequestNode::DataRequestNode()
 {
 }
 //------------------------------------------------------------------------------------
-DataRequestNode::DataRequestNode(QString prefix, QString name, bool checked, bool collapsed, bool grandchildren, DataRequestNode* parent)
+DataRequestNode::DataRequestNode(QString name, bool checked, bool collapsed, QString type, DataRequestNode* parent)
   : _parent(parent)
   , _name(name)
   , _checked(checked)
   , _collapsed(collapsed)
-  , _grandchildren(grandchildren)
+  , _type(type)
 {
 }
 //------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ void DataRequestNode::checked(bool value)
   _checked = value;
 }
 //------------------------------------------------------------------------------------
-bool DataRequestNode::collapsed() const 
+bool DataRequestNode::collapsed() const
 {
   return _collapsed;
 }
@@ -53,14 +53,28 @@ void DataRequestNode::collapsed(bool value)
   _collapsed = value;
 }
 //------------------------------------------------------------------------------------
-bool DataRequestNode::grandchildren() const
+QString DataRequestNode::type() const
 {
-  return _grandchildren;
+  return _type;
 }
 //------------------------------------------------------------------------------------
-void DataRequestNode::grandchildren(bool value)
+void DataRequestNode::type(QString& value)
 {
-  _grandchildren = value;
+  _type = value;
+}
+//------------------------------------------------------------------------------------
+int DataRequestNode::rows() const
+{
+  return _children.size();
+}
+//------------------------------------------------------------------------------------
+int DataRequestNode::rowInParent() const
+{
+  if (_parent != nullptr) {
+    return _parent->children().indexOf(const_cast<DataRequestNode*>(this));
+  } else {
+    return 0;
+  }
 }
 //------------------------------------------------------------------------------------
 DataRequestNode const* DataRequestNode::parent() const
@@ -72,5 +86,62 @@ DataRequestNode* DataRequestNode::parent()
 {
   return _parent;
 }
-
-
+//------------------------------------------------------------------------------------
+DataRequestNode* DataRequestNode::child(int index)
+{
+  if (0 <= index && index <= _children.size()) {
+    return _children[index];
+  }
+  return nullptr;
+}
+//------------------------------------------------------------------------------------
+DataRequestNode const* DataRequestNode::child(int index) const
+{
+  if (0 <= index && index <= _children.size()) {
+    return _children[index];
+  }
+  return nullptr;
+}
+//------------------------------------------------------------------------------------
+QVector<DataRequestNode*> DataRequestNode::children() const
+{
+  return _children;
+}
+//------------------------------------------------------------------------------------
+QVariant DataRequestNode::data(int role) const
+{
+  switch (role) {
+  case Qt::DisplayRole:
+    return QVariant(_name);
+  case Qt::CheckStateRole:
+    return QVariant(_checked);
+  case DataRequestTree::CollapsedRole:
+    return QVariant(_collapsed);
+  case DataRequestTree::TypeRole:
+    return QVariant(_type);
+  default:
+    return QVariant();
+  }
+}
+//------------------------------------------------------------------------------------
+DataRequestNode* DataRequestNode::appendChild(QString name, QString type)
+{
+  DataRequestNode* newNode = new DataRequestNode();
+  newNode->_name = name;
+  newNode->_checked = false;
+  newNode->_collapsed = true;
+  newNode->_type = type;
+  newNode->_parent = this;
+  _children.append(newNode);
+  return _children.back();
+}
+//------------------------------------------------------------------------------------
+DataRequestNode* DataRequestNode::appendChildren(QList<QPair<QString, QString>> nameTypePairs)
+{
+  QList<QPair<QString, QString>>::const_iterator nodeIt;
+  for (nodeIt = nameTypePairs.constBegin(); nodeIt != nameTypePairs.constEnd(); ++nodeIt) {
+    DataRequestNode* childNode = new DataRequestNode((*nodeIt).first, false, true, (*nodeIt).second, this);
+    _children.append(childNode);
+  }
+  return _children.back();
+}

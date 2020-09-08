@@ -3,6 +3,11 @@ import com.biogearsengine.ui.scenario 1.0
 
 MenuAreaForm {
   id : root
+  signal newDataRequestModel(DataRequestModel requestTree)
+
+  onNewDataRequestModel : {
+    root.scenarioBuilder.bgRequests = requestTree
+  }
 
   function parseToolsSelection (dataType, mode){
     var biogearsTypes = {

@@ -28,6 +28,7 @@
 #include "PatientMetrics.h"
 #include "PatientState.h"
 #include "Urinalysis.h"
+#include "Models/DataRequestTree.h"
 
 namespace biogears {
 class SEScalar;
@@ -157,6 +158,7 @@ signals:
   void patientConditionsChanged(PatientConditions conditions);
   void urinalysis_completed(Urinalysis* urinalysis); 
 
+  void dataRequestModelChanged(DataRequestTree* requestTree);
   void timeAdvance(double time_s);
   void substanceActivated(QModelIndex subIndex);
   void physiologyChanged(BioGearsData* model);
@@ -219,6 +221,7 @@ private:
   QVector<QString> _nutrition_list;
 
   BioGearsData* _physiology_model;
+  DataRequestTree* _data_request_tree;
 
   QtLogForward* _consoleLog;
 

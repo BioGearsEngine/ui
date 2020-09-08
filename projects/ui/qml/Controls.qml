@@ -13,6 +13,7 @@ ControlsForm {
   signal playClicked()
   signal speedToggled(int speed)
 
+  signal dataRequestModelChanged(DataRequestModel requestTree)
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
   signal patientPhysiologyChanged(PhysiologyModel model)
@@ -24,6 +25,7 @@ ControlsForm {
 
   property PhysiologyModel bgData
   property Urinalysis urinalysisData
+  property DataRequestModel bgRequests
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
   
@@ -43,6 +45,10 @@ ControlsForm {
   }
   Scenario {
     id: biogears_scenario
+    onDataRequestModelChanged : {
+      bgRequests = requestTree
+      root.dataRequestModelChanged(bgRequests)
+    }
     onPatientMetricsChanged: {
         root.respiratoryRate.value.text       = metrics.RespiratoryRate
         root.heartRate.value.text             = metrics.HeartRate 

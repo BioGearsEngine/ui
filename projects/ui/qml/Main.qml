@@ -42,6 +42,9 @@ ApplicationWindow {
 		controls.onPatientPhysiologyChanged : {
 			graphArea.newPhysiologyModel(model)
 		}
+    controls.onDataRequestModelChanged : {
+      menuArea.newDataRequestModel(requestTree)
+    }
     controls.onNewActiveSubstance : {
       graphArea.newActiveSubstance(subIndex)
     }

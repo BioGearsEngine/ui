@@ -11,11 +11,16 @@
 class DataRequestNode {
 public:
   DataRequestNode();
-  DataRequestNode(QString prefix, QString name, bool checked = false, bool collapsed = true, bool grandchildren = false, DataRequestNode* parent = nullptr);
+  DataRequestNode(QString name, bool checked = false, bool collapsed = true, QString type = "", DataRequestNode* parent = nullptr);
   ~DataRequestNode();
 
+  struct NodeInput {
+    QString name;
+    QString type;
+  };
+
   QString name() const;
-  void name(const QString&);
+  void name(const QString& value);
 
   bool checked() const;
   void checked(bool value);
@@ -23,22 +28,28 @@ public:
   bool collapsed() const;
   void collapsed(bool value);
 
-  bool grandchildren() const;
-  void grandchildren(bool value);
+  QString type() const;
+  void type(QString& value);
 
-  QVector<DataRequestNode> children();
-  
+  int rows() const;
+  int rowInParent() const;
 
+  QVariant data(int role) const;
 
   DataRequestNode const* parent() const;
   DataRequestNode* parent();
+  DataRequestNode* child(int row);
+  DataRequestNode const* child(int row) const;
+  QVector<DataRequestNode*> children() const;
+  DataRequestNode* appendChild(QString name, QString type = "");
+  DataRequestNode* appendChildren(QList<QPair<QString, QString>> nameTypePairs);
 
 private:
   DataRequestNode* _parent = nullptr;
 
-  QVector<DataRequestNode> _children;
+  QVector<DataRequestNode*> _children;
   QString _name;
   bool _checked = false;
   bool _collapsed = true;
-  bool _grandchildren = true;
+  QString _type = "";
 };
