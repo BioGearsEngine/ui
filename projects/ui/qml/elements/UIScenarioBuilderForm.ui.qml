@@ -331,7 +331,7 @@ Window {
       Rectangle {
         id : requestMenu
         Layout.preferredHeight : parent.height
-        Layout.preferredWidth : parent.width / 2
+        Layout.preferredWidth : parent.width / 3
         ListView {
           id : requestListView
           anchors.fill : parent
@@ -366,10 +366,13 @@ Window {
       Rectangle { 
         id : requestPanel
         Layout.preferredHeight : parent.height
-        Layout.preferredWidth : parent.width / 2
+        Layout.preferredWidth : 2 * parent.width / 3
         ListView {
           id : activeRequestView
-          anchors.fill : parent
+          width : parent.width
+          anchors.top : parent.top
+          anchors.topMargin : 5
+          anchors.bottom : parent.bottom
           property double scrollWidth : activeRequestScroll.width
           model : activeRequests
           currentIndex : -1
@@ -783,9 +786,9 @@ Window {
         onClicked : {
           model.setData(index, checkState, Qt.CheckStateRole)
           if (checkState == Qt.Checked){
-            activeRequests.addRequest(path)
+            activeRequests.addRequest(path, model.data(index, DataRequestModel.TypeRole))
           } else {
-            activeRequests.remove(path)
+            activeRequests.removeRequest(path)
           }
         }
       }

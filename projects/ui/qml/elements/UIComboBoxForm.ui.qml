@@ -91,6 +91,9 @@ RowLayout {
       width : parent.width
       highlighted : value.highlightedIndex === index;
     }
+    background : Rectangle {
+      color : "transparent"
+    }
   }
 }
 

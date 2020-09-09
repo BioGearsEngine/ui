@@ -212,14 +212,14 @@ UIScenarioBuilderForm {
 
   activeRequests : ObjectModel {
     id : activeModel
-    function addRequest(path){
+    function addRequest(path, unit){
       let splitPath = path.split(':')
       var v_requestForm = Qt.createComponent("UIDataRequest.qml");
       let requestRoot = splitPath.shift();    //removes first element in split path array and assigns to request type
       let requestLeaf = splitPath.pop();        //removes last element in split path array and assign to request name
       let requestBranches = splitPath;        //whatever is left over (maybe nothing) when we remove root and leaf
       if ( v_requestForm.status == Component.Ready)  {
-        var v_request = v_requestForm.createObject(activeRequestView, { "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches,
+        var v_request = v_requestForm.createObject(activeRequestView, { "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches, "unitClass" : unit,
                                                                         "requestLeaf" : requestLeaf, "width" : activeRequestView.width-activeRequestView.scrollWidth
                                                                 })
         activeModel.append(v_request)
@@ -237,7 +237,7 @@ UIScenarioBuilderForm {
       //Instead, search for full path name that traverses tree from root to menu item (guaranteed to be unique)
       for (let i = 0; i < activeModel.count; ++i){
         let request = activeModel.get(i);
-        if (request.pathId = path){
+        if (request.pathId == path){
           activeModel.remove(i, 1);
           return;
         }
