@@ -50,7 +50,7 @@ constexpr const char* _COMPILER_VERSION_ =
 constexpr const char* _COMPILER_NAME_ = "Clang";
 #elif defined(__GNUG__)
 constexpr const char* _COMPILER_NAME_ = "GCC";
-constexpr const char* _COMPILER_VERSION_ = "\""+"__GNUC__.__GNUC_MINOR__";
+constexpr const char* _COMPILER_VERSION_ = "__GNUC__.__GNUC_MINOR__";
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 constexpr const char* _COMPILER_NAME_ = "MiniGW";
 constexpr const char* _COMPILER_VERSION_ = "";
