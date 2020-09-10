@@ -13,15 +13,15 @@
 class BioGearsData : public QAbstractItemModel {
   Q_OBJECT
 
-  Q_PROPERTY(double simulation_time  READ getSimulationTime NOTIFY timeAdvanced )
+  Q_PROPERTY(double simulation_time READ getSimulationTime NOTIFY timeAdvanced)
 public:
   enum Categories {
     VITALS = 0,
     CARDIOPULMONARY,
     BLOOD_CHEMISTRY,
     ENERGY_AND_METABOLISM,
-    RENAL_FLUID_BALANCE,
-    RENAL_OVERVIEW,
+    FLUID_BALANCE,
+    RENAL,
     SUBSTANCES,
     CUSTOM,
     TOTAL_CATEGORIES
@@ -43,7 +43,8 @@ public:
     AutoScaleRole,
     YMaxRole,
     YMinRole,
-    XIntervalRole
+    XIntervalRole,
+    InitializedRole
   };
   Q_ENUMS(PhysiologyRequestRoles)
 
@@ -72,7 +73,6 @@ public:
 
   QModelIndex index(QAbstractItemModel const* model) const;
 
-
   double getSimulationTime();
   void setSimulationTime(double time_s);
 
@@ -96,6 +96,7 @@ public:
     roles[YMaxRole] = "ymax";
     roles[YMinRole] = "ymin";
     roles[XIntervalRole] = "xinterval";
+    roles[InitializedRole] = "initialized"; // initialized works side by side with enabled but differs in that it specifys if/when specifically a graph is active. Once enabled, initialized should follow
     return roles;
   }
 
@@ -118,10 +119,10 @@ private:
   BioGearsData* _cardiopulmonary = nullptr;
   BioGearsData* _blood_chemistry = nullptr;
   BioGearsData* _energy_and_metabolism = nullptr;
-  BioGearsData* _renal_fluid_balance = nullptr;
-  BioGearsData* _renal_overview = nullptr;
+  BioGearsData* _fluid_balance = nullptr;
+  BioGearsData* _renal = nullptr;
   BioGearsData* _substances = nullptr;
   BioGearsData* _customs = nullptr;
 
-  Q_PROPERTY ( QString name MEMBER _name CONSTANT)
+  Q_PROPERTY(QString name MEMBER _name CONSTANT)
 };

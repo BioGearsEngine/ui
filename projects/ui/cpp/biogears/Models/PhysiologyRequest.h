@@ -44,6 +44,9 @@ public:
   double x_interval() const;
   void x_interval(double value);
 
+  bool initialized() const;
+  void initialized(bool value);
+
   bool custom() const;
   void custom(std::function<double(void)>&& value, std::function<QString(void)>&& unit);
 
@@ -101,6 +104,7 @@ private:
   double _y_max;
   double _y_min;
   double _x_interval;
+  bool _initialized = false;
   biogears::SEScalar const* _value = nullptr;
   biogears::SEUnitScalar const* _unit = nullptr;
 

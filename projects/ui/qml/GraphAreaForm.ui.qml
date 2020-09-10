@@ -16,6 +16,7 @@ Page {
 
     property PhysiologyModel physiologyRequestModel
 	property alias energyMetabolismSeries : energyMetabolismSeries
+	property alias renalOverviewSeries : renalOverviewSeries
 	
     property alias vitalsGridView : vitalsGridView
     property alias cardiopulmonaryGridView : cardiopulmonaryGridView
@@ -25,10 +26,8 @@ Page {
 	property alias renalOverviewGridView : renalOverviewSeries.renalOverviewGridView
     property alias substanceGridView : substanceGridView
     property alias customGridView : customGridView
-	
-	property alias energyTimer : energyMetabolismSeries.energyTimer
-	property alias renalOverviewSeries : renalOverviewSeries
 
+	property alias energyTimer : energyMetabolismSeries.energyTimer
 	property alias renalTimer : renalOverviewSeries.renalTimer
     property alias tenHzPlotTimer : tenHzPlotTimer
     property alias fiveHzPlotTimer : fiveHzPlotTimer
@@ -156,26 +155,27 @@ Page {
                                 checkable : true
                                 checked : _model.data(_item, PhysiologyModel.EnabledRole)
                                 text :    _model.data(_item, PhysiologyModel.RequestRole) 
+								property bool _initialized : _model.data(_item, PhysiologyModel.InitializedRole)
                                 onClicked : {
                                     if (checked) {
-										console.log ("Checked Item %1".arg(_item))
-										console.log ("Checked Index %1".arg(plots.currentIndex))
-										console.log ("Checked Model %1".arg(_model))
-										console.log ("Checked Titel %1".arg(_title))
                                         _model.setData(_item, true, PhysiologyModel.EnabledRole)
+										_model.setData(_item, true, PhysiologyModel.InitializedRole)
                                         createPlotView(plots.currentIndex, _model, _item, _title)
                                     } else {
                                         _model.setData(_item, false, PhysiologyModel.EnabledRole)
+										_model.setData(_item, false, PhysiologyModel.InitializedRole)
                                         removePlotView(plots.currentIndex, _item.row, _title)
                                     }
                                 }
 								Component.onCompleted: {
-									if (checked) {
+									if (checked && !_initialized) {
+									  _model.setData(_item, true, PhysiologyModel.InitializedRole)
 									  createPlotView(plots.currentIndex, _model, _item, _title)
 									}
 								}
                             }
                         }
+                        
                     }
 
                     // ! When a item is nested like substances
@@ -229,6 +229,7 @@ Page {
                         }
                     }
                 }
+
             }
         }
         Button {

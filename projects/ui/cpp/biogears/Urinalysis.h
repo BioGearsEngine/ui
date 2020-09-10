@@ -38,20 +38,6 @@ struct Urinalysis : public QObject {
   void Nitrite(bool value);
   void LeukocyteEsterase(bool value);
 
-signals:
-  //void colorChanged(QString);
-  //void appearanceChanged(QString);
-  //void bilirubinChanged(QString);
-  //void specificGravityChanged(QString);
-  //void pHChanged(QString);
-  //void urobilinogenChanged(QString);
-  //void glucoseChanged(QString);
-  //void ketoneChanged(QString);
-  //void proteinChanged(QString);
-  //void bloodChanged(QString);
-  //void nitriteChanged(QString);
-  //void leukocyteEsteraseChanged(QString);
-
 private:
   Q_OBJECT
   QString _color;

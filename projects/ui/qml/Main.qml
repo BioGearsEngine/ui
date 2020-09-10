@@ -40,7 +40,6 @@ ApplicationWindow {
           actionDrawer.openActionDrawer();
         }
 		controls.onPatientPhysiologyChanged : {
-			console.log ("physiology changed %1".arg(model))
 			graphArea.newPhysiologyModel(model)
 		}
 	  

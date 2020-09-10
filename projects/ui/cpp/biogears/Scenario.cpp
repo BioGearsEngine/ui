@@ -427,30 +427,30 @@ Scenario& Scenario::load_patient(QString file)
       energy_and_metabolism->child(11)->scalar(&cond.GetRelativeHumidity());
     }
 
-    auto renal_fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_FLUID_BALANCE, 0, QModelIndex()).internalPointer());
+    auto fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::FLUID_BALANCE, 0, QModelIndex()).internalPointer());
     {
 
-      renal_fluid_balance->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
-      renal_fluid_balance->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
-      renal_fluid_balance->child(2)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
-      renal_fluid_balance->child(3)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
-      renal_fluid_balance->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
-      renal_fluid_balance->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
-      renal_fluid_balance->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
-      renal_fluid_balance->child(7)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
-      renal_fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
-      renal_fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
-      renal_fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
-      renal_fluid_balance->child(11)->unit_scalar(&_engine->GetRenal().GetLeftReabsorptionRate());
-      renal_fluid_balance->child(12)->unit_scalar(&_engine->GetRenal().GetRightReabsorptionRate());
+      fluid_balance->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+      fluid_balance->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
+      fluid_balance->child(2)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
+      fluid_balance->child(3)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
+      fluid_balance->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
+      fluid_balance->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
+      fluid_balance->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
+      fluid_balance->child(7)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
+      fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
+      fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
+      fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
+      fluid_balance->child(11)->unit_scalar(&_engine->GetRenal().GetLeftReabsorptionRate());
+      fluid_balance->child(12)->unit_scalar(&_engine->GetRenal().GetRightReabsorptionRate());
 
     }
 
-    auto renal_overview = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL_OVERVIEW, 0, QModelIndex()).internalPointer());
+    auto renal = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL, 0, QModelIndex()).internalPointer());
     {
-      renal_overview->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
-      renal_overview->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
-      renal_overview->child(2)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
+      renal->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+      renal->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
+      renal->child(2)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
 
     }
 

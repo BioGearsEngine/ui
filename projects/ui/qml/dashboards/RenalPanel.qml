@@ -53,6 +53,7 @@ Item {
 	// Based on BioGearsData for RENAL_OVERVIEW (physiologyRenalModel)
 	// 0 - Mean Urine Output
 	// 1 - Urine Production Rate
+	// 2 - Glomerular Filtration Rate
 	
 	// Based on BioGearsData for RENAL_FLUID_BALANCE (physiologyRenalFluidModel)
     // 0 - Mean Urine Output
@@ -240,7 +241,7 @@ Item {
 							border.width: 2
 							Text {
 								id: uaSpecificGravText
-								text: qsTr("s.g.: ")+ root.uaSpecificG
+								text: qsTr("S.G.: ")+ root.uaSpecificG
 								anchors.horizontalCenter: parent.horizontalCenter
 								anchors.verticalCenter: parent.verticalCenter
 								color: "black"

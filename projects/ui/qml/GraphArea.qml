@@ -76,8 +76,8 @@ GraphAreaForm {
     physiologyRequestModel = model;
 	energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
 	energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
-	renalOverviewSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW))
-	renalOverviewSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE))
+	renalOverviewSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL))
+	renalOverviewSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE))
   }
   
   onUrinalysisChanged : {
@@ -133,7 +133,6 @@ GraphAreaForm {
   }
 
   onSpeedToggled :{
-    console.log("Speed = " + speed)
     if (speed == 1){
       root.state = "realTime"
     } else {
@@ -293,7 +292,7 @@ GraphAreaForm {
   ObjectModel {
     id: renalFluidBalanceObjectModel
     function createPlotView (model, request, title) {
-     var vitals = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+     var vitals = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
      root.createPlotViewHelper(model, request, title,renalFluidBalanceObjectModel, renalFluidBalanceGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
@@ -315,7 +314,7 @@ GraphAreaForm {
   ObjectModel {
     id: renalOverviewObjectModel
     function createPlotView (model, request, title) {
-     var vitals = physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW)
+     var vitals = physiologyRequestModel.category(PhysiologyModel.RENAL)
 	 root.createPlotViewHelper(model, request, title,renalOverviewObjectModel, renalOverviewGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
@@ -381,6 +380,7 @@ GraphAreaForm {
             console.log(title + " not found");
         } 
       }
+	  
     }
 
     function resizePlots(newWidth, newHeight){
@@ -412,10 +412,10 @@ GraphAreaForm {
       case PhysiologyModel.ENERGY_AND_METABOLISM:
         energyMetabolismModel.createPlotView(model, request, title);
         break;
-      case PhysiologyModel.RENAL_FLUID_BALANCE:
+      case PhysiologyModel.FLUID_BALANCE:
         renalFluidBalanceModel.createPlotView(model, request, title);
         break;
-	  case PhysiologyModel.RENAL_OVERVIEW:
+	  case PhysiologyModel.RENAL:
         renalOverviewModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.SUBSTANCES:
@@ -441,10 +441,10 @@ GraphAreaForm {
         case PhysiologyModel.ENERGY_AND_METABOLISM:
           model = energyMetabolismModel
           break;
-        case PhysiologyModel.RENAL_FLUID_BALANCE:
+        case PhysiologyModel.FLUID_BALANCE:
           model = renalFluidBalanceModel
           break;
-		case PhysiologyModel.RENAL_OVERVIEW:
+		case PhysiologyModel.RENAL:
 		  model = renalOverviewModel
           break;
         case PhysiologyModel.SUBSTANCES:
@@ -491,12 +491,12 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
         break;
-        case PhysiologyModel.RENAL_FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+        case PhysiologyModel.FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
           currentModel = renalFluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL_OVERVIEW:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW)
+		case PhysiologyModel.RENAL:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
           currentModel = renalOverviewObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
@@ -541,12 +541,12 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
         break;
-        case PhysiologyModel.RENAL_FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+        case PhysiologyModel.FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
           currentModel = renalFluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL_OVERVIEW:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW)
+		case PhysiologyModel.RENAL:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
           currentModel = renalOverviewObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
@@ -590,12 +590,12 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
         break;
-        case PhysiologyModel.RENAL_FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+        case PhysiologyModel.FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
           currentModel = renalFluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL_OVERVIEW:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW)
+		case PhysiologyModel.RENAL:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
           currentModel = renalOverviewObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
@@ -639,12 +639,12 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
         break;
-        case PhysiologyModel.RENAL_FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+        case PhysiologyModel.FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
           currentModel = renalFluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL_OVERVIEW:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW)
+		case PhysiologyModel.RENAL:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
           currentModel = renalOverviewObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
@@ -689,12 +689,12 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
         break;
-        case PhysiologyModel.RENAL_FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_FLUID_BALANCE)
+        case PhysiologyModel.FLUID_BALANCE:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
           currentModel = renalFluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL_OVERVIEW:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL_OVERVIEW)
+		case PhysiologyModel.RENAL:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
           currentModel = renalOverviewObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:

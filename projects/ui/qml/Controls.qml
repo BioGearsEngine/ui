@@ -15,7 +15,6 @@ ControlsForm {
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
-  //signal urinalysisUpdated(Urinalysis urinalysisData)
   // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
