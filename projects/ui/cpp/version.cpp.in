@@ -20,7 +20,7 @@ constexpr const char* _OS_ =
 #if defined(_MSVC_LANG)
 constexpr const char* _COMPILER_NAME_ = "MSVC";
 constexpr const char* _COMPILER_VERSION_ =
-#  if _MSC_VER == 1200
+#if _MSC_VER == 1200
     "6.0"
 #  elif _MSC_VER == 1300
     "7.0"
@@ -38,36 +38,14 @@ constexpr const char* _COMPILER_VERSION_ =
     "12.0"
 #  elif _MSC_VER == 1900
     "14.0"
-#  elif _MSC_VER == 1910
-    "15.0"
-#  elif _MSC_VER == 1911
-    "15.3"
-#  elif _MSC_VER == 1912
-    "15.5"
-#  elif _MSC_VER == 1913
-    "15.6"
-#  elif _MSC_VER == 1914
-    "15.7"
-#  elif _MSC_VER == 1915
-    "15.8"
-#  elif _MSC_VER == 1916
-    "15.9"
-#  elif _MSC_VER == 1920
-    "16.0"
-#  elif _MSC_VER == 1921
-    "16.1"
-#  elif _MSC_VER == 1922
-    "16.2"
-#  elif _MSC_VER == 1923
-    "16.3"
-#  elif _MSC_VER == 1924
-    "16.4"
-#  elif _MSC_VER == 1925
-    "16.5"
-#  elif _MSC_VER == 1926
-    "16.5"
+#  elif _MSC_VER <= 1920
+    "15.X"
+#  elif _MSC_VER <= 1930
+    "16.X"
+#  else 
+    "Unknown"
 #  endif
-  ;
+;
 #elif defined(__clang__)
 constexpr const char* _COMPILER_NAME_ = "Clang";
 #elif defined(__GNUG__)

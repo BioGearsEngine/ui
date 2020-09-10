@@ -14,10 +14,11 @@
 #*.jar filter=lfs diff=lfs merge=lfs -text
 
 # Set the default behavior, in case people don't have core.autocrlf set.
-* text=auto
+* text=auto eol=lf
 
 
 # Normalize line endings. 
+
 *.c text eol=lf
 *.h text eol=lf
 *.xsd text eol=lf
