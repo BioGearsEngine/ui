@@ -40,7 +40,7 @@ QtLogForward::QtLogForward(QObject* parent)
 
 //-------------------------------------------------------------------------------
 struct QtLogger::Implementation {
-  QtLogForward UE4LogStream;
+  QtLogForward Qt5LogStream;
 };
 //-------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ QtLogger::QtLogger(const QString& logFilename, const QString& working_dir)
   : biogears::Logger(logFilename.toStdString(), working_dir.toStdString())
   , _pimpl(std::make_unique<Implementation>())
 {
-  biogears::Logger::SetForward(&_pimpl->UE4LogStream);
+  biogears::Logger::SetForward(&_pimpl->Qt5LogStream);
 }
 //-------------------------------------------------------------------------------
 QtLogger::~QtLogger()
@@ -56,28 +56,3 @@ QtLogger::~QtLogger()
   _pimpl = nullptr;
 }
 
-//-------------------------------------------------------------------------------
-void QtLogger::Debug(const QString& msg, const QString& origin)
-{
-  biogears::Logger::Debug(msg.toStdString(), origin.toStdString());
-}
-//-------------------------------------Sc------------------------------------------
-void QtLogger::Info(const QString& msg, const QString& origin)
-{
-  biogears::Logger::Info(msg.toStdString(), origin.toStdString());
-}
-//-------------------------------------------------------------------------------
-void QtLogger::Warning(const QString& msg, const QString& origin)
-{
-  biogears::Logger::Warning(msg.toStdString(), origin.toStdString());
-}
-//-------------------------------------------------------------------------------
-void QtLogger::Error(const QString& msg, const QString& origin)
-{
-  biogears::Logger::Error(msg.toStdString(), origin.toStdString());
-}
-//-------------------------------------------------------------------------------
-void QtLogger::Fatal(const QString& msg, const QString& origin)
-{
-  biogears::Logger::Fatal(msg.toStdString(), origin.toStdString());
-}

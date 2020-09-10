@@ -1,8 +1,7 @@
 #pragma once
 
 #include <QObject>
-
-namespace bio {
+#include <memory>
 
 struct Substance : QObject {
   //Default constructor -- Sentinal value of -1 set at initialization.  If the property is active for a substance, it will get reset to a new value.
@@ -79,4 +78,3 @@ private:
   Q_PROPERTY(double HepaticMassCleared MEMBER hepatic_mass_cleared)
 };
 Q_DECLARE_METATYPE(Substance)
-}

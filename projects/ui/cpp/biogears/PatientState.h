@@ -3,8 +3,8 @@
 #include <QObject>
 
 struct PatientState {
-  QString alive = false;
-  QString tacycardia = false;
+  bool alive = false;
+  bool tacycardia = false;
 
   QString age;
   QString height_cm;
@@ -32,7 +32,8 @@ struct PatientState {
 
 private:
   Q_GADGET
-  Q_PROPERTY(QString Alive MEMBER alive)
+  Q_PROPERTY(bool Alive MEMBER alive)
+  Q_PROPERTY(bool Tacycardia MEMBER tacycardia)
 
   Q_PROPERTY(QString Age MEMBER age)
   Q_PROPERTY(QString Height MEMBER height_cm)

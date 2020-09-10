@@ -1,6 +1,7 @@
 #pragma once
 #include <biogears/cdm/utils/Logger.h>
 #include <string>
+#include <memory>
 
 #include <QObject>
 #include <QString>
@@ -34,12 +35,6 @@ class QtLogger : public biogears::Logger {
 public:
   QtLogger(const QString& logFilename, const QString& working_dir);
   virtual ~QtLogger();
-
-  void Debug(const QString& msg, const QString& origin = TEXT(""));
-  void Info(const QString& msg, const QString& origin = TEXT(""));
-  void Warning(const QString& msg, const QString& origin = TEXT(""));
-  void Error(const QString& msg, const QString& origin = TEXT(""));
-  void Fatal(const QString& msg, const QString& origin = TEXT(""));
 
 protected:
   using biogears::Logger::HasForward;
