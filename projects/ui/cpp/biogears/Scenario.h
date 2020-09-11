@@ -84,7 +84,7 @@ public:
   Q_INVOKABLE QVariantMap edit_patient();
   Q_INVOKABLE void export_patient(); //Export current patient (uses save_patient)
   Q_INVOKABLE Scenario& load_patient(QString);
-  Q_INVOKABLE void create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree * events);
+  Q_INVOKABLE void create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* events, QVariantList requests);
   Q_INVOKABLE void create_substance(QVariantMap substanceData);
   Q_INVOKABLE QVariantMap edit_substance();
   Q_INVOKABLE void export_substance();
@@ -101,12 +101,12 @@ public:
   Q_INVOKABLE void join() final;
   Q_INVOKABLE void step();
 
-  Q_INVOKABLE QVector<QString> get_drugs();
-  Q_INVOKABLE QVector<QString> get_volatile_drugs();
-  Q_INVOKABLE QVector<QString> get_compounds();
-  Q_INVOKABLE QVector<QString> get_transfusion_products();
-  Q_INVOKABLE QVector<QString> get_components();
-  Q_INVOKABLE QVector<QString> get_nutrition();
+  Q_INVOKABLE QVariantList get_drugs();
+  Q_INVOKABLE QVariantList get_volatile_drugs();
+  Q_INVOKABLE QVariantList get_compounds();
+  Q_INVOKABLE QVariantList get_transfusion_products();
+  Q_INVOKABLE QVariantList get_components();
+  Q_INVOKABLE QVariantList get_nutrition();
 
   Q_INVOKABLE QtLogForward* getLogFoward();
 
@@ -211,14 +211,14 @@ private:
   std::atomic<bool> _paused;
   std::atomic<bool> _throttle;
 
-  QVector<QString> _drugs_list; //Subs with PK/PD data
-  QVector<QString> _volatile_drugs_list; //Gaseous subs with PK/PD that can be added to ventilator
-  QVector<QString> _compounds_list; //Compounds
-  QVector<QString> _transfusions_list; //Blood products
-  QVector<QString> _components_list; //Subs that can be components of compounds
-  QVector<QString> _ambient_gas_list; //Gases that can be added to environment
-  QVector<QString> _ambient_aerosol_list; //Aerosolized liquids that can be added to environment
-  QVector<QString> _nutrition_list;
+  QVariantList _drugs_list; //Subs with PK/PD data
+  QVariantList _volatile_drugs_list; //Gaseous subs with PK/PD that can be added to ventilator
+  QVariantList _compounds_list; //Compounds
+  QVariantList _transfusions_list; //Blood products
+  QVariantList _components_list;        //Subs that can be components of compounds
+  QVariantList _ambient_gas_list; //Gases that can be added to environment
+  QVariantList _ambient_aerosol_list; //Aerosolized liquids that can be added to environment
+  QVariantList _nutrition_list;
 
   BioGearsData* _physiology_model;
   DataRequestTree* _data_request_tree;

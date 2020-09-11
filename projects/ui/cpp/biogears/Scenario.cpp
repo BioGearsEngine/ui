@@ -679,32 +679,32 @@ void Scenario::setup_physiology_lists()
   }
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::get_drugs()
+QVariantList Scenario::get_drugs()
 {
   return _drugs_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::get_volatile_drugs()
+QVariantList Scenario::get_volatile_drugs()
 {
   return _volatile_drugs_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::get_compounds()
+QVariantList Scenario::get_compounds()
 {
   return _compounds_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::get_transfusion_products()
+QVariantList Scenario::get_transfusion_products()
 {
   return _transfusions_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::get_components()
+QVariantList Scenario::get_components()
 {
   return _components_list;
 }
 //---------------------------------------------------------------------------------
-QVector<QString> Scenario::get_nutrition()
+QVariantList Scenario::get_nutrition()
 {
   return _nutrition_list;
 }
@@ -1056,7 +1056,7 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   return;
 }
 
-void Scenario::create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* eventTree)
+void Scenario::create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* eventTree, QVariantList requests)
 {
   eventTree->sort_events(); //Get actions in right order
 
@@ -1098,6 +1098,11 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
       }
     }
   }
+  //Create requests
+  for (int i = 0; i < requests.size(); ++i) {
+    buildScenario->GetDataRequestManager().CreateFromBind(*_data_request_tree->decode_request(requests[i].toString()), _engine->GetSubstanceManager());
+  }
+
 
   std::string fileLoc = "./Scenarios/" + buildScenario->GetName() + ".xml";
   std::string fullPath = biogears::ResolvePath(fileLoc);

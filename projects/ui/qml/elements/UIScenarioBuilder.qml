@@ -24,6 +24,11 @@ UIScenarioBuilderForm {
 		  builderModel.remove(1, builderModel.count -2); //Delete actions, leaving behind initial patient block and scenario length block
     }
     builderModel.scenarioLength_s = 0.0
+    activeRequestsModel.clear()
+    root.bgRequests.resetData()     //Sets all collapsed roles to true and check states to 0 for nodes in Data Request Model
+    requestView.loadSource = false  //Need to unload, then reload component to Loader in request delegate so that all delegates are destroyed and loader is forced to re-create them with updated model
+    requestView.loadSource = true
+
 	}
 	function seconds_to_clock_time(time_s) {
     var v_seconds = time_s % 60
@@ -50,6 +55,25 @@ UIScenarioBuilderForm {
       return null
     }
   }
+
+  function saveScenario(){
+    console.log(builderModel.get(0).objectName)
+    //If time end component is not at top of model, then we are still editing an action
+    if (builderModel.get(0).objectName !== "scenarioEnd"){
+      root.warningMessage.text = "Action editing in process"
+      root.warningMessage.open();
+      return;
+    }
+    //Make sure that data requests are valid before saving.  If not, request model will trigger warning
+    if (activeRequestsModel.setRequestQueue()){
+      builderModel.setActionQueue()
+      let prefix = isPatientFile ? "" : "./states/"
+      let initialParameters = prefix + scenarioInput
+      bg_scenario.create_scenario(root.scenarioName, isPatientFile, initialParameters + ".xml", eventModel, activeRequestsModel.requestQueue);
+      root.close()
+    }
+  }
+
   //List model elements can't assign javascript objects to properties, but JS objects are what get passed to ActionModel functions.  Get around this 
   //by assigning each action a "genProps" function that returns the initial properties we want, which we can then pass along to their respective "makeAction" function
   //This also lets us assign differently named properties to each action (if we did nested ListElements, ListModel expects each subelement to get the same properties defined)
@@ -116,12 +140,26 @@ UIScenarioBuilderForm {
       builderModel.insert(1, v_timeGap)
       newAction.currentSelection = Qt.binding(function() { return actionSwitchView.currentIndex === newAction.ObjectModel.index} )
       newAction.selected.connect(function() {actionSwitchView.currentIndex = newAction.ObjectModel.index})
+      newAction.editing.connect(function () {builderModel.adjustFade("ON", newAction.ObjectModel.index) } )
       newAction.buildSet.connect(builderModel.setViewIndex)
+      newAction.editing()
       actionSwitchView.currentIndex = 0 //New action gets focus
+    }
+    function adjustFade(state, index){
+      for (let i = 0; i < builderModel.count; i++){
+        if (state == "ON"){
+          if (i != index){
+            builderModel.get(i).opacity = 0.25
+          }
+        } else {
+          builderModel.get(i).opacity = 1.0
+        }
+      }
     }
     function setViewIndex(action){
       //When we edit an action (in particular it's start time) we need to make sure that we percolate it up/down to the right location in the view area
       let newIndex = 1
+      adjustFade("OFF", 0)
       let actionIndex = action.ObjectModel.index;  //where the action currently resides in the view
       let startIndex = actionIndex == 0 ? 3 : 1  //If object is at index 0, then it has just been created. There is a time block (not visible) and the end sim block below it, so the first action to compare this action to is at index 3.  If this action has already been placed in list, then the end sim block occupies index 0 and the first action for comparison is at index 1 
       let actionTime = action.actionStartTime_s;   //the time the action is to be applied
@@ -210,10 +248,12 @@ UIScenarioBuilderForm {
     showDirs : false
   }
 
-  activeRequests : ObjectModel {
-    id : activeModel
+  activeRequestsModel : ObjectModel {
+    id : activeRequestsModel
+    signal invalidRequests(string err)
+    property var requestQueue : []
     function addRequest(path, unit){
-      let splitPath = path.split(':')
+      let splitPath = path.split(';')
       var v_requestForm = Qt.createComponent("UIDataRequest.qml");
       let requestRoot = splitPath.shift();    //removes first element in split path array and assigns to request type
       let requestLeaf = splitPath.pop();        //removes last element in split path array and assign to request name
@@ -222,7 +262,7 @@ UIScenarioBuilderForm {
         var v_request = v_requestForm.createObject(activeRequestView, { "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches, "unitClass" : unit,
                                                                         "requestLeaf" : requestLeaf, "width" : activeRequestView.width-activeRequestView.scrollWidth
                                                                 })
-        activeModel.append(v_request)
+        activeRequestsModel.append(v_request)
       } else {
         if (v_requestForm.status == Component.Error){
           console.log("Error : " + v_requestForm.errorString() );
@@ -235,13 +275,32 @@ UIScenarioBuilderForm {
     function removeRequest(path){
       //Can't bind menu element to index in active request model because menu elements are destroyed when menu section is collapsed, which removes bindings.
       //Instead, search for full path name that traverses tree from root to menu item (guaranteed to be unique)
-      for (let i = 0; i < activeModel.count; ++i){
-        let request = activeModel.get(i);
+      for (let i = 0; i < activeRequestsModel.count; ++i){
+        let request = activeRequestsModel.get(i);
         if (request.pathId == path){
-          activeModel.remove(i, 1);
+          activeRequestsModel.remove(i, 1);
           return;
         }
       }
+    }
+    function setRequestQueue(){
+      let errMsg = "Invalid Data Requests:";    //for reporting id's of invalid requests
+      activeRequestsModel.requestQueue.length = 0   //clears any requests we had from previous calls
+      let valid = true
+      console.log(activeRequestsModel.count)
+      for (let i = 0; i < activeRequestsModel.count; ++i){
+        let request = activeRequestsModel.get(i);
+        activeRequestsModel.requestQueue.push(request.formatOutput());
+        if (!request.isValid()){
+          errMsg += "\n\*  " + request.pathId;
+          valid = false;
+        }
+      }
+      if (!valid){
+        warningMessage.text = errMsg;
+        warningMessage.open();
+      }
+      return valid;
     }
   }
 }

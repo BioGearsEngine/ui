@@ -11,7 +11,7 @@
 class DataRequestNode {
 public:
   DataRequestNode();
-  DataRequestNode(QString name, bool checked = false, bool collapsed = true, QString type = "", DataRequestNode* parent = nullptr);
+  DataRequestNode(QString name, int checked = 0, bool collapsed = true, QString type = "", DataRequestNode* parent = nullptr);
   ~DataRequestNode();
 
   struct NodeInput {
@@ -22,8 +22,8 @@ public:
   QString name() const;
   void name(const QString& value);
 
-  bool checked() const;
-  void checked(bool value);
+  int checked() const;
+  void checked(int value);
 
   bool collapsed() const;
   void collapsed(bool value);
@@ -43,13 +43,14 @@ public:
   QVector<DataRequestNode*> children() const;
   DataRequestNode* appendChild(QString name, QString type = "");
   DataRequestNode* appendChildren(QList<QPair<QString, QString>> nameTypePairs);
+  void reset();
 
 private:
   DataRequestNode* _parent = nullptr;
 
   QVector<DataRequestNode*> _children;
   QString _name;
-  bool _checked = false;
+  int _checked = 0;
   bool _collapsed = true;
   QString _type = "";
 };

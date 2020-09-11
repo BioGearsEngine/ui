@@ -14,6 +14,7 @@ Window {
   property alias activeRequestView : activeRequestView
   property alias actionView : actionListView
   property alias scenarioView : scenarioListView
+  property alias requestView : requestListView
   property alias warningMessage : warningMessage
   property string scenarioInput : "DefaultTemplateMale"
   property string scenarioName : "TestScenario"
@@ -26,7 +27,7 @@ Window {
   property FolderListModel patientModel
   property FolderListModel stateModel
   property ListModel actionModel
-  property ObjectModel activeRequests
+  property ObjectModel activeRequestsModel
   //Components used to create time-based object in builder model
   property Component timeGapComponent : timeGapComponent
   property Component timeStartComponent : timeStartComponent
@@ -239,84 +240,7 @@ Window {
             }
           }
         }
-        Button {
-          id : setPatientButton
-          Layout.alignment : Qt.AlignHCenter
-          Layout.preferredHeight : parent.height
-          Layout.preferredWidth : parent.width / 5
-          text : "Set Input "
-          onClicked : {
-            patientMenu.open()
-          }
-          Menu {
-            id : patientMenu
-            closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
-            delegate : MenuItem {
-              font.pixelSize : 15
-              background : Rectangle {
-                color : "transparent"
-                border.color : "#1A5276"
-                border.width : highlighted ? 2 : 0
-              }
-            }
-            Menu {
-              title : "Patient"
-              Repeater {
-                id : patientSubMenu
-                model : root.patientModel.status == FolderListModel.Ready ? root.patientModel : null
-                delegate : MenuItem {
-                  id : patientDelegate
-                  text : model.fileBaseName
-                  contentItem : Text {
-                    text : patientDelegate.text
-                    font.pixelSize : 15
-                    horizontalAlignment : Qt.AlignHCenter
-                  }
-                  width : parent.width
-                  onTriggered : {
-                    root.scenarioInput = text
-                    root.isPatientFile = true
-                    patientMenu.close()
-                  }
-                  background : Rectangle {
-                    color : "transparent"
-                    border.color : "#1A5276"
-                    border.width : patientDelegate.highlighted ? 2 : 0
-                  }
-                }
-              }
-            }
-            Menu {
-              title : "Engine State"
-              Repeater {
-                id : stateSubMenu
-                model : root.stateModel.status == FolderListModel.Ready ? root.patientModel : null
-                delegate : MenuItem {
-                  id : stateDelegate
-                  text : model.fileBaseName
-                  contentItem : Text {
-                    text : stateDelegate.text
-                    font.pixelSize : 15
-                    horizontalAlignment : Qt.AlignHCenter
-                  }
-                  width : parent.width
-                  onTriggered : {
-                    root.scenarioInput = text
-                    root.isPatientFile = false
-                    patientMenu.close()
-                  }
-                  background : Rectangle {
-                    anchors.fill : parent
-                    color : "transparent"
-                    border.color : "#1A5276"
-                    border.width : stateDelegate.highlighted ? 2 : 0
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      }//end button area
     } //end first tab
     //------Second Tab-----------
     GridLayout {
@@ -336,14 +260,16 @@ Window {
           id : requestListView
           anchors.fill : parent
           property double scrollWidth : requestScroll.width
+          property bool loadSource : true
           model : DelegateModel {
             id : requestModel
             model : root.bgRequests
             //rootIndex defaults to topmost node, which is what we want
             delegate : Component {
               Loader {
+                id : requestLoader
                 width : requestListView.width - requestListView.scrollWidth
-                sourceComponent : dataRequestNode
+                sourceComponent : requestListView.loadSource ? dataRequestNode : null
                 property var _model_data : root.bgRequests
                 property var _node_index : requestModel.modelIndex(index)
                 property int _indent_level : 0
@@ -374,7 +300,7 @@ Window {
           anchors.topMargin : 5
           anchors.bottom : parent.bottom
           property double scrollWidth : activeRequestScroll.width
-          model : activeRequests
+          model : activeRequestsModel
           currentIndex : -1
           clip : true
           ScrollBar.vertical : ScrollBar {
@@ -400,11 +326,7 @@ Window {
       height : parent.height
       width : parent.width / 3
       onClicked : {
-        builderModel.setActionQueue()
-        let prefix = isPatientFile ? "" : "./states/"
-        let initialParameters = prefix + scenarioInput
-        bg_scenario.create_scenario(root.scenarioName, isPatientFile, initialParameters + ".xml", eventModel);
-        root.close()
+        root.saveScenario()
       }
     }
   }
@@ -412,8 +334,7 @@ Window {
   id : warningMessage
   icon : StandardIcon.Critical
   standardButtons : StandardButton.Ok
-  width : parent.width / 4
-  height : parent.height / 5
+  width : parent.width / 3
   text : ""
  }
  //---Components loaded during runtime----------------
@@ -507,6 +428,90 @@ Window {
           font.pointSize : 14
           text : "Input: " + root.scenarioInput
         } 
+        ToolTip {
+          visible : inputMouseArea.containsMouse
+          delay : 200
+          timeout : 2000
+          text : "Change patient"
+          font.pointSize : 10
+        }
+        MouseArea {
+          id : inputMouseArea
+          hoverEnabled: true
+          anchors.fill : parent
+          cursorShape : Qt.PointingHandCursor
+          acceptedButtons : Qt.LeftButton
+          onClicked: {
+            patientMenu.open()
+          }
+        }
+        Menu {
+          id : patientMenu
+          closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
+          delegate : MenuItem {
+            font.pixelSize : 15
+            background : Rectangle {
+              color : "transparent"
+              border.color : "#1A5276"
+              border.width : highlighted ? 2 : 0
+            }
+          }
+          Menu {
+            title : "Patient"
+            Repeater {
+              id : patientSubMenu
+              model : root.patientModel.status == FolderListModel.Ready ? root.patientModel : null
+              delegate : MenuItem {
+                id : patientDelegate
+                text : model.fileBaseName
+                contentItem : Text {
+                  text : patientDelegate.text
+                  font.pixelSize : 15
+                  horizontalAlignment : Qt.AlignHCenter
+                }
+                width : parent.width
+                onTriggered : {
+                  root.scenarioInput = text
+                  root.isPatientFile = true
+                  patientMenu.close()
+                }
+                background : Rectangle {
+                  color : "transparent"
+                  border.color : "#1A5276"
+                  border.width : patientDelegate.highlighted ? 2 : 0
+                }
+              }
+            }
+          }
+          Menu {
+            title : "Engine State"
+            Repeater {
+              id : stateSubMenu
+              model : root.stateModel.status == FolderListModel.Ready ? root.patientModel : null
+              delegate : MenuItem {
+                id : stateDelegate
+                text : model.fileBaseName
+                contentItem : Text {
+                  text : stateDelegate.text
+                  font.pixelSize : 15
+                  horizontalAlignment : Qt.AlignHCenter
+                }
+                width : parent.width
+                onTriggered : {
+                  root.scenarioInput = text
+                  root.isPatientFile = false
+                  patientMenu.close()
+                }
+                background : Rectangle {
+                  anchors.fill : parent
+                  color : "transparent"
+                  border.color : "#1A5276"
+                  border.width : stateDelegate.highlighted ? 2 : 0
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -515,7 +520,6 @@ Window {
     id : timeEndComponent
     Column {
       id : timeEndColumn
-      objectName : "timeEndColumn"
       property double scenarioLength_s : 0.0
       property double finalAdvanceTime_s : 0.0
       width : builderModel.actionSwitchView.width - builderModel.actionSwitchView.scrollWidth
@@ -573,6 +577,7 @@ Window {
               visible : parent.cursorVisible
               width :  parent.cursorRectangle.width
               color : "blue"
+              opacity : 0.3
             }
             Keys.onPressed : {
               //Prevent user from deleting time--only allow overwriting
@@ -737,6 +742,7 @@ Window {
           id : nestedComponent
           Column {
             id : nestedNode
+            signal resetNested()
             property int indentLevel : _indent_level
             property var nestedModel : _nested_model
             property var root : _root_index
@@ -786,9 +792,9 @@ Window {
         onClicked : {
           model.setData(index, checkState, Qt.CheckStateRole)
           if (checkState == Qt.Checked){
-            activeRequests.addRequest(path, model.data(index, DataRequestModel.TypeRole))
+            activeRequestsModel.addRequest(path, model.data(index, DataRequestModel.TypeRole))
           } else {
-            activeRequests.removeRequest(path)
+            activeRequestsModel.removeRequest(path)
           }
         }
       }

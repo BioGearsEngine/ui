@@ -14,7 +14,11 @@ Column {
   property string unitClass : ""
   property string header : {
     if (requestRoot == "Compartment"){
-      return requestBranches[0] + " Compartment Data Request: " + requestBranches[1]
+      if (requestLeaf == "SubstanceQuantity"){
+        return requestBranches[0] + " Compartment Data Request: " + requestBranches[1] + " (Substance Quantity)"
+      } else {
+        return requestBranches[0] + " Compartment Data Request: " + requestBranches[1]
+      }
     } else if (requestRoot == "Physiology"){
       return "Physiology Data Request: " + requestBranches[0]
     } else if (requestRoot == "Substance"){
@@ -56,27 +60,33 @@ Column {
     id : scalarQuantityRequest
     RowLayout {
       id : scalarLayout
-      spacing : 0
+      spacing : 40
       Rectangle {
-        Layout.preferredHeight : parent.height - parent.spacing * 3
-        Layout.preferredWidth : 2 * parent.width / 5
+        Layout.preferredHeight : parent.height
+        Layout.preferredWidth : 0.4 * scalarLayout.width - spacing * 2
         color : "transparent"
         Text {
           height : parent.height
+          width : parent.width
           anchors.left : parent.left
           font.pointSize : 12
-          text : requestLeaf
+          text : root.displayFormat(requestLeaf)
+          leftPadding : 20
           verticalAlignment : Text.AlignVCenter
+          horizontalAlignment : Text.AlignLeft
         }
       }
       Loader {
         id : unitCombo
-        sourceComponent : comboInput
+        sourceComponent : unitClass == "" ? null : comboInput
         property var _label_text : "Unit"
         property var _combo_model : units[unitClass]
-        onLoaded : {
-          Layout.preferredHeight = scalarLayout.height
-          Layout.preferredWidth  = 2 * scalarLayout.width / 5
+        Layout.preferredHeight : scalarLayout.height
+        Layout.preferredWidth  : 0.3 * scalarLayout.width - spacing * 2
+        Layout.alignment : Qt.AlignHCenter
+        Connections {
+          target : unitCombo.item
+          onActivated : {root.unitValue = target.currentText }
         }
       }
       Loader {
@@ -84,9 +94,12 @@ Column {
         sourceComponent : comboInput
         property var _label_text : "Precision"
         property var _combo_model : 6
-        onLoaded : {
-          Layout.preferredHeight = scalarLayout.height
-          Layout.preferredWidth  = scalarLayout.width / 5
+        Layout.preferredHeight : scalarLayout.height
+        Layout.preferredWidth  :  0.3 * scalarLayout.width - spacing * 2
+        Layout.alignment : Qt.AlignHCenter
+        Connections {
+          target : precisionCombo.item
+          onActivated : {root.precisionValue = target.currentText }
         }
       }
     } 
@@ -96,20 +109,34 @@ Column {
     id : subQuantityRequest
     RowLayout {
       id : subLayout
-      spacing : 0
+      spacing : 5
+      Loader {
+        id : subCombo
+        sourceComponent : comboInput
+        property var _label_text : "Substance"
+        property var _combo_model : scenario.get_components()
+        Layout.preferredHeight : subLayout.height
+        Layout.preferredWidth  : subLayout.width / 4 - spacing * 3
+        Layout.alignment : Qt.AlignHCenter
+        Connections {
+          target : subCombo.item
+          onActivated : {root.substanceValue = target.currentText }
+        }
+      }
       Loader {
         id : quantityCombo
         sourceComponent : comboInput
         property var _sub_quantity_model : requestBranches[0] === 'Gas' ? gasSubQuantities : requestBranches[0] === 'Liquid' ? liquidSubQuantities : tissueSubQuantities
         property var _label_text : "Quantity"
         property var _combo_model : Object.keys(_sub_quantity_model)
+        Layout.preferredHeight : subLayout.height
+        Layout.preferredWidth  : subLayout.width / 4 - spacing * 3
+        Layout.alignment : Qt.AlignHCenter
         Connections {
           target: quantityCombo.item
-          onOptionSelected : { unitCombo._combo_model = quantityCombo._sub_quantity_model[text] }
-        }
-        onLoaded : {
-          Layout.preferredHeight = subLayout.height
-          Layout.preferredWidth  = 2 * subLayout.width / 5
+          onActivated : { unitCombo._combo_model = units[quantityCombo._sub_quantity_model[quantityCombo.item.currentText]]; 
+                          unitCombo.item.currentIndex = -1;
+                          root.quantityValue = target.currentText}
         }
       }
       Loader {
@@ -117,9 +144,12 @@ Column {
         sourceComponent : comboInput
         property var _label_text : "Unit"
         property var _combo_model : null
-        onLoaded : {
-          Layout.preferredHeight = subLayout.height
-          Layout.preferredWidth  = 2 * subLayout.width / 5
+        Layout.preferredWidth : subLayout.width / 4 - spacing * 3
+        Layout.preferredHeight : subLayout.height
+        Layout.alignment : Qt.AlignHCenter
+        Connections {
+          target : unitCombo.item
+          onActivated : {root.unitValue = target.currentText }
         }
       }
       Loader {
@@ -127,9 +157,12 @@ Column {
         sourceComponent : comboInput
         property var _label_text : "Precision"
         property var _combo_model : 6
-        onLoaded : {
-          Layout.preferredHeight = subLayout.height
-          Layout.preferredWidth  = subLayout.width / 5
+        Layout.preferredWidth : subLayout.width / 4 - spacing * 3
+        Layout.preferredHeight : subLayout.height
+        Layout.alignment : Qt.AlignHCenter
+        Connections {
+          target : precisionCombo.item
+          onActivated : {root.precisionValue = target.currentText }
         }
       }
     } 
@@ -137,79 +170,55 @@ Column {
   //Component used to stand up all unit/precision/substance/substance parameter combo selection widgets
   Component {
     id : comboInput
-    Rectangle {
-      id : inputWrapper
-      color : "transparent"
-      signal optionSelected(int index, string text)
-      property var labelText : _label_text
-      property var comboModel : _combo_model
-      onComboModelChanged : {
-        comboBox.currentIndex = -1
-      }
-      Label {
-        id : label
-        text : labelText
-        width : parent.width / 2
-        height : parent.height 
+    ComboBox {
+      id : comboBox
+      currentIndex : -1
+      bottomInset : 0
+      topInset : 0
+      model : _combo_model
+      flat : false
+      contentItem : Text {
+        width : comboBox.width
+        height : comboBox.height
+        text : currentIndex == -1 ? _label_text : displayText
         font.pointSize : 12
         verticalAlignment : Text.AlignVCenter
         horizontalAlignment : Text.AlignHCenter
       }
-      ComboBox {
-        id : comboBox
-        currentIndex : -1
-        anchors.left : label.right
-        bottomInset : 0
-        topInset : 0
-        model : comboModel
-        flat : false
+      delegate : ItemDelegate {
+        width : comboBox.popup.width
         contentItem : Text {
-          width : comboBox.width
-          height : comboBox.height
-          text : comboBox.displayText
+          width : parent.width
+          text : modelData
           font.pointSize : 12
           verticalAlignment : Text.AlignVCenter
           horizontalAlignment : Text.AlignHCenter
-        }
-        delegate : ItemDelegate {
-          width : comboBox.popup.width
-          contentItem : Text {
-            width : parent.width
-            text : modelData
-            font.pointSize : 12
-            verticalAlignment : Text.AlignVCenter
-            horizontalAlignment : Text.AlignHCenter
-            }
-          background : Rectangle {
-            anchors.fill : parent
-            color : "transparent"
-            border.color : "green"
-            border.width : comboBox.highlightedIndex === index ? 2 : 0
           }
-        }
-        popup : Popup {
-          y : comboBox.height
-          x : 0
-          padding : 0
-          width : comboBox.width - comboBox.indicator.width
-          implicitHeight : contentItem.implicitHeight
-          contentItem : ListView {
-            clip : true
-            implicitHeight : contentHeight
-            model : comboBox.popup.visible ? comboBox.delegateModel : null
-            currentIndex : comboBox.highlightedIndex
-          }
-        }
         background : Rectangle {
-          id : comboBackground
-          implicitWidth : inputWrapper.width / 2
-          implicitHeight : inputWrapper.height
-          border.color : "black"
-          border.width : 1
+          anchors.fill : parent
+          color : "transparent"
+          border.color : "green"
+          border.width : comboBox.highlightedIndex === index ? 2 : 0
         }
-        onActivated : {
-          inputWrapper.optionSelected(currentIndex, currentText)
+      }
+      popup : Popup {
+        y : comboBox.height
+        x : 0
+        padding : 0
+        width : comboBox.width - comboBox.indicator.width
+        implicitHeight : contentItem.implicitHeight
+        contentItem : ListView {
+          clip : true
+          implicitHeight : contentHeight
+          model : comboBox.popup.visible ? comboBox.delegateModel : null
+          currentIndex : comboBox.highlightedIndex
         }
+      }
+      background : Rectangle {
+        id : comboBackground
+        //Height and width of this rectangle established by Layout preferred dimensions assigned in Loader
+        border.color : "black"
+        border.width : 1
       }
     }
   }

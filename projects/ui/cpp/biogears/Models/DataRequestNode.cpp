@@ -9,7 +9,7 @@ DataRequestNode::DataRequestNode()
 {
 }
 //------------------------------------------------------------------------------------
-DataRequestNode::DataRequestNode(QString name, bool checked, bool collapsed, QString type, DataRequestNode* parent)
+DataRequestNode::DataRequestNode(QString name, int checked, bool collapsed, QString type, DataRequestNode* parent)
   : _parent(parent)
   , _name(name)
   , _checked(checked)
@@ -33,12 +33,12 @@ void DataRequestNode::name(const QString& value)
   _name = value;
 }
 //------------------------------------------------------------------------------------
-bool DataRequestNode::checked() const
+int DataRequestNode::checked() const
 {
   return _checked;
 }
 //------------------------------------------------------------------------------------
-void DataRequestNode::checked(bool value)
+void DataRequestNode::checked(int value)
 {
   _checked = value;
 }
@@ -128,7 +128,7 @@ DataRequestNode* DataRequestNode::appendChild(QString name, QString type)
 {
   DataRequestNode* newNode = new DataRequestNode();
   newNode->_name = name;
-  newNode->_checked = false;
+  newNode->_checked = 0;
   newNode->_collapsed = true;
   newNode->_type = type;
   newNode->_parent = this;
@@ -140,8 +140,19 @@ DataRequestNode* DataRequestNode::appendChildren(QList<QPair<QString, QString>> 
 {
   QList<QPair<QString, QString>>::const_iterator nodeIt;
   for (nodeIt = nameTypePairs.constBegin(); nodeIt != nameTypePairs.constEnd(); ++nodeIt) {
-    DataRequestNode* childNode = new DataRequestNode((*nodeIt).first, false, true, (*nodeIt).second, this);
+    DataRequestNode* childNode = new DataRequestNode((*nodeIt).first, 0, true, (*nodeIt).second, this);
     _children.append(childNode);
   }
   return _children.back();
+}
+//------------------------------------------------------------------------------------
+void DataRequestNode::reset()
+{
+  collapsed(true);
+  checked(0);
+  if (_children.size() > 0) {
+    for (auto child : _children) {
+      child->reset();
+    }
+  }
 }
