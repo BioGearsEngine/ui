@@ -467,7 +467,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Rectangle {

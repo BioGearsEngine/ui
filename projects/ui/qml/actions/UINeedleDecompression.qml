@@ -171,7 +171,7 @@ UIActionForm {
         elementRatio : 0.35
         radioGroup.checkedButton : setButtonState()
         label.text : "Side"
-        label.font.pointSize : 14
+        label.font.pointSize : 13
         buttonModel : ['Left', 'Right']
         radioGroup.onClicked : {
           side = button.buttonIndex
@@ -204,7 +204,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Rectangle {

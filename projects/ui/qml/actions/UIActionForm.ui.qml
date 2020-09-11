@@ -10,12 +10,14 @@ Rectangle {
   color: "transparent"
   border.color: "black"
   height : viewLoader.item.height
+  radius : builderMode ? 10 : 0
 
   signal activate()
   signal deactivate()
   signal remove( string uuid )
   signal adjust( var list)
   signal selected()     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
+  signal editing()      //notifies action model that this action is being edited so that other actions in scenario window fade in opacity
   signal buildSet(var action)
 
   property Scenario scenario
@@ -33,6 +35,7 @@ Rectangle {
   property double actionDuration_s : 0.0          //Length of time over which action will be applied
   property Loader viewLoader : loader
   property alias timeEntry : timeEntry
+  property alias comboInput : comboInput
 
 
   property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg("Identifier").arg("Value")
@@ -251,6 +254,7 @@ Rectangle {
           if (builderMode){
             if ( loader.state === "collapsedBuilder") {
               loader.state = "expandedBuilder"
+              root.editing()
             } else {
               //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
               //loader.state = "collapsed"
@@ -294,152 +298,166 @@ Rectangle {
       }
     }
   }
+  Component {
+    id : comboInput
+    ComboBox {
+      id : comboBox
+      property var initialValue : _initial_value
+      currentIndex : setCurrentIndex()
+      bottomInset : 5
+      topInset : 5
+      model : _combo_model
+      flat : false
+      contentItem : Text {
+        width : comboBox.width
+        height : comboBox.height
+        text : comboBox.displayText
+        font.pixelSize : 18
+        verticalAlignment : Text.AlignVCenter
+        horizontalAlignment : Text.AlignHCenter
+      }
+      delegate : ItemDelegate {
+        width : comboBox.popup.width
+        contentItem : Text {
+          width : parent.width
+          text : modelData
+          font.pixelSize : 18
+          verticalAlignment : Text.AlignVCenter
+          horizontalAlignment : Text.AlignHCenter
+          }
+        background : Rectangle {
+          anchors.fill : parent
+          color : "transparent"
+          border.color : "green"
+          border.width : comboBox.highlightedIndex === index ? 2 : 0
+        }
+      }
+      popup : Popup {
+        y : comboBox.height
+        x : 0
+        padding : 0
+        width : comboBox.width - comboBox.indicator.width
+        implicitHeight : contentItem.implicitHeight
+        contentItem : ListView {
+          clip : true
+          implicitHeight : contentHeight
+          model : comboBox.popup.visible ? comboBox.delegateModel : null
+          currentIndex : comboBox.highlightedIndex
+        }
+      }
+      background : Rectangle {
+        id : comboBackground
+        //Height and width of this rectangle established by Layout preferred dimensions assigned in Loader
+        implicitHeight : 40
+        border.color : "black"
+        border.width : 1
+      }
+      function setCurrentIndex(){
+        for (let i = 0; i < model.length; ++i){
+          if (model[i]===_initial_value){
+            return i;
+          }
+        }
+        return -1;
+      }
+    }
+  }
+
 
   Component {
     id : timeEntry
     RowLayout {
-      signal timeUpdated (int seconds, int minutes, int hours)
+      id : timeInput
+      signal timeUpdated (int totalTime_s)
       signal clear ()
-      signal reload (int totalTime_s) 
-      property int seconds : 0
-      property int minutes : 0
-      property int hours : 0
+      signal reload (int totalTime_s)
       property string entryName : ""
-      onHoursChanged : {
-        if (hours !== Number.fromLocaleString(hoursField.text)){
-          hoursField.text = Number(hours).toLocaleString()
-        }
-        timeUpdated(seconds, minutes, hours)
-      }
-      onMinutesChanged : {
-        if (minutes !== Number.fromLocaleString(minutesField.text)){
-          minutesField.text = Number(minutes).toLocaleString()
-        }
-        timeUpdated(seconds, minutes, hours)
-      }
-      onSecondsChanged : {
-        if (seconds !== Number.fromLocaleString(secondsField.text)){
-          secondsField.text = Number(seconds).toLocaleString()
-        }
-        timeUpdated(seconds, minutes, hours)
-      }
+      property int time_s : 0
       onClear : {
-        hoursField.clear()
-        minutesField.clear()
-        secondsField.clear()
-        seconds = 0
-        minutes = 0
-        hours = 0
+        timeField.text = "00:00:00"
+        time_s = 0
       }
       onReload : {
-        hours = Math.floor(totalTime_s / 3600)
-        minutes = Math.floor((totalTime_s - hours * 3600) / 60)
-        seconds = totalTime_s - hours * 3600 - minutes * 60
+        timeField.text = seconds_to_clock_time(totalTime_s)
+        time_s = totalTime_s
       }
-
       Label {
         Layout.alignment : Qt.AlignCenter
         verticalAlignment : Text.AlignVCenter
-        text : entryName
-        font.pixelSize : 15
+        text : entryName + ":  "
+        font.pixelSize : 18
         Layout.fillHeight : true
       }
-      TextField {
-        id : hoursField
-        placeholderText : "0"
-        Layout.preferredWidth : 25
-        Layout.fillHeight : true
-        Layout.preferredHeight : implicitHeight
-        topPadding : 16
-        font.pixelSize : 15
-        Layout.alignment : Qt.AlignRight | Qt.AlignBottom
-        verticalAlignment : TextInput.AlignBottom
-        horizontalAlignment : TextInput.AlignHCenter
-        validator : IntValidator {
-          bottom : 0
+      TextInput {
+        id : timeField
+        property int lastPosition : -1
+        text : "00:00:00"
+        overwriteMode : true
+        maximumLength : 8
+        font.pixelSize : 18
+        anchors.bottomMargin : 2
+        cursorDelegate : Rectangle {
+          visible : parent.cursorVisible
+          width :  parent.cursorRectangle.width
+          color : "blue"
+          opacity : 0.3
         }
-        onTextEdited : {
-          if (text===""){
-              parent.hours = 0
-          } else if(acceptableInput){
-              parent.hours = Number.fromLocaleString(text)
+        Rectangle {
+          width : parent.width
+          height : 2
+          anchors.bottom : parent.bottom
+          color : parent.activeFocus ? "blue" : "black"
+        }
+        Keys.onPressed : {
+          //Prevent user from deleting time--only allow overwriting
+          if (event.key == Qt.Key_Backspace || event.key == Qt.Key_Delete || event.key == Qt.Key_Space){
+            event.accepted = true   //accepting swallows the key event and keeps it local to this Keys block, meaning it won't get propagated up to text input
+          } else {
+            event.accepted = false
           }
         }
-      }
-      Label {
-        text : "H"
-        font.pixelSize : 15
-        Layout.alignment : Qt.AlignLeft | Qt.AlignCenter
-        rightPadding : 10
-      }
-      TextField {
-        id : minutesField
-        placeholderText : "0"
-        Layout.preferredWidth : 25
-        Layout.fillHeight : true
-        Layout.preferredHeight : implicitHeight
-        topPadding : 16
-        font.pixelSize : 15
-        Layout.alignment : Qt.AlignRight | Qt.AlignBottom
-        verticalAlignment : TextInput.AlignBottom
-        horizontalAlignment : TextInput.AlignHCenter
-        validator : IntValidator {
-          bottom : 0
-        }
-        onTextEdited : {
-          if (text ===""){
-              parent.minutes = 0
-          } else if (acceptableInput){
-            let minutesInput = Number.fromLocaleString(text)
-            if (minutesInput > 60){
-              let hoursToAdd = Math.floor(minutesInput / 60)
-              minutesInput = minutesInput % 60
-              parent.hours += hoursToAdd
-              text = Number(minutesInput).toLocaleString()
+        onCursorPositionChanged : {
+          if (text[cursorPosition] == ':'){
+            if (cursorPosition > timeField.lastPosition){
+              //Moving left
+              ++cursorPosition;
             }
-            parent.minutes = minutesInput
+            else {
+              //Moving right
+              --cursorPosition
+            }
           }
-        }
-      }
-      Label {
-        text : "M"
-        font.pixelSize : 15
-        Layout.alignment : Qt.AlignLeft
-        rightPadding : 10
-      }
-      TextField {
-        id : secondsField
-        placeholderText : "0"
-        Layout.preferredWidth : 25
-        Layout.fillHeight : true
-        Layout.preferredHeight : implicitHeight
-        font.pixelSize : 15
-        topPadding : 16
-        Layout.alignment : Qt.AlignRight | Qt.AlignBottom
-        verticalAlignment : TextInput.AlignBottom
-        horizontalAlignment : TextInput.AlignHCenter
-        validator : IntValidator {
-          bottom : 0
+          lastPosition = cursorPosition
         }
         onTextEdited : {
-          if (text === ""){
-              parent.seconds = 0
-          } else if (acceptableInput){
-            let secondsInput = Number.fromLocaleString(text)
-            if (secondsInput > 60){
-              let minutesToAdd = Math.floor(secondsInput / 60)
-              secondsInput = secondsInput % 60
-              parent.minutes += minutesToAdd
-              text = Number(secondsInput).toLocaleString()
+          time_s = clock_time_to_seconds(text)
+          timeInput.timeUpdated(time_s)
+        }
+        function seconds_to_clock_time(time_s) {
+          var v_seconds = time_s % 60
+          var v_minutes = Math.floor(time_s / 60) % 60
+          var v_hours   = Math.floor(time_s / 3600)
+
+          v_seconds = (v_seconds<10) ? "0%1".arg(v_seconds) : "%1".arg(v_seconds)
+          v_minutes = (v_minutes<10) ? "0%1".arg(v_minutes) : "%1".arg(v_minutes)
+          v_hours = (v_hours < 10) ? "0%1".arg(v_hours) : "%1".arg(v_hours)
+
+          return "%1:%2:%3".arg(v_hours).arg(v_minutes).arg(v_seconds)
+        }
+        function clock_time_to_seconds(timeString){
+          let timeUnits = timeString.split(':');    //splits into [hh, mm, ss]
+          try {
+            let hours = Number.fromLocaleString(timeUnits[0])
+            let minutes = Number.fromLocaleString(timeUnits[1])
+            let seconds = Number.fromLocaleString(timeUnits[2])
+            if (hours < 0.0 || minutes < 0.0 || seconds < 0.0){
+              throw "Negative time"
             }
-            parent.seconds = secondsInput
+            return 3600 * hours + 60 * minutes + seconds;
+          } catch (err){
+            return null
           }
         }
-      }
-      Label {
-        text : "S"
-        font.pixelSize : 15
-        Layout.alignment : Qt.AlignLeft
       }
     }
   }

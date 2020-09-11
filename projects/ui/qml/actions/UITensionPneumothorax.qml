@@ -175,7 +175,7 @@ UIActionForm {
           id : severityLabel
           leftPadding : 5
           text : "Severity"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: severitySlider
@@ -191,7 +191,7 @@ UIActionForm {
         }
         Label {
           text : "%1".arg(root.severity)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -214,7 +214,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -236,7 +236,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       
@@ -253,7 +253,7 @@ UIActionForm {
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "Type"
-        label.font.pointSize : 11
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Open', 'Closed']
@@ -281,7 +281,7 @@ UIActionForm {
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "Side"
-        label.font.pointSize : 11
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Left', 'Right']

@@ -168,7 +168,7 @@ UIActionForm {
           id : intensityLabel
           leftPadding : 5
           text : "Intensity"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: stimulus
@@ -183,7 +183,7 @@ UIActionForm {
         }
         Label {
           text : "%1".arg(root.intensity)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -206,7 +206,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -228,7 +228,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       
@@ -243,7 +243,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Location"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : locationCombo

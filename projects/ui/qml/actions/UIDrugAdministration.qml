@@ -363,7 +363,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Drug"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : subCombo
@@ -413,7 +413,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Rectangle {
@@ -441,7 +441,7 @@ UIActionForm {
         elementRatio : 0.2
         radioGroup.checkedButton : setButtonState()
         label.text : "Route"
-        label.font.pointSize : 11
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Intraarterial', 'Intramuscular', 'Intravenous']
@@ -470,7 +470,7 @@ UIActionForm {
           id : doseLabel
           leftPadding : 5
           text : "Dose"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: doseSlider
@@ -486,7 +486,7 @@ UIActionForm {
         }
         Label {
           text : "%1 mL".arg(root.dose)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -500,7 +500,7 @@ UIActionForm {
         Label {
           id : concentrationLabel
           text : "Concentration"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: concentrationSlider
@@ -516,7 +516,7 @@ UIActionForm {
         }
         Label {
           text : "%1 ug/mL".arg(root.concentration)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -623,7 +623,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Drug"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : subCombo
@@ -674,7 +674,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -697,7 +697,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       
@@ -714,7 +714,7 @@ UIActionForm {
           id : rateLabel
           leftPadding : 5
           text : "Rate"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: rateSlider
@@ -730,7 +730,7 @@ UIActionForm {
         }
         Label {
           text : "%1 mL/min".arg(root.rate)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -746,7 +746,7 @@ UIActionForm {
         Label {
           id : concentrationLabel
           text : "Concentration"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: concentrationSlider
@@ -762,7 +762,7 @@ UIActionForm {
         }
         Label {
           text : "%1 ug/mL".arg(root.concentration)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -872,7 +872,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Drug"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : subCombo
@@ -916,7 +916,7 @@ UIActionForm {
         elementRatio : 0.2
         radioGroup.checkedButton : setButtonState()
         label.text : "Route"
-        label.font.pointSize : 11
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Gastrointestinal', 'Transmucosal']
@@ -948,7 +948,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       
@@ -963,8 +963,8 @@ UIActionForm {
         Label {
           id : doseLabel
           leftPadding : 5
-          text : "dose"
-          font.pixelSize : 15
+          text : "Dose"
+          font.pixelSize : 18
         }
         Slider {
           id: doseSlider
@@ -980,7 +980,7 @@ UIActionForm {
         }
         Label {
           text : root.adminRoute === "Oral-Transmucosal" ? "%1 ug".arg(root.dose) : "%1 mg".arg(root.dose)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }

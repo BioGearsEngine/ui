@@ -170,7 +170,7 @@ UIActionForm {
           id : rateLabel
           leftPadding : 5
           text : "Rate"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: rateSlider
@@ -186,7 +186,7 @@ UIActionForm {
         }
         Label {
           text : "%1 mL/min".arg(root.rate)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -209,7 +209,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -231,7 +231,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       
@@ -240,16 +240,28 @@ UIActionForm {
         Layout.row : 2
         Layout.column : 0
         Layout.fillWidth : true
-        Layout.maximumWidth : grid.Width / 3
+        Layout.maximumWidth : grid.width / 3
         Layout.fillHeight : true
         spacing : 15
         Label {
+          id : compartmentLabel
           leftPadding : 5
           text : "Compartment"
-          font.pixelSize : 15
-        }      
-        ComboBox {
+          font.pixelSize : 18
+        }
+        Loader {
           id : compartmentCombo
+          sourceComponent : comboInput
+          property var _combo_model : ['Aorta', 'Large Intestine','Left Arm', 'Left Leg', 'Muscle', 'Right Arm', 'Right Leg', 'Skin', 'Small Intestine', 'Spleen', 'Vena Cava']
+          property var _initial_value : root.compartment
+          Layout.fillWidth : true
+          //Layout.preferredHeight : grid.height / 3
+          Layout.maximumWidth : grid.width / 3 - 1.2 * compartmentLabel.width - parent.spacing
+        }
+        /*ComboBox {
+          id : compartmentCombo
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 3 - 1.2 * compartmentLabel.width - parent.spacing
           currentIndex : setCurrentIndex()    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
           function setCurrentIndex(){
             for (let i = 0; i < model.length; ++i){
@@ -260,10 +272,18 @@ UIActionForm {
             return -1;
           }
           model : ['Aorta', 'Large Intestine','Left Arm', 'Left Leg', 'Muscle', 'Right Arm', 'Right Leg', 'Skin', 'Small Intestine', 'Spleen', 'Vena Cava']
+          contentItem : Text {
+            width : compartmentCombo.width
+            height : compartmentCombo.height
+            text : compartmentCombo.displayText
+            font.pixelSize : 18
+            verticalAlignment : Text.AlignVCenter
+            horizontalAlignment : Text.AlignHCenter
+          }
           onActivated : {
             compartment = textAt(index)
           }
-        }
+        }*/
       }
       Rectangle {
         Layout.row : 2

@@ -199,7 +199,7 @@ UIActionForm {
           id : micLabel
           leftPadding : 5
           text : "MIC"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: micSlider
@@ -215,7 +215,7 @@ UIActionForm {
         }
         Label {
           text : "%1 mg/L".arg(root.mic)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -238,7 +238,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Rectangle {
@@ -265,7 +265,7 @@ UIActionForm {
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "Type"
-        label.font.pointSize : 11
+        label.font.pointSize : 18
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Mild', 'Moderate', 'Severe']
@@ -291,7 +291,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Location"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : locationCombo

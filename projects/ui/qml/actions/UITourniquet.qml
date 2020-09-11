@@ -176,7 +176,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Compartment"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : compartmentCombo
@@ -215,8 +215,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
-          console.log(actionStartTime_s)
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -237,7 +236,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       //Row 3
@@ -253,7 +252,7 @@ UIActionForm {
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "State"
-        label.font.pointSize : 11
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Applied', 'Misapplied']

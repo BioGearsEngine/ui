@@ -157,7 +157,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 0
         Label {
-          font.pixelSize : 15
+          font.pixelSize : 18
           text : "Severity"
           leftPadding : 5
         }      
@@ -173,7 +173,7 @@ UIActionForm {
         }
         Label {
           text : "%1".arg(root.severity)
-          font.pixelSize: 15
+          font.pixelSize: 18
         }
       }
       Loader {
@@ -195,7 +195,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -217,7 +217,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       

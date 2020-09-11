@@ -379,7 +379,7 @@ UIActionForm {
         elementRatio : 0.25
         radioGroup.checkedButton : grid.subType == -1 ? null : radioGroup.buttons[grid.subType]
         label.text : "Input Type"
-        label.font.pointSize : 11
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Intensity (0-1)', 'Power Output (W)']
@@ -406,7 +406,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -428,7 +428,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       //Row 3
@@ -443,7 +443,7 @@ UIActionForm {
           id : inputLabel
           leftPadding : 5
           text : grid.subType == 0 ? "Intensity" : grid.subType == 1 ? "Power" : ""
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: inputSlider
@@ -463,7 +463,7 @@ UIActionForm {
         }
         Label {
           text : grid.subType === 0 ? "%1".arg(root.property_1) : grid.subType ===1 ? "%1 W".arg(root.property_2) : ""
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -558,7 +558,7 @@ UIActionForm {
           id : prop1Label
           leftPadding : 5
           text : root.type === "Cycling" ? "Cadence" : "Velocity"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: prop1Slider
@@ -574,7 +574,7 @@ UIActionForm {
         }
         Label {
           text : root.type === "Cycling" ? "%1 RPM".arg(root.property_1) : "%1 m/s".arg(root.property_1)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -585,7 +585,7 @@ UIActionForm {
           item.entryName = "Start Time"
           Layout.row = 1
           Layout.column = 2
-          Layout.alignment = Qt.AlignLeft
+          Layout.alignment = Qt.AlignHCenter
           Layout.fillWidth = true
           Layout.fillHeight = true
           Layout.maximumWidth = grid.width / 5
@@ -597,7 +597,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Loader {
@@ -607,7 +607,7 @@ UIActionForm {
           item.entryName = "Duration"
           Layout.row = 1
           Layout.column = 3
-          Layout.alignment = Qt.AlignLeft
+          Layout.alignment = Qt.AlignHCenter
           Layout.fillWidth = true
           Layout.fillHeight = true
           Layout.maximumWidth = grid.width / 5
@@ -619,7 +619,7 @@ UIActionForm {
       Connections {
         target : durationLoader.item
         onTimeUpdated : {
-          root.actionDuration_s = seconds + 60 * minutes + 3600 * hours
+          root.actionDuration_s = totalTime_s
         }
       }
       //Row 3
@@ -635,7 +635,7 @@ UIActionForm {
           id : prop2Label
           leftPadding : 5
           text : root.type === "Cycling" ? "Power" : "Incline"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: prop2Slider
@@ -651,7 +651,7 @@ UIActionForm {
         }
         Label {
           text : root.type === "Cycling" ? "%1 W".arg(property_2) : "%1 %".arg(property_2)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -667,7 +667,7 @@ UIActionForm {
           id : weightLabel
           leftPadding : 5
           text : "Weight Pack (opt)"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: weightSlider
@@ -683,7 +683,7 @@ UIActionForm {
         }
         Label {
           text : "%1 kg".arg(root.weight)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -788,7 +788,7 @@ UIActionForm {
           id : prop1Label
           leftPadding : 5
           text : "Weight"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: prop1Slider
@@ -804,7 +804,7 @@ UIActionForm {
         }
         Label {
           text : "%1 kg".arg(root.weight)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -827,7 +827,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Rectangle {

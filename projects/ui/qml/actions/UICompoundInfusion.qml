@@ -200,7 +200,7 @@ UIActionForm {
         Label {
           leftPadding : 5
           text : "Compound"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }      
         ComboBox {
           id : compoundCombo
@@ -250,7 +250,7 @@ UIActionForm {
       Connections {
         target : startTimeLoader.item
         onTimeUpdated : {
-          root.actionStartTime_s = seconds + 60 * minutes + 3600 * hours
+          root.actionStartTime_s = totalTime_s
         }
       }
       Rectangle {
@@ -278,7 +278,7 @@ UIActionForm {
           id : rateLabel
           leftPadding : 5
           text : "Rate"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: rateSlider
@@ -294,7 +294,7 @@ UIActionForm {
         }
         Label {
           text : "%1 mL/min".arg(root.rate)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
@@ -310,7 +310,7 @@ UIActionForm {
           id : volumeLabel
           leftPadding : 5
           text : "Volume"
-          font.pixelSize : 15
+          font.pixelSize : 18
         }
         Slider {
           id: volumeSlider
@@ -326,7 +326,7 @@ UIActionForm {
         }
         Label {
           text : "%1 mL".arg(root.volume)
-          font.pixelSize : 15
+          font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }
       }
