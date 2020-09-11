@@ -425,6 +425,11 @@ void BioGearsData::setSimulationTime(double time_s)
 
 }
 //------------------------------------------------------------------------------------
+void BioGearsData::clear()
+{
+  _rootRequest.clear();
+}
+  //------------------------------------------------------------------------------------
 PhysiologyRequest* BioGearsData::
   append(QString prefix, QString name)
 {

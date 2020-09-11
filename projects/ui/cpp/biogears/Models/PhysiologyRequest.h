@@ -56,6 +56,7 @@ public:
   biogears::SEScalar const* scalar() const;
   void scalar(biogears::SEScalar*);
 
+ void clear();
   PhysiologyRequest const* parent() const;
   PhysiologyRequest* parent();
   PhysiologyRequest* child(int row);

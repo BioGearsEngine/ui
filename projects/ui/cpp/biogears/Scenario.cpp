@@ -42,7 +42,7 @@
 #include <chrono>
 namespace bio {
 Scenario::Scenario(QObject* parent)
-  : Scenario("biogears_default", parent)
+  : Scenario("DefaultTemplateMale", parent)
 {
 }
 Scenario::Scenario(QString name, QObject* parent)
@@ -65,16 +65,20 @@ Scenario::Scenario(QString name, QObject* parent)
 
   biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
   engine->GetPatient().SetName(name.toStdString());
+  load_patient("StandardMale@0s.xml");
 }
 void Scenario::setup_physiology_model()
 {
   _physiology_model = std::make_unique<BioGearsData>(QString(_engine->GetPatient().GetName_cStr()), this).release();
-  _physiology_model->initialize();
-  emit physiologyChanged(_physiology_model);
+  _physiology_model->initialize();    
 }
 //-------------------------------------------------------------------------------
 void Scenario::setup_physiology_substances(BioGearsData* substances)
 {
+  //Note Doesn't this function just add more and more substances with every data load
+  //This is a harder problem then it seems.
+
+  substances->clear();
   //NOTE: Must be called after setup_physiology_model, but after engine->load_state
   //TODO: Destroy and Recreate substances ever load state or we will be hurting.
   //
@@ -443,7 +447,6 @@ Scenario& Scenario::load_patient(QString file)
       fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
       fluid_balance->child(11)->unit_scalar(&_engine->GetRenal().GetLeftReabsorptionRate());
       fluid_balance->child(12)->unit_scalar(&_engine->GetRenal().GetRightReabsorptionRate());
-
     }
 
     auto renal = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL, 0, QModelIndex()).internalPointer());
@@ -451,7 +454,6 @@ Scenario& Scenario::load_patient(QString file)
       renal->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
       renal->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
       renal->child(2)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
-
     }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
@@ -478,10 +480,15 @@ Scenario& Scenario::load_patient(QString file)
     QFileInfo stateFileInfo = QFileInfo(QString::fromStdString(path));
     QString stateBaseName = stateFileInfo.baseName();
 
-    emit patientMetricsChanged(get_physiology_metrics());
-    emit patientStateChanged(get_physiology_state());
-    emit patientConditionsChanged(get_physiology_conditions());
-    emit stateLoad(stateBaseName);
+    if (_initialized) {
+      emit patientMetricsChanged(get_physiology_metrics());
+      emit patientStateChanged(get_physiology_state());
+      emit patientConditionsChanged(get_physiology_conditions());
+      emit stateLoad(stateBaseName);
+      emit physiologyChanged(_physiology_model);//OK Matt We have to talk about this
+    } else {
+      _initialized = true;
+    }
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
   }

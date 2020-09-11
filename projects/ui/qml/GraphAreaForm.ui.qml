@@ -15,27 +15,27 @@ Page {
     property bool initialized : false
 
     property PhysiologyModel physiologyRequestModel
-	property alias energyMetabolismSeries : energyMetabolismSeries
-	property alias renalOverviewSeries : renalOverviewSeries
-	
+    property alias energyMetabolismSeries : energyMetabolismSeries
+    property alias renalOverviewSeries : renalOverviewSeries
+    
     property alias vitalsGridView : vitalsGridView
     property alias cardiopulmonaryGridView : cardiopulmonaryGridView
     property alias bloodChemistryGridView : bloodChemistryGridView
-	property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
+    property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
     property alias renalFluidBalanceGridView : renalFluidBalanceGridView
-	property alias renalOverviewGridView : renalOverviewSeries.renalOverviewGridView
+    property alias renalOverviewGridView : renalOverviewSeries.renalOverviewGridView
     property alias substanceGridView : substanceGridView
     property alias customGridView : customGridView
 
-	property alias energyTimer : energyMetabolismSeries.energyTimer
-	property alias renalTimer : renalOverviewSeries.renalTimer
+    property alias energyTimer : energyMetabolismSeries.energyTimer
+    property alias renalTimer : renalOverviewSeries.renalTimer
     property alias tenHzPlotTimer : tenHzPlotTimer
     property alias fiveHzPlotTimer : fiveHzPlotTimer
     property alias oneHzPlotTimer : oneHzPlotTimer
     property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
     property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer
-	
-	signal urinalysisRequest()
+    
+    signal urinalysisRequest()
 
     state : "realTime"
 
@@ -120,117 +120,164 @@ Page {
         }
 
         Button {
-            id : filterMenuButton
-            text : "Filter Menu"
-            display : AbstractButton.IconOnly
-            icon.source : "qrc:/icons/menu.png"
-            icon.name : "terminate"
-            icon.color : "transparent"
-            onClicked : {
-                if (filterMenu.visible) {
-                    filterMenu.close()
-                } else {
-                    filterMenu.open()
-                }
+          id : filterMenuButton
+          text : "Filter Menu"
+          display : AbstractButton.IconOnly
+          icon.source : "qrc:/icons/menu.png"
+          icon.name : "terminate"
+          icon.color : "transparent"
+          onClicked : {
+            if (filterMenu.visible) {
+              filterMenu.close()
+            } else {
+              filterMenu.open()
             }
-            background : Rectangle {
-                color : "transparent"
-            }
-            Menu {
-                id: filterMenu
-                x : -200
-                y : 50
-                closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
-                Repeater {
-                    id : filterMenuInstance
-                    model : (physiologyRequestModel) ? physiologyRequestModel.category(plots.currentIndex) : null
-                    // !
-                    // ! Component for Selecting a Data Request.
-                    // ! Creates a checkbox which activates a plot when clicked
-                    // ! Covers signle and multiplots
-                    Component {
-                        id : singleItemComponent
-                        MenuItem {
-                            CheckBox {
-                                checkable : true
-                                checked : _model.data(_item, PhysiologyModel.EnabledRole)
-                                text :    _model.data(_item, PhysiologyModel.RequestRole) 
-								property bool _initialized : _model.data(_item, PhysiologyModel.InitializedRole)
-                                onClicked : {
-                                    if (checked) {
-                                        _model.setData(_item, true, PhysiologyModel.EnabledRole)
-										_model.setData(_item, true, PhysiologyModel.InitializedRole)
-                                        createPlotView(plots.currentIndex, _model, _item, _title)
-                                    } else {
-                                        _model.setData(_item, false, PhysiologyModel.EnabledRole)
-										_model.setData(_item, false, PhysiologyModel.InitializedRole)
-                                        removePlotView(plots.currentIndex, _item.row, _title)
-                                    }
-                                }
-								Component.onCompleted: {
-									if (checked && !_initialized) {
-									  _model.setData(_item, true, PhysiologyModel.InitializedRole)
-									  createPlotView(plots.currentIndex, _model, _item, _title)
-									}
-								}
-                            }
-                        }
-                        
-                    }
+          }
+          background : Rectangle {
+            color : "transparent"
+          }
+          Menu {
+            id: filterMenu
+            x : -50
+            y : 50
+            spacing: 0
+            padding: 0
+            margins: 0
+            closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
+            StackLayout  {
+              id: filterMenuView
+              currentIndex:plots.currentIndex
+              height : children[currentIndex].height +  10
+              width :  children[currentIndex].width + 2
+        
+              Repeater {
+                model : physiologyRequestModel
+                delegate : ColumnLayout {
+                  property int curCategory : index
+                  width : childrenRect.width
+                  height : childrenRect.height
+                  Layout.preferredHeight: childrenRect.height
+                  Layout.preferredWidth: childrenRect.width
+                  Layout.maximumWidth: childrenRect.width
+                  Layout.maximumHeight: childrenRect.height
+                  spacing : 1
+                  Repeater {
+                                          // !
+                      // ! Component for Selecting a Data Request.
+                      // ! Creates a checkbox which activates a plot when clicked
+                      // ! Covers signle and multiplots
+                      Component {
+                          id : singleItemComponent
+                          MenuItem {
+                              height : checkbox.height + 2
+                              CheckBox {
+                                  id : checkbox
+                                  checkable : true
+                                  checked : _model.data(_item, PhysiologyModel.EnabledRole)
+                                  text :    _model.data(_item, PhysiologyModel.RequestRole) 
+                                  onClicked : {
+                                      if (checked) {
+                                          _model.setData(_item, true, PhysiologyModel.EnabledRole)
+                                          createPlotView(_category, _model, _item, _title)
+                                      } else {
+                                          _model.setData(_item, false, PhysiologyModel.EnabledRole)
+                                          removePlotView(_category, _item.row, _title)
+                                      }
+                                  }
+                                  Component.onCompleted: {
+                                      console.log("Creating %1".arg(_title))
+                                      if (checked ) {
+                                        createPlotView(_category, _model, _item, _title)
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                     
+                      // ! When a item is nested like substances
+                      // ! We want to be able to select individual data request
+                      // ! Under a nested menu to plot multiple single plots
+                      Component {
+                          id : categorySelectionComponent
+                          Button {
+                            id: buttonMenu
 
-                    // ! When a item is nested like substances
-                    // ! We want to be able to select individual data request
-                    // ! Under a nested menu to plot multiple single plots
-                    Component {
-                        id : categorySelectionComponent
-                        Instantiator {
-                            id : menuItemInstance
                             property var bgData : _model
                             property var entry : _item
-                            model : _current
-                            delegate : Menu {
-                                id : substanceSubMenu
-                                title : _model.data(_item, PhysiologyModel.RequestRole)
+                            property int category : _category
+
+                            text : _title
+                                    
+                            contentItem: Label {
+                                text: buttonMenu.text + ">"
+                                font: buttonMenu.font
+                                font.pixelSize : 10
+                                verticalAlignment: Text.AlignVCenter
+                            }
+
+                            width :  200 
+                            height : buttonMenu.pixelSize
+                            anchors.right : parent.right
+
+                            background: Rectangle {
+                                anchors.fill : parent
+                                border.color: "blue"
+                                opacity: 0.3
+                                color : buttonMenu.down ? "#555555" : "#111111"
+                            }
+
+                            MouseArea {
+                              anchors.fill: parent
+                              acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                              onClicked: {
+                                  if (mouse.button === Qt.LeftButton)
+                                      substanceMenu.open()
+                              }
+
+                              Menu {
+                                id : substanceMenu
+                                x : -implicitWidth
+                                y: 0
                                 Repeater {
-                                    id : subMenuInstance
-                                    model : DelegateModel {
-                                        model : _model
-                                        rootIndex : _model.index(index, 0)
-                                        delegate : Loader {
-                                            property var _model: menuItemInstance.bgData//subMenuInstance.rootIndex.model
-                                            property var _item:  menuItemInstance.bgData.index(index,0,entry)//subMenuInstance.model.index(index, 0, subMenuInstance.rootIndex)
-                                            property var _title: "%1 - %2".arg(menuItemInstance.bgData.data(entry, Qt.DisplayRole))
-                                                                          .arg(menuItemInstance.bgData.data(_item, Qt.DisplayRole))
-                                            sourceComponent : singleItemComponent
-                                        }
+                                  id : componentMenu
+                                  model : DelegateModel {
+                                    model : _model
+                                    rootIndex : _model.index(index, 0)
+                                    delegate : Loader {
+                                      property int _category : buttonMenu.category
+                                      property var _model: buttonMenu.bgData
+                                      property var _item:  buttonMenu.bgData.index(index,0,buttonMenu.entry)
+                                      property var _title: "%1 - %2".arg(buttonMenu.bgData.data(entry, Qt.DisplayRole))
+                                                                    .arg(buttonMenu.bgData.data(_item, Qt.DisplayRole))
+                                      sourceComponent : singleItemComponent
                                     }
+                                  }
                                 }
+                              }
                             }
-                            onObjectAdded : {
-                                filterMenu.addMenu(object)
-                            }
-                            onObjectRemoved : {
-                                filterMenu.removeMenu(object)
-                            }
-                        }
-                    }
-
+                          }
+                      }                                                       
+                    model : physiologyRequestModel.category(curCategory)
                     delegate : Loader {
-                        property var             _current : model
-                        property PhysiologyModel _model : root.physiologyRequestModel.category(plots.currentIndex)
-                        property var             _item  : _model.index(index, 0)
-                        property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
-                        sourceComponent : {
-                            if (!model.nested) {
-                                return singleItemComponent
-                            } else {
-                                return categorySelectionComponent
+                            property int _category : curCategory
+                            property var             _current : model
+                            property PhysiologyModel _model : physiologyRequestModel.category(_category)
+                            property var             _item  : _model.index(index, 0)
+                            property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
+                            sourceComponent : {
+                              if (!model.nested) {
+                                  return singleItemComponent
+                              } else { 
+                                  return categorySelectionComponent
+                              }
                             }
-                        }
-                    }
+                          }
+                  }
                 }
-
-            }
+              }
+            }   
+          }
         }
         Button {
             id : next
@@ -336,8 +383,8 @@ Page {
             id : energyMetabolismSeries
             Layout.fillWidth : true
             Layout.fillHeight : true
-			
-		}
+            
+        }
         Item {
             id : renalFluidBalanceSeries
             Layout.fillWidth : true
@@ -363,14 +410,14 @@ Page {
                 }
             }
         }
-		RenalPanel {
+        RenalPanel {
             id : renalOverviewSeries
             Layout.fillWidth : true
             Layout.fillHeight : true
-			
-			onUrinalysisRequest: {
-			  root.urinalysisRequest();
-			}
+            
+            onUrinalysisRequest: {
+              root.urinalysisRequest();
+            }
         }
         Item {
             id : substanceSeries

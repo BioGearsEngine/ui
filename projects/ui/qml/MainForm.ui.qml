@@ -24,8 +24,8 @@ GridLayout {
 
     MenuArea {
       id: menuArea
-      Layout.row : 1
-      Layout.column : 1
+      Layout.row : 0
+      Layout.column : 0
       Layout.fillWidth : false
       Layout.fillHeight : false
     }
@@ -38,8 +38,8 @@ GridLayout {
     }
     Controls {
       id: controls
-      Layout.row : 2
-      Layout.column : 1
+      Layout.row : 1
+      Layout.column : 0
       Layout.fillWidth: false
       Layout.alignment: Qt.AlignTop
       Layout.fillHeight: false
@@ -48,8 +48,8 @@ GridLayout {
 
     GraphArea {
       id: graphArea
-      Layout.row : 1
-      Layout.column : 2
+      Layout.row : 0
+      Layout.column : 1
       Layout.preferredHeight:root.height * (3./4.)-10;
       Layout.rowSpan : 2
       Layout.fillWidth: true
@@ -58,8 +58,8 @@ GridLayout {
     }
     LuaConsole {
       id:consoleArea
-      Layout.row : 3
-      Layout.column : 2
+      Layout.row : 2
+      Layout.column : 1
       Layout.fillWidth: true
       Layout.fillHeight: true
       Layout.preferredHeight : root.height * (1./4.) - 10;

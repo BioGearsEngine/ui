@@ -6,7 +6,7 @@ import com.biogearsengine.ui.scenario 1.0
     id : actionSwitchModel
     property ListView actionSwitchView
 
-    property Item notification :     Component {
+    property var notification :     Component {
       id : notifierComponent
       Rectangle {
         id: notifierRect

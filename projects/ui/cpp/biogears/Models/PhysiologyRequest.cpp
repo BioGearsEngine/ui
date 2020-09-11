@@ -163,6 +163,12 @@ void PhysiologyRequest::scalar(biogears::SEScalar* value)
   _value = value;
 }
 //------------------------------------------------------------------------------------
+void PhysiologyRequest::clear()
+{
+  _children.clear();
+}
+
+//------------------------------------------------------------------------------------
 PhysiologyRequest const* PhysiologyRequest::parent() const
 {
   return _parent;

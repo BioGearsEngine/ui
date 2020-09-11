@@ -100,6 +100,7 @@ public:
     return roles;
   }
 
+  void clear(); //Remove all Children;
   PhysiologyRequest* append(QString prefix, QString name);
   PhysiologyRequest const* child(int row) const;
   PhysiologyRequest* child(int row);

@@ -187,6 +187,7 @@ protected:
   void export_substance(const biogears::SESubstance* substance);
 
 private:
+  bool _initialized = false;
   std::thread _thread;
   biogears::Logger _logger;
   std::unique_ptr<biogears::BioGearsEngine> _engine;
