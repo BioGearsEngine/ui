@@ -48,6 +48,7 @@ constexpr const char* _COMPILER_VERSION_ =
 ;
 #elif defined(__clang__)
 constexpr const char* _COMPILER_NAME_ = "Clang";
+constexpr const char* _COMPILER_VERSION_ = "__clang_major__.__clang_minor__.__clang_patchlevel__";
 #elif defined(__GNUG__)
 constexpr const char* _COMPILER_NAME_ = "GCC";
 constexpr const char* _COMPILER_VERSION_ = "__GNUC__.__GNUC_MINOR__";
