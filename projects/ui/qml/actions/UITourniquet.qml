@@ -63,7 +63,6 @@ UIActionForm {
         to : 1
         stepSize : 1
         value : root.tState
-
         onMoved : {
           root.tState = value
           if ( root.active )
@@ -73,7 +72,6 @@ UIActionForm {
       Label {
         text : "%1".arg(root.tState_str )
       }
-    
       // Column 3
       Rectangle {
         id: toggle      
@@ -94,26 +92,22 @@ UIActionForm {
           anchors.verticalCenter: parent.verticalCenter
         }
         Rectangle { // pill
-            id: pill
-    
-            x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
-            width: parent.width * .5;
-            height: parent.height // square
-            border.width: parent.border.width
+          id: pill
+          x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
+          width: parent.width * .5;
+          height: parent.height // square
+          border.width: parent.border.width
     
         }
         MouseArea {
             id: mouseArea
-    
             anchors.fill: parent
-    
             drag {
                 target:   pill
                 axis:     Drag.XAxis
                 maximumX: toggle.width - pill.width
                 minimumX: 0
             }
-    
             onReleased: { // Did we drag the button far enough.
               if( root.active) {
                   if(pill.x < toggle.width - pill.width) {
@@ -153,7 +147,7 @@ UIActionForm {
         id : actionLabel
         Layout.row : 0
         Layout.column : 0
-        Layout.columnSpan : 4
+        Layout.columnSpan : 3
         Layout.fillHeight : true
         Layout.fillWidth : true
         Layout.preferredWidth : grid.width * 0.5
@@ -174,25 +168,23 @@ UIActionForm {
         Layout.fillHeight : true
         spacing : 15
         Label {
+          id : compartmentLabel
           leftPadding : 5
           text : "Compartment"
           font.pixelSize : 18
-        }      
-        ComboBox {
+        }     
+        Loader {
           id : compartmentCombo
-          currentIndex : setCurrentIndex()    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          function setCurrentIndex(){
-            for (let i = 0; i < model.length; ++i){
-              if (model[i]===root.compartment){
-                return i;
-              }
-            }
-            return -1;
-          }
-          model : ['Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']
+          sourceComponent : comboInput
+          property var _combo_model : ['Left Arm', 'Left Leg', 'Right Arm', 'Right Leg']
+          property var _initial_value : root.compartment
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 3 - compartmentLabel.width - parent.spacing
+        }
+        Connections {
+          target : compartmentCombo.item
           onActivated : {
-            compartment = textAt(index)
-            console.log(compartment)
+            root.compartment = target.textAt(target.currentIndex)
           }
         }
       }

@@ -361,36 +361,23 @@ UIActionForm {
         Layout.fillHeight : true
         spacing  : 30
         Label {
+          id : drugLabel
           leftPadding : 5
           text : "Drug"
           font.pixelSize : 18
         }      
-        ComboBox {
-          id : subCombo
-          currentIndex : -1    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          textRole : "drug"
-          model : null
-          function setCurrentIndex(){
-            let drugNames = scenario.get_drugs();
-            for (let i = 0; i < drugNames.length; ++i){
-              if (drugNames[i]===root.drug){
-                return i;
-              }
-            }
-            return -1;
-          }
+        Loader {
+          id : drugCombo
+          sourceComponent : comboInput
+          property var _combo_model : scenario.get_drugs()
+          property var _initial_value : root.drug
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 3 - drugLabel.width - parent.spacing
+        }
+        Connections {
+          target : drugCombo.item
           onActivated : {
-            root.drug = textAt(index)
-          }
-          Component.onCompleted : {
-            let listModel = Qt.createQmlObject("import QtQuick.Controls 2.12; import QtQuick 2.12; ListModel {}", subCombo, 'ListModelErrorString')
-            let modelData = scenario.get_drugs()
-            for (let i = 0; i < modelData.length; ++i){
-              let element = { "drug" : modelData[i] }
-              listModel.append(element)
-            }
-            model = listModel
-            currentIndex = setCurrentIndex()
+            root.drug = target.textAt(target.currentIndex)
           }
         }
       }
@@ -621,36 +608,23 @@ UIActionForm {
         Layout.fillHeight : true
         spacing  : 30
         Label {
+          id : drugLabel
           leftPadding : 5
           text : "Drug"
           font.pixelSize : 18
         }      
-        ComboBox {
-          id : subCombo
-          currentIndex : -1    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          textRole : "drug"
-          model : null
-          function setCurrentIndex(){
-            let drugNames = scenario.get_drugs();
-            for (let i = 0; i < drugNames.length; ++i){
-              if (drugNames[i]===root.drug){
-                return i;
-              }
-            }
-            return -1;
-          }
+        Loader {
+          id : drugCombo
+          sourceComponent : comboInput
+          property var _combo_model : scenario.get_drugs()
+          property var _initial_value : root.drug
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 3 - drugLabel.width - parent.spacing
+        }
+        Connections {
+          target : drugCombo.item
           onActivated : {
-            root.drug = textAt(index)
-          }
-          Component.onCompleted : {
-            let listModel = Qt.createQmlObject("import QtQuick.Controls 2.12; import QtQuick 2.12; ListModel {}", subCombo, 'ListModelErrorString')
-            let modelData = scenario.get_drugs()
-            for (let i = 0; i < modelData.length; ++i){
-              let element = { "drug" : modelData[i] }
-              listModel.append(element)
-            }
-            model = listModel
-            currentIndex = setCurrentIndex()
+            root.drug = target.textAt(target.currentIndex)
           }
         }
       }
@@ -870,36 +844,23 @@ UIActionForm {
         Layout.fillHeight : true
         spacing  : 30
         Label {
+          id : drugLabel
           leftPadding : 5
           text : "Drug"
           font.pixelSize : 18
         }      
-        ComboBox {
-          id : subCombo
-          currentIndex : -1    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          textRole : "drug"
-          model : null
-          function setCurrentIndex(){
-            let drugNames = scenario.get_drugs();
-            for (let i = 0; i < drugNames.length; ++i){
-              if (drugNames[i]===root.drug){
-                return i;
-              }
-            }
-            return -1;
-          }
+        Loader {
+          id : drugCombo
+          sourceComponent : comboInput
+          property var _combo_model : scenario.get_drugs()
+          property var _initial_value : root.drug
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 3 - drugLabel.width - parent.spacing
+        }
+        Connections {
+          target : drugCombo.item
           onActivated : {
-            root.drug = textAt(index)
-          }
-          Component.onCompleted : {
-            let listModel = Qt.createQmlObject("import QtQuick.Controls 2.12; import QtQuick 2.12; ListModel {}", subCombo, 'ListModelErrorString')
-            let modelData = scenario.get_drugs()
-            for (let i = 0; i < modelData.length; ++i){
-              let element = { "drug" : modelData[i] }
-              listModel.append(element)
-            }
-            model = listModel
-            currentIndex = setCurrentIndex()
+            root.drug = target.textAt(target.currentIndex)
           }
         }
       }

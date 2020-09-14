@@ -192,14 +192,13 @@ UIActionForm {
           root.actionDuration_s = totalTime_s
         }
       }
-      
       //Row 3
       Rectangle {
         Layout.row : 2
         Layout.column : 0
         Layout.fillWidth : true
         Layout.fillHeight : true
-        Layout.preferredHeight : startTimeLoader.item.height
+        Layout.preferredHeight : 2 * startTimeLoader.item.height
         Layout.maximumWidth : grid.width / 2
         Layout.alignment : Qt.AlignHCenter
         color : "transparent"

@@ -233,8 +233,7 @@ UIActionForm {
         onTimeUpdated : {
           root.actionDuration_s = totalTime_s
         }
-      }
-      
+      }      
       //Row 3
       RowLayout {
         Layout.row : 2
@@ -255,35 +254,14 @@ UIActionForm {
           property var _combo_model : ['Aorta', 'Large Intestine','Left Arm', 'Left Leg', 'Muscle', 'Right Arm', 'Right Leg', 'Skin', 'Small Intestine', 'Spleen', 'Vena Cava']
           property var _initial_value : root.compartment
           Layout.fillWidth : true
-          //Layout.preferredHeight : grid.height / 3
           Layout.maximumWidth : grid.width / 3 - 1.2 * compartmentLabel.width - parent.spacing
         }
-        /*ComboBox {
-          id : compartmentCombo
-          Layout.fillWidth : true
-          Layout.maximumWidth : grid.width / 3 - 1.2 * compartmentLabel.width - parent.spacing
-          currentIndex : setCurrentIndex()    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          function setCurrentIndex(){
-            for (let i = 0; i < model.length; ++i){
-              if (model[i]===root.compartment){
-                return i;
-              }
-            }
-            return -1;
-          }
-          model : ['Aorta', 'Large Intestine','Left Arm', 'Left Leg', 'Muscle', 'Right Arm', 'Right Leg', 'Skin', 'Small Intestine', 'Spleen', 'Vena Cava']
-          contentItem : Text {
-            width : compartmentCombo.width
-            height : compartmentCombo.height
-            text : compartmentCombo.displayText
-            font.pixelSize : 18
-            verticalAlignment : Text.AlignVCenter
-            horizontalAlignment : Text.AlignHCenter
-          }
+        Connections {
+          target : compartmentCombo.item
           onActivated : {
-            compartment = textAt(index)
+            root.compartment = target.textAt(target.currentIndex)
           }
-        }*/
+        }
       }
       Rectangle {
         Layout.row : 2

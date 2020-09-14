@@ -57,7 +57,6 @@ UIScenarioBuilderForm {
   }
 
   function saveScenario(){
-    console.log(builderModel.get(0).objectName)
     //If time end component is not at top of model, then we are still editing an action
     if (builderModel.get(0).objectName !== "scenarioEnd"){
       root.warningMessage.text = "Action editing in process"
@@ -128,6 +127,9 @@ UIScenarioBuilderForm {
       sourceComponent : root.timeStartComponent
     }
     function createAction(actionElement){
+      if (builderModel.get(0).objectName !== "scenarioEnd"){
+        return;   //Make sure any actions added have been fully set up before adding new actions
+      }
       if (actionElement.genProps){
         let actionProps = actionElement.genProps()
         var newAction = actionElement.makeAction(actionProps, bg_scenario)
@@ -142,8 +144,17 @@ UIScenarioBuilderForm {
       newAction.selected.connect(function() {actionSwitchView.currentIndex = newAction.ObjectModel.index})
       newAction.editing.connect(function () {builderModel.adjustFade("ON", newAction.ObjectModel.index) } )
       newAction.buildSet.connect(builderModel.setViewIndex)
+      newAction.remove.connect(removeAction)
       newAction.editing()
       actionSwitchView.currentIndex = 0 //New action gets focus
+    }
+    function removeAction(){
+      if (scenarioView.currentIndex !== -1){
+        builderModel.remove(scenarioView.currentIndex, 2)   //Remove two items to get time block associated with action
+        builderModel.updateTimeComponents()
+        builderModel.refreshScenarioLength()
+        scenarioView.currentIndex = -1
+      }
     }
     function adjustFade(state, index){
       for (let i = 0; i < builderModel.count; i++){
@@ -181,6 +192,7 @@ UIScenarioBuilderForm {
       }
       updateTimeComponents();
       refreshScenarioLength();
+      scenarioView.currentIndex = -1
     }
     function setActionQueue(){
       //Add actions to event model.  They are in reverse chronological order, so count backwards (seems more efficient than trying to put in front and forcing array to shift elements on every addition)

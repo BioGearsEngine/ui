@@ -198,36 +198,23 @@ UIActionForm {
         Layout.fillHeight : true
         spacing  : 30
         Label {
+          id : compoundLabel
           leftPadding : 5
           text : "Compound"
           font.pixelSize : 18
         }      
-        ComboBox {
+        Loader {
           id : compoundCombo
-          currentIndex : -1    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          textRole : "compound"
-          model : null
-          function setCurrentIndex(){
-            let compoundNames = scenario.get_compounds();
-            for (let i = 0; i < compoundNames.length; ++i){
-              if (compoundNames[i]===root.compound){
-                return i;
-              }
-            }
-            return -1;
-          }
+          sourceComponent : comboInput
+          property var _combo_model : scenario.get_compounds()
+          property var _initial_value : root.compound
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 2 - 1.5 * compoundLabel.width - parent.spacing
+        }
+        Connections {
+          target : compoundCombo.item
           onActivated : {
-            root.compound = textAt(index)
-          }
-          Component.onCompleted : {
-            let listModel = Qt.createQmlObject("import QtQuick.Controls 2.12; import QtQuick 2.12; ListModel {}", compoundCombo, 'ListModelErrorString')
-            let modelData = scenario.get_compounds()
-            for (let i = 0; i < modelData.length; ++i){
-              let element = { "compound" : modelData[i] }
-              listModel.append(element)
-            }
-            model = listModel
-            currentIndex = setCurrentIndex()
+            root.compound = target.textAt(target.currentIndex)
           }
         }
       }

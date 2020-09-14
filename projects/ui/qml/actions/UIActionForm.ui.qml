@@ -43,7 +43,6 @@ Rectangle {
 
   //This state controls whether the highlighting of the rectangle containing this action.  It is used in scenario builder to help users move actions up/down
   // queue and select action for removal.
-  //state : viewLoader.status==Loader.Ready ? viewLoader.item.state : "" 
   states : [
      State {
         name: "expandedViewUnselected"; when : (builderMode && !currentSelection && !collapsed)
@@ -51,7 +50,7 @@ Rectangle {
       }
       ,State {
         name: "expandedViewSelected"; when : (builderMode && currentSelection && !collapsed)
-        PropertyChanges { target : root; border.color : "green"; border.width : 2}
+        PropertyChanges { target : root; border.color : "green"; border.width : 3}
       }
       ,State {
         name : "noBorder"; when : (builderMode && collapsed)
@@ -170,11 +169,11 @@ Rectangle {
       states : [
       State {
         name: "collapsedViewUnselected"; when : (root.builderMode && !root.currentSelection && root.collapsed)
-        PropertyChanges { target : buildSummaryWrapper; border.color : "black"}
+        PropertyChanges { target : buildSummaryWrapper; border.color : "black"; border.width : 2}
       }
       ,State {
         name: "collapsedViewSelected"; when : (root.builderMode && root.currentSelection && root.collapsed)
-        PropertyChanges { target : buildSummaryWrapper; border.color : "green"}
+        PropertyChanges { target : buildSummaryWrapper; border.color : "green"; border.width : 3}
       }
     ]
       Label {
@@ -255,9 +254,6 @@ Rectangle {
             if ( loader.state === "collapsedBuilder") {
               loader.state = "expandedBuilder"
               root.editing()
-            } else {
-              //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
-              //loader.state = "collapsed"
             }
           } else {
             if ( loader.state === "collapsedControls") {
@@ -274,8 +270,10 @@ Rectangle {
       Menu {
         id : contextMenu
         MenuItem {
+          visible : !builderMode
+          height : builderMode ? 0 : removeItem.height
           text : (loader.state === "collapsedControls")? "Configure" : "Collapse"
-           onTriggered: {
+          onTriggered: {
             //Only using this in controls instance (not in builder mode)
             if (!builderMode) {
               if ( loader.state === "collapsedControls") {
@@ -287,13 +285,14 @@ Rectangle {
           }
         }
         MenuItem {
+          id : removeItem
           text : "Remove"
-           onTriggered: {
+          onTriggered: {
             if (root.active){
               root.deactivate()
             }
             root.remove( root.uuid )
-           }
+          }
         }
       }
     }

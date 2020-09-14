@@ -157,13 +157,13 @@ Window {
             policy : ScrollBar.AlwaysOn
           }
           move : Transition {
-            NumberAnimation {properties: "x,y"; duration : 1000; easing.type: Easing.Linear}
+            NumberAnimation {properties: "x,y"; duration : 500; easing.type: Easing.Linear}
           }
           moveDisplaced : Transition {
-            NumberAnimation {properties : "y"; duration : 1000; easing.type : Easing.Linear}
+            NumberAnimation {properties : "y"; duration : 500; easing.type : Easing.Linear}
           }
           addDisplaced : Transition {
-            NumberAnimation {properties : "y"; duration : 200; easing.type : Easing.Linear}
+            NumberAnimation {properties : "y"; duration : 500; easing.type : Easing.Linear}
           }
         }
       }
@@ -201,12 +201,7 @@ Window {
           Layout.preferredWidth : parent.width / 5
           text : "Remove Action"
           onClicked : {
-            if (scenarioView.currentIndex !== -1){
-              builderModel.remove(scenarioView.currentIndex, 2)   //Remove two items to get time block associated with action
-              builderModel.updateTimeComponents()
-              builderModel.refreshScenarioLength()
-              scenarioView.currentIndex = -1
-            }
+            builderModel.removeAction()
           }
         }
         RowLayout {
@@ -360,7 +355,11 @@ Window {
       MouseArea {
         anchors.fill : parent
         onClicked : {
-            actionListView.currentIndex = index;
+          actionListView.currentIndex = index;
+        }
+        onDoubleClicked : {
+          builderModel.createAction(actionModel.get(actionView.currentIndex))
+          actionView.currentIndex = -1
         }
       }
     }

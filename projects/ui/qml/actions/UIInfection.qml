@@ -265,7 +265,7 @@ UIActionForm {
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "Type"
-        label.font.pointSize : 18
+        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Mild', 'Moderate', 'Severe']
@@ -281,6 +281,7 @@ UIActionForm {
           }
         }
       }
+      
       RowLayout {
         Layout.row : 2
         Layout.column : 1
@@ -289,24 +290,23 @@ UIActionForm {
         Layout.fillHeight : true
         spacing : 15
         Label {
+          id : locationLabel
           leftPadding : 5
           text : "Location"
           font.pixelSize : 18
         }      
-        ComboBox {
+        Loader {
           id : locationCombo
-          currentIndex : setCurrentIndex()    //Need this because when loader changes source, this combo box is destroyed.  When it gets remade (reopened), we need to get root location to pick up where we left off.
-          function setCurrentIndex(){
-            for (let i = 0; i < model.length; ++i){
-              if (model[i]===root.location){
-                return i;
-              }
-            }
-            return -1;
-          }
-          model : ['Gut', 'LeftArm','LeftLeg','RightArm','RightLeg']
+          sourceComponent : comboInput
+          property var _combo_model : ['Gut', 'Left Arm','Left Leg','Right Arm','Right Leg']
+          property var _initial_value : root.location
+          Layout.fillWidth : true
+          Layout.maximumWidth : grid.width / 4 - locationLabel.width - parent.spacing
+        }
+        Connections {
+          target : locationCombo.item
           onActivated : {
-            location = textAt(index)
+            root.compartment = target.textAt(target.currentIndex)
           }
         }
       }
