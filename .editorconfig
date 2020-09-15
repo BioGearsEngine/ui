@@ -12,3 +12,7 @@ indent_size = 2
 [*.cpp]
 indent_style = space
 indent_size = 2
+
+[*.qml]
+indent_style = space
+indent_size = 2

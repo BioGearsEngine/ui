@@ -3,15 +3,16 @@
 ## BioGears Simulation UI
 BioGears® simulation UI source code is hosted here. Our latest deployment is still in a beta phase, and is intended to be an intermediate release to showcase the capabilities of the BioGears® simulation UI. This version of the software is meant to elicit feedback and enhance community involvement in establishing end product expectations.
 
+
 Build Status
 -----------------
 | Platform | Compiler | Architecture | Status |
 |----------|----------|--------------|--------|
-| Windows  |  msvc15  | amd64        | ![Windows msvc15 Build  Status](https://biogearsengine.com/content/badges/nightly_biogears_ui_windows_msvc15.png) |
-| Windows  |  msvc16  | amd64        | ![Windows msvc16 Build Status](https://biogearsengine.com/content/badges/nightly_biogears_ui_windows_msvc16.png) |
-| Linux  |  gcc5.4  | amd64 | ![Linux-gcc5.4-amd64 Build Status](https://biogearsengine.com/content/badges/nightly_biogears_ui_gcc5.4-core2_64.png) |
-| MacOS  Yosemite |  clang10  | amd64 | ![MacOS Yosemite clang11 Build Status](https://biogearsengine.com/content/badges/nightly_biogears_ui_macos-yosemite.png) |
-| MacOS  Catalina|  clang11  | amd64 | ![MacOS Catalina clang11 Build Status](https://biogearsengine.com/content/badges/nightly_biogears_ui_macos-catalina.png) |
+| Windows  |  msvc15  | amd64        | ![Windows msvc15 Build  Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_windows_msvc15.png) |
+| Windows  |  msvc16  | amd64        | ![Windows msvc16 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_windows_msvc16.png) |
+| Linux  |  gcc5.4  | amd64 | ![Linux-gcc5.4-amd64 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_linux_gcc5.4-core2_64.png) |
+| MacOS  Yosemite |  clang10  | amd64 | ![MacOS Yosemite clang11 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_macos-yosemite.png) |
+| MacOS  Catalina|  clang11  | amd64 | ![MacOS Catalina clang11 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_macos-catalina.png) |
 
 ## Objectives
 
