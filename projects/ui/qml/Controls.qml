@@ -15,11 +15,9 @@ ControlsForm {
 
   signal patientMetricsChanged(PatientMetrics metrics )
   signal patientStateChanged(PatientState patientState )
-  // signal patientConditionsChanged(PatientConditions conditions )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
-
-  signal activeSubstanceAdded(Substance sub)
+  signal newActiveSubstances()
   signal substanceDataChanged(real time_s, var subData)
 
   signal openActionDrawer()
@@ -30,22 +28,21 @@ ControlsForm {
   property ObjectModel actionModel : actionSwitchModel
   
   function requestUrinalysis() {
-	root.scenario.request_urinalysis();
+	  root.scenario.request_urinalysis();
   }
 
   function seconds_to_clock_time(SimulationTime_s) {
-        var v_seconds = SimulationTime_s % 60
-        var v_minutes = Math.floor(SimulationTime_s / 60) % 60
-        var v_hours   = Math.floor(SimulationTime_s / 3600)
+    var v_seconds = SimulationTime_s % 60
+    var v_minutes = Math.floor(SimulationTime_s / 60) % 60
+    var v_hours   = Math.floor(SimulationTime_s / 3600)
 
-        v_seconds = (v_seconds<10) ? "0%1".arg(v_seconds) : "%1".arg(v_seconds)
-        v_minutes = (v_minutes<10) ? "0%1".arg(v_minutes) : "%1".arg(v_minutes)
+    v_seconds = (v_seconds<10) ? "0%1".arg(v_seconds) : "%1".arg(v_seconds)
+    v_minutes = (v_minutes<10) ? "0%1".arg(v_minutes) : "%1".arg(v_minutes)
 
-        return "%1:%2:%3".arg(v_hours).arg(v_minutes).arg(v_seconds)
+    return "%1:%2:%3".arg(v_hours).arg(v_minutes).arg(v_seconds)
   }
   Scenario {
     id: biogears_scenario
-
     onPatientMetricsChanged: {
         root.respiratoryRate.value.text       = metrics.RespiratoryRate
         root.heartRate.value.text             = metrics.HeartRate 
@@ -54,7 +51,6 @@ ControlsForm {
         root.systolicBloodPressure.value.text = metrics.SystolicBloodPressure
         root.dystolicBloodPressure.value.text = metrics.DiastolicBloodPressure
     }
-
     onPatientStateChanged: {
       root.age_yr.value.text    = patientState.Age
       root.gender.value.text    = patientState.Gender
@@ -66,18 +62,18 @@ ControlsForm {
       root.fat_pct.value.text              = patientState.BodyFat
 
       root.patientStateChanged(patientState)
+    }	
+    onUrinalysis_completed: {
+	    root.urinalysisData = urinalysis
     }
-	
-	onUrinalysis_completed: {
-		root.urinalysisData = urinalysis
-	}
-
     onPhysiologyChanged:  {
       bgData = model
       root.patientPhysiologyChanged(model)
       root.restartClicked(scenario.time_s);
     }
-
+    onSubstancesActivated : {
+      root.newActiveSubstances()
+    }
     onStateLoad: {
       //Check if the patient base name (format : :"patient@xs") is substring of the text displayed in the patient menu
       // (format : "Patient: patient@xs").  If it is, then we are up to date.  If not, we need to search patient file map 
@@ -102,15 +98,12 @@ ControlsForm {
       }
       root.restartClicked(scenario.get_simulation_time)
     }
-
     onNewStateAdded : {
       patientMenu.buildPatientMenu()
     }
-
     onTimeAdvance: {
       playback.simulationTime = seconds_to_clock_time(time_s)
     }
-
     onRunningToggled : {
       if( isRunning){
           playback.simButton.state = "Simulating";
@@ -121,7 +114,7 @@ ControlsForm {
     onPausedToggled : {
       if( biogears_scenario.isRunning) {
         root.pauseClicked(isPaused)
-        if( isPaused ){
+        if ( isPaused ){
             playback.simButton.state = "Paused";
         } else {
             playback.simButton.state = "Simulating";
@@ -136,13 +129,11 @@ ControlsForm {
       }
     }
   }
-
   ActionModel {
     id : actionSwitchModel
     actionSwitchView : root.actionSwitchView
     
   }
-  
   playback.onRestartClicked: {
     patientMenu.loadState(patientMenu.patientText.text.split(" ")[1]+".xml");
     let l_simulation_time_s = scenario.time_s
@@ -168,23 +159,21 @@ ControlsForm {
   openDrawerButton.onPressed : {
     root.openActionDrawer();
   }
-
   function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
-
   function removeAction( uuid) {
-        console.log(uuid)
-        for ( let i = 0; i < actionSwitchModel.count; ++i){
-          console.log (actionSwitchModel, actionSwitchModel.get(i), actionSwitchModel.get(i).uuid)
-          if (actionSwitchModel.get(i).uuid === uuid){
-            actionSwitchModel.remove(i)
-          }
-        }
+    console.log(uuid)
+    for ( let i = 0; i < actionSwitchModel.count; ++i){
+      console.log (actionSwitchModel, actionSwitchModel.get(i), actionSwitchModel.get(i).uuid)
+      if (actionSwitchModel.get(i).uuid === uuid){
+        actionSwitchModel.remove(i)
+      }
     }
+  }
 }
 
 /*##^## Designer {

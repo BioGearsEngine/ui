@@ -9,116 +9,108 @@ import QtQml.Models 2.2
 
 import com.biogearsengine.ui.scenario 1.0
 Page {
-    id: root
-    z : 0 // Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
+  id: root
+  z : 0 // Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
+  property bool initialized : false
+  property PhysiologyModel physiologyRequestModel
+  property alias energyMetabolismSeries : energyMetabolismSeries
+  property alias renalOverviewSeries : renalOverviewSeries 
+  property alias vitalsGridView : vitalsGridView
+  property alias cardiopulmonaryGridView : cardiopulmonaryGridView
+  property alias bloodChemistryGridView : bloodChemistryGridView
+  property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
+  property alias renalFluidBalanceGridView : renalFluidBalanceGridView
+  property alias renalOverviewGridView : renalOverviewSeries.renalOverviewGridView
+  property alias substanceGridView : substanceGridView
+  property alias customGridView : customGridView
+  property alias energyTimer : energyMetabolismSeries.energyTimer
+  property alias renalTimer : renalOverviewSeries.renalTimer
+  property alias tenHzPlotTimer : tenHzPlotTimer
+  property alias fiveHzPlotTimer : fiveHzPlotTimer
+  property alias oneHzPlotTimer : oneHzPlotTimer
+  property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
+  property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer   
+  signal urinalysisRequest()
 
-    property bool initialized : false
+  state : "realTime"
 
-    property PhysiologyModel physiologyRequestModel
-    property alias energyMetabolismSeries : energyMetabolismSeries
-    property alias renalOverviewSeries : renalOverviewSeries
-    
-    property alias vitalsGridView : vitalsGridView
-    property alias cardiopulmonaryGridView : cardiopulmonaryGridView
-    property alias bloodChemistryGridView : bloodChemistryGridView
-    property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
-    property alias renalFluidBalanceGridView : renalFluidBalanceGridView
-    property alias renalOverviewGridView : renalOverviewSeries.renalOverviewGridView
-    property alias substanceGridView : substanceGridView
-    property alias customGridView : customGridView
-
-    property alias energyTimer : energyMetabolismSeries.energyTimer
-    property alias renalTimer : renalOverviewSeries.renalTimer
-    property alias tenHzPlotTimer : tenHzPlotTimer
-    property alias fiveHzPlotTimer : fiveHzPlotTimer
-    property alias oneHzPlotTimer : oneHzPlotTimer
-    property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
-    property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer
-    
-    signal urinalysisRequest()
-
-    state : "realTime"
-
-    // The states defined for GraphArea relate to the timers that trigger plot updates. During "RealTime", the slower timer triggers plot updates every 1 s (1 Hz),
-    // while faster timer triggers every 0.1 s (10 Hz).  At maximum run rate, these refresh rates are multipled by factor of 5 (5 Hz for slow timer, 50 Hz for
-    // fast timer) to keep up with BioGears metrics update rate.  By default, all plots are assigned to slower timer (see GraphArea.qml).  Only plots that
-    // absolutely require a faster sampling rate for resolution (like Respiratory PV Curve) should connect plot to faster timer.
-    states : [
-        State {
-            name : "realTime"
-            PropertyChanges {
-                target : tenHzPlotTimer;
-                interval : 100
-            }
-            PropertyChanges {
-                target : oneHzPlotTimer;
-                interval : 1000
-            }
-        },
-        State {
-            name : "max"
-            PropertyChanges {
-                target : tenHzPlotTimer;
-                interval : 20
-            }
-            PropertyChanges {
-                target : oneHzPlotTimer;
-                interval : 200
-            }
+  // The states defined for GraphArea relate to the timers that trigger plot updates. During "RealTime", the slower timer triggers plot updates every 1 s (1 Hz),
+  // while faster timer triggers every 0.1 s (10 Hz).  At maximum run rate, these refresh rates are multipled by factor of 5 (5 Hz for slow timer, 50 Hz for
+  // fast timer) to keep up with BioGears metrics update rate.  By default, all plots are assigned to slower timer (see GraphArea.qml).  Only plots that
+  // absolutely require a faster sampling rate for resolution (like Respiratory PV Curve) should connect plot to faster timer.
+  states : [
+    State {
+      name : "realTime"
+      PropertyChanges {
+        target : tenHzPlotTimer;
+        interval : 100
+      }
+      PropertyChanges {
+        target : oneHzPlotTimer;
+        interval : 1000
+      }
+    },
+    State {
+      name : "max"
+      PropertyChanges {
+        target : tenHzPlotTimer;
+        interval : 20
+      }
+      PropertyChanges {
+        target : oneHzPlotTimer;
+        interval : 200
+      }
+    }
+  ]
+  header : RowLayout {
+    id : headerBar
+    Layout.fillWidth : true
+    Layout.fillHeight : true
+    Button {
+      id : previous
+      text : "Prev"
+      display : AbstractButton.IconOnly
+      icon.source : "qrc:/icons/prev.png"
+      icon.name : "terminate"
+      icon.color : "transparent"
+      background : Rectangle {
+        color : "transparent"
+      }
+      onClicked : {
+        if (plots.currentIndex == 0) {
+          plots.currentIndex = plots.count - 1;
+        } else {
+          plots.currentIndex = plots.currentIndex - 1
         }
-    ]
-
-    header : RowLayout {
-        id : headerBar
+        if (filterMenu.visible) { // This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
+          filterMenu.open()
+        }
+      }
+    }
+    SwipeView {
+      id : systemSwipeView
+      clip : true
+      Layout.fillWidth : true
+      Layout.preferredWidth : 200
+      Layout.preferredHeight : 40
+      Repeater { 
+        // contentHeight: 40
         Layout.fillWidth : true
-        Layout.fillHeight : true
-        Button {
-            id : previous
-            text : "Prev"
-            display : AbstractButton.IconOnly
-            icon.source : "qrc:/icons/prev.png"
-            icon.name : "terminate"
-            icon.color : "transparent"
-            background : Rectangle {
-                color : "transparent"
-            }
-            onClicked : {
-                if (plots.currentIndex == 0) {
-                    plots.currentIndex = plots.count - 1;
-                } else {
-                    plots.currentIndex = plots.currentIndex - 1
-                }
-                if (filterMenu.visible) { // This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
-                    filterMenu.open()
-                }
-            }
+        Layout.preferredWidth : 200
+        Layout.preferredHeight : 40
+        // font.pointSize: 12
+        model : physiologyRequestModel
+        delegate : UITabButtonForm {
+          text : name
         }
-
-        SwipeView {
-            id : systemSwipeView
-            clip : true
-            Layout.fillWidth : true
-            Layout.preferredWidth : 200
-            Layout.preferredHeight : 40
-            Repeater { // contentHeight: 40
-                Layout.fillWidth : true
-                Layout.preferredWidth : 200
-                Layout.preferredHeight : 40
-                // font.pointSize: 12
-                model : physiologyRequestModel
-
-                delegate : UITabButtonForm {
-                    text : name
-                }
-            }
-            currentIndex : plots.currentIndex
-            onCurrentIndexChanged : {
-                if (plots.currentIndex != currentIndex) {
-                    plots.currentIndex = currentIndex;
-                }
-            }
+      }
+      currentIndex : plots.currentIndex
+      onCurrentIndexChanged : {
+        if (plots.currentIndex != currentIndex) {
+          plots.currentIndex = currentIndex;
         }
-
+      }
+    }
         Button {
           id : filterMenuButton
           text : "Filter Menu"
@@ -149,7 +141,6 @@ Page {
               currentIndex:plots.currentIndex
               height : children[currentIndex].height +  10
               width :  children[currentIndex].width + 2
-        
               Repeater {
                 model : physiologyRequestModel
                 delegate : ColumnLayout {
@@ -162,117 +153,124 @@ Page {
                   Layout.maximumHeight: childrenRect.height
                   spacing : 1
                   Repeater {
-                                          // !
-                      // ! Component for Selecting a Data Request.
-                      // ! Creates a checkbox which activates a plot when clicked
-                      // ! Covers signle and multiplots
-                      Component {
-                          id : singleItemComponent
-                          MenuItem {
-                              height : checkbox.height + 2
-                              CheckBox {
-                                  id : checkbox
-                                  checkable : true
-                                  checked : _model.data(_item, PhysiologyModel.EnabledRole)
-                                  text :    _model.data(_item, PhysiologyModel.RequestRole) 
-                                  onClicked : {
-                                      if (checked) {
-                                          _model.setData(_item, true, PhysiologyModel.EnabledRole)
-                                          createPlotView(_category, _model, _item, _title)
-                                      } else {
-                                          _model.setData(_item, false, PhysiologyModel.EnabledRole)
-                                          removePlotView(_category, _item.row, _title)
-                                      }
-                                  }
-                                  Component.onCompleted: {
-                                      console.log("Creating %1".arg(_title))
-                                      if (checked ) {
-                                        createPlotView(_category, _model, _item, _title)
-                                      }
-                                  }
-                              }
+                    // ! Component for Selecting a Data Request.
+                    // ! Creates a checkbox which activates a plot when clicked
+                    // ! Covers signle and multiplots
+                    Component {
+                      id : singleItemComponent
+                      MenuItem {
+                        height : checkbox.height + 2
+                        CheckBox {
+                          id : checkbox
+                          checkable : true
+                          checked : _model.data(_item, PhysiologyModel.EnabledRole)
+                          text :    _model.data(_item, PhysiologyModel.RequestRole) 
+                          onClicked : {
+                            if (checked) {
+                              _model.setData(_item, true, PhysiologyModel.EnabledRole)
+                              createPlotView(_category, _model, _item, _title)
+                            } else {
+                              _model.setData(_item, false, PhysiologyModel.EnabledRole)
+                              removePlotView(_category, _item.row, _title)
+                            }
                           }
+                          Component.onCompleted: {
+                            console.log("Creating %1".arg(_title))
+                            if (checked ) {
+                              createPlotView(_category, _model, _item, _title)
+                            }
+                          }
+                        }
                       }
-                     
-                      // ! When a item is nested like substances
-                      // ! We want to be able to select individual data request
-                      // ! Under a nested menu to plot multiple single plots
-                      Component {
-                          id : categorySelectionComponent
-                          Button {
-                            id: buttonMenu
-
-                            property var bgData : _model
-                            property var entry : _item
-                            property int category : _category
-
-                            text : _title
-                                    
-                            contentItem: Label {
-                                text: buttonMenu.text + ">"
-                                font: buttonMenu.font
-                                font.pixelSize : 10
-                                verticalAlignment: Text.AlignVCenter
-                            }
-
-                            width :  200 
-                            height : buttonMenu.pixelSize
-                            anchors.right : parent.right
-
-                            background: Rectangle {
-                                anchors.fill : parent
-                                border.color: "blue"
-                                opacity: 0.3
-                                color : buttonMenu.down ? "#555555" : "#111111"
-                            }
-
-                            MouseArea {
-                              anchors.fill: parent
-                              acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-                              onClicked: {
-                                  if (mouse.button === Qt.LeftButton)
-                                      substanceMenu.open()
-                              }
-
-                              Menu {
-                                id : substanceMenu
-                                x : -implicitWidth
-                                y: 0
-                                Repeater {
-                                  id : componentMenu
-                                  model : DelegateModel {
-                                    model : _model
-                                    rootIndex : _model.index(index, 0)
-                                    delegate : Loader {
-                                      property int _category : buttonMenu.category
-                                      property var _model: buttonMenu.bgData
-                                      property var _item:  buttonMenu.bgData.index(index,0,buttonMenu.entry)
-                                      property var _title: "%1 - %2".arg(buttonMenu.bgData.data(entry, Qt.DisplayRole))
-                                                                    .arg(buttonMenu.bgData.data(_item, Qt.DisplayRole))
-                                      sourceComponent : singleItemComponent
-                                    }
-                                  }
+                    }
+                    // ! When a item is nested like substances
+                    // ! We want to be able to select individual data request
+                    // ! Under a nested menu to plot multiple single plots
+                    Component {
+                      id : categorySelectionComponent
+                      Button {
+                        id: buttonMenu
+                        property var bgData : _model
+                        property var entry : _item
+                        property int category : _category
+                        text : _title           
+                        contentItem: Label {
+                          text: buttonMenu.text + ">"
+                          font.pixelSize : 10
+                          verticalAlignment: Text.AlignVCenter
+                        }
+                        width :  200 
+                        height : buttonMenu.pixelSize
+                        anchors.right : parent.right
+                        background: Rectangle {
+                          anchors.fill : parent
+                          border.color: "blue"
+                          opacity: 0.3
+                          color : buttonMenu.down ? "#555555" : "#111111"
+                        }
+                        MouseArea {
+                          anchors.fill: parent
+                          acceptedButtons: Qt.LeftButton | Qt.RightButton
+                          onClicked: {
+                            if (mouse.button === Qt.LeftButton)
+                              substanceMenu.open()
+                          }
+                          Menu {
+                            id : substanceMenu
+                            x : -implicitWidth
+                            y: 0
+                            Repeater {
+                              id : componentMenu
+                              model : DelegateModel {
+                                model : _model
+                                rootIndex : _model.index(index, 0)
+                                delegate : Loader {
+                                  property int _category : buttonMenu.category
+                                  property var _model: buttonMenu.bgData
+                                  property var _item:  buttonMenu.bgData.index(index,0,buttonMenu.entry)
+                                  property var _title: "%1 - %2".arg(buttonMenu.bgData.data(entry, Qt.DisplayRole))
+                                                                .arg(buttonMenu.bgData.data(_item, Qt.DisplayRole))
+                                  sourceComponent : singleItemComponent
                                 }
                               }
                             }
                           }
-                      }                                                       
+                        }
+                      }
+                    }                                                       
                     model : physiologyRequestModel.category(curCategory)
+                    function refreshSubstances(){
+                      if (curCategory == PhysiologyModel.SUBSTANCES){
+                        console.log(curCategory)
+                        //Setting model to null unloads current data -- reassignment to substances data model causes incorporation of newly active substances
+                        model = null
+                        model = physiologyRequestModel.category(curCategory)
+                      }
+                    }
+                    Component.onCompleted : {
+                      root.newActiveSubstances.connect(refreshSubstances)
+                    }
                     delegate : Loader {
-                            property int _category : curCategory
-                            property var             _current : model
-                            property PhysiologyModel _model : physiologyRequestModel.category(_category)
-                            property var             _item  : _model.index(index, 0)
-                            property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
-                            sourceComponent : {
-                              if (!model.nested) {
-                                  return singleItemComponent
-                              } else { 
-                                  return categorySelectionComponent
-                              }
-                            }
+                      property int _category : curCategory
+                      property var             _current : model
+                      property PhysiologyModel _model : physiologyRequestModel.category(_category)
+                      property var             _item  : _model.index(index, 0)
+                      property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
+                      sourceComponent : {
+                        if (!model.nested) {
+                            return singleItemComponent
+                        } else if (_category == PhysiologyModel.SUBSTANCES){
+                          //We only want to plot substance sub men if the substance is currently active in Biogears (i.e. usable)
+                          if (model.usable){
+                            return categorySelectionComponent
+                          } else {
+                            return null
                           }
+                        } else { 
+                          return categorySelectionComponent
+                        }
+                      }
+                    }
                   }
                 }
               }

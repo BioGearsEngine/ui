@@ -8,7 +8,6 @@
 #include "biogears/PatientState.h"
 #include "biogears/BioGearsData.h"
 #include "biogears/Scenario.h"
-#include "biogears/Substance.h"
 #include "version.h"
 
 #include "biogears/EventTree.h"
@@ -27,7 +26,6 @@ int main(int argc, char* argv[])
   qmlRegisterType<bio::Scenario>("com.biogearsengine.ui.scenario", 1, 0, "Scenario");
   qmlRegisterType<PatientMetrics>("com.biogearsengine.ui.scenario", 1, 0, "PatientMetrics");
   qmlRegisterType<bio::SystemInformation>("com.biogearsengine.ui.scenario", 1, 0, "Info");
-  qmlRegisterType<Substance>("com.biogearsengine.ui.scenario", 1, 0, "Substance");
   qmlRegisterType<BioGearsData>("com.biogearsengine.ui.scenario", 1, 0, "PhysiologyModel");
   qmlRegisterType<QtLogForward>("com.biogearsengine.ui.scenario", 1, 0, "LogForward");
   qmlRegisterType<Urinalysis>("com.biogearsengine.ui.scenario", 1, 0, "Urinalysis");

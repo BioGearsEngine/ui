@@ -27,7 +27,6 @@
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
 #include "PatientState.h"
-#include "Substance.h"
 #include "Urinalysis.h"
 
 namespace biogears {
@@ -159,6 +158,7 @@ signals:
   void urinalysis_completed(Urinalysis* urinalysis); 
 
   void timeAdvance(double time_s);
+  void substancesActivated();
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);
   void newStateAdded();
@@ -174,7 +174,6 @@ protected:
 
   void setup_physiology_model();
   void setup_physiology_substances(BioGearsData*);
-  void add_physiology_substance(biogears::SESubstance* newSub);
   void setup_physiology_lists();
 
   void physiology_thread_main();

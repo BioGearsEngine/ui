@@ -11,14 +11,14 @@
 class PhysiologyRequest {
 public:
   PhysiologyRequest();
-  PhysiologyRequest(QString prefix, QString name, bool active = false, PhysiologyRequest* parent = nullptr);
+  PhysiologyRequest(QString prefix, QString name, bool enabled = false, PhysiologyRequest* parent = nullptr);
   ~PhysiologyRequest();
 
   QString name() const;
   void name(const QString&);
 
-  bool active() const;
-  void active(bool value);
+  bool usable() const;
+  void usable(bool value);
 
   int rate() const;
   void rate(int value);
@@ -30,7 +30,7 @@ public:
   int columns() const;
 
   bool enabled() const;
-  void enabled(bool);
+  void enabled(bool value);
 
   bool auto_scale() const;
   void auto_scale(bool value);
@@ -63,7 +63,7 @@ public:
   PhysiologyRequest const* child(int row) const;
 
   QString header(int col) const;
-  PhysiologyRequest* append(QString prefix, QString name, bool active = false);
+  PhysiologyRequest* append(QString prefix, QString name, bool enabled = false, bool usable = true);
   void modify(int row, const biogears::SEUnitScalar* data);
   void modify(int row, const biogears::SEScalar* data);
   void modify(int row, int refreshRate);
@@ -97,7 +97,8 @@ private:
   QVector<PhysiologyRequest> _children;
   QString _prefix;
   QString _name;
-  bool _active = false;
+  bool _usable = false;
+  bool _enabled = false;
   bool _custom = false;
   bool _nested = false;
   int _refresh_rate = 1;

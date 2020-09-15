@@ -9,10 +9,10 @@ PhysiologyRequest::PhysiologyRequest()
 {
 }
 //------------------------------------------------------------------------------------
-PhysiologyRequest::PhysiologyRequest(QString prefix, QString name, bool active, PhysiologyRequest* parent)
+PhysiologyRequest::PhysiologyRequest(QString prefix, QString name, bool enabled, PhysiologyRequest* parent)
   : _parent(parent)
   , _name(name)
-  , _active(active)
+  , _enabled(enabled)
   , _prefix(prefix)
 {
 }
@@ -32,14 +32,14 @@ void PhysiologyRequest::name(const QString& value)
   _name = value;
 }
 //------------------------------------------------------------------------------------
-bool PhysiologyRequest::active() const
+bool PhysiologyRequest::usable() const
 {
-  return _active;
+  return _usable;
 }
 //------------------------------------------------------------------------------------
-void PhysiologyRequest::active(bool value)
+void PhysiologyRequest::usable(bool value)
 {
-  _active = value;
+  _usable = value;
 }
 //------------------------------------------------------------------------------------
 int PhysiologyRequest::rate() const
@@ -71,14 +71,15 @@ int PhysiologyRequest::columns() const
 {
   return 5;
 }
+//------------------------------------------------------------------------------------
 bool PhysiologyRequest::enabled() const
 {
-  return _active;
+  return _enabled;
 }
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::enabled(bool value)
 {
-  _active = value;
+  _enabled = value;
 }
 //------------------------------------------------------------------------------------
 bool PhysiologyRequest::auto_scale() const
@@ -239,13 +240,14 @@ auto PhysiologyRequest::header(int section) const -> QString
   }
 }
 //------------------------------------------------------------------------------------
-PhysiologyRequest* PhysiologyRequest::append(QString prefix, QString name, bool active)
+PhysiologyRequest* PhysiologyRequest::append(QString prefix, QString name, bool enabled, bool usable)
 {
   PhysiologyRequest request;
   request._prefix = prefix;
   request._name = name;
   request._parent = this;
-  request._active = active;
+  request._enabled = enabled;
+  request._usable = usable;
   _children.append(request);
   return &_children.back();
 }
@@ -274,7 +276,7 @@ void PhysiologyRequest::modify(int row, int refreshRate)
 void PhysiologyRequest::modify(int row, bool enabled)
 {
   if (0 <= row && row < _children.size()) {
-    _children[row]._active = enabled;
+    _children[row]._enabled = enabled;
   }
 }
 //------------------------------------------------------------------------------------
@@ -303,8 +305,10 @@ QVariant PhysiologyRequest::data(int role) const
     } else {
       return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : QVariant("");
     }
+  case BioGearsData::UsableRole:
+    return _usable;
   case BioGearsData::EnabledRole:
-    return _active;
+    return _enabled;
   case BioGearsData::RowRole:
     return _children.size();
   case BioGearsData::RateRole:

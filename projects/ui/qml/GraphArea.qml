@@ -12,12 +12,10 @@ GraphAreaForm {
   signal restart()
   signal pause(bool paused)
   signal speedToggled(int speed)
-
   signal stateUpdates(PatientState state)
   signal conditionUpdates(PatientConditions conditions)
-
+  signal newActiveSubstances()
   signal newPhysiologyModel(PhysiologyModel model)
-
   property double count_1 : 0.0
   property double count_2 : 0.0
 

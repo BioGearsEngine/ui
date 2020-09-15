@@ -138,9 +138,9 @@ void BioGearsData::initialize()
 
   _renal->append(QString("Renal"), QString("Mean Urine Output"));
   _renal->append(QString("Renal"), QString("Urine Production Rate"));
-  _renal->child(1)->active(true);
+  _renal->child(1)->enabled(true);
   _renal->append(QString("Renal"), QString("Glomerular Filtration Rate"));
-  _renal->child(2)->active(true);
+  _renal->child(2)->enabled(true);
 
   _customs->append(QString("Plots"), QString("Respiratory PV Curve"));
   auto custom = _customs->child(0);
@@ -283,7 +283,7 @@ QVariant BioGearsData::data(const QModelIndex& index, int role) const
 bool BioGearsData::setData(const QModelIndex& index, const QVariant& value, int role)
 {
   if (role == EnabledRole && index.internalPointer()) {
-    static_cast<PhysiologyRequest*>(index.internalPointer())->active(value.toBool());
+    static_cast<PhysiologyRequest*>(index.internalPointer())->enabled(value.toBool());
     return true;
   } else if (role == RateRole && index.internalPointer()) {
     static_cast<PhysiologyRequest*>(index.internalPointer())->rate(value.toInt());
