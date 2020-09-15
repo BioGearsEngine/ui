@@ -32,6 +32,9 @@ Page {
   property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer   
   signal urinalysisRequest()
 
+  property Component simpleMenuComponent : simpleMenuComponent
+  property Component nestedMenuComponent : nestedMenuComponent
+
   state : "realTime"
 
   // The states defined for GraphArea relate to the timers that trigger plot updates. During "RealTime", the slower timer triggers plot updates every 1 s (1 Hz),
@@ -111,194 +114,96 @@ Page {
         }
       }
     }
-        Button {
-          id : filterMenuButton
-          text : "Filter Menu"
-          display : AbstractButton.IconOnly
-          icon.source : "qrc:/icons/menu.png"
-          icon.name : "terminate"
-          icon.color : "transparent"
-          onClicked : {
-            if (filterMenu.visible) {
-              filterMenu.close()
-            } else {
-              filterMenu.open()
+    Button {
+      id : filterMenuButton
+      text : "Filter Menu"
+      display : AbstractButton.IconOnly
+      icon.source : "qrc:/icons/menu.png"
+      icon.name : "terminate"
+      icon.color : "transparent"
+      onClicked : {
+        let menuObject = menuInstantiator.objectAt(plots.currentIndex)
+        if (menuObject.visible){
+          menuObject.close()
+        } else {
+          menuObject.open()
+        }
+      }
+      background : Rectangle {
+        color : "transparent"
+      }
+      Instantiator {
+        id : menuInstantiator
+        model : PhysiologyModel.TOTAL_CATEGORIES
+        delegate : Menu {
+          visible : false
+          x : -200
+          y : 50
+          Repeater {
+            id : menuRepeater
+            model : physiologyRequestModel.category(index)
+            property int category : index
+            function refreshSubstances() {
+              
             }
-          }
-          background : Rectangle {
-            color : "transparent"
-          }
-          Menu {
-            id: filterMenu
-            x : -50
-            y : 50
-            spacing: 0
-            padding: 0
-            margins: 0
-            closePolicy : Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
-            StackLayout  {
-              id: filterMenuView
-              currentIndex:plots.currentIndex
-              height : children[currentIndex].height +  10
-              width :  children[currentIndex].width + 2
-              Repeater {
-                model : physiologyRequestModel
-                delegate : ColumnLayout {
-                  property int curCategory : index
-                  width : childrenRect.width
-                  height : childrenRect.height
-                  Layout.preferredHeight: childrenRect.height
-                  Layout.preferredWidth: childrenRect.width
-                  Layout.maximumWidth: childrenRect.width
-                  Layout.maximumHeight: childrenRect.height
-                  spacing : 1
-                  Repeater {
-                    // ! Component for Selecting a Data Request.
-                    // ! Creates a checkbox which activates a plot when clicked
-                    // ! Covers signle and multiplots
-                    Component {
-                      id : singleItemComponent
-                      MenuItem {
-                        height : checkbox.height + 2
-                        CheckBox {
-                          id : checkbox
-                          checkable : true
-                          checked : _model.data(_item, PhysiologyModel.EnabledRole)
-                          text :    _model.data(_item, PhysiologyModel.RequestRole) 
-                          onClicked : {
-                            if (checked) {
-                              _model.setData(_item, true, PhysiologyModel.EnabledRole)
-                              createPlotView(_category, _model, _item, _title)
-                            } else {
-                              _model.setData(_item, false, PhysiologyModel.EnabledRole)
-                              removePlotView(_category, _item.row, _title)
-                            }
-                          }
-                          Component.onCompleted: {
-                            console.log("Creating %1".arg(_title))
-                            if (checked ) {
-                              createPlotView(_category, _model, _item, _title)
-                            }
-                          }
-                        }
-                      }
-                    }
-                    // ! When a item is nested like substances
-                    // ! We want to be able to select individual data request
-                    // ! Under a nested menu to plot multiple single plots
-                    Component {
-                      id : categorySelectionComponent
-                      Button {
-                        id: buttonMenu
-                        property var bgData : _model
-                        property var entry : _item
-                        property int category : _category
-                        text : _title           
-                        contentItem: Label {
-                          text: buttonMenu.text + ">"
-                          font.pixelSize : 10
-                          verticalAlignment: Text.AlignVCenter
-                        }
-                        width :  200 
-                        height : buttonMenu.pixelSize
-                        anchors.right : parent.right
-                        background: Rectangle {
-                          anchors.fill : parent
-                          border.color: "blue"
-                          opacity: 0.3
-                          color : buttonMenu.down ? "#555555" : "#111111"
-                        }
-                        MouseArea {
-                          anchors.fill: parent
-                          acceptedButtons: Qt.LeftButton | Qt.RightButton
-                          onClicked: {
-                            if (mouse.button === Qt.LeftButton)
-                              substanceMenu.open()
-                          }
-                          Menu {
-                            id : substanceMenu
-                            x : -implicitWidth
-                            y: 0
-                            Repeater {
-                              id : componentMenu
-                              model : DelegateModel {
-                                model : _model
-                                rootIndex : _model.index(index, 0)
-                                delegate : Loader {
-                                  property int _category : buttonMenu.category
-                                  property var _model: buttonMenu.bgData
-                                  property var _item:  buttonMenu.bgData.index(index,0,buttonMenu.entry)
-                                  property var _title: "%1 - %2".arg(buttonMenu.bgData.data(entry, Qt.DisplayRole))
-                                                                .arg(buttonMenu.bgData.data(_item, Qt.DisplayRole))
-                                  sourceComponent : singleItemComponent
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }                                                       
-                    model : physiologyRequestModel.category(curCategory)
-                    function refreshSubstances(){
-                      if (curCategory == PhysiologyModel.SUBSTANCES){
-                        console.log(curCategory)
-                        //Setting model to null unloads current data -- reassignment to substances data model causes incorporation of newly active substances
-                        model = null
-                        model = physiologyRequestModel.category(curCategory)
-                      }
-                    }
-                    Component.onCompleted : {
-                      root.newActiveSubstances.connect(refreshSubstances)
-                    }
-                    delegate : Loader {
-                      property int _category : curCategory
-                      property var             _current : model
-                      property PhysiologyModel _model : physiologyRequestModel.category(_category)
-                      property var             _item  : _model.index(index, 0)
-                      property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
-                      sourceComponent : {
-                        if (!model.nested) {
-                            return singleItemComponent
-                        } else if (_category == PhysiologyModel.SUBSTANCES){
-                          //We only want to plot substance sub men if the substance is currently active in Biogears (i.e. usable)
-                          if (model.usable){
-                            return categorySelectionComponent
-                          } else {
-                            return null
-                          }
-                        } else { 
-                          return categorySelectionComponent
-                        }
-                      }
-                    }
+            Component.onCompleted : {
+              root.newActiveSubstances.connect(refreshSubstances)
+            }
+            delegate : Loader {
+              id : menuLoader
+              sourceComponent : {
+                if (!model.nested){
+                  return simpleMenuComponent
+                } else if (menuRepeater.category == PhysiologyModel.SUBSTANCES){
+                  if (model.usable){
+                    return nestedMenuComponent
+                  } else {
+                    return null
                   }
+                } else {
+                  return nestedMenuComponent
                 }
               }
-            }   
+              property Instantiator _parentMenu : menuInstantiator
+              property int _category : menuRepeater.category
+              property PhysiologyModel _model : physiologyRequestModel.category(_category)
+              property var _item : _model.index(index, 0)
+              property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
+              onLoaded : {
+                if (_category == PhysiologyModel.SUBSTANCES){
+                  //root.newActiveSubstances.connect(item.clearObjects)
+                  //item.objectsCleared.connect(menuRepeater.refreshSubstances)
+                }
+              }
+            }
           }
         }
-        Button {
-            id : next
-            text : "Next"
-            display : AbstractButton.IconOnly
-            icon.source : "qrc:/icons/next.png"
-            icon.name : "terminate"
-            icon.color : "transparent"
-            onClicked : {
-                if (plots.currentIndex == plots.count - 1) {
-                    plots.currentIndex = 0;
-                } else {
-                    plots.currentIndex = plots.currentIndex + 1
-                }
-                if (filterMenu.visible) { // This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
-                    filterMenu.open()
-                }
-            }
-            background : Rectangle {
-                color : "transparent"
-            }
-        }
+        onObjectAdded : {object.parent = filterMenuButton}
+        onObjectRemoved : {console.log('Removed menu--not desirable')}
+      }
     }
+    Button {
+      id : next
+      text : "Next"
+      display : AbstractButton.IconOnly
+      icon.source : "qrc:/icons/next.png"
+      icon.name : "terminate"
+      icon.color : "transparent"
+      onClicked : {
+        if (plots.currentIndex == plots.count - 1) {
+          plots.currentIndex = 0;
+        } else {
+          plots.currentIndex = plots.currentIndex + 1
+        }
+        if (filterMenu.visible) { // This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
+          filterMenu.open()
+        }
+      }
+      background : Rectangle {
+        color : "transparent"
+      }
+    }
+  }//end header
 
     SwipeView {
         id : plots
@@ -516,7 +421,86 @@ Page {
         repeat : true
         triggeredOnStart : true
     }
-}
+    //Component used by Menu Instantiator to set up bottom-level menu items
+    Component {
+      id : simpleMenuComponent
+      MenuItem {
+        property var item : _item
+        property var category : _category
+        property var model : _model
+        property var title : _title
+        height : checkbox.height + 2
+        CheckBox {
+          id : checkbox
+          checkable : true
+          checked : model.data(item, PhysiologyModel.EnabledRole)
+          text : model.data(item, PhysiologyModel.RequestRole)
+          onClicked : {
+            if (checked){
+              model.setData(item, true, PhysiologyModel.EnabledRole)
+              createPlotView(category, model, item, title)
+            } else {
+              model.setData(item, false, PhysiologyModel.EnabledRole)
+              removePlotView(category, item.row, title)
+            }
+          }
+        }
+      }
+    }
+    //Component used by Menu Instantiator to set up nested sub-menus (calls to simpleMenuComponent to make bottome level items)
+    Component {
+      id : nestedMenuComponent
+      Instantiator {
+        id : nestedMenuItem
+        property Instantiator parentMenu : _parentMenu
+        property var bgData : _model
+        property var entry : _item
+        property var category : _category
+        signal objectsCleared()
+        function clearObjects() {
+          active = false;
+          //objectsCleared();
+        }
+        onCountChanged : {
+          if (count == 0){
+            console.log('done clearing')
+            objectsCleared();
+          }
+        }
+        function setObjects() {
+          active = true;
+        }
+        delegate : Menu {
+          id : subMenu
+          title : _model.data(_item, PhysiologyModel.RequestRole)
+          Repeater {
+            id : subMenuRepeater
+            model : DelegateModel {
+              model : bgData
+              rootIndex : entry
+              delegate : Loader {
+                property var _category : category
+                property var _model : nestedMenuItem.bgData
+                property var _item : nestedMenuItem.bgData.index(index, 0, entry) //{ let temp = nestedMenuItem.bgData.index(index, 0, entry); console.log(_model.data(temp, PhysiologyModel.RequestRole)); return temp}
+                property var _title : "%1 - %2".arg(nestedMenuItem.bgData.data(entry, Qt.DisplayRole))
+                                                .arg(nestedMenuItem.bgData.data(_item, Qt.DisplayRole))
+                sourceComponent : simpleMenuComponent
+              }
+            }
+          }
+        }
+        onObjectAdded : {
+          console.log('Adding ' + object.title, index)
+          parentMenu.objectAt(PhysiologyModel.SUBSTANCES).addMenu(object)
+                  
+        }
+        onObjectRemoved : {
+          console.log('Removing ' + object.title)
+          parentMenu.objectAt(PhysiologyModel.SUBSTANCES).removeMenu(object)
+        }
+      }
+    }
+  }
 
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

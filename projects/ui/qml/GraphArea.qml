@@ -19,6 +19,10 @@ GraphAreaForm {
   property double count_1 : 0.0
   property double count_2 : 0.0
 
+  onNewActiveSubstances : {
+    console.log("new subs")
+  }
+
   property ObjectModel vitalsModel : vitalsObjectModel
   property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
   property ObjectModel bloodChemistryModel : bloodChemistryObjectModel
