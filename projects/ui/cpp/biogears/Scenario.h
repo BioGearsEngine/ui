@@ -158,7 +158,7 @@ signals:
   void urinalysis_completed(Urinalysis* urinalysis); 
 
   void timeAdvance(double time_s);
-  void substancesActivated();
+  void substanceActivated(QModelIndex subIndex);
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);
   void newStateAdded();

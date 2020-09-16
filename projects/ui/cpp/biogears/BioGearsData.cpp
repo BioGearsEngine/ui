@@ -291,7 +291,7 @@ bool BioGearsData::setData(const QModelIndex& index, const QVariant& value, int 
   } else if (role == InitializedRole && index.internalPointer()) {
     static_cast<PhysiologyRequest*>(index.internalPointer())->initialized(value.toBool());
     return true;
-  }
+  } 
   return false;
 }
 //------------------------------------------------------------------------------------

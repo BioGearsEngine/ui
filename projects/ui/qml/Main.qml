@@ -42,8 +42,8 @@ ApplicationWindow {
 		controls.onPatientPhysiologyChanged : {
 			graphArea.newPhysiologyModel(model)
 		}
-    controls.onNewActiveSubstances : {
-      graphArea.newActiveSubstances()
+    controls.onNewActiveSubstance : {
+      graphArea.newActiveSubstance(subIndex)
     }
 		controls.onUrinalysisDataChanged : {
 			graphArea.urinalysis = controls.urinalysisData

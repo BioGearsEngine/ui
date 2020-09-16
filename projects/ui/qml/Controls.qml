@@ -17,7 +17,7 @@ ControlsForm {
   signal patientStateChanged(PatientState patientState )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
-  signal newActiveSubstances()
+  signal newActiveSubstance(var subIndex)
   signal substanceDataChanged(real time_s, var subData)
 
   signal openActionDrawer()
@@ -71,8 +71,8 @@ ControlsForm {
       root.patientPhysiologyChanged(model)
       root.restartClicked(scenario.time_s);
     }
-    onSubstancesActivated : {
-      root.newActiveSubstances()
+    onSubstanceActivated : {
+      root.newActiveSubstance(subIndex)
     }
     onStateLoad: {
       //Check if the patient base name (format : :"patient@xs") is substring of the text displayed in the patient menu

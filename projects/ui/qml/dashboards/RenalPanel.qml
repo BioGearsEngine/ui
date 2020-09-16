@@ -19,7 +19,7 @@ Item {
 	
 	signal urinalysisRequest()
 	
-	property alias renalOverviewGridView:renalOverviewGridView
+	property alias renalGridView: renalGridView
 	property alias renalTimer : renalTimer
 		
 	property string uaColor: "Yellow"
@@ -594,17 +594,17 @@ Item {
 				Layout.preferredWidth: renalPanelGrid.prefWidth(this)
 				color : Qt.rgba(1, 1, 1, 0.0)
 				GridView {
-					id : renalOverviewGridView
+					id : renalGridView
 					anchors.fill : parent
 					clip : true
 					cellWidth : graphConsole.width
 					cellHeight : plots.height / 2.25
-					model : renalOverviewModel
+					model : renalModel
 					ScrollBar.vertical : ScrollBar {
-						parent : renalOverviewGridView.parent
-						anchors.top : renalOverviewGridView.top
-						anchors.right : renalOverviewGridView.right
-						anchors.bottom : renalOverviewGridView.bottom
+						parent : renalGridView.parent
+						anchors.top : renalGridView.top
+						anchors.right : renalGridView.right
+						anchors.bottom : renalGridView.bottom
 					}
 				}
 			}

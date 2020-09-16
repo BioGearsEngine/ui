@@ -6,7 +6,6 @@ import QtQml.Models 2.2
 import com.biogearsengine.ui.scenario 1.0
 
 GraphAreaForm {
-
   id: root
   signal start()
   signal restart()
@@ -14,28 +13,25 @@ GraphAreaForm {
   signal speedToggled(int speed)
   signal stateUpdates(PatientState state)
   signal conditionUpdates(PatientConditions conditions)
-  signal newActiveSubstances()
+  signal newActiveSubstance(var subIndex)
   signal newPhysiologyModel(PhysiologyModel model)
   property double count_1 : 0.0
   property double count_2 : 0.0
-
-  onNewActiveSubstances : {
-    console.log("new subs")
-  }
-
   property ObjectModel vitalsModel : vitalsObjectModel
   property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
   property ObjectModel bloodChemistryModel : bloodChemistryObjectModel
   property ObjectModel energyMetabolismModel : energyMetabolismObjectModel
-  property ObjectModel renalFluidBalanceModel : renalFluidBalanceObjectModel
-  property ObjectModel renalOverviewModel : renalOverviewObjectModel
+  property ObjectModel fluidBalanceModel : fluidBalanceObjectModel
+  property ObjectModel renalModel : renalObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ObjectModel customModel : customObjectModel
-  
   property Urinalysis urinalysis
-  
   property double currentTime_s
 
+  Rectangle {
+    anchors.fill : parent
+    border.color: "black"; color: "transparent"
+  }
 
   // Request = "C++ PhysiologyReqest"
   // ObjectModel = QML ObjectModel
@@ -69,51 +65,42 @@ GraphAreaForm {
     }
   }
 
-  Rectangle {
-    anchors.fill : parent
-    border.color: "black"; color: "transparent"
-  }
-
   onNewPhysiologyModel : {
     physiologyRequestModel = model;
-	energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
-	energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
-	renalOverviewSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL))
-	renalOverviewSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE))
+	  energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
+	  energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
+	  renalSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL))
+	  renalSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE))
   }
-  
   onUrinalysisChanged : {
-	renalOverviewSeries.urinalysisData = urinalysis;
+	  renalSeries.urinalysisData = urinalysis;
   }
-
   onStart : {
     oneHzPlotTimer.start();
     fiveHzPlotTimer.start();
     tenHzPlotTimer.start();
     everyFiveSecondsPlotTimer.start();
     everyTenSecondsPlotTimer.start();
-	energyTimer.start();
-	renalTimer.start();
+	  energyTimer.start();
+	  renalTimer.start();
   }
-
   onRestart : {
     oneHzPlotTimer.stop();
     fiveHzPlotTimer.stop();
     tenHzPlotTimer.stop();
     everyFiveSecondsPlotTimer.stop();
     everyTenSecondsPlotTimer.stop();
-	energyTimer.stop();
-	renalTimer.stop();
+	  energyTimer.stop();
+	  renalTimer.stop();
     vitalsObjectModel.clearPlots()
     cardiopulmonaryObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
     energyMetabolismObjectModel.clearPlots()
-    renalFluidBalanceObjectModel.clearPlots()
-	renalOverviewObjectModel.clearPlots()
+    fluidBalanceObjectModel.clearPlots()
+	  renalObjectModel.clearPlots()
     substanceObjectModel.clearPlots()
     customObjectModel.clearPlots()
   }
-
   onPause: {
     if (paused){
       oneHzPlotTimer.stop();
@@ -121,19 +108,18 @@ GraphAreaForm {
       tenHzPlotTimer.stop();
       everyFiveSecondsPlotTimer.stop();
       everyTenSecondsPlotTimer.stop();
-	  energyTimer.stop();
-	  renalTimer.stop();
+	    energyTimer.stop();
+	    renalTimer.stop();
     } else {
       oneHzPlotTimer.start();
       fiveHzPlotTimer.start();
       tenHzPlotTimer.start();
       everyFiveSecondsPlotTimer.start();
       everyTenSecondsPlotTimer.start();
-	  energyTimer.start();
-	  renalTimer.start();
+	    energyTimer.start();
+	    renalTimer.start();
     }
   }
-
   onSpeedToggled :{
     if (speed == 1){
       root.state = "realTime"
@@ -141,10 +127,9 @@ GraphAreaForm {
       root.state = "max"
     }
   }
-
   onPhysiologyRequestModelChanged: {
     //TODO Fix Initial Plots
-    if( !root.initialized ){
+    if ( !root.initialized ){
       root.initialized = true;
       var vitalsReq = physiologyRequestModel.category(0)
       for ( var i = 0; i < vitalsReq.count ; ++i){
@@ -174,18 +159,18 @@ GraphAreaForm {
           energyMetabolismModel.createPlotView(energyMetabolismReq.get(i))
         }
       }
-      var renalFluidBalanceReq = physiologyRequestModel.category(4)
-      for ( var i = 0; i < renalFluidBalanceReq.count ; ++i){
-        if(renalFluidBalanceReq.get(i).active){
-          physiologyRequestModel.get(4).activeRequests.append({"request": renalFluidBalanceReq.get(i).request})
-          renalFluidBalanceModel.createPlotView(renalFluidBalanceReq.get(i))
+      var fluidBalanceReq = physiologyRequestModel.category(4)
+      for ( var i = 0; i < fluidBalanceReq.count ; ++i){
+        if(fluidBalanceReq.get(i).active){
+          physiologyRequestModel.get(4).activeRequests.append({"request": fluidBalanceReq.get(i).request})
+          fluidBalanceModel.createPlotView(fluidBalanceReq.get(i))
         }  
       }
-	  var renalOverviewReq = physiologyRequestModel.category(5)
-      for ( var i = 0; i < renalOverviewReq.count ; ++i){
-        if(renalOverviewReq.get(i).active){
-          physiologyRequestModel.get(5).activeRequests.append({"request": renalOverviewReq.get(i).request})
-          renalOverviewModel.createPlotView(renalOverviewReq.get(i))
+	    var renalReq = physiologyRequestModel.category(5)
+      for ( var i = 0; i < renalReq.count ; ++i){
+        if(renalReq.get(i).active){
+          physiologyRequestModel.get(5).activeRequests.append({"request": renalReq.get(i).request})
+          renalModel.createPlotView(renalReq.get(i))
         }  
       }
       var customReq = physiologyRequestModel.category(6)
@@ -200,7 +185,6 @@ GraphAreaForm {
   //Vitals//
   ObjectModel {
     id: vitalsObjectModel
-
     function createPlotView (model, request, title) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.VITALS)
      root.createPlotViewHelper(model, request, title,vitalsObjectModel, vitalsGridView, 1)
@@ -211,19 +195,16 @@ GraphAreaForm {
     function clearPlots() {
       root.clearPlotsHelper(vitalsObjectModel)
       }
-
     function updatePlot(key, data, model) {
       updatePlotHelper(key,data,model)
     }
   }
-
   vitalsGridView.onCellWidthChanged : {
     vitalsObjectModel.resizePlots(vitalsGridView.cellWidth, vitalsGridView.cellHeight)
   }
   vitalsGridView.onCellHeightChanged : {
     vitalsObjectModel.resizePlots(vitalsGridView.cellWidth, vitalsGridView.cellHeight)
   }
-
  //Cardiopulmonary//
   ObjectModel {
     id: cardiopulmonaryObjectModel
@@ -238,14 +219,12 @@ GraphAreaForm {
       root.clearPlotsHelper(cardiopulmonaryObjectModel)
     }
   }
-
   cardiopulmonaryGridView.onCellWidthChanged : {
     cardiopulmonaryObjectModel.resizePlots(cardiopulmonaryGridView.cellWidth, cardiopulmonaryGridView.cellHeight)
   }
   cardiopulmonaryGridView.onCellHeightChanged : {
     cardiopulmonaryObjectModel.resizePlots(cardiopulmonaryGridView.cellWidth, cardiopulmonaryGridView.cellHeight)
   }
-
   //Blood Chemistry//
   ObjectModel {
     id: bloodChemistryObjectModel
@@ -260,14 +239,12 @@ GraphAreaForm {
       root.clearPlotsHelper(bloodChemistryObjectModel)
     }
   }
-
   bloodChemistryGridView.onCellWidthChanged : {
     bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
   }
   bloodChemistryGridView.onCellHeightChanged : {
     bloodChemistryObjectModel.resizePlots(bloodChemistryGridView.cellWidth, bloodChemistryGridView.cellHeight)
   }
-
   //Energy - Metabolism//
   ObjectModel {
     id: energyMetabolismObjectModel
@@ -282,63 +259,53 @@ GraphAreaForm {
       root.clearPlotsHelper(energyMetabolismObjectModel)
     }
   }
-
   energyMetabolismGridView.onCellWidthChanged : {
     energyMetabolismObjectModel.resizePlots(energyMetabolismGridView.cellWidth, energyMetabolismGridView.cellHeight)
   }
   energyMetabolismGridView.onCellHeightChanged : {
     energyMetabolismObjectModel.resizePlots(energyMetabolismGridView.cellWidth, energyMetabolismGridView.cellHeight)
   }
-
-  //Renal - Fluid Balance//
+  //Fluid Balance//
   ObjectModel {
-    id: renalFluidBalanceObjectModel
+    id: fluidBalanceObjectModel
     function createPlotView (model, request, title) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-     root.createPlotViewHelper(model, request, title,renalFluidBalanceObjectModel, renalFluidBalanceGridView, 1)
+     root.createPlotViewHelper(model, request, title,fluidBalanceObjectModel, fluidBalanceGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
-      root.resizePlotsHelper(newWidth,newHeight,renalFluidBalanceObjectModel)
+      root.resizePlotsHelper(newWidth,newHeight,fluidBalanceObjectModel)
     }
     function clearPlots() {
-      root.clearPlotsHelper(renalFluidBalanceObjectModel)
+      root.clearPlotsHelper(fluidBalanceObjectModel)
     }
   }
-
-  renalFluidBalanceGridView.onCellWidthChanged : {
-    renalFluidBalanceObjectModel.resizePlots(renalFluidBalanceGridView.cellWidth, renalFluidBalanceGridView.cellHeight)
+  fluidBalanceGridView.onCellWidthChanged : {
+    fluidBalanceObjectModel.resizePlots(fluidBalanceGridView.cellWidth, fluidBalanceGridView.cellHeight)
   }
-  renalFluidBalanceGridView.onCellHeightChanged : {
-    renalFluidBalanceObjectModel.resizePlots(renalFluidBalanceGridView.cellWidth, renalFluidBalanceGridView.cellHeight)
+  fluidBalanceGridView.onCellHeightChanged : {
+    fluidBalanceObjectModel.resizePlots(fluidBalanceGridView.cellWidth, fluidBalanceGridView.cellHeight)
   }
-  
   //Renal - Overview//
   ObjectModel {
-    id: renalOverviewObjectModel
+    id: renalObjectModel
     function createPlotView (model, request, title) {
      var vitals = physiologyRequestModel.category(PhysiologyModel.RENAL)
-	 root.createPlotViewHelper(model, request, title,renalOverviewObjectModel, renalOverviewGridView, 1)
+	 root.createPlotViewHelper(model, request, title,renalObjectModel, renalGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
-      root.resizePlotsHelper(newWidth,newHeight,renalOverviewObjectModel)
+      root.resizePlotsHelper(newWidth,newHeight,renalObjectModel)
     }
     function clearPlots() {
-      root.clearPlotsHelper(renalOverviewObjectModel)
+      root.clearPlotsHelper(renalObjectModel)
     }
   }
-  
-  renalOverviewGridView.onCellWidthChanged : {
-    renalOverviewObjectModel.resizePlots(renalOverviewGridView.cellWidth, renalOverviewGridView.cellHeight)
+  renalGridView.onCellWidthChanged : {
+    renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
   }
-  renalOverviewGridView.onCellHeightChanged : {
-    renalOverviewObjectModel.resizePlots(renalOverviewGridView.cellWidth, renalOverviewGridView.cellHeight)
+  renalGridView.onCellHeightChanged : {
+    renalObjectModel.resizePlots(renalGridView.cellWidth, renalGridView.cellHeight)
   }
-
   //Substances
-  ListModel {
-    //List model for menu of currently active substances and valid properties--blank at initialization (dynamically updated by onNewActiveSubstance)
-    id : substanceMenuListModel
-  }
   ObjectModel {
     id: substanceObjectModel
     function createPlotView (model, request, title) {
@@ -352,14 +319,12 @@ GraphAreaForm {
       root.clearPlotsHelper(substanceObjectModel)
     }
   }
-
   substanceGridView.onCellWidthChanged : {
     substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
   }
   substanceGridView.onCellHeightChanged : {
     substanceObjectModel.resizePlots(substanceGridView.cellWidth, substanceGridView.cellHeight)
   }
-
   //Custom Views//
   ObjectModel {
     id: customObjectModel
@@ -381,10 +346,8 @@ GraphAreaForm {
           default :
             console.log(title + " not found");
         } 
-      }
-	  
+      }  
     }
-
     function resizePlots(newWidth, newHeight){
       root.resizePlotsHelper(newWidth,newHeight,customObjectModel)
     }
@@ -392,14 +355,12 @@ GraphAreaForm {
       root.clearPlotsHelper(customObjectModel)
     }
   }
-
   customGridView.onCellWidthChanged : {
     customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
   customGridView.onCellHeightChanged : {
     customObjectModel.resizePlots(customGridView.cellWidth, customGridView.cellHeight)
   }
-
   function createPlotView(category, model, request, title){
     switch(category) {
       case PhysiologyModel.VITALS:
@@ -415,10 +376,10 @@ GraphAreaForm {
         energyMetabolismModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.FLUID_BALANCE:
-        renalFluidBalanceModel.createPlotView(model, request, title);
+        fluidBalanceModel.createPlotView(model, request, title);
         break;
-	  case PhysiologyModel.RENAL:
-        renalOverviewModel.createPlotView(model, request, title);
+	    case PhysiologyModel.RENAL:
+        renalModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.SUBSTANCES:
         substanceModel.createPlotView(model, request, title);
@@ -429,46 +390,43 @@ GraphAreaForm {
     }
   }
   function removePlotView(category, menuIndex, request){
-      let model = null
-      switch(category) {
-        case PhysiologyModel.VITALS:
-          model = vitalsModel
-          break;
-        case PhysiologyModel.CARDIOPULMONARY:
-          model = cardiopulmonaryModel
-          break;
-        case PhysiologyModel.BLOOD_CHEMISTRY:
-          model = bloodChemistryModel
-          break;
-        case PhysiologyModel.ENERGY_AND_METABOLISM:
-          model = energyMetabolismModel
-          break;
-        case PhysiologyModel.FLUID_BALANCE:
-          model = renalFluidBalanceModel
-          break;
-		case PhysiologyModel.RENAL:
-		  model = renalOverviewModel
-          break;
-        case PhysiologyModel.SUBSTANCES:
-          model = substanceModel
-          break;
-        case PhysiologyModel.CUSTOM:
-          model = customModel
-          break;
-        default:
-          console.log("Could not find Category  : %1".arg(category))
-          return
+    let model = null
+    switch(category) {
+      case PhysiologyModel.VITALS:
+        model = vitalsModel
+        break;
+      case PhysiologyModel.CARDIOPULMONARY:
+        model = cardiopulmonaryModel
+        break;
+      case PhysiologyModel.BLOOD_CHEMISTRY:
+        model = bloodChemistryModel
+        break;
+      case PhysiologyModel.ENERGY_AND_METABOLISM:
+        model = energyMetabolismModel
+        break;
+      case PhysiologyModel.FLUID_BALANCE:
+        model = fluidBalanceModel
+        break;
+		  case PhysiologyModel.RENAL:
+		    model = renalModel
+        break;
+      case PhysiologyModel.SUBSTANCES:
+        model = substanceModel
+        break;
+      case PhysiologyModel.CUSTOM:
+        model = customModel
+        break;
+      default:
+        console.log("Could not find Category  : %1".arg(category))
+        return
+    }
+    for ( var i = 0; i < model.count; ++i ){
+      var plot = model.get(i)
+      console.log("Remove Custom Plot")
+      console.log(category, menuIndex, request, plot.title)
+      if (plot.title == request){
+        model.remove(i,1)
       }
-      for ( var i = 0; i < model.count; ++i ){
-        var plot = model.get(i)
-                  console.log("Remove Custom Plot")
-          console.log(category, menuIndex, request, plot.title)
-        if(plot.title == request)
-        {
-          model.remove(i,1)
-          
-
-        }
     }
   }
 
@@ -495,11 +453,11 @@ GraphAreaForm {
         break;
         case PhysiologyModel.FLUID_BALANCE:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = renalFluidBalanceObjectModel
+          currentModel = fluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL:
+		  case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
-          currentModel = renalOverviewObjectModel
+          currentModel = renalObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
@@ -515,12 +473,11 @@ GraphAreaForm {
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 10){
-          
           plot.update(physiologyRequestModel.simulation_time)
         }
       }
     }
-   }
+  }
   
   fiveHzPlotTimer.onTriggered : {
     let currentCategory = null
@@ -545,11 +502,11 @@ GraphAreaForm {
         break;
         case PhysiologyModel.FLUID_BALANCE:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = renalFluidBalanceObjectModel
+          currentModel = fluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL:
+		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
-          currentModel = renalOverviewObjectModel
+          currentModel = renalObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
@@ -569,7 +526,7 @@ GraphAreaForm {
         }
       }
     }
-   }
+  }
 
   oneHzPlotTimer.onTriggered : {
     let currentCategory = null
@@ -594,11 +551,11 @@ GraphAreaForm {
         break;
         case PhysiologyModel.FLUID_BALANCE:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = renalFluidBalanceObjectModel
+          currentModel = fluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL:
+		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
-          currentModel = renalOverviewObjectModel
+          currentModel = renalObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
@@ -643,11 +600,11 @@ GraphAreaForm {
         break;
         case PhysiologyModel.FLUID_BALANCE:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = renalFluidBalanceObjectModel
+          currentModel = fluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL:
+		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
-          currentModel = renalOverviewObjectModel
+          currentModel = renalObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
@@ -668,7 +625,7 @@ GraphAreaForm {
         }
       }
     }
-   }
+  }
 
   everyTenSecondsPlotTimer.onTriggered : {
     let currentCategory = null
@@ -693,11 +650,11 @@ GraphAreaForm {
         break;
         case PhysiologyModel.FLUID_BALANCE:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = renalFluidBalanceObjectModel
+          currentModel = fluidBalanceObjectModel
         break;
-		case PhysiologyModel.RENAL:
+		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
-          currentModel = renalOverviewObjectModel
+          currentModel = renalObjectModel
         break;
         case PhysiologyModel.SUBSTANCES:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.SUBSTANCES)
@@ -717,5 +674,5 @@ GraphAreaForm {
         }
       }
     }
-   }
+  }
 }

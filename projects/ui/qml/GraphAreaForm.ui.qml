@@ -13,27 +13,26 @@ Page {
   z : 0 // Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
   property bool initialized : false
   property PhysiologyModel physiologyRequestModel
+  property Component requestMenuComponent : requestMenuComponent
+  property Component requestMenuItemComponent : requestMenuItemComponent
   property alias energyMetabolismSeries : energyMetabolismSeries
-  property alias renalOverviewSeries : renalOverviewSeries 
+  property alias renalSeries : renalSeries 
   property alias vitalsGridView : vitalsGridView
   property alias cardiopulmonaryGridView : cardiopulmonaryGridView
   property alias bloodChemistryGridView : bloodChemistryGridView
   property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
-  property alias renalFluidBalanceGridView : renalFluidBalanceGridView
-  property alias renalOverviewGridView : renalOverviewSeries.renalOverviewGridView
+  property alias fluidBalanceGridView : fluidBalanceGridView
+  property alias renalGridView : renalSeries.renalGridView
   property alias substanceGridView : substanceGridView
   property alias customGridView : customGridView
   property alias energyTimer : energyMetabolismSeries.energyTimer
-  property alias renalTimer : renalOverviewSeries.renalTimer
+  property alias renalTimer : renalSeries.renalTimer
   property alias tenHzPlotTimer : tenHzPlotTimer
   property alias fiveHzPlotTimer : fiveHzPlotTimer
   property alias oneHzPlotTimer : oneHzPlotTimer
   property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
   property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer   
   signal urinalysisRequest()
-
-  property Component simpleMenuComponent : simpleMenuComponent
-  property Component nestedMenuComponent : nestedMenuComponent
 
   state : "realTime"
 
@@ -85,9 +84,6 @@ Page {
         } else {
           plots.currentIndex = plots.currentIndex - 1
         }
-        if (filterMenu.visible) { // This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
-          filterMenu.open()
-        }
       }
     }
     SwipeView {
@@ -97,11 +93,9 @@ Page {
       Layout.preferredWidth : 200
       Layout.preferredHeight : 40
       Repeater { 
-        // contentHeight: 40
         Layout.fillWidth : true
         Layout.preferredWidth : 200
         Layout.preferredHeight : 40
-        // font.pointSize: 12
         model : physiologyRequestModel
         delegate : UITabButtonForm {
           text : name
@@ -122,7 +116,7 @@ Page {
       icon.name : "terminate"
       icon.color : "transparent"
       onClicked : {
-        let menuObject = menuInstantiator.objectAt(plots.currentIndex)
+        let menuObject = menuInstantiator.objectAt(plots.currentIndex).item
         if (menuObject.visible){
           menuObject.close()
         } else {
@@ -134,52 +128,29 @@ Page {
       }
       Instantiator {
         id : menuInstantiator
-        model : PhysiologyModel.TOTAL_CATEGORIES
-        delegate : Menu {
-          visible : false
-          x : -200
-          y : 50
-          Repeater {
-            id : menuRepeater
-            model : physiologyRequestModel.category(index)
-            property int category : index
-            function refreshSubstances() {
-              
-            }
-            Component.onCompleted : {
-              root.newActiveSubstances.connect(refreshSubstances)
-            }
-            delegate : Loader {
-              id : menuLoader
-              sourceComponent : {
-                if (!model.nested){
-                  return simpleMenuComponent
-                } else if (menuRepeater.category == PhysiologyModel.SUBSTANCES){
-                  if (model.usable){
-                    return nestedMenuComponent
-                  } else {
-                    return null
-                  }
-                } else {
-                  return nestedMenuComponent
-                }
-              }
-              property Instantiator _parentMenu : menuInstantiator
-              property int _category : menuRepeater.category
-              property PhysiologyModel _model : physiologyRequestModel.category(_category)
-              property var _item : _model.index(index, 0)
-              property var _title: "%1".arg(_model.data(_item, Qt.DisplayRole))
-              onLoaded : {
-                if (_category == PhysiologyModel.SUBSTANCES){
-                  //root.newActiveSubstances.connect(item.clearObjects)
-                  //item.objectsCleared.connect(menuRepeater.refreshSubstances)
-                }
-              }
-            }
+        model : DelegateModel {
+          id : menuModel
+          model : physiologyRequestModel
+          //root index defaults to top level
+          delegate : Loader  {
+            id : menuLoader
+            x : -50
+            y : 50
+            property var _model_data : root.physiologyRequestModel
+            property var _node_index : menuModel.modelIndex(index)
+            property int _category : index
+            property string _info : ""
+            property int _level : 0
+            sourceComponent : requestMenuComponent
           }
         }
-        onObjectAdded : {object.parent = filterMenuButton}
-        onObjectRemoved : {console.log('Removed menu--not desirable')}
+        onObjectAdded : {
+          object.parent = filterMenuButton
+          if (index == PhysiologyModel.SUBSTANCES){
+            root.newActiveSubstance.connect(object.item.activateObject)
+          }
+        }
+        onObjectRemoved : {console.log('Removed menu--not desirable behavior')}
       }
     }
     Button {
@@ -195,9 +166,6 @@ Page {
         } else {
           plots.currentIndex = plots.currentIndex + 1
         }
-        if (filterMenu.visible) { // This overrides the "CloseOnReleaseOutside" policy so that menu stays open when switching to new view panel
-          filterMenu.open()
-        }
       }
       background : Rectangle {
         color : "transparent"
@@ -205,302 +173,332 @@ Page {
     }
   }//end header
 
-    SwipeView {
-        id : plots
+  SwipeView {
+      id : plots
+      anchors.fill : parent
+      currentIndex : 0
+      clip : true
+    Item {
+      id : vitalsSeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : vitalsBackground
         anchors.fill : parent
-        currentIndex : 0
+        color : "#7CB342"
+      }
+      GridView {
+        id : vitalsGridView
+        anchors.fill : parent
         clip : true
-        Item {
-            id : vitalsSeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            Rectangle {
-                id : vitalsBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : vitalsGridView
-                anchors.fill : parent
-                clip : true
-                cellWidth : parent.width / 2
-                cellHeight : parent.height / 2
-                model : vitalsModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : vitalsGridView.parent
-                    anchors.top : vitalsGridView.top
-                    anchors.right : vitalsGridView.right
-                    anchors.bottom : vitalsGridView.bottom
-                }
-            }
-        }
-        Item {
-            id : cardiopulmonarySeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            Rectangle {
-                id : cardiovascularBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : cardiopulmonaryGridView
-                anchors.fill : parent
-                clip : true
-                cellWidth : plots.width / 2
-                cellHeight : plots.height / 2
-                model : cardiopulmonaryModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : cardiopulmonaryGridView.parent
-                    anchors.top : cardiopulmonaryGridView.top
-                    anchors.right : cardiopulmonaryGridView.right
-                    anchors.bottom : cardiopulmonaryGridView.bottom
-                }
-            }
-        }
-        Item {
-            id : bloodChemistrySeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            Rectangle {
-                id : bloodChemistryBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : bloodChemistryGridView
-                anchors.fill : parent
-                clip : true
-                cellWidth : plots.width / 2
-                cellHeight : plots.height / 2
-                model : bloodChemistryModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : bloodChemistryGridView.parent
-                    anchors.top : bloodChemistryGridView.top
-                    anchors.right : bloodChemistryGridView.right
-                    anchors.bottom : bloodChemistryGridView.bottom
-                }
-            }
-        }
-        EnergyPanel {
-            id : energyMetabolismSeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            
-        }
-        Item {
-            id : renalFluidBalanceSeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-
-            Rectangle {
-                id : renalFluidBalanceBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : renalFluidBalanceGridView
-                anchors.fill : parent
-                clip : true
-                cellWidth : plots.width / 2
-                cellHeight : plots.height / 2
-                model : renalFluidBalanceModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : renalFluidBalanceGridView.parent
-                    anchors.top : renalFluidBalanceGridView.top
-                    anchors.right : renalFluidBalanceGridView.right
-                    anchors.bottom : renalFluidBalanceGridView.bottom
-                }
-            }
-        }
-        RenalPanel {
-            id : renalOverviewSeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            
-            onUrinalysisRequest: {
-              root.urinalysisRequest();
-            }
-        }
-        Item {
-            id : substanceSeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            Rectangle {
-                id : substanceBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : substanceGridView
-                anchors.fill : parent
-                clip : true
-                cellWidth : plots.width / 2
-                cellHeight : plots.height / 2
-                model : substanceModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : substanceGridView.parent
-                    anchors.top : substanceGridView.top
-                    anchors.right : substanceGridView.right
-                    anchors.bottom : substanceGridView.bottom
-                }
-            }
-        }
-        Item {
-            id : customSeries
-            Layout.fillWidth : true
-            Layout.fillHeight : true
-            Rectangle {
-                id : customBackground
-                anchors.fill : parent
-                color : "#7CB342"
-            }
-            GridView {
-                id : customGridView
-                anchors.fill : parent
-                clip : true
-                cellWidth : plots.width / 2
-                cellHeight : plots.height / 2
-                model : customModel
-                ScrollBar.vertical : ScrollBar {
-                    parent : customGridView.parent
-                    anchors.top : customGridView.top
-                    anchors.right : customGridView.right
-                    anchors.bottom : customGridView.bottom
-                }
-            }
-        }
-    }
-    
-    PageIndicator {
-        id : indicator
-
-        count : plots.count
-        currentIndex : plots.currentIndex
-
-        anchors.bottom : plots.bottom
-        anchors.horizontalCenter : plots.horizontalCenter
-    }
-
-    Timer {
-        id : tenHzPlotTimer
-        interval : 100
-        running : false
-        repeat : true
-        triggeredOnStart : true
-    }
-
-    Timer {
-        id : fiveHzPlotTimer
-        interval : 200
-        running : false
-        repeat : true
-        triggeredOnStart : true
-    }
-
-    Timer {
-        id : oneHzPlotTimer
-        interval : 1000
-        running : false
-        repeat : true
-        triggeredOnStart : true
-    }
-
-    Timer {
-        id : everyFiveSecondsPlotTimer
-        interval : 5000
-        running : false
-        repeat : true
-        triggeredOnStart : true
-    }
-
-    Timer {
-        id : everyTenSecondsPlotTimer
-        interval : 10000
-        running : false
-        repeat : true
-        triggeredOnStart : true
-    }
-    //Component used by Menu Instantiator to set up bottom-level menu items
-    Component {
-      id : simpleMenuComponent
-      MenuItem {
-        property var item : _item
-        property var category : _category
-        property var model : _model
-        property var title : _title
-        height : checkbox.height + 2
-        CheckBox {
-          id : checkbox
-          checkable : true
-          checked : model.data(item, PhysiologyModel.EnabledRole)
-          text : model.data(item, PhysiologyModel.RequestRole)
-          onClicked : {
-            if (checked){
-              model.setData(item, true, PhysiologyModel.EnabledRole)
-              createPlotView(category, model, item, title)
-            } else {
-              model.setData(item, false, PhysiologyModel.EnabledRole)
-              removePlotView(category, item.row, title)
-            }
-          }
+        cellWidth : parent.width / 2
+        cellHeight : parent.height / 2
+        model : vitalsModel
+        ScrollBar.vertical : ScrollBar {
+          parent : vitalsGridView.parent
+          anchors.top : vitalsGridView.top
+          anchors.right : vitalsGridView.right
+          anchors.bottom : vitalsGridView.bottom
         }
       }
     }
-    //Component used by Menu Instantiator to set up nested sub-menus (calls to simpleMenuComponent to make bottome level items)
-    Component {
-      id : nestedMenuComponent
-      Instantiator {
-        id : nestedMenuItem
-        property Instantiator parentMenu : _parentMenu
-        property var bgData : _model
-        property var entry : _item
-        property var category : _category
-        signal objectsCleared()
-        function clearObjects() {
-          active = false;
-          //objectsCleared();
-        }
-        onCountChanged : {
-          if (count == 0){
-            console.log('done clearing')
-            objectsCleared();
+    Item {
+      id : cardiopulmonarySeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : cardiovascularBackground
+        anchors.fill : parent
+        color : "#7CB342"
+      }
+      GridView {
+          id : cardiopulmonaryGridView
+          anchors.fill : parent
+          clip : true
+          cellWidth : plots.width / 2
+          cellHeight : plots.height / 2
+          model : cardiopulmonaryModel
+          ScrollBar.vertical : ScrollBar {
+            parent : cardiopulmonaryGridView.parent
+            anchors.top : cardiopulmonaryGridView.top
+            anchors.right : cardiopulmonaryGridView.right
+            anchors.bottom : cardiopulmonaryGridView.bottom
           }
+      }
+    }
+    Item {
+      id : bloodChemistrySeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : bloodChemistryBackground
+        anchors.fill : parent
+        color : "#7CB342"
+      }
+      GridView {
+        id : bloodChemistryGridView
+        anchors.fill : parent
+        clip : true
+        cellWidth : plots.width / 2
+        cellHeight : plots.height / 2
+        model : bloodChemistryModel
+        ScrollBar.vertical : ScrollBar {
+          parent : bloodChemistryGridView.parent
+          anchors.top : bloodChemistryGridView.top
+          anchors.right : bloodChemistryGridView.right
+          anchors.bottom : bloodChemistryGridView.bottom
         }
-        function setObjects() {
-          active = true;
+      }
+    }
+    EnergyPanel {
+      id : energyMetabolismSeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+            
+    }
+    Item {
+      id : fluidBalanceSeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : fluidBalanceBackground
+        anchors.fill : parent
+        color : "#7CB342"
+      }
+      GridView {
+        id : fluidBalanceGridView
+        anchors.fill : parent
+        clip : true
+        cellWidth : plots.width / 2
+        cellHeight : plots.height / 2
+        model : fluidBalanceModel
+        ScrollBar.vertical : ScrollBar {
+          parent : fluidBalanceGridView.parent
+          anchors.top : fluidBalanceGridView.top
+          anchors.right : fluidBalanceGridView.right
+          anchors.bottom : fluidBalanceGridView.bottom
         }
-        delegate : Menu {
-          id : subMenu
-          title : _model.data(_item, PhysiologyModel.RequestRole)
-          Repeater {
-            id : subMenuRepeater
-            model : DelegateModel {
-              model : bgData
-              rootIndex : entry
-              delegate : Loader {
-                property var _category : category
-                property var _model : nestedMenuItem.bgData
-                property var _item : nestedMenuItem.bgData.index(index, 0, entry) //{ let temp = nestedMenuItem.bgData.index(index, 0, entry); console.log(_model.data(temp, PhysiologyModel.RequestRole)); return temp}
-                property var _title : "%1 - %2".arg(nestedMenuItem.bgData.data(entry, Qt.DisplayRole))
-                                                .arg(nestedMenuItem.bgData.data(_item, Qt.DisplayRole))
-                sourceComponent : simpleMenuComponent
+      }
+    }
+    RenalPanel {
+      id : renalSeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      onUrinalysisRequest: {
+        root.urinalysisRequest();
+      }
+    }
+    Item {
+      id : substanceSeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : substanceBackground
+        anchors.fill : parent
+        color : "#7CB342"
+      }
+      GridView {
+        id : substanceGridView
+        anchors.fill : parent
+        clip : true
+        cellWidth : plots.width / 2
+        cellHeight : plots.height / 2
+        model : substanceModel
+        ScrollBar.vertical : ScrollBar {
+          parent : substanceGridView.parent
+          anchors.top : substanceGridView.top
+          anchors.right : substanceGridView.right
+          anchors.bottom : substanceGridView.bottom
+        }
+      }
+    }
+    Item {
+      id : customSeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : customBackground
+        anchors.fill : parent
+        color : "#7CB342"
+      }
+      GridView {
+        id : customGridView
+        anchors.fill : parent
+        clip : true
+        cellWidth : plots.width / 2
+        cellHeight : plots.height / 2
+        model : customModel
+        ScrollBar.vertical : ScrollBar {
+          parent : customGridView.parent
+          anchors.top : customGridView.top
+          anchors.right : customGridView.right
+          anchors.bottom : customGridView.bottom
+        }
+      }
+    }
+  }
+  PageIndicator {
+    id : indicator
+    count : plots.count
+    currentIndex : plots.currentIndex
+    anchors.bottom : plots.bottom
+    anchors.horizontalCenter : plots.horizontalCenter
+  }
+  Timer {
+    id : tenHzPlotTimer
+    interval : 100
+    running : false
+    repeat : true
+    triggeredOnStart : true
+  }
+  Timer {
+    id : fiveHzPlotTimer
+    interval : 200
+    running : false
+    repeat : true
+    triggeredOnStart : true
+  }
+  Timer {
+    id : oneHzPlotTimer
+    interval : 1000
+    running : false
+    repeat : true
+    triggeredOnStart : true
+  }
+  Timer {
+    id : everyFiveSecondsPlotTimer
+    interval : 5000
+    running : false
+    repeat : true
+    triggeredOnStart : true
+  }
+  Timer {
+    id : everyTenSecondsPlotTimer
+    interval : 10000
+    running : false
+    repeat : true
+    triggeredOnStart : true
+  }
+  //Component used by Menu Instantiator to set up bottom-level menu items
+  Component {
+    id : requestMenuComponent
+    Menu {
+      id : requestMenu
+      property var modelData : _model_data
+      property var nodeIndex : _node_index
+      property var category : _category
+      property string info : _info
+      property int level : _level
+      property bool menuItem : false
+      title : level > 0 ? modelData.data(nodeIndex, PhysiologyModel.RequestRole) : ""   //Don't display a title for top level (e.g. "Vitals", "Cardiopulmonary", ...)
+      function activateObject(objectIndex){
+        //This function is currently only connected to a signal in the Substances menu (see MenuInstantiator)
+        requestInstantiator.activateObject(objectIndex)
+      }
+      Instantiator {
+        id : requestInstantiator
+        signal objectActivated(var object, string role)
+        model : DelegateModel {
+          id : requestDelegate
+          model : requestMenu.modelData
+          rootIndex : requestMenu.nodeIndex
+          delegate : Loader {
+            id : menuLoader
+            property var _model_data : requestMenu.modelData
+            property var _node_index : requestDelegate.modelIndex(index)
+            property var _category : requestMenu.category
+            property var _level : requestMenu.level + 1
+            property string _info : requestMenu.info + _model_data.data(_node_index, PhysiologyModel.DisplayRole) + " - "
+            sourceComponent : {
+              if (_model_data.data(_node_index, PhysiologyModel.NestedRole)){
+                return requestMenuComponent
+              } else {
+                return requestMenuItemComponent
               }
             }
           }
         }
         onObjectAdded : {
-          console.log('Adding ' + object.title, index)
-          parentMenu.objectAt(PhysiologyModel.SUBSTANCES).addMenu(object)
-                  
+          if (object._model_data.data(object._node_index, PhysiologyModel.UsableRole)){
+            //Only add the object to the menu if its usable role is true.  This signal will only be emitted when patient state is changed, because the instantiator only adds 
+            // objects when the model changes (PhysiologyModel constant for a given patient state). Note that this means that Instantiator owns all objects that *could* be added 
+            // to menu over scenario lifetime, but only objects explicity added to menu will be displayed.  Thus, to add sub-menus / menu items during runtime, we will use the custom 
+            // "objectActivated" signal.  
+            if (object.item.menuItem){
+              requestMenu.addItem(object.item)
+            } else {
+              requestMenu.addMenu(object.item)
+            }   
+          }  
+        }
+        onObjectActivated : {
+          //Insert subMenu into parent menu alphabetically
+          let insertIndex = 0
+          while (insertIndex < requestMenu.count && requestMenu.menuAt(insertIndex).title < role){
+            ++insertIndex;
+          }
+          requestMenu.insertMenu(insertIndex, object.item)
         }
         onObjectRemoved : {
-          console.log('Removing ' + object.title)
-          parentMenu.objectAt(PhysiologyModel.SUBSTANCES).removeMenu(object)
+          if (object.item.menuItem){
+            requestMenu.removeItem(object.item)
+          } else {
+            object.item.releaseObjects()
+            requestMenu.removeItem(object.item)
+          }
+        }
+        function activateObject(subIndex){
+          for (let i = 0; i < count; ++i){
+            //Search across all the objects in the Substance instantiator (only called when we are in the Substances menu)
+            //We compare the name role of the indicated QModelIndex (subIndex) -- which has just had it's "usable" role changed to TRUE -- 
+            // to each of the instantiated objects. When we find it, we emit "objectActivated" signal so that instantiator knows to insert
+            // the menu associated with this substance into the Substance menu. We will need to implement a tree-search algorithm if we have
+            // other menus with nested roles who's usable role can change from false to true
+            let object = objectAt(i)
+            let objectRole = modelData.data(object.item.nodeIndex, PhysiologyModel.DisplayRole)
+            let compRole = modelData.data(subIndex, PhysiologyModel.DisplayRole)
+            if (compRole == objectRole){
+              objectActivated(object, objectRole)
+              break;
+            }
+          }
         }
       }
     }
   }
+  //Component used by Menu Instantiator to set up nested sub-menus (calls to simpleMenuComponent to make bottome level items)
+  Component {
+    id : requestMenuItemComponent
+    MenuItem {
+      id : requestMenuItem
+      height : checkbox.height + 2
+      property var modelData : _model_data
+      property var item : _node_index
+      property int category : _category
+      property int level : _level
+      property string info : _info
+      property string title : info.slice(0,-3)    //chops the trailing " - " sequence off the info string
+      property bool menuItem : true
+      property PhysiologyModel bgModel : modelData.category(_category)
+      CheckBox {
+        id : checkbox
+        checkable : true
+        checked : modelData.data(item, PhysiologyModel.EnabledRole)
+        text : modelData.data(item, PhysiologyModel.RequestRole)
+        onClicked : {
+          if (checked){
+            modelData.setData(item, true, PhysiologyModel.EnabledRole)
+            createPlotView(category, bgModel, item, title)
+          } else {
+            console.log(item.row)
+            modelData.setData(item, false, PhysiologyModel.EnabledRole)
+            removePlotView(category, item.row, title)
+          }
+        }
+      }
+    }
+  }
+}
 
 /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}

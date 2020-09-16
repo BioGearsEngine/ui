@@ -495,18 +495,19 @@ inline void Scenario::physiology_thread_step()
 
     //Now that any drug actions have been processed and advanced, newly activated substances will have all members initialized.
     //At this point, we can search for new subs in physiology model and set them to usable so that graph area menu can find them
-    auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());
+    QModelIndex substanceIndex = _physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex());
+    auto substances = static_cast<BioGearsData*>(substanceIndex.internalPointer());
     if (!_substance_queue.empty()) {
         while (!_substance_queue.empty()) {
           for (int i = 0; i < substances->rowCount(); ++i) {
             if (substances->child(i)->name().toStdString() == _substance_queue.back()->GetName()) {
               substances->child(i)->usable(true);
+              substanceActivated(_physiology_model->index(i, 0, substanceIndex));
               break;
             }
           }
           _substance_queue.pop_back();
         }
-        emit substancesActivated();
       }
 
     emit patientMetricsChanged(get_physiology_metrics());
