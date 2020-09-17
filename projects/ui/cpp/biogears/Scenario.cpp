@@ -9,7 +9,6 @@
 
 #include "Models/PhysiologyRequest.h"
 
-
 //#include <biogears/version.h>
 #include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
@@ -72,7 +71,7 @@ Scenario::Scenario(QString name, QObject* parent)
 void Scenario::setup_physiology_model()
 {
   _physiology_model = std::make_unique<BioGearsData>(QString(_engine->GetPatient().GetName_cStr()), this).release();
-  _physiology_model->initialize();    
+  _physiology_model->initialize();
 }
 //-------------------------------------------------------------------------------
 void Scenario::setup_physiology_substances(BioGearsData* substances)
@@ -140,7 +139,7 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
         };
         std::function<double(void)> valueFunc = [&, _sub]() {
           return (lKidneyIntracellular.HasSubstanceQuantity(*_sub) && rKidneyIntracellular.HasSubstanceQuantity(*_sub)) ? lKidneyIntracellular.GetSubstanceQuantity(*_sub)->GetMassCleared(biogears::MassUnit::ug) + rKidneyIntracellular.GetSubstanceQuantity(*_sub)->GetMassCleared(biogears::MassUnit::ug)
-                                                                                                                                    : 0;
+                                                                                                                        : 0;
         };
 
         metric->custom(std::move(valueFunc), std::move(unitFunc));
@@ -424,7 +423,7 @@ Scenario& Scenario::load_patient(QString file)
       emit patientStateChanged(get_physiology_state());
       emit patientConditionsChanged(get_physiology_conditions());
       emit stateLoad(stateBaseName);
-      emit physiologyChanged(_physiology_model);//OK Matt We have to talk about this
+      emit physiologyChanged(_physiology_model); //OK Matt We have to talk about this
       emit dataRequestModelChanged(_data_request_tree);
     } else {
       _initialized = true;
@@ -506,17 +505,17 @@ inline void Scenario::physiology_thread_step()
     QModelIndex substanceIndex = _physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex());
     auto substances = static_cast<BioGearsData*>(substanceIndex.internalPointer());
     if (!_substance_queue.empty()) {
-        while (!_substance_queue.empty()) {
-          for (int i = 0; i < substances->rowCount(); ++i) {
-            if (substances->child(i)->name().toStdString() == _substance_queue.back()->GetName()) {
-              substances->child(i)->usable(true);
-              substanceActivated(_physiology_model->index(i, 0, substanceIndex));
-              break;
-            }
+      while (!_substance_queue.empty()) {
+        for (int i = 0; i < substances->rowCount(); ++i) {
+          if (substances->child(i)->name().toStdString() == _substance_queue.back()->GetName()) {
+            substances->child(i)->usable(true);
+            substanceActivated(_physiology_model->index(i, 0, substanceIndex));
+            break;
           }
-          _substance_queue.pop_back();
         }
+        _substance_queue.pop_back();
       }
+    }
 
     emit patientMetricsChanged(get_physiology_metrics());
     emit patientStateChanged(get_physiology_state());
@@ -1066,7 +1065,7 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
 
   biogears::SEAction* action;
   //Set up re-usable Advance Time event to apply between adjacent actions
-  bio::Event advanceTime;
+  Event advanceTime;
   advanceTime.typeName = "AdvanceTime";
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
 
@@ -1077,10 +1076,10 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
   }
   for (int i = 0; i < eventTree->get_events().size() - 1; ++i) {
     //Stopping before size-1 becasue eventTree[size -1] so that our final "next event" does not exceed loop bounds (last event, which is an advance time, is still processed)
-    bio::Event thisEvent = eventTree->get_events()[i];
+    Event thisEvent = eventTree->get_events()[i];
     action = eventTree->decode_action(thisEvent, _engine->GetSubstances());
     buildScenario->AddAction(*action);
-    bio::Event nextEvent = eventTree->get_events()[i + 1];
+    Event nextEvent = eventTree->get_events()[i + 1];
     //Place an advance time action between successive BG actions (unless the next action is the final advance time action in the scenario)
     if (nextEvent.eType != EventTree::EventTypes::AdvanceTime) {
       advanceTime.startTime = thisEvent.startTime; //Start at same time as action we just applied
@@ -1104,7 +1103,6 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
     buildScenario->GetDataRequestManager().CreateFromBind(*_data_request_tree->decode_request(requests[i].toString()), _engine->GetSubstanceManager());
   }
 
-
   std::string fileLoc = "./Scenarios/" + buildScenario->GetName() + ".xml";
   std::string fullPath = biogears::ResolvePath(fileLoc);
   biogears::CreateFilePath(fullPath);
@@ -1116,6 +1114,27 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
   CDM::Scenario(stream, *sceData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved scenario: " + fullPath);
+}
+
+void Scenario::edit_scenario()
+{
+  //Open file dialog in nutrition folder
+  QString scenarioFile = QFileDialog::getOpenFileName(nullptr, "Edit Scenario", "./Scenarios", "Scenario (*.xml)");
+  if (scenarioFile.isNull()) {
+    return;
+  }
+  //Load file and create and SENutrition object from it using serializer
+  if (!QFileInfo::exists(scenarioFile)) {
+    throw std::runtime_error("Unable to locate " + scenarioFile.toStdString());
+  }
+
+  std::unique_ptr<CDM::ObjectData> scenarioXML = biogears::Serializer::ReadFile(scenarioFile.toStdString(), _engine->GetLogger());
+  CDM::ScenarioData* scenarioData = dynamic_cast<CDM::ScenarioData*>(scenarioXML.get());
+
+  EventTree* events = new EventTree();
+  events->encode_actions(scenarioData);
+  QVariantList requests = _data_request_tree->encode_requests(scenarioData);
+  emit scenarioFileLoaded(events, requests);
 }
 
 void Scenario::create_substance(QVariantMap substanceData)

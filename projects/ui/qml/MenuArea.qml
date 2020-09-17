@@ -4,9 +4,13 @@ import com.biogearsengine.ui.scenario 1.0
 MenuAreaForm {
   id : root
   signal newDataRequestModel(DataRequestModel requestTree)
+  signal scenarioFileLoaded(EventModel events, var requests)
 
   onNewDataRequestModel : {
     root.scenarioBuilder.bgRequests = requestTree
+  }
+  onScenarioFileLoaded : {
+    scenarioBuilder.loadExisting(events, requests)
   }
 
   function parseToolsSelection (dataType, mode){

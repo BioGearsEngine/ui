@@ -121,6 +121,293 @@ DataRequestNode* DataRequestTree::appendChildren(QList<QPair<QString, QString>> 
   return _root->appendChildren(nameUnitPairs);
 }
 //------------------------------------------------------------------------------------
+QVariantList DataRequestTree::encode_requests(CDM::ScenarioData* scenario)
+{
+  QVariantList requests;
+  QString request;
+  DataRequestNode* compartmentNode = static_cast<DataRequestNode*>(index(0, 0, QModelIndex()).internalPointer());
+  compartmentNode->collapsed(false);
+  if (scenario->DataRequests().present()) {
+    for (auto& req : scenario->DataRequests().get().DataRequest()) {
+      if (auto gasCompartmentReq = dynamic_cast<CDM::GasCompartmentDataRequestData*>(&req)) {
+        request = encode_gas_compartment_request(gasCompartmentReq);
+      } else if (auto liquidCompartmentReq = dynamic_cast<CDM::LiquidCompartmentDataRequestData*>(&req)) {
+        request = encode_liquid_compartment_request(liquidCompartmentReq);
+      } else if (auto thermalCompartmentReq = dynamic_cast<CDM::ThermalCompartmentDataRequestData*>(&req)) {
+        request = encode_thermal_compartment_request(thermalCompartmentReq);
+      } else if (auto tissueCompartmentReq = dynamic_cast<CDM::TissueCompartmentDataRequestData*>(&req)) {
+        request = encode_tissue_compartment_request(tissueCompartmentReq);
+      } else if (auto environmentReq = dynamic_cast<CDM::EnvironmentDataRequestData*>(&req)) {
+        request = encode_environment_request(environmentReq);
+      } else if (auto patientReq = dynamic_cast<CDM::PatientDataRequestData*>(&req)) {
+        request = encode_patient_request(patientReq);
+      } else if (auto physiologyReq = dynamic_cast<CDM::PhysiologyDataRequestData*>(&req)) {
+        request = encode_physiology_request(physiologyReq);
+      } else if (auto substanceReq = dynamic_cast<CDM::SubstanceDataRequestData*>(&req)) {
+        request = encode_substance_request(substanceReq);
+      }
+      if (!request.isEmpty()) {
+        requests.push_back(request);
+      }
+      request.clear();
+    }
+  }
+  return requests;
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_gas_compartment_request(CDM::GasCompartmentDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=GasCompartment";
+  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  if (req->Substance().present()) {
+    request += ("SUBSTANCE=" + req->Substance().get() + ";");
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex gasIndex = index(0, 0, index(0, 0, QModelIndex())); //Gas branch is 0th element inside the Compartment branch  (0th element of top level)
+  DataRequestNode* gasNode = static_cast<DataRequestNode*>(gasIndex.internalPointer());
+  gasNode->collapsed(false);
+  for (int i = 0; i < gasNode->children().size(); ++i) {
+    //Next level is gas compartment name -- figure out which compartment we are in
+    if (gasNode->children()[i]->name().toStdString() == req->Compartment()) {
+      QModelIndex compartmentIndex = index(i, 0, gasIndex);
+      DataRequestNode* compartmentNode = static_cast<DataRequestNode*>(compartmentIndex.internalPointer());
+      compartmentNode->collapsed(false);
+      for (int j = 0; j < compartmentNode->children().size(); ++j) {
+        //Now that we know compartment, figure out the name of the data request
+        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+          compartmentNode->children()[j]->checked(true);
+          break;
+        }
+      }
+      break;
+    }
+  }
+
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_liquid_compartment_request(CDM::LiquidCompartmentDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=LiquidCompartment;";
+  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()) + ";");
+  }
+  if (req->Substance().present()) {
+    request += ("SUBSTANCE=" + req->Substance().get() + ";");
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex liquidIndex = index(1, 0, index(0, 0, QModelIndex())); //Liquid branch is 1st element inside the Compartment branch  (0th element of top level)
+  DataRequestNode* liquidNode = static_cast<DataRequestNode*>(liquidIndex.internalPointer());
+  liquidNode->collapsed(false);
+  for (int i = 0; i < liquidNode->children().size(); ++i) {
+    //Next level is liquid compartment name -- figure out which compartment we are in
+    if (liquidNode->children()[i]->name().toStdString() == req->Compartment()) {
+      QModelIndex compartmentIndex = index(i, 0, liquidIndex);
+      DataRequestNode* compartmentNode = static_cast<DataRequestNode*>(compartmentIndex.internalPointer());
+      compartmentNode->collapsed(false);
+      for (int j = 0; j < compartmentNode->children().size(); ++j) {
+        //Now that we know compartment, figure out the name of the data request
+        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+          compartmentNode->children()[j]->checked(true);
+          break;
+        }
+      }
+      break;
+    }
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_thermal_compartment_request(CDM::ThermalCompartmentDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=ThermalCompartment";
+  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex thermalIndex = index(2, 0, index(0, 0, QModelIndex())); //Thermal branch is 2nd element inside the Compartment branch  (0th element of top level)
+  DataRequestNode* thermalNode = static_cast<DataRequestNode*>(thermalIndex.internalPointer());
+  thermalNode->collapsed(false);
+  for (int i = 0; i < thermalNode->children().size(); ++i) {
+    //Next level is thermal compartment name -- figure out which compartment we are in
+    if (thermalNode->children()[i]->name().toStdString() == req->Compartment()) {
+      QModelIndex compartmentIndex = index(i, 0, thermalIndex);
+      DataRequestNode* compartmentNode = static_cast<DataRequestNode*>(compartmentIndex.internalPointer());
+      compartmentNode->collapsed(false);
+      for (int j = 0; j < compartmentNode->children().size(); ++j) {
+        //Now that we know compartment, figure out the name of the data request
+        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+          compartmentNode->children()[j]->checked(true);
+          break;
+        }
+      }
+      break;
+    }
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_tissue_compartment_request(CDM::TissueCompartmentDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=TissueCompartment";
+  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex tissueIndex = index(3, 0, index(0, 0, QModelIndex())); //Tissue branch is 3rd element inside the Compartment branch  (0th element of top level)
+  DataRequestNode* tissueNode = static_cast<DataRequestNode*>(tissueIndex.internalPointer());
+  tissueNode->collapsed(false);
+  for (int i = 0; i < tissueNode->children().size(); ++i) {
+    //Next level is tissue compartment name -- figure out which compartment we are in
+    if (tissueNode->children()[i]->name().toStdString() == req->Compartment()) {
+      QModelIndex compartmentIndex = index(i, 0, tissueIndex);
+      DataRequestNode* compartmentNode = static_cast<DataRequestNode*>(compartmentIndex.internalPointer());
+      compartmentNode->collapsed(false);
+      for (int j = 0; j < compartmentNode->children().size(); ++j) {
+        //Now that we know compartment, figure out the name of the data request
+        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+          compartmentNode->children()[j]->checked(true);
+          break;
+        }
+      }
+      break;
+    }
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_environment_request(CDM::EnvironmentDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=Environment";
+  request += ("NAME=" + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_patient_request(CDM::PatientDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=Patient";
+  request += ("NAME=" + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex patientIndex = index(2, 0, QModelIndex()); //Patient branch is 2nd element inside top level
+  DataRequestNode* patientNode = static_cast<DataRequestNode*>(patientIndex.internalPointer());
+  patientNode->collapsed(false);
+  for (int i = 0; i < patientNode->children().size(); ++i) {
+    //Only one level of data beneath patient -- check which request we are calling
+    if (patientNode->children()[i]->name().toStdString() == req->Name()) {
+      patientNode->children()[i]->checked(true);
+      break;
+    }
+    break;
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_physiology_request(CDM::PhysiologyDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=Physiology";
+  request += ("NAME=" + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex physiologyIndex = index(3, 0, QModelIndex()); //Physiology branch is 3rd element inside top level
+  DataRequestNode* physiologyNode = static_cast<DataRequestNode*>(physiologyIndex.internalPointer());
+  physiologyNode->collapsed(false);
+  bool foundRequest = false;
+  int childIndex = 0;
+  DataRequestNode* childNode;
+  while (!foundRequest && childIndex < physiologyNode->children().size()) {
+    //Data request model nests requests according to physiology type (Cardiovascular, Respiratory ,etc).  This structure is not present in the schema (everything is
+    // under physiology).  So we need to search through each of our physiology sub-sections to find this request
+    childNode = static_cast<DataRequestNode*>(index(childIndex, 0, physiologyIndex).internalPointer());   //Physioloy sub-type (Cardiovascular, Respiratory, ...)
+    for (int i = 0; i < childNode->children().size(); ++i) {
+      //Search children within sub-type (e.g. Cardiovacular->Heart Rate, Blood Pressure, ...)
+      if (childNode->children()[i]->name().toStdString() == req->Name()) {
+        childNode->collapsed(false);    //Show physiology type in open view
+        childNode->children()[i]->checked(true);    //Request check box will be checked
+        foundRequest = true;  //Stop searching
+        break;
+      }
+    }
+    ++childIndex;
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
+QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData* req)
+{
+  //Format request string that will be used to create Request Component in Scenario Builder
+  std::string request = "TYPE=Substance";
+  request += ("NAME=" + req->Substance() + "," + req->Name() + ";");
+  if (req->Unit().present()) {
+    request += ("UNIT=" + req->Unit().get() + ";");
+  }
+  if (req->Precision().present()) {
+    request += ("PRECISION=" + std::to_string(req->Precision().get()));
+  }
+  //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
+  QModelIndex substanceGroupIndex = index(4, 0, QModelIndex()); //substance branch is 4th element inside top level
+  DataRequestNode* substanceGroupNode = static_cast<DataRequestNode*>(substanceGroupIndex.internalPointer());
+  substanceGroupNode->collapsed(false);
+  for (int i = 0; i < substanceGroupNode->children().size(); ++i) {
+    //Next level is substance name -- figure out which substance we are requesting
+    if (substanceGroupNode->children()[i]->name().toStdString() == req->Substance()) {
+      QModelIndex substanceIndex = index(i, 0, substanceGroupIndex);
+      DataRequestNode* substanceNode = static_cast<DataRequestNode*>(substanceIndex.internalPointer());
+      substanceNode->collapsed(false);
+      for (int j = 0; j < substanceNode->children().size(); ++j) {
+        //Now that we know compartment, figure out the name of the data request
+        if (req->Name() == substanceNode->children()[j]->name().toStdString()) {
+          substanceNode->children()[j]->checked(true);
+          break;
+        }
+      }
+      break;
+    }
+  }
+  return QString::fromStdString(request);
+}
+//------------------------------------------------------------------------------------
 CDM::DataRequestData* DataRequestTree::decode_request(QString request)
 {
   CDM::DataRequestData* bgRequest = nullptr;
@@ -157,7 +444,7 @@ CDM::CompartmentDataRequestData* DataRequestTree::decode_compartment_request(int
     for (int i = 1; i < args.size(); ++i) {
       inputSplit = biogears::split(args[i], '=');
       if (inputSplit[0] == "NAME") {
-        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value"
+        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value name"
         gRequest->Compartment(nameSplit[0]);
         gRequest->Name(nameSplit[1]);
       } else if (inputSplit[0] == "UNIT") {
@@ -175,7 +462,7 @@ CDM::CompartmentDataRequestData* DataRequestTree::decode_compartment_request(int
     for (int i = 1; i < args.size(); ++i) {
       inputSplit = biogears::split(args[i], '=');
       if (inputSplit[0] == "NAME") {
-        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value"
+        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value name"
         lRequest->Compartment(nameSplit[0]);
         lRequest->Name(nameSplit[1]);
       } else if (inputSplit[0] == "UNIT") {
@@ -193,7 +480,7 @@ CDM::CompartmentDataRequestData* DataRequestTree::decode_compartment_request(int
     for (int i = 1; i < args.size(); ++i) {
       inputSplit = biogears::split(args[i], '=');
       if (inputSplit[0] == "NAME") {
-        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value"
+        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value name"
         thRequest->Compartment(nameSplit[0]);
         thRequest->Name(nameSplit[1]);
       } else if (inputSplit[0] == "UNIT") {
@@ -209,7 +496,7 @@ CDM::CompartmentDataRequestData* DataRequestTree::decode_compartment_request(int
     for (int i = 1; i < args.size(); ++i) {
       inputSplit = biogears::split(args[i], '=');
       if (inputSplit[0] == "NAME") {
-        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value"
+        nameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Compartment,value name"
         tisRequest->Compartment(nameSplit[0]);
         tisRequest->Name(nameSplit[1]);
       } else if (inputSplit[0] == "UNIT") {
@@ -274,7 +561,7 @@ CDM::SubstanceDataRequestData* DataRequestTree::decode_substance_request(std::ve
   for (int i = 1; i < args.size(); ++i) {
     inputSplit = biogears::split(args[i], '=');
     if (inputSplit[0] == "NAME") {
-      std::vector<std::string> subNameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Substance,value"
+      std::vector<std::string> subNameSplit = biogears::split(inputSplit[1], ','); //sub request name formatted as "NAME=Substance,value name"
       subRequest->Substance(subNameSplit[0]);
       subRequest->Name(subNameSplit[1]);
     } else if (inputSplit[0] == "UNIT") {

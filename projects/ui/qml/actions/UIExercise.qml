@@ -11,32 +11,33 @@ UIActionForm {
   border.color: "black"
 
   property string type : ""
+  property int genericSubType : -1  //0 = Intensity, 1 = Power
   property double  weight : 0.0
   property double  property_1 : 0.0
   property double  property_2 : 0.0
   property bool validBuildConfig : {
     if (root.type==="Generic"){
-      return ((property_1 > 0.0 || property_2 > 0.0) && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+      return ((property_1 > 0.0 || property_2 > 0.0) && actionDuration_s > 0.0)
     } else if (root.type==="Strength"){
-      return (weight > 0.0 && property_2 > 0.0 && actionStartTime_s > 0.0)
+      return (weight > 0.0 && property_2 > 0.0)
     } else {
-      return (property_1 > 0.0 && property_2 > 0.0 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+      return (property_1 > 0.0 && property_2 > 0.0 && actionDuration_s > 0.0)
     }
   }
     //Builder mode data -- data passed to scenario builder
   buildParams : {
     if (root.type==="Generic"){
       if (property_1 > 0.0){
-        return "Intensity:" + property_1 + ";";
+        return "Intensity=" + property_1 + ";";
       } else {
-        return "DesiredWorkRate:" + property_2 + ";";
+        return "DesiredWorkRate=" + property_2 + ";";
       }
     } else if (root.type==="Cycling"){
-      return "Cadence:" + property_1 + ",1/min;Power:" + property_2 + ",W;AddedWeight:" + weight + ",kg;"
+      return "Cadence=" + property_1 + ",1/min;Power=" + property_2 + ",W;AddedWeight=" + weight + ",kg;"
     } else if (root.type==="Running") {
-      return "Speed:" + property_1 + ",m/s;Incline:" + property_2+";AddedWeight:" + weight+",kg;"
+      return "Speed=" + property_1 + ",m/s;Incline=" + property_2+";AddedWeight=" + weight+",kg;"
     } else { 
-      return "Weight:" + weight + ",kg;Repetitions:" + property_2 + ";";
+      return "Weight=" + weight + ",kg;Repetitions=" + property_2 + ";";
     }
   }
   //Interactive mode -- apply action immediately while running
@@ -298,26 +299,39 @@ UIActionForm {
           PropertyChanges { target : root; collapsed : true}
           AnchorChanges { target : exerciseLoader; anchors.horizontalCenter : root.horizontalCenter}
         }
-      ]
-      MouseArea {
-        id: actionMouseArea
-        anchors.fill: parent
-        z: -1
-        acceptedButtons:  Qt.LeftButton | Qt.RightButton
-      
-        onDoubleClicked: { // Double Clicking Window
-          if ( mouse.button === Qt.LeftButton ){
-            if (exerciseLoader.state === "collapsedBuilder") {
-              exerciseLoader.state = "expandedBuilder"
-            } else {
-              //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
-              //loader.state = "collapsed"
-            }
-          } else {
-            mouse.accepted = false
+    ]
+    MouseArea {
+      id: actionMouseArea
+      anchors.fill: parent
+      z: -1
+      acceptedButtons:  Qt.LeftButton | Qt.RightButton
+      onClicked : {
+        if ( mouse.button == Qt.RightButton) {
+          contextMenu.popup()
+        }
+        selected()
+      }
+      onDoubleClicked: { // Double Clicking Window
+        if ( mouse.button === Qt.LeftButton ){
+          if (exerciseLoader.state === "collapsedBuilder") {
+            exerciseLoader.state = "expandedBuilder"
+            root.editing()
+          } 
+        } else {
+          mouse.accepted = false
+        }
+      }
+      Menu {
+        id : contextMenu
+        MenuItem {
+          id : removeItem
+          text : "Remove"
+          onTriggered: {
+            root.remove( root.uuid )
           }
         }
       }
+    }
     Component.onCompleted : {
       viewLoader.state = "unset"   //"Unset" state in base loader class unloads anything that was already there
       viewLoader = exerciseLoader     //Reassign viewLoader property to use exercise Loader that will handle multiple views depending on drug admin type
@@ -334,7 +348,7 @@ UIActionForm {
       anchors.centerIn : parent
       columnSpacing : 20
       rowSpacing : 15
-      property int subType : root.property_1 > 0.0 ? 0 : root.property_2 > 0.0 ? 1 : -1      //0 = Intensity, 1 = Power
+      property int subType : root.genericSubType     //0 = Intensity, 1 = Power
       onSubTypeChanged : {
         if (subType==0){
           property_2 = 0.0
@@ -346,7 +360,7 @@ UIActionForm {
       onClear : {
         root.property_1 = 0.0
         root.property_2 = 0.0
-        subType = -1
+        root.genericSubType = -1
         typeRadioGroup.radioGroup.checkState = Qt.Unchecked
         startTimeLoader.item.clear()
         durationLoader.item.clear()
@@ -376,7 +390,7 @@ UIActionForm {
         Layout.alignment : Qt.AlignVCenter | Qt.AlignHCenter
         prefWidth : grid.width / 3
         prefHeight : 50
-        elementRatio : 0.25
+        elementRatio : 0.35
         radioGroup.checkedButton : grid.subType == -1 ? null : radioGroup.buttons[grid.subType]
         label.text : "Input Type"
         label.font.pointSize : 13
@@ -384,7 +398,7 @@ UIActionForm {
         label.padding : 5
         buttonModel : ['Intensity (0-1)', 'Power Output (W)']
         radioGroup.onClicked : {
-          grid.subType = button.buttonIndex
+          root.genericSubType = button.buttonIndex
         }
       }
       Loader {

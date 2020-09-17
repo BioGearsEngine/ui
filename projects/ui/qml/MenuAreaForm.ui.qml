@@ -68,7 +68,7 @@ Item {
       Action {
         text : "Load Scenario"
         onTriggered : {
-          console.log("Support for scenario loading forthcoming")
+          scenario.edit_scenario()
         }
       }
       delegate : MenuItem {

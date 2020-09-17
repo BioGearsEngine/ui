@@ -38,16 +38,16 @@ UIActionForm {
   property bool validBuildConfig : {
     let hasBaseValues = connection !== "" && primaryGas !== "" && o2Source !== "" && inletFlow_L_Per_min > 0.0 && ieRatio > 0.0 && pMax_cmH2O > 0.0 && peep_cmH2O > 0.0
                           && respirationRate_Per_min > 0.0 && reliefPressure_cmH2O > 0.0 && o2Fraction > 0.0;
-    let bottle1Check = ((o2Source === "Bottle One" && bottle1_mL > 0.0) || (o2Source!=="Bottle One" && bottle1_mL ===0.0))
-    let bottle2Check = ((o2Source === "Bottle Two" && bottle2_mL > 0.0) || (o2Source!=="Bottle Two" && bottle2_mL ===0.0))
-    return hasBaseValues && bottle1Check && bottle2Check && leftSubCheck && rightSubCheck
+    let bottle1Check = o2Source !== "Bottle One" ? true : bottle1_mL > 0.0 ? true : false 
+    let bottle2Check =  o2Source !== "Bottle Two" ? true : bottle2_mL > 0.0 ? true : false 
+    return hasBaseValues && bottle1Check && bottle2Check && leftSubCheck && rightSubCheck && actionDuration_s > 0.0
   }
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "Connection:" + connection + ";PrimaryGas:" + primaryGas + ";OxygenSource:" + o2Source + ";VentilatorPressure:" + pMax_cmH2O + ",cmH2O;PositiveEndExpiredPressure:" + peep_cmH2O + ",cmH2O;InletFlow:"
-          +  inletFlow_L_Per_min + ",L/min; RespirationRate:" + respirationRate_Per_min + ",1/min;InspiratoryExpiratoryRatio:" + ieRatio + ";OxygenFraction:" + o2Fraction + ";ReliefValvePressure:" + reliefPressure_cmH2O + ",cmH2O;"
-          + "OxygenBottleOne:" +  bottle1_mL + ",mL;OxygenBottleTwo:" + bottle2_mL + ",mL;LeftChamberSubstance:" + leftChamberSub + ";LeftChamberSubstanceFraction:" + leftChamberFraction + ";RightChamberSubstance:"
-          +  rightChamberSub + ";RightChamberSubtanceFraction:" + rightChamberFraction + ";"
+  buildParams : "Connection=" + connection + ";PrimaryGas=" + primaryGas + ";OxygenSource=" + o2Source + ";VentilatorPressure=" + pMax_cmH2O + ",cmH2O;PositiveEndExpiredPressure=" + peep_cmH2O + ",cmH2O;InletFlow="
+          +  inletFlow_L_Per_min + ",L/min; RespirationRate=" + respirationRate_Per_min + ",1/min;InspiratoryExpiratoryRatio=" + ieRatio + ";OxygenFraction=" + o2Fraction + ";ReliefValvePressure=" + reliefPressure_cmH2O + ",cmH2O;"
+          + "OxygenBottleOne=" +  bottle1_mL + ",mL;OxygenBottleTwo=" + bottle2_mL + ",mL;LeftChamberSubstance=" + leftChamberSub + ";LeftChamberSubstanceFraction=" + leftChamberFraction + ";RightChamberSubstance="
+          +  rightChamberSub + ";RightChamberSubtanceFraction=" + rightChamberFraction + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   {
     let connectEnum = root.connection == "Mask" ? 1 : (root.connection == "Tube" ? 2 : 0)
@@ -1017,6 +1017,7 @@ UIActionForm {
           onClicked : {
             if (validBuildConfig){
               viewLoader.state = "collapsedBuilder"
+              root.buildSet(root)
             }
           }
         }

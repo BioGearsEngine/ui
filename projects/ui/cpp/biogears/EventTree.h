@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QVariantMap>
 
 #include <map>
 #include <vector>
@@ -59,24 +60,32 @@ namespace tatrc {
 
 namespace CDM = mil::tatrc::physiology::datamodel;
 
-namespace bio {
 
-//!
 //!  This class is for storing event information for a EventTree
 //!  A EventTree is QImage
 struct Event {
-
   int eType;
-  int eSubType;     //For actions like "Substance Bolus", which can be grouped by SubstanceAdministration type and then by specific route
+  int eSubType = -1; //For actions like "Substance Bolus", which can be grouped by SubstanceAdministration type and then by specific route
   QString typeName;
-
   double startTime = -1;
-  double duration = -1.;
-
+  double duration = 0.0;
   QString description; //The Description of a ActionType
   QString params; //The list of parameter for the ActionType "TYP1=field1;TYPE2=field1,field2
   QString comment; //Comment from the ActionData
+  
+  bool operator==(const Event& rhs) const { return eType == rhs.eType && eSubType == rhs.eSubType; }
+  bool operator!=(const Event& rhs) const { return !(*this == rhs); }
+
+  private:
+  Q_GADGET
+  Q_PROPERTY(int Type MEMBER eType);
+  Q_PROPERTY(int SubType MEMBER eSubType);
+  Q_PROPERTY(QString TypeName MEMBER typeName);
+  Q_PROPERTY(QString Params MEMBER params);
+  Q_PROPERTY(double StartTime MEMBER startTime);
+  Q_PROPERTY(double Duration MEMBER duration);
 };
+Q_DECLARE_METATYPE(Event);
 
 inline std::ostream& operator<<(std::ostream& os, const Event& e)
 {
@@ -101,6 +110,7 @@ inline std::ostream& operator<<(std::ostream& os, const Event& e)
   return os;
 }
 
+namespace bio {
 class EventTree : public QObject {
   Q_OBJECT
 
@@ -150,6 +160,7 @@ public:
     SubstanceCompoundInfusion,
     TensionPneumothorax,
     Tourniquet,
+    Transfusion,
     Urinate,
     Override,
     EnvironmentAction,
@@ -182,6 +193,9 @@ public:
 
   Q_INVOKABLE void add_event(Event ev);
   Q_INVOKABLE void add_event(QString name, int type, int subType, QString params, double startTime_s, double duration_s);
+  Q_INVOKABLE Event get_event(int index) { return _events[index]; };
+  Q_INVOKABLE int get_event_count() { return _events.size(); };
+  Q_INVOKABLE void clear_events() { return _events.clear(); }
 
   void Source(QString source);
   QString Source() const;
@@ -190,6 +204,7 @@ public:
   void sort_events();
   std::vector<Event> get_events() { return _events; };
   biogears::SEAction* decode_action(Event& ev, biogears::SESubstanceManager& subMgr);
+  void encode_actions(CDM::ScenarioData* scenario);
 
   friend std::ostream& operator<<(std::ostream& os, EventTree& EventTree);
 
@@ -203,6 +218,7 @@ signals:
 private:
 
   bool load(QString source);
+  bool deactivateEvent(Event& ev);
 
   bool process_action(Event& ev, CDM::ActionData& action);
   bool process_action(Event& ev, CDM::PatientActionData* action);

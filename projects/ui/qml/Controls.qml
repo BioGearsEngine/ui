@@ -18,9 +18,9 @@ ControlsForm {
   signal patientStateChanged(PatientState patientState )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
+  signal scenarioFileLoaded(EventModel events, var requests)
   signal newActiveSubstance(var subIndex)
   signal substanceDataChanged(real time_s, var subData)
-
   signal openActionDrawer()
 
   property PhysiologyModel bgData
@@ -48,6 +48,9 @@ ControlsForm {
     onDataRequestModelChanged : {
       bgRequests = requestTree
       root.dataRequestModelChanged(bgRequests)
+    }
+    onScenarioFileLoaded : {
+      root.scenarioFileLoaded(events, requests)
     }
     onPatientMetricsChanged: {
         root.respiratoryRate.value.text       = metrics.RespiratoryRate

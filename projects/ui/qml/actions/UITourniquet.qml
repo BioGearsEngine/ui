@@ -15,7 +15,7 @@ UIActionForm {
   property string state_str : (root.tState == -1) ? "" : (root.tState == 0) ? "Applied" : ( root.tState == 1) ? "Misapplied" : "None"
   property string state_str_formated : (root.state == 0) ? "[<font color=\"green\">%2</font>]".arg(root.state_str) : 
                                        (root.state == 1) ? "[<font color=\"red\">%2</font>]".arg(root.state_str) : ""
-  property bool validBuildConfig : (tState !== -1 && compartment !=="" && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+  property bool validBuildConfig : (tState !== -1 && compartment !=="" )
 
   actionType : "Tourniquet"
   actionClass : EventModel.Tourniquet
@@ -23,7 +23,7 @@ UIActionForm {
   shortName : "[<font color=\"lightsteelblue\"> %2</font>] <b>%1</b> %3".arg(actionType).arg(compartment).arg((root.active) ? state_str_formated.arg(state_str) : "")
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "Compartment:" + compartment + ";TourniquetLevel:" + tState + ";"
+  buildParams : "Compartment=" + compartment + ";TourniquetLevel=" + tState + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_tourniquet_action(compartment, tState)  }
   onDeactivate: { scenario.create_tourniquet_action(compartment, 2)  }

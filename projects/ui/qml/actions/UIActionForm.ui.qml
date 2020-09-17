@@ -19,10 +19,12 @@ Rectangle {
   signal selected()     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
   signal editing()      //notifies action model that this action is being edited so that other actions in scenario window fade in opacity
   signal buildSet(var action)
+  onEditing : {
+    console.log(actionType + " editing")
+  }
 
   property Scenario scenario
   property string buildParams : ""
-  property bool queued : false        //Has the action been added to the scenario queue yet in build mode?
   property string actionType : "UnSet"
   property int actionClass : -1
   property int actionSubClass : -1
@@ -57,6 +59,14 @@ Rectangle {
         PropertyChanges { target : root; border.width : 0}
       }
   ]
+
+  onActiveChanged : {
+    if ( active) {
+      root.activate()
+    } else {
+      root.deactivate();
+    }
+  }
 
   property Component controlsDetails
   property Component builderDetails
@@ -191,13 +201,6 @@ Rectangle {
           color : "transparent"
         }
       }
-    }
-  }
-  onActiveChanged : {
-    if ( active) {
-      root.activate()
-    } else {
-      root.deactivate();
     }
   }
 
@@ -373,7 +376,7 @@ Rectangle {
       property string entryName : ""
       property int time_s : 0
       onClear : {
-        timeField.text = "00:00:00"
+        //timeField.text = "00:00:00"
         time_s = 0
       }
       onReload : {
@@ -390,7 +393,7 @@ Rectangle {
       TextInput {
         id : timeField
         property int lastPosition : -1
-        text : "00:00:00"
+        text : seconds_to_clock_time(timeInput.time_s)
         overwriteMode : true
         maximumLength : 8
         font.pixelSize : 18

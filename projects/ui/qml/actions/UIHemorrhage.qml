@@ -12,14 +12,14 @@ UIActionForm {
 
   property double rate : 0.0
   property string compartment : ""
-  property bool validBuildConfig : (rate > 0.0 && compartment !=="" && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+  property bool validBuildConfig : (rate > 0.0 && compartment !=="" && actionDuration_s > 0.0)
   
   actionType : "Hemorrhage"
   actionClass : EventModel.Hemorrhage
   fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Rate = %3ml/min".arg(actionType).arg(compartment).arg(rate)
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <font color=\"lightsteelblue\">%3ml/min</font>".arg(actionType).arg(compartment).arg(rate)
   //Builder mode data -- data passed to scenario builder
-  buildParams : "InitialRate:" + rate + ",mL/min;Compartment:" + compartment + ";"
+  buildParams : "InitialRate=" + rate + ",mL/min;Compartment=" + compartment + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_hemorrhage_action(compartment, rate)  }
   onDeactivate: { scenario.create_hemorrhage_action(compartment, 0)  }

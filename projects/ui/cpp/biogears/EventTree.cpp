@@ -211,7 +211,7 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
     ev.description = "Applies a burn wound insult";
     ev.params = "";
 
-    ev.params.append(asprintf("State=%s;", burn->TotalBodySurfaceArea().value(), burn->TotalBodySurfaceArea().unit()->c_str()).c_str());
+    ev.params.append(asprintf("Severity=%f;", burn->TotalBodySurfaceArea().value()).c_str());
     return true;
   } else if (auto cardiacarrest = dynamic_cast<const CDM::CardiacArrestData*>(action)) {
     ev.eType = EventTypes::CardiacArrest;
@@ -293,24 +293,28 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
         ev.params.append(asprintf("Name=%s;", nutrition.Name()->c_str()).c_str());
       }
       if (nutrition.Calcium().present()) {
-        ev.params.append(asprintf("Calcium=%f,%s;", nutrition.Calcium()->value(), nutrition.Calcium()->unit()->c_str()).c_str());
+        double calciumMass = biogears::Convert(nutrition.Calcium()->value(), biogears::CCompoundUnit(nutrition.Calcium()->unit()->c_str()), biogears::CCompoundUnit("mg"));
+        ev.params.append(asprintf("Calcium=%f,%s;", calciumMass, "mg").c_str());
       }
       if (nutrition.Carbohydrate().present()) {
-        ev.params.append(asprintf("Carbohydrate=%f,%s;", nutrition.Carbohydrate()->value(), nutrition.Carbohydrate()->unit()->c_str()).c_str());
+        double carbMass = biogears::Convert(nutrition.Carbohydrate()->value(), biogears::CCompoundUnit(nutrition.Carbohydrate()->unit()->c_str()), biogears::CCompoundUnit("g"));
+        ev.params.append(asprintf("Carbohydrate=%f,%s;", carbMass, "mg").c_str());
       }
       if (nutrition.Fat().present()) {
-        ev.params.append(asprintf("Fat=%f,%s;", nutrition.Fat()->value(), nutrition.Fat()->unit()->c_str()).c_str());
+        double fatMass = biogears::Convert(nutrition.Fat()->value(), biogears::CCompoundUnit(nutrition.Fat()->unit()->c_str()), biogears::CCompoundUnit("g"));
+        ev.params.append(asprintf("Fat=%f,%s;", fatMass, "g").c_str());
       }
-
       if (nutrition.Protein().present()) {
-        ev.params.append(asprintf("Water=%f,%s;", nutrition.Protein()->value(), nutrition.Protein()->unit()->c_str()).c_str());
+        double proteinMass = biogears::Convert(nutrition.Protein()->value(), biogears::CCompoundUnit(nutrition.Protein()->unit()->c_str()), biogears::CCompoundUnit("g"));
+        ev.params.append(asprintf("Protein=%f,%s;", proteinMass, "g").c_str());
       }
-
       if (nutrition.Sodium().present()) {
-        ev.params.append(asprintf("Water=%f,%s;", nutrition.Sodium()->value(), nutrition.Sodium()->unit()->c_str()).c_str());
+        double sodiumMass = biogears::Convert(nutrition.Sodium()->value(), biogears::CCompoundUnit(nutrition.Sodium()->unit()->c_str()), biogears::CCompoundUnit("mg"));
+        ev.params.append(asprintf("Sodium=%f,%s;", sodiumMass, "mg").c_str());
       }
       if (nutrition.Water().present()) {
-        ev.params.append(asprintf("Water=%f,%s;", nutrition.Water()->value(), nutrition.Water()->unit()->c_str()).c_str());
+        double waterVolume = biogears::Convert(nutrition.Water()->value(), biogears::CCompoundUnit(nutrition.Water()->unit()->c_str()), biogears::CCompoundUnit("mL"));
+        ev.params.append(asprintf("Water=%f,%s;", waterVolume, "mL").c_str());
       }
     }
     if (consume->NutritionFile().present()) {
@@ -331,10 +335,11 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.description = "Generic Exercise Action";
 
       if (generic.DesiredWorkRate().present()) {
-        ev.params.append(asprintf("DesiredWorkRate=%f,%s;", generic.DesiredWorkRate()->value(), generic.DesiredWorkRate()->unit()->c_str()).c_str());
+        double workRate = biogears::Convert(generic.DesiredWorkRate().get().value(), biogears::CCompoundUnit(generic.DesiredWorkRate().get().unit()->c_str()), biogears::CCompoundUnit("W"));
+        ev.params.append(asprintf("DesiredWorkRate=%f,%s;", workRate, "W").c_str());
       }
       if (generic.Intensity().present()) {
-        ev.params.append(asprintf("Intensity=%f,%s;", generic.Intensity()->value(), generic.Intensity()->unit()->c_str()).c_str());
+        ev.params.append(asprintf("Intensity=%f;", generic.Intensity()->value()).c_str());
       }
     }
     if (exercise->CyclingExercise().present()) {
@@ -344,10 +349,13 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.description = "Cycling Exercise Action";
 
       if (cycling.AddedWeight().present()) {
-        ev.params.append(asprintf("AddedWeight=%f,%s;", cycling.AddedWeight()->value(), cycling.AddedWeight()->unit()->c_str()).c_str());
+        double weight = biogears::Convert(cycling.AddedWeight().get().value(), biogears::CCompoundUnit(cycling.AddedWeight().get().unit()->c_str()), biogears::CCompoundUnit("kg"));
+        ev.params.append(asprintf("AddedWeight=%f,%s;", weight, "kg").c_str());
       }
-      ev.params.append(asprintf("Power=%f,%s;", cycling.Power().value(), cycling.Power().unit()->c_str()).c_str());
-      ev.params.append(asprintf("Cadence=%f,%s;", cycling.Cadence().value(), cycling.Cadence().unit()->c_str()).c_str());
+      double power = biogears::Convert(cycling.Power().value(), biogears::CCompoundUnit(cycling.Power().unit()->c_str()), biogears::CCompoundUnit("W"));
+      ev.params.append(asprintf("Power=%f,%s;", power, "W").c_str());
+      double cadence = biogears::Convert(cycling.Cadence().value(), biogears::CCompoundUnit(cycling.Cadence().unit()->c_str()), biogears::CCompoundUnit("1/min"));
+      ev.params.append(asprintf("Cadence=%f,%s;", cadence, "1/min").c_str());
     }
     if (exercise->RunningExercise().present()) {
       auto& running = exercise->RunningExercise().get();
@@ -356,10 +364,12 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.description = "Running Exercise Action";
 
       if (running.AddedWeight().present()) {
-        ev.params.append(asprintf("AddedWeight=%f,%s;", running.AddedWeight()->value(), running.AddedWeight()->unit()->c_str()).c_str());
+        double weight = biogears::Convert(running.AddedWeight().get().value(), biogears::CCompoundUnit(running.AddedWeight().get().unit()->c_str()), biogears::CCompoundUnit("kg"));
+        ev.params.append(asprintf("AddedWeight=%f,%s;", weight, "kg").c_str());
       }
       ev.params.append(asprintf("Power=%f;", running.Incline().value()).c_str());
-      ev.params.append(asprintf("Cadence=%f,%s;", running.Speed().value(), running.Speed().unit()->c_str()).c_str());
+      double speed = biogears::Convert(running.Speed().value(), biogears::CCompoundUnit(running.Speed().unit()->c_str()), biogears::CCompoundUnit("m/s"));
+      ev.params.append(asprintf("Speed=%f,%s;", speed, "m/s").c_str());
     }
     if (exercise->StrengthExercise().present()) {
       auto& strength = exercise->StrengthExercise().get();
@@ -368,7 +378,8 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.description = "Strength Exercise Action";
 
       ev.params.append(asprintf("Repetitions=%f;", strength.Repetitions().value()).c_str());
-      ev.params.append(asprintf("Weight=%f,%s;", strength.Weight().value(), strength.Weight().unit()->c_str()).c_str());
+      double weight = biogears::Convert(strength.Weight().value(), biogears::CCompoundUnit(strength.Weight().unit()->c_str()), biogears::CCompoundUnit("kg"));
+      ev.params.append(asprintf("Weight=%f,%s;", weight, "kg").c_str());
     }
 
     return true;
@@ -377,9 +388,10 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
     ev.typeName = "Hemorrhage";
     ev.description = "Applies a hemorrhage insult to the patient for a given compartment";
     ev.params = "";
-
+    //Store rate in default mL/min unit
+    double initialRate = biogears::Convert(hem->InitialRate().value(), biogears::CCompoundUnit(hem->InitialRate().unit()->c_str()), biogears::CCompoundUnit("mL/min"));
     ev.params.append(asprintf("Compartment=%s;", hem->Compartment().c_str()).c_str());
-    ev.params.append(asprintf("InitialRate=%f,%s;", hem->InitialRate().value(), hem->InitialRate().unit()->c_str()).c_str());
+    ev.params.append(asprintf("InitialRate=%f,%s;", initialRate, "mL/min").c_str());
     return true;
   } else if (auto infect = dynamic_cast<const CDM::InfectionData*>(action)) {
     ev.eType = EventTypes::Infection;
@@ -402,7 +414,8 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       break;
     }
     ev.params.append(asprintf("Location=%s;", infect->Location().c_str()).c_str());
-    ev.params.append(asprintf("MinimumInhibitoryConcentration=%f;", infect->MinimumInhibitoryConcentration().value()).c_str());
+    double mic = biogears::Convert(infect->MinimumInhibitoryConcentration().value(), biogears::CCompoundUnit(infect->MinimumInhibitoryConcentration().unit()->c_str()), biogears::CCompoundUnit("mg/L"));
+    ev.params.append(asprintf("MinimumInhibitoryConcentration=%f,%s;", mic, "mg/L").c_str());
 
     return true;
   } else if (auto intubation = dynamic_cast<const CDM::IntubationData*>(action)) {
@@ -482,7 +495,8 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
     ev.params = "";
 
     if (auto bolusData = dynamic_cast<const CDM::SubstanceBolusData*>(admin)) {
-      ev.eType = EventTypes::SubstanceBolus;
+      ev.eType = EventTypes::SubstanceAdministration;
+      ev.eSubType = EventTypes::SubstanceBolus;
       ev.typeName = "Substance Administration by Bolus";
       ev.description = "Apply a substance bolus to the patient";
       ev.params = "";
@@ -501,9 +515,14 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
         ev.params.append(asprintf("AdminRoute=Unknown;").c_str());
         break;
       }
-      ev.params.append(asprintf("Dose=%f,%s;", bolusData->Dose().value(), bolusData->Dose().unit()->c_str()).c_str());
-      ev.params.append(asprintf("AdminTime=%f,%s;", bolusData->AdminTime()->value(), bolusData->AdminTime()->unit()->c_str()).c_str());
-      ev.params.append(asprintf("AdminRoute=%s;", bolusData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "Gastrointestinal" : "Transmucosal").c_str());
+      double dose = biogears::Convert(bolusData->Dose().value(), biogears::CCompoundUnit(bolusData->Dose().unit()->c_str()), biogears::CCompoundUnit("mL"));
+      ev.params.append(asprintf("Dose=%f,%s;", dose, "mg").c_str());
+      double concentration = biogears::Convert(bolusData->Concentration().value(), biogears::CCompoundUnit(bolusData->Concentration().unit()->c_str()), biogears::CCompoundUnit("ug/mL"));
+      ev.params.append(asprintf("Concentration=%f,%s;", concentration, "ug/mL").c_str());
+      if (bolusData->AdminTime().present()) {
+        double time = biogears::Convert(bolusData->AdminTime().get().value(), biogears::CCompoundUnit(bolusData->AdminTime().get().unit()->c_str()), biogears::CCompoundUnit("s"));
+        ev.params.append(asprintf("AdminTime=%f,%s;", time, "s").c_str());
+      }     
       ev.params.append(asprintf("Substance=%s;", bolusData->Substance().c_str()).c_str());
       return true;
     }
@@ -514,8 +533,10 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.description = "Apply an oral dose of a substance to the patient";
       ev.params = "";
 
-      ev.params.append(asprintf("Concentration=%f,%s;", oralData->Dose().value(), oralData->Dose().unit()->c_str()).c_str());
       ev.params.append(asprintf("AdminRoute=%s;", oralData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "Gastrointestinal" : "Transmucosal").c_str());
+      std::string doseUnit = oralData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "mg" : "ug";
+      double dose = biogears::Convert(oralData->Dose().value(), biogears::CCompoundUnit(oralData->Dose().unit()->c_str()), biogears::CCompoundUnit(doseUnit));
+      ev.params.append(asprintf("Dose=%f,%s;", dose, doseUnit).c_str());
       ev.params.append(asprintf("Substance=%s;", oralData->Substance().c_str()).c_str());
       return true;
     }
@@ -526,20 +547,28 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.description = "Apply a substance infusion to the patient";
       ev.params = "";
 
-      ev.params.append(asprintf("Concentration=%f,%s;", subInfuzData->Concentration().value(), subInfuzData->Concentration().unit()->c_str()).c_str());
-      ev.params.append(asprintf("Rate=%f,%s;", subInfuzData->Rate().value(), subInfuzData->Rate().unit()->c_str()).c_str());
+      double concentration = biogears::Convert(subInfuzData->Concentration().value(), biogears::CCompoundUnit(subInfuzData->Concentration().unit()->c_str()), biogears::CCompoundUnit("ug/mL"));
+      ev.params.append(asprintf("Concentration=%f,%s;", concentration, "ug/mL").c_str());
+      double rate = biogears::Convert(subInfuzData->Rate().value(), biogears::CCompoundUnit(subInfuzData->Rate().unit()->c_str()), biogears::CCompoundUnit("mL/min"));
+      ev.params.append(asprintf("Rate=%f,%s;", rate, "mL/min").c_str());
       ev.params.append(asprintf("Substance=%s;", subInfuzData->Substance().c_str()).c_str());
       return true;
     }
     if (auto subCInfuzData = dynamic_cast<const CDM::SubstanceCompoundInfusionData*>(admin)) {
       ev.eType = EventTypes::SubstanceAdministration;
-      ev.eSubType = EventTypes::SubstanceCompoundInfusion;
+      if (subCInfuzData->SubstanceCompound().find("Blood") != std::string::npos) {
+        ev.eSubType = EventTypes::Transfusion;
+      } else {
+        ev.eSubType = EventTypes::SubstanceCompoundInfusion;
+      }
       ev.typeName = "Substance Compound Administration by Infusion";
       ev.description = "Apply a substance compound infusion to the patient";
       ev.params = "";
 
-      ev.params.append(asprintf("BagVolume=%f,%s;", subCInfuzData->BagVolume().value(), subCInfuzData->BagVolume().unit()->c_str()).c_str());
-      ev.params.append(asprintf("Rate=%f,%s;", subCInfuzData->Rate().value(), subCInfuzData->BagVolume().unit()->c_str()).c_str());
+      double volume = biogears::Convert(subCInfuzData->BagVolume().value(), biogears::CCompoundUnit(subCInfuzData->BagVolume().unit()->c_str()), biogears::CCompoundUnit("mL"));
+      ev.params.append(asprintf("BagVolume=%f,%s;", volume, "mL").c_str());
+      double rate = biogears::Convert(subCInfuzData->Rate().value(), biogears::CCompoundUnit(subCInfuzData->Rate().unit()->c_str()), biogears::CCompoundUnit("mL/min"));
+      ev.params.append(asprintf("Rate=%f,%s;", rate, "mL/min").c_str());
       ev.params.append(asprintf("SubstanceCompound=%s;", subCInfuzData->SubstanceCompound().c_str()).c_str());
       return true;
     }
@@ -562,7 +591,7 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
     ev.description = "Tourniquet application to a compartment";
     ev.params = "";
 
-    ev.params.append(asprintf("", tournData->Compartment().c_str()).c_str());
+    ev.params.append(asprintf("Compartment", tournData->Compartment().c_str()).c_str());
 
     switch (tournData->TourniquetLevel()) {
     case CDM::enumTourniquetApplicationLevel::Applied:
@@ -769,16 +798,16 @@ bool EventTree::process_action(Event& ev, CDM::AnesthesiaMachineActionData* acti
         }
       }
       if (config.InletFlow().present()) {
-        auto inletFlow = config.InletFlow().get();
-        ev.params += asprintf("InletFlow=%f,%s;", inletFlow.value(), inletFlow.unit()->c_str()).c_str();
+        double flow = biogears::Convert(config.InletFlow().get().value(), biogears::CCompoundUnit(config.InletFlow().get().unit()->c_str()), biogears::CCompoundUnit("L/min"));
+        ev.params += asprintf("InletFlow=%f,%s;", flow, "L/min").c_str();
       }
       if (config.InspiratoryExpiratoryRatio().present()) {
         auto ratio = config.InspiratoryExpiratoryRatio().get();
-        ev.params += asprintf("InspiratoryExpiratoryRatio=%f,%s;", ratio.value(), ratio.unit()->c_str()).c_str();
+        ev.params += asprintf("InspiratoryExpiratoryRatio=%f;", ratio.value()).c_str();
       }
       if (config.OxygenFraction().present()) {
         auto oxygenFraction = config.OxygenFraction().get();
-        ev.params += asprintf("OxygenFraction=%f,%s;", oxygenFraction.value(), oxygenFraction.unit()->c_str()).c_str();
+        ev.params += asprintf("OxygenFraction=%f;", oxygenFraction.value()).c_str();
       }
       if (config.OxygenSource().present()) {
         switch (config.OxygenSource().get()) {
@@ -794,24 +823,24 @@ bool EventTree::process_action(Event& ev, CDM::AnesthesiaMachineActionData* acti
         }
       }
       if (config.PositiveEndExpiredPressure().present()) {
-        auto positiveEndExpiredPressure = config.PositiveEndExpiredPressure().get();
-        ev.params += asprintf("PositiveEndExpiredPressure=%f,%s;", positiveEndExpiredPressure.value(), positiveEndExpiredPressure.unit()->c_str()).c_str();
+        double peep = biogears::Convert(config.PositiveEndExpiredPressure().get().value(), biogears::CCompoundUnit(config.PositiveEndExpiredPressure().get().unit()->c_str()), biogears::CCompoundUnit("cmH2O"));
+        ev.params += asprintf("PositiveEndExpiredPressure=%f,%s;", peep, "cmH2O").c_str();
       }
       if (config.PrimaryGas().present()) {
         auto primaryGas = config.PrimaryGas().get();
-        ev.params += asprintf("PositiveEndExpiredPressure=%s;", primaryGas.c_str()).c_str();
+        ev.params += asprintf("PrimaryGas=%s;", primaryGas.c_str()).c_str();
       }
       if (config.ReliefValvePressure().present()) {
-        auto reliefValvePressure = config.ReliefValvePressure().get();
-        ev.params += asprintf("PositiveEndExpiredPressure=%f,%s;", reliefValvePressure.value(), reliefValvePressure.unit()->c_str()).c_str();
+        double reliefPressure = biogears::Convert(config.ReliefValvePressure().get().value(), biogears::CCompoundUnit(config.ReliefValvePressure().get().unit()->c_str()), biogears::CCompoundUnit("cmH2O"));
+        ev.params += asprintf("ReliefValvePressure=%f,%s;", reliefPressure, "cmH2O").c_str();
       }
       if (config.RespiratoryRate().present()) {
-        auto respiratoryRate = config.RespiratoryRate().get();
-        ev.params += asprintf("PositiveEndExpiredPressure=%f,%s;", respiratoryRate.value(), respiratoryRate.unit()->c_str()).c_str();
+        double respirationRate = biogears::Convert(config.RespiratoryRate().get().value(), biogears::CCompoundUnit(config.RespiratoryRate().get().unit()->c_str()), biogears::CCompoundUnit("1/min"));
+        ev.params += asprintf("RespiratoryRate=%f,%s;", respirationRate, "1/min").c_str();
       }
       if (config.VentilatorPressure().present()) {
-        auto respiratoryRate = config.VentilatorPressure().get();
-        ev.params += asprintf("PositiveEndExpiredPressure=%f,%s;", respiratoryRate.value(), respiratoryRate.unit()->c_str()).c_str();
+        double ventPressure = biogears::Convert(config.VentilatorPressure().get().value(), biogears::CCompoundUnit(config.VentilatorPressure().get().unit()->c_str()), biogears::CCompoundUnit("cmH2O"));
+        ev.params += asprintf("VentilatorPressure=%f,%s;", ventPressure, "cmH2O").c_str();
       }
       if (config.LeftChamber().present()) {
         auto leftChamber = config.LeftChamber().get();
@@ -838,12 +867,12 @@ bool EventTree::process_action(Event& ev, CDM::AnesthesiaMachineActionData* acti
         }
       }
       if (config.OxygenBottleOne().present() && config.OxygenBottleOne()->Volume().present()) {
-        auto oxygenBottle = config.OxygenBottleOne()->Volume().get();
-        ev.params += asprintf("OxygenBottleOne-Volume=%f,%s;", oxygenBottle.value(), oxygenBottle.unit()->c_str()).c_str();
+        double volume = biogears::Convert(config.OxygenBottleOne()->Volume().get().value(), biogears::CCompoundUnit(config.OxygenBottleOne()->Volume().get().unit()->c_str()), biogears::CCompoundUnit("mL"));
+        ev.params += asprintf("OxygenBottleOne-Volume=%f,%s;", volume, "mL/min").c_str();
       }
       if (config.OxygenBottleTwo().present() && config.OxygenBottleTwo().get().Volume().present()) {
-        auto oxygenBottle = config.OxygenBottleTwo()->Volume().get();
-        ev.params += asprintf("OxygenBottleOne-Volume=%f,%s;", oxygenBottle.value(), oxygenBottle.unit()->c_str()).c_str();
+        double volume = biogears::Convert(config.OxygenBottleTwo()->Volume().get().value(), biogears::CCompoundUnit(config.OxygenBottleTwo()->Volume().get().unit()->c_str()), biogears::CCompoundUnit("mL"));
+        ev.params += asprintf("OxygenBottleOne-Volume=%f,%s;", volume, "mL").c_str();
       }
       for (auto& event : config.ActiveEvent()) {
         switch (event.Event()) {
@@ -1004,6 +1033,144 @@ bool EventTree::process_action(Event& ev, CDM::SerializeStateData* action)
   return true;
 }
 //-----------------------------------------------------------------------------
+void EventTree::encode_actions(CDM::ScenarioData* scenario)
+{
+  double sim_time_s = 0.0;
+  for (auto& action : scenario->Action()) {
+    Event ev;
+
+    ev.eType = EventTypes::UnknownAction;
+    ev.typeName = "Unknown Action";
+    ev.comment = (action.Comment().present()) ? action.Comment().get().c_str() : "";
+
+    if (process_action(ev, action)) {
+      if (ev.params.size() && ev.params.back() == ";") {
+        ev.params.remove(ev.params.size() - 1, 1);
+      }
+      if (ev.eType == EventTree::AdvanceTime) {
+        std::string time = biogears::split(ev.params.toStdString(), '=')[1]; //[0] = "Time", [1] = "value,unit"
+        std::vector<std::string> timeUnitPair = biogears::split(time, ',');
+        double timeValue = std::stod(timeUnitPair[0]); //Assume unit = s, if not, adjust below
+        if (timeUnitPair[1] == "s") {
+          sim_time_s += timeValue;
+        } else if (timeUnitPair[1] == "min") {
+          sim_time_s += (timeValue * 60.0);
+        } else {
+          sim_time_s += (timeValue * 3600.0);
+        }
+      } else {
+        if (ev.eType != EventTree::PatientAssessmentRequest) { //Assessments not currently supported in scenario builder
+          ev.startTime = sim_time_s;
+          _events.push_back(ev);
+        }     
+      }
+    } else {
+      _validity = false;
+      emit validityChanged(_validity);
+      emit loadFailure();
+      std::cerr << "Error processing the " << ev.typeName.toStdString() << "\n";
+    }
+  }
+
+  for (int i = 0; i < _events.size(); ++i) {
+    for (int j = i + 1; j < _events.size(); ++j) {
+      if (_events[i] == _events[j]) {
+        _events[i].duration = _events[j].startTime - _events[i].startTime;
+        if (deactivateEvent(_events[j])) {
+          _events.erase(_events.begin() + j);
+        }
+        break;
+      }
+      if (_events[i].eType == EventTree::AnesthesiaMachineConfiguration) {
+        //Anesthesia configuration changes will be caught in previous block--but we turn machine off by setting an Intubation Action with Type=Off, so we need
+        // to search for this particular case
+        if (_events[j].eType == EventTree::Intubation && _events[j].params.contains("Off")) {
+          _events[i].duration = _events[j].startTime - _events[i].startTime;
+          _events.erase(_events.begin() + j);
+        }
+        break;
+      }
+    }
+  }
+  //Add terminal advance time action (if present)
+  double lastEventEnd_s = _events.back().startTime + _events.back().duration;
+  if (sim_time_s > lastEventEnd_s) {
+    Event timeExtend;
+    timeExtend.startTime = lastEventEnd_s;
+    timeExtend.duration = sim_time_s - lastEventEnd_s;
+    timeExtend.eType = EventTree::AdvanceTime;
+    _events.push_back(timeExtend);
+  }
+}
+//-----------------------------------------------------------------------------
+bool EventTree::deactivateEvent(Event& ev)
+{
+  std::vector<std::string> params = biogears::split(ev.params.toStdString(), ';');
+  //Search parameters for "off" indicators (Severity for severity-based actions, rate for drug infusion, etc)
+  std::vector<std::string> nameSplit;
+  std::vector<std::string> valueUnitPair;
+  for (std::string param : params) {
+    nameSplit = biogears::split(param, '=');
+    if (nameSplit[0] == "Severity") {
+      if (std::stod(nameSplit[1]) <= 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "Rate") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      if (std::stod(valueUnitPair[0]) < 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "InitialRate") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      if (std::stod(valueUnitPair[0]) < 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "State") {
+      if (nameSplit[1] == "Off") {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "Intensity" && ev.eSubType == EventTree::GenericExercise) {
+      //Putting an extra check for subType here since "Intensity" is somewhat generic is only on off switch for exercise
+      if (std::stod(nameSplit[1]) < 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "DesiredWorkRate") {
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      if (std::stod(valueUnitPair[0]) < 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "Velocity") {
+      //Assuming velocity = 0 deactivates running exercise regardless of incline
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      if (std::stod(valueUnitPair[0]) < 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+    if (nameSplit[0] == "Cadence") {
+      //Assuming cadence = 0 deactivate cycling exercise regardless of power
+      valueUnitPair = biogears::split(nameSplit[1], ',');
+      if (std::stod(valueUnitPair[0]) < 1.0e-6) {
+        return true;
+      }
+      break;
+    }
+  }
+  return false;
+}
+//-----------------------------------------------------------------------------
 void EventTree::add_event(Event ev)
 {
   _events.push_back(ev);
@@ -1027,46 +1194,46 @@ void EventTree::add_event(QString name, int type, int subType, QString params, d
     int endLoc;
     //Most actions are severity based -- set severity to 0 to turn off
     if (offParams.contains("Severity")) {
-      startLoc = params.indexOf("Severity");
-      endLoc = params.indexOf(";", startLoc);
-      offParams.replace(startLoc, endLoc - startLoc, "Severity:0");
+      startLoc = offParams.indexOf("Severity");
+      endLoc = offParams.indexOf(";", startLoc);
+      offParams.replace(startLoc, endLoc - startLoc, "Severity=0");
     } else if (offParams.contains("Rate")) {
       //Actions like hemorrhage and drug infusion are deactivated by setting a rate to 0
-      startLoc = params.indexOf("Rate");
-      endLoc = params.indexOf(",", startLoc); //Replace up to unit (demarcated by , )
-      offParams.replace(startLoc, endLoc - startLoc, "Rate:0");
-    } else if (name.contains("Exercise")) {
+      startLoc = offParams.indexOf("Rate");
+      endLoc = offParams.indexOf(",", startLoc); //Replace up to unit (demarcated by , )
+      offParams.replace(startLoc, endLoc - startLoc, "Rate=0");
+    } else if (offParams.contains("Exercise")) {
       //Exercise is the oddball and there are about a zillion ways to deactivate it depending on the type
       if (offParams.contains("Intensity")) {
         //Generic-Intensity based
-        startLoc = params.indexOf("Intensity");
-        endLoc = params.indexOf(";", startLoc);
-        offParams.replace(startLoc, endLoc - startLoc, "Intensity:0");
+        startLoc = offParams.indexOf("Intensity");
+        endLoc = offParams.indexOf(";", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Intensity=0");
       } else if (offParams.contains("DesiredWorkRate")) {
         //Generic-Work rate based
-        startLoc = params.indexOf("DesiredWorkRate");
-        endLoc = params.indexOf(",", startLoc);
-        offParams.replace(startLoc, endLoc - startLoc, "DesiredWorkRate:0");
+        startLoc = offParams.indexOf("DesiredWorkRate");
+        endLoc = offParams.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "DesiredWorkRate=0");
       } else if (offParams.contains("Cadence")) {
         //Cycling
-        startLoc = params.indexOf("Cadence");
-        endLoc = params.indexOf(",", startLoc);
-        offParams.replace(startLoc, endLoc - startLoc, "Cadence:0");
-        startLoc = params.indexOf("Power");
-        endLoc = params.indexOf(",", startLoc);
-        offParams.replace(startLoc, endLoc - startLoc, "Power:0");
+        startLoc = offParams.indexOf("Cadence");
+        endLoc = offParams.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Cadence=0");
+        startLoc = offParams.indexOf("Power");
+        endLoc = offParams.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Power=0");
       } else if (offParams.contains("Speed")) {
         //Running
-        startLoc = params.indexOf("Speed");
-        endLoc = params.indexOf(",", startLoc);
-        offParams.replace(startLoc, endLoc - startLoc, "Speed:0");
+        startLoc = offParams.indexOf("Speed");
+        endLoc = offParams.indexOf(",", startLoc);
+        offParams.replace(startLoc, endLoc - startLoc, "Speed=0");
       }
-    } else if (params.contains("On")) {
+    } else if (offParams.contains("On")) {
       //Action with on/off (Cardiac Arrest, Anesthesia Machine Connection)
-      startLoc = params.indexOf("On");
-      endLoc = params.indexOf(";", startLoc);
-      QString replaced = offParams.replace(startLoc, endLoc - startLoc, "Off");
-    } 
+      startLoc = offParams.indexOf("On");
+      endLoc = offParams.indexOf(";", startLoc);
+      offParams.replace(startLoc, endLoc - startLoc, "Off");
+    }
     offEvent.typeName = name;
     offEvent.eType = type;
     offEvent.eSubType = subType;
@@ -1095,7 +1262,7 @@ void EventTree::sort_events()
 biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceManager& subMgr)
 {
   biogears::SEAction* action = nullptr;
-  
+
   switch (ev.eType) {
   case EventTypes::AdvanceTime:
     action = decode_advance_time(ev);
@@ -1159,7 +1326,6 @@ biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceMan
     break;
   }
 
-
   return action;
 }
 //-----------------------------------------------------------------------------
@@ -1175,8 +1341,8 @@ biogears::SEAdvanceTime* EventTree::decode_advance_time(Event& ev)
 biogears::SEAcuteRespiratoryDistress* EventTree::decode_acute_respiratory_distress(Event& ev)
 {
   biogears::SEAcuteRespiratoryDistress* action = new biogears::SEAcuteRespiratoryDistress();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetSeverity().SetValue(input);
   return action;
 }
@@ -1184,8 +1350,8 @@ biogears::SEAcuteRespiratoryDistress* EventTree::decode_acute_respiratory_distre
 biogears::SEAcuteStress* EventTree::decode_acute_stress(Event& ev)
 {
   biogears::SEAcuteStress* action = new biogears::SEAcuteStress();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetSeverity().SetValue(input);
   return action;
 }
@@ -1193,8 +1359,8 @@ biogears::SEAcuteStress* EventTree::decode_acute_stress(Event& ev)
 biogears::SEAirwayObstruction* EventTree::decode_airway_obstruction(Event& ev)
 {
   biogears::SEAirwayObstruction* action = new biogears::SEAirwayObstruction();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetSeverity().SetValue(input);
   return action;
 }
@@ -1203,7 +1369,7 @@ biogears::SEAnesthesiaMachineConfiguration* EventTree::decode_anesthesia_machine
 {
   biogears::SEAnesthesiaMachineConfiguration* action = new biogears::SEAnesthesiaMachineConfiguration(subMgr);
   auto& config = action->GetConfiguration();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
@@ -1216,9 +1382,9 @@ biogears::SEAnesthesiaMachineConfiguration* EventTree::decode_anesthesia_machine
   double rightSubFraction = 0.0;
 
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');   //e.g. separates name from input; eg: "Ventilator:10,cmH2O" --> ["Ventilator", "10,cmH2O"]
+    nameSplit = biogears::split(inputs[i], '='); //e.g. separates name from input; eg: "Ventilator:=10,cmH2O" --> ["Ventilator", "10,cmH2O"]
     if (nameSplit.size() == 1) {
-      //Nothing after ":", so empty and do not parse
+      //Nothing after "=", so empty and do not parse
       continue;
     }
     if (nameSplit[0] == "Connection") {
@@ -1280,14 +1446,14 @@ biogears::SEAnesthesiaMachineConfiguration* EventTree::decode_anesthesia_machine
     config.GetRightChamber().GetSubstanceFraction().SetValue(rightSubFraction);
     config.GetRightChamber().SetState(CDM::enumOnOff::On);
   }
-  
+
   return action;
 }
 biogears::SEApnea* EventTree::decode_apnea(Event& ev)
 {
   biogears::SEApnea* action = new biogears::SEApnea();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetSeverity().SetValue(input);
   return action;
 }
@@ -1295,8 +1461,8 @@ biogears::SEApnea* EventTree::decode_apnea(Event& ev)
 biogears::SEAsthmaAttack* EventTree::decode_asthma_attack(Event& ev)
 {
   biogears::SEAsthmaAttack* action = new biogears::SEAsthmaAttack();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetSeverity().SetValue(input);
   return action;
 }
@@ -1304,8 +1470,8 @@ biogears::SEAsthmaAttack* EventTree::decode_asthma_attack(Event& ev)
 biogears::SEBronchoconstriction* EventTree::decode_bronchoconstriction(Event& ev)
 {
   biogears::SEBronchoconstriction* action = new biogears::SEBronchoconstriction();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetSeverity().SetValue(input);
   return action;
 }
@@ -1313,8 +1479,8 @@ biogears::SEBronchoconstriction* EventTree::decode_bronchoconstriction(Event& ev
 biogears::SEBurnWound* EventTree::decode_burn_wound(Event& ev)
 {
   biogears::SEBurnWound* action = new biogears::SEBurnWound();
-  //Only one arg (severity), split at ":" --> e.g. severity:0.5
-  double input = std::stod(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (severity), split at "=" --> e.g. severity:0.5
+  double input = std::stod(biogears::split(ev.params.toStdString(), '=')[1]);
   action->GetTotalBodySurfaceArea().SetValue(input);
   return action;
 }
@@ -1322,24 +1488,24 @@ biogears::SEBurnWound* EventTree::decode_burn_wound(Event& ev)
 biogears::SECardiacArrest* EventTree::decode_cardiac_arrest(Event& ev)
 {
   biogears::SECardiacArrest* action = new biogears::SECardiacArrest();
-  //Only one arg (on/off), split at ":" --> e.g. State:On
-  std::string state = biogears::split(ev.params.toStdString(), ':')[1];
-  action->SetActive(state=="On");
+  //Only one arg (on/off), split at "=" --> e.g. State:On
+  std::string state = biogears::split(ev.params.toStdString(), '=')[1];
+  action->SetActive(state == "On");
   return action;
 }
 //-----------------------------------------------------------------------------
 biogears::SEConsumeNutrients* EventTree::decode_consume_nutrients(Event& ev)
 {
   biogears::SEConsumeNutrients* action = new biogears::SEConsumeNutrients();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':'); //e.g. separates name from input; eg: "Ventilator:10,cmH2O" --> ["Ventilator", "10,cmH2O"]
+    nameSplit = biogears::split(inputs[i], '='); //e.g. separates name from input; eg: "Ventilator=10,cmH2O" --> ["Ventilator", "10,cmH2O"]
     if (nameSplit.size() == 1) {
-      //Nothing after ":", so empty and do not parse
+      //Nothing after "=", so empty and do not parse
       continue;
     }
     if (nameSplit[0] == "Carbohydrate") {
@@ -1367,20 +1533,20 @@ biogears::SEConsumeNutrients* EventTree::decode_consume_nutrients(Event& ev)
 //-----------------------------------------------------------------------------
 biogears::SESubstanceAdministration* EventTree::decode_substance_administration(Event& ev, biogears::SESubstanceManager& subMgr)
 {
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   std::string value;
   //Need to extract substance or substance compound name -- params string set up so that Substance/SubstanceCompound name is first element
-  std::string sub = biogears::split(inputs[0], ':')[1];
+  std::string sub = biogears::split(inputs[0], '=')[1];
   switch (ev.eSubType) {
   case EventTypes::SubstanceBolus: {
     biogears::SESubstanceBolus* bolus = new biogears::SESubstanceBolus(*subMgr.GetSubstance(sub));
     for (unsigned int i = 1; i < inputs.size(); ++i) {
       //Starting at i = 1 because sub name was index 0
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Concentration") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         bolus->GetConcentration().SetValue(std::stod(valueUnitPair[0]), biogears::MassPerVolumeUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1389,7 +1555,7 @@ biogears::SESubstanceAdministration* EventTree::decode_substance_administration(
         bolus->GetDose().SetValue(std::stod(valueUnitPair[0]), biogears::VolumeUnit::GetCompoundUnit(valueUnitPair[1]));
       } else if (nameSplit[0] == "Route") {
         value = nameSplit[1];
-        int route = value == "Bolus-Intraarterial" ? 0 : value=="Bolus-Intramuscular" ? 1 : 2;
+        int route = value == "Bolus-Intraarterial" ? 0 : value == "Bolus-Intramuscular" ? 1 : 2;
         bolus->SetAdminRoute((CDM::enumBolusAdministration::value)route);
       }
     }
@@ -1399,22 +1565,22 @@ biogears::SESubstanceAdministration* EventTree::decode_substance_administration(
     biogears::SESubstanceInfusion* infuse = new biogears::SESubstanceInfusion(*subMgr.GetSubstance(sub));
     for (unsigned int i = 1; i < inputs.size(); ++i) {
       //Starting at i = 1 because sub name was index 0
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Concentration") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         infuse->GetConcentration().SetValue(std::stod(valueUnitPair[0]), biogears::MassPerVolumeUnit::GetCompoundUnit(valueUnitPair[1]));
       } else if (nameSplit[0] == "Rate") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
-       infuse->GetRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
+        infuse->GetRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
       }
     }
     return infuse;
-  } 
+  }
   case EventTypes::SubstanceOralDose: {
     biogears::SESubstanceOralDose* oDose = new biogears::SESubstanceOralDose(*subMgr.GetSubstance(sub));
     for (unsigned int i = 1; i < inputs.size(); ++i) {
       //Starting at i = 1 because sub name was index 0
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Dose") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         oDose->GetDose().SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1426,11 +1592,12 @@ biogears::SESubstanceAdministration* EventTree::decode_substance_administration(
     }
     return oDose;
   }
-  case EventTypes::SubstanceCompoundInfusion: {
+  case EventTypes::SubstanceCompoundInfusion:
+  case EventTypes::Transfusion: {
     biogears::SESubstanceCompoundInfusion* infuse = new biogears::SESubstanceCompoundInfusion(*subMgr.GetCompound(sub));
     for (unsigned int i = 1; i < inputs.size(); ++i) {
       //Starting at i = 1 because compound name was index 0
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Rate") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         infuse->GetRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1449,7 +1616,7 @@ biogears::SESubstanceAdministration* EventTree::decode_substance_administration(
 biogears::SEExercise* EventTree::decode_exercise(Event& ev)
 {
   biogears::SEExercise* action = new biogears::SEExercise();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
@@ -1459,7 +1626,7 @@ biogears::SEExercise* EventTree::decode_exercise(Event& ev)
   case EventTypes::GenericExercise: {
     biogears::SEExercise::SEGeneric gen;
     for (unsigned int i = 0; i < inputs.size(); ++i) {
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Intensity") {
         gen.Intensity.SetValue(std::stod(nameSplit[1]));
       } else if (nameSplit[0] == "DesiredWorkRate") {
@@ -1472,7 +1639,7 @@ biogears::SEExercise* EventTree::decode_exercise(Event& ev)
   case EventTypes::CyclingExercise: {
     biogears::SEExercise::SECycling cycle;
     for (unsigned int i = 0; i < inputs.size(); ++i) {
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Cadence") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         cycle.CadenceCycle.SetValue(std::stod(valueUnitPair[0]), biogears::FrequencyUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1489,7 +1656,7 @@ biogears::SEExercise* EventTree::decode_exercise(Event& ev)
   case EventTypes::RunningExercise: {
     biogears::SEExercise::SERunning run;
     for (unsigned int i = 0; i < inputs.size(); ++i) {
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Speed") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         run.SpeedRun.SetValue(std::stod(valueUnitPair[0]), biogears::LengthPerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1505,7 +1672,7 @@ biogears::SEExercise* EventTree::decode_exercise(Event& ev)
   case EventTypes::StengthExercise: {
     biogears::SEExercise::SEStrengthTraining strength;
     for (unsigned int i = 0; i < inputs.size(); ++i) {
-      nameSplit = biogears::split(inputs[i], ':');
+      nameSplit = biogears::split(inputs[i], '=');
       if (nameSplit[0] == "Weight") {
         valueUnitPair = biogears::split(nameSplit[1], ',');
         strength.WeightStrength.SetValue(std::stod(valueUnitPair[0]), biogears::MassUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1522,13 +1689,13 @@ biogears::SEExercise* EventTree::decode_exercise(Event& ev)
 biogears::SEHemorrhage* EventTree::decode_hemorrhage(Event& ev)
 {
   biogears::SEHemorrhage* action = new biogears::SEHemorrhage();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');
+    nameSplit = biogears::split(inputs[i], '=');
     if (nameSplit[0] == "InitialRate") {
       valueUnitPair = biogears::split(nameSplit[1], ',');
       action->GetInitialRate().SetValue(std::stod(valueUnitPair[0]), biogears::VolumePerTimeUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1542,13 +1709,13 @@ biogears::SEHemorrhage* EventTree::decode_hemorrhage(Event& ev)
 biogears::SEInfection* EventTree::decode_infection(Event& ev)
 {
   biogears::SEInfection* action = new biogears::SEInfection();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');
+    nameSplit = biogears::split(inputs[i], '=');
     if (nameSplit[0] == "MinimumInhibitoryConcentration") {
       valueUnitPair = biogears::split(nameSplit[1], ',');
       action->GetMinimumInhibitoryConcentration().SetValue(std::stod(valueUnitPair[0]), biogears::MassPerVolumeUnit::GetCompoundUnit(valueUnitPair[1]));
@@ -1564,8 +1731,8 @@ biogears::SEInfection* EventTree::decode_infection(Event& ev)
 biogears::SENeedleDecompression* EventTree::decode_needle_decompression(Event& ev)
 {
   biogears::SENeedleDecompression* action = new biogears::SENeedleDecompression();
-  //Only one arg (side), split at ":" --> e.g. side:0
-  int input = std::stoi(biogears::split(ev.params.toStdString(), ':')[1]);
+  //Only one arg (side), split at "=" --> e.g. side:0
+  int input = std::stoi(biogears::split(ev.params.toStdString(), '=')[1]);
   action->SetSide((CDM::enumSide::value)input);
   return action;
 }
@@ -1573,13 +1740,13 @@ biogears::SENeedleDecompression* EventTree::decode_needle_decompression(Event& e
 biogears::SEPainStimulus* EventTree::decode_pain_stimulus(Event& ev)
 {
   biogears::SEPainStimulus* action = new biogears::SEPainStimulus();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');
+    nameSplit = biogears::split(inputs[i], '=');
     if (nameSplit[0] == "Severity") {
       action->GetSeverity().SetValue(std::stod(nameSplit[1]));
     } else if (nameSplit[0] == "Location") {
@@ -1592,13 +1759,13 @@ biogears::SEPainStimulus* EventTree::decode_pain_stimulus(Event& ev)
 biogears::SETensionPneumothorax* EventTree::decode_tension_pneumothorax(Event& ev)
 {
   biogears::SETensionPneumothorax* action = new biogears::SETensionPneumothorax();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');
+    nameSplit = biogears::split(inputs[i], '=');
     if (nameSplit[0] == "Severity") {
       action->GetSeverity().SetValue(std::stod(nameSplit[1]));
     } else if (nameSplit[0] == "Side") {
@@ -1613,13 +1780,13 @@ biogears::SETensionPneumothorax* EventTree::decode_tension_pneumothorax(Event& e
 biogears::SETourniquet* EventTree::decode_tourniquet(Event& ev)
 {
   biogears::SETourniquet* action = new biogears::SETourniquet();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');
+    nameSplit = biogears::split(inputs[i], '=');
     if (nameSplit[0] == "Compartment") {
       action->SetCompartment(nameSplit[1]);
     } else if (nameSplit[0] == "TourniquetLevel") {
@@ -1632,13 +1799,13 @@ biogears::SETourniquet* EventTree::decode_tourniquet(Event& ev)
 biogears::SEBrainInjury* EventTree::decode_traumatic_brain_injury(Event& ev)
 {
   biogears::SEBrainInjury* action = new biogears::SEBrainInjury();
-  //Split parameter string so that every parameter has individual entry, e.g. ["Connection:Mask", "OxygenSource:Wall", ...]
+  //Split parameter string so that every parameter has individual entry, e.g. ["Connection=Mask", "OxygenSource=Wall", ...]
   std::vector<std::string> inputs = biogears::split(ev.params.toStdString(), ';');
   //Re-usable variables
   std::vector<std::string> nameSplit;
   std::vector<std::string> valueUnitPair;
   for (unsigned int i = 0; i < inputs.size(); ++i) {
-    nameSplit = biogears::split(inputs[i], ':');
+    nameSplit = biogears::split(inputs[i], '=');
     if (nameSplit[0] == "Severity") {
       action->GetSeverity().SetValue(std::stod(nameSplit[1]));
     } else if (nameSplit[0] == "Type") {

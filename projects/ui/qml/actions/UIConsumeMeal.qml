@@ -10,8 +10,8 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property string actionType : "Consume Meal"
-  actionClass : EventModel.ConsumeMeal
+  property string actionType : "Consume Nutrients"
+  actionClass : EventModel.ConsumeNutrients
 
   //Begin Action Properties
   property string name : "Default"
@@ -22,13 +22,13 @@ UIActionForm {
   property double calcium_mg : 0
   property double sodium_mg  : 0
   property double water_mL : 0
-  property bool validBuildConfig : actionStartTime_s > 0.0
+  property bool validBuildConfig : true   //No required fields and action does not have a duration
 
   fullName  : "<b>Consume <font color=\"lightsteelblue\">%1</font>  Meal</b>".arg(root.name)
   shortName : "<b>Consume <font color=\"lightsteelblue\">%1</font> </b>".arg(root.name)
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "Carboyhdrate:" + carbs_g + ",g;Fat:" + fat_g + ",g;Protein:" + protein_g + ",g;Calcium:" + calcium_mg + ",mg;Sodium:" + sodium_mg + ",mg;Water:" + water_mL + ",mL;";
+  buildParams : "Carboyhdrate=" + carbs_g + ",g;Fat=" + fat_g + ",g;Protein=" + protein_g + ",g;Calcium=" + calcium_mg + ",mg;Sodium=" + sodium_mg + ",mg;Water=" + water_mL + ",mL;";
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_consume_meal_action(name, carbs_g, fat_g, protein_g, sodium_mg, calcium_mg, water_mL)  }
   onDeactivate: { }

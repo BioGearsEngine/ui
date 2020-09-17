@@ -13,8 +13,8 @@ UIActionForm {
   property int severity : -1
   property double mic : 0.0
   property string location : ""
-  property string severity_str :  (severity == -1) ? "" : (severity == 0) ?"None" : (severity == 1) ?"Mild" : (severity == 2) ?"Moderate" : "Severe"
-  property bool validBuildConfig : (severity !== -1 && location !=="" && mic > 0.0 && actionStartTime_s)
+  property string severity_str :  (severity == -1) ? "" : (severity == 0) ?"None" : (severity == 1) ?"Mild" : (severity == 2) ? "Moderate" : "Severe"
+  property bool validBuildConfig : (severity !== -1 && location !=="" && mic > 0.0)
 
   actionType : "Bacterial Infection"
   actionClass : EventModel.Infection
@@ -25,7 +25,7 @@ UIActionForm {
   shortName : " [<font color=\"lightsteelblue\"> %3</font>] <b>%1</b>  <font color=\"lightsteelblue\">%2</font>".arg(actionType).arg(location).arg(severity_str)
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "Location:" + location + ";Severity:" + severity + ";MinimumInhibitoryConcentration:" + mic + ",mg/L;"
+  buildParams : "Location=" + location + ";Severity=" + severity + ";MinimumInhibitoryConcentration=" + mic + ",mg/L;"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_infection_action(location, severity, mic)  }
   onDeactivate: { scenario.create_infection_action(location, 0, 0 )  }
@@ -274,10 +274,10 @@ UIActionForm {
         }
         function setButtonState(){
           //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
-          if (root.severity == -1){
+          if (severity == -1){
             return null
           } else {
-            return radioGroup.buttons[severity]
+            return radioGroup.buttons[severity-1]   
           }
         }
       }
@@ -298,7 +298,7 @@ UIActionForm {
         Loader {
           id : locationCombo
           sourceComponent : comboInput
-          property var _combo_model : ['Gut', 'Left Arm','Left Leg','Right Arm','Right Leg']
+          property var _combo_model : ['Gut', 'Left Arm','Left Leg','Right Arm','Right Leg', 'Skin']
           property var _initial_value : root.location
           Layout.fillWidth : true
           Layout.maximumWidth : grid.width / 4 - locationLabel.width - parent.spacing
@@ -306,7 +306,7 @@ UIActionForm {
         Connections {
           target : locationCombo.item
           onActivated : {
-            root.compartment = target.textAt(target.currentIndex)
+            root.location = target.textAt(target.currentIndex)
           }
         }
       }

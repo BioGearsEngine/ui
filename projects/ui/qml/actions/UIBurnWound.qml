@@ -10,9 +10,10 @@ UIActionForm {
   color: "transparent"
   border.color: "black"
 
-  property double tbsa : 0.0
-  property alias severity  : root.tbsa
-  property bool validBuildConfig : (severity > 0.0 && actionStartTime_s > 0.0)
+  property double severity : 0.0
+  property alias tbsa : root.severity
+
+  property bool validBuildConfig : severity > 0.0
 
   actionType : "Burn Wound"
   actionClass : EventModel.BurnWound
@@ -20,7 +21,7 @@ UIActionForm {
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(tbsa)
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "TotalBodySurfaceArea:" + tbsa + ";"
+  buildParams : "TotalBodySurfaceArea=" + tbsa + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_burn_action(tbsa)  }
   onDeactivate: { scenario.create_burn_action(0)  }

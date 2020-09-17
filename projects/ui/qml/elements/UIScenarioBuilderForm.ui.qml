@@ -10,6 +10,7 @@ import com.biogearsengine.ui.scenario 1.0
 Window {
   id : scenarioBuilder
   title : "Scenario Builder"
+  property alias tabBar : tabBar
   property alias actionDelegate : actionListDelegate
   property alias activeRequestView : activeRequestView
   property alias actionView : actionListView
@@ -370,6 +371,7 @@ Window {
     Column {
       id : timeColumn
       property double blockTime_s : 0
+      property int index : -1   //Note that this index counts up from the bottom of the scenario builder
       width : builderModel.actionSwitchView.width - builderModel.actionSwitchView.scrollWidth
       height : 60
       spacing : 0
@@ -377,12 +379,12 @@ Window {
         State {
           name : "collapsed"
           PropertyChanges {target : timeColumn; height : 0; visible : false}
-          when : blockTime_s == 0
+          when : blockTime_s == 0 && index > 1  //Normally, if there is no time between actions we will not display a clock event. The exception is the first time block (bottom most) between the patient block and the first action
         }
         ,State {
           name : "expanded"
           PropertyChanges {target : timeColumn; height : 60; visible : true}
-          when : blockTime_s > 0
+          when : blockTime_s > 0 || index == 1
         }     
       ]
       Rectangle {

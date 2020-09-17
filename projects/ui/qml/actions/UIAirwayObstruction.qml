@@ -11,7 +11,7 @@ UIActionForm {
   border.color: "black"
 
   property double severity : 0.0
-  property bool validBuildConfig : (severity > 0.0 && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+  property bool validBuildConfig : (severity > 0.0 && actionDuration_s > 0.0)
   
   actionType : "Airway Obstruction"
   actionClass : EventModel.AirwayObstruction
@@ -19,7 +19,7 @@ UIActionForm {
   shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg(severity)
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "Severity:" + severity + ";"
+  buildParams : "Severity=" + severity + ";"
   //Interactive mode -- apply action immediately while running
   onActivate:   { scenario.create_airway_obstruction_action(severity)  }
   onDeactivate: { scenario.create_airway_obstruction_action(0)  }

@@ -15,84 +15,73 @@ UIActionForm {
   property double  concentration : 0.0
   property double rate : 0.0
   property string drug : ""
+  property string subClass_str : actionSubClass === EventModel.SubstanceBolus ? "Bolus" : actionSubClass === EventModel.SubstanceInfusion ? "Infusion" : "Oral"
 
   property bool validBuildConfig : {
-    if (root.adminRoute.includes("Bolus")){
-      return (dose > 0.0 && concentration > 0.0 && drug !== "" && actionStartTime_s > 0.0)
-    } else if (adminRoute==="Infusion"){
-      return (rate > 0.0 && concentration > 0.0 && drug !== "" && actionStartTime_s > 0.0 && actionDuration_s > 0.0)
+    if (actionSubClass === EventModel.SubstanceBolus){
+      return (dose > 0.0 && concentration > 0.0 && drug !== "")
+    } else if (actionSubClass === EventModel.SubstanceInfusion){
+      return (rate > 0.0 && concentration > 0.0 && drug !== "" && actionDuration_s > 0.0)
+    } else if (actionSubClass === EventModel.SubstanceOralDose){
+      return (dose > 0.0 && drug !== "")
     } else {
-      return (dose > 0.0 && drug !== "" && actionStartTime_s > 0.0)
+      return false
     }
   }
   actionType : "Administration"
   actionClass : EventModel.SubstanceAdministration
-  actionSubClass : {
-    if (root.adminRoute.includes("Bolus")){
-      return EventModel.SubstanceBolus
-    } else if (root.adminRoute.includes("Infusion")){
-      return EventModel.SubstanceInfusion
-    } else {
-      return EventModel.SubstanceOralDose
-    }
-  }
   fullName  : {
-    let tmp =  "<b>%1 %2</b><br>".arg(adminRoute).arg(actionType)
-    if (root.adminRoute == 'Bolus-Intraarterial' ||
-           root.adminRoute == 'Bolus-Intramuscular' || 
-           root.adminRoute == 'Bolus-Intravenous')
-    {
-      tmp += "<br> Dose %1 mL<br> Concentration %2ug/mL".arg(root.dose).arg(root.concentration)
-    } else if ( root.adminRoute == 'Infusion-Intravenous') {
-      tmp += "<br> Concentration %1 ug/mL<br> Concentration %2mL/min".arg(root.concentration).arg(root.rate)
+    if (actionSubClass === EventModel.SubstanceBolus){
+      return "<b>%1</b><br>".arg(subClass_str + "-" + adminRoute) + "<br> Dose %1 mL<br> Concentration %2ug/mL".arg(root.dose).arg(root.concentration)
+    } else if (actionSubClass === EventModel.SubstanceInfusion) {
+      return "<b>%1</b><br>".arg(subClass_str) + "<br> Concentration %1 ug/mL<br> Rate %2mL/min".arg(root.concentration).arg(root.rate)
+    } else if (actionSubClass === EventModel.SubstanceOralDose && root.adminRoute.includes("Transmucosal")){
+      return "<b>%1</b><br>".arg(subClass_str + "-" + adminRoute) + "<br> Dose %1 ug".arg(root.dose)
+    } else if (actionSubClass === EventModel.SubstanceOralDose && root.adminRoute.includes("Gastrointenstinal")){
+      return "<b>%1</b><br>".arg(subClass_str + "-" + adminRoute) + "<br> Dose %1 mg".arg(root.dose)
     } else {
-      tmp += "<br> Dose %1 mg".arg(root.dose)
+      return ""
     }
-    return tmp
   }
   shortName : "<font color=\"lightsteelblue\"> %2</font> <b>%1</b>".arg(actionType).arg(drug)
  
   //Builder mode data -- data passed to scenario builder
   buildParams : {
-    if (root.adminRoute.includes("Bolus")){
-      return "Substance:" + drug + ";Route:" + adminRoute + ";Concentration:" + concentration + ",ug/mL;Dose:" + dose + ",mL;";
-    } else if (root.adminRoute.includes("Infusion")){
-      return "Substance:" + drug + ";Concentration:" + concentration + ",ug/mL;Rate:" + rate + ",mL/min;";
-    } else if (root.adminRoute.includes("Transmucosal")) {
-      return "Substance:" + drug + ";Dose:" + dose + ",ug;Route:" + root.adminRoute + ";";
+    if (actionSubClass === EventModel.SubstanceBolus){
+      return "Substance=" + drug + ";Route=" + adminRoute + ";Concentration=" + concentration + ",ug/mL;Dose=" + dose + ",mL;";
+    } else if (actionSubClass === EventModel.SubstanceInfusion){
+      return "Substance=" + drug + ";Concentration=" + concentration + ",ug/mL;Rate=" + rate + ",mL/min;";
+    } else if (actionSubClass === EventModel.SubstanceOralDose && root.adminRoute.includes("Transmucosal")) {
+      return "Substance=" + drug + ";Dose=" + dose + ",ug;Route=" + root.adminRoute + ";";
+    } else if (actionSubClass === EventModel.SubstanceOralDose && root.adminRoute.includes("Gastrointestinal")){
+      return "Substance=" + drug + ";Dose=" + dose + ",mg;Route=" + root.adminRoute + ";";
     } else {
-      return "Substance:" + drug + ";Dose:" + dose + ",mg;Route:" + root.adminRoute + ";";
+      return ""
     }
   }
   //Interactive mode -- apply action immediately while running
   onActivate:   { 
-    if (root.adminRoute == 'Bolus-Intraarterial' ) {
-      scenario.create_substance_bolus_action(drug, 0, dose, concentration) 
-    } else if ( root.adminRoute == 'Bolus-Intramuscular' ) {
-      scenario.create_substance_bolus_action(drug, 1, dose, concentration) 
-    } else if ( root.adminRoute == 'Bolus-Intravenous') {
-      scenario.create_substance_bolus_action(drug, 2, dose, concentration) 
-    }  else if ( root.adminRoute == 'Infusion-Intravenous') {
+    if (root.actionSubClass === EventModel.SubstanceBolus){
+      if (root.adminRoute == 'Intraarterial' ) {
+        scenario.create_substance_bolus_action(drug, 0, dose, concentration) 
+      } else if ( root.adminRoute == 'Intramuscular' ) {
+        scenario.create_substance_bolus_action(drug, 1, dose, concentration) 
+      } else if ( root.adminRoute == 'Intravenous') {
+        scenario.create_substance_bolus_action(drug, 2, dose, concentration) 
+      }
+    }  else if (root.actionSubClass === EventModel.SubstanceInfusion) {
       scenario.create_substance_infusion_action(drug, concentration, rate) 
-    } else if ( root.adminRoute == 'Oral') {
-      scenario.create_substance_oral_action(drug, 0, dose) 
-    } else {
-      scenario.create_substance_oral_action(drug, 1, dose) 
+    } else if (root.actionSubClass === EventModel.SubstanceBolus){
+      if ( root.adminRoute == 'Gastrointestinal') {
+        scenario.create_substance_oral_action(drug, 0, dose) 
+      } else {
+        scenario.create_substance_oral_action(drug, 1, dose) 
+      }
     }
   }
   onDeactivate: { 
-       if (root.adminRoute == 'Bolus-Intraarterial' ) {
-      scenario.create_substance_bolus_action(drug, 0, 0, 0) 
-    } else if ( root.adminRoute == 'Bolus-Intramuscular' ) {
-      scenario.create_substance_bolus_action(drug, 1, 0, 0) 
-    } else if ( root.adminRoute == 'Bolus-Intravenous') {
-      scenario.create_substance_bolus_action(drug, 2, 0, 0) 
-    }  else if ( root.adminRoute == 'Infusion-Intravenous') {
+    if (root.actionSubClass === EventModel.SubstanceInfusion) {
       scenario.create_substance_infusion_action(drug, 0, 0) 
-    } else if ( root.adminRoute == 'Oral') {
-      scenario.create_substance_oral_action(drug, 0, 0) 
-    } else {
-      scenario.create_substance_oral_action(drug, 1, 0) 
     }
   }
 
@@ -121,7 +110,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 0
         text : "Dose"
-        visible : dosage.concentration
+        visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
       }      
       Slider {
         id: dosage
@@ -131,9 +120,7 @@ UIActionForm {
         to : 1000
         stepSize : 1
         value : root.dose
-
-        visible :  (root.adminRoute!=  'Infusion-Intravenous') ?  true : false
-
+        visible :  root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
         onMoved : {
           root.dose = value
           if ( root.active )
@@ -142,21 +129,25 @@ UIActionForm {
       }
       Label {
         text : {
-              if (root.adminRoute == 'Bolus-Intraarterial' ||
-                  root.adminRoute == 'Bolus-Intramuscular' || 
-                  root.adminRoute == 'Bolus-Intravenous')
-                return "%1 mL".arg(root.dose)
-              else (root.adminRoute == 'Oral' || root.adminRoute == 'Transmucosal')
-                return "%1 mg".arg(root.dose)
+          if (root.adminRoute == 'Intraarterial' ||
+              root.adminRoute == 'Intramuscular' || 
+              root.adminRoute == 'Intravenous'){
+            return "%1 mL".arg(root.dose)
           }
-          visible : dosage.concentration
+          else if  (root.adminRoute == 'Gastrointestinal'){
+            return "%1 mg".arg(root.dose)
+          } else if (root.adminRoute == 'Transmucosal'){
+            return "%1 ug".arg(root.dose)
+          }
+        }
+        visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
       }
       //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
         text : "Concentration"
-        visible : flowRate.concentration
+        visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceInfusion
       }      
       Slider {
         id: concentration
@@ -166,13 +157,7 @@ UIActionForm {
         to : 1000
         stepSize : 1
         value : root.concentration
-        visible : {
-          if ( root.adminRoute == 'Oral' || root.adminRoute == 'Transmucosal') {
-            return false;
-          } else {
-            return true;
-          }
-        }
+        visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceInfusion
         onMoved : {
           root.concentration = value
           if ( root.active )
@@ -181,14 +166,14 @@ UIActionForm {
       }
       Label {
         text : "%1 ug/mL".arg(root.concentration )
-        visible : flowRate.concentration
+        visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceInfusion
       }
     //Column 4
       Label {
         Layout.row : 3
         Layout.column : 0
         text : "Flow Rate"
-        visible : flowRate.visible
+        visible : root.actionSubClass === EventModel.SubstanceInfusion
       }      
       Slider {
         id: flowRate
@@ -198,13 +183,7 @@ UIActionForm {
         to : 1000
         stepSize : 1
         value : root.rate
-        visible : {
-          if ( root.adminRoute == 'Infusion-Intravenous' ) {
-            return true;
-          } else {
-            return false;
-          }
-        }
+        visible : root.actionSubClass === EventModel.SubstanceInfusion
         onMoved : {
           root.rate = value
           if ( root.active )
@@ -213,7 +192,7 @@ UIActionForm {
       }
       Label {
         text : "%1 ml/min".arg(root.rate )
-        visible : flowRate.visible
+        visible : root.actionSubClass === EventModel.SubstanceInfusion
       }
     
       // Column 5
@@ -282,7 +261,7 @@ UIActionForm {
   states : [
      State {
         name : "expandedBuilder"
-        PropertyChanges {target : drugLoader; sourceComponent : root.adminRoute.includes("Bolus") ? bolusBuilderDetails : root.adminRoute.includes("Infusion") ? infusionBuilderDetails : oralBuilderDetails}
+        PropertyChanges {target : drugLoader; sourceComponent : root.actionSubClass === EventModel.SubstanceBolus ? bolusBuilderDetails : root.actionSubClass === EventModel.SubstanceInfusion ? infusionBuilderDetails : oralBuilderDetails}
         PropertyChanges { target : root; collapsed : false}
       }
       ,State {
@@ -291,26 +270,39 @@ UIActionForm {
         PropertyChanges { target : root; collapsed : true}
         AnchorChanges { target : drugLoader; anchors.horizontalCenter : root.horizontalCenter}
       }
-    ]
-    MouseArea {
-      id: actionMouseArea
-      anchors.fill: parent
-      z: -1
-      acceptedButtons:  Qt.LeftButton | Qt.RightButton
-      
-      onDoubleClicked: { // Double Clicking Window
-        if ( mouse.button === Qt.LeftButton ){
-          if (drugLoader.state === "collapsedBuilder") {
-            drugLoader.state = "expandedBuilder"
-          } else {
-            //Not allowing double click to expand right now -- use "Set Action" button instead so that we can check that action is defined in build mode
-            //loader.state = "collapsed"
-          }
-        } else {
-          mouse.accepted = false
+  ]
+  MouseArea {
+    id: actionMouseArea
+    anchors.fill: parent
+    z: -1
+    acceptedButtons:  Qt.LeftButton | Qt.RightButton
+    onClicked : {
+      if ( mouse.button == Qt.RightButton) {
+        contextMenu.popup()
+      }
+      selected()
+    }
+    onDoubleClicked: { // Double Clicking Window
+      if ( mouse.button === Qt.LeftButton ){
+        if (drugLoader.state === "collapsedBuilder") {
+          drugLoader.state = "expandedBuilder"
+          root.editing()
+        } 
+      } else {
+        mouse.accepted = false
+      }
+    }
+    Menu {
+      id : contextMenu
+      MenuItem {
+        id : removeItem
+        text : "Remove"
+        onTriggered: {
+          root.remove( root.uuid )
         }
       }
     }
+  }
   Component.onCompleted : {
       viewLoader.state = "unset"   //"Unset" state in base loader class unloads anything that was already there
       viewLoader = drugLoader     //Reassign viewLoader property to use drug Loader that will handle multiple views depending on drug admin type
@@ -332,7 +324,7 @@ UIActionForm {
         root.drug = ""
         root.dose = 0
         rote.concentration = 0
-        root.adminRoute = "Bolus-"
+        root.adminRoute = ""
         bolusRadioGroup.radioGroup.checkState = Qt.Unchecked
         startTimeLoader.item.clear()
       }
@@ -433,13 +425,12 @@ UIActionForm {
         label.padding : 5
         buttonModel : ['Intraarterial', 'Intramuscular', 'Intravenous']
         radioGroup.onClicked : {
-          root.adminRoute = "Bolus-" + buttonModel[button.buttonIndex]
+          root.adminRoute = buttonModel[button.buttonIndex]
         }
         function setButtonState(){
           //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
-          let bolusType = root.adminRoute.split("-")[1] //split at "-" should return array [Bolus, Type], and we want the second element
           for (let i = 0; i < buttonModel.length; ++i){
-            if (bolusType===buttonModel[i]){
+            if (root.adminRoute===buttonModel[i]){
               return radioGroup.buttons[i]
             }
           }
@@ -813,7 +804,7 @@ UIActionForm {
       signal clear()
       onClear : {
         subCombo.currentIndex = -1
-        root.adminRoute = "Oral-"
+        root.adminRoute = ""
         root.drug = ""
         root.dose = 0.0
         startTimeLoader.item.clear()
@@ -882,12 +873,11 @@ UIActionForm {
         label.padding : 5
         buttonModel : ['Gastrointestinal', 'Transmucosal']
         radioGroup.onClicked : {
-          root.adminRoute = "Oral-" + buttonModel[button.buttonIndex]
+          root.adminRoute = buttonModel[button.buttonIndex]
         }
         function setButtonState(){
           //Each time this item goes out of focus, it is destroyed (property of loader).  When we reload it, we want to make sure we incoprorate any data already set (e.g. left or right checked state)
-          let oralType = root.adminRoute.split("-")[1] //split at "-" should return array [Bolus, Type], and we want the second element
-          return oralType === "Gastrointestinal" ? radioGroup.buttons[0] : oralType === "Transmucosal" ? radioGroup.buttons[1] : null
+          return adminRoute === "Gastrointestinal" ? radioGroup.buttons[0] : oralType === "Transmucosal" ? radioGroup.buttons[1] : null
         }
       }
       Loader {
@@ -940,7 +930,7 @@ UIActionForm {
           }
         }
         Label {
-          text : root.adminRoute === "Oral-Transmucosal" ? "%1 ug".arg(root.dose) : "%1 mg".arg(root.dose)
+          text : root.adminRoute === "Transmucosal" ? "%1 ug".arg(root.dose) : "%1 mg".arg(root.dose)
           font.pixelSize : 18
           Layout.alignment : Qt.AlignLeft
         }

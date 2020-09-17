@@ -271,8 +271,24 @@ import com.biogearsengine.ui.scenario 1.0
     }
     function add_drug_administration_action(props) {
       var compartment = Qt.createComponent("UIDrugAdministration.qml");
+      let type = -1;
+      let route = "";
+      if (props.adminRoute.includes("Bolus")){
+        type = EventModel.SubstanceBolus;
+        route = props.adminRoute.split("-")[1];
+      } else if (props.adminRoute.includes("Infusion")){
+        type = EventModel.SubstanceInfusion;
+        route = "Infusion";
+      } else {
+        type = EventModel.SubstanceOralDose
+        if (adminProps.route == "Oral"){
+          route = "Gastrointestinal";
+        } else {
+          route = "Transmucosal";
+        }
+      }
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{ "adminRoute" : props.adminRoute, "drug" : props.substance,
+        var action = compartment.createObject(actionSwitchView,{ "adminRoute" : route, "drug" : props.substance, "actionSubClass" : type,
                                                                  "dose" : props.dose,  "concentration" : props.concentration,   "rate" : props.rate,
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
@@ -368,14 +384,19 @@ import com.biogearsengine.ui.scenario 1.0
     }
 
     //Actions that support scenario builder
-    function add_single_range_builder(componentType, props, scenario) {
+    function add_single_range_builder(componentType, scenario, props = "", startTime = 0, duration = 0) {
+      let severity = 0.0;
+      if (props!==""){
+        //Only 1 arg (e.g. Severity=0.0)--split at =
+        severity = parseFloat(props.split("=")[1]);
+      }
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
-        var v_action = v_severityForm.createObject(actionSwitchView,{ "severity" : props.spinnerValue, "scenario" : scenario,
+        var v_action = v_severityForm.createObject(actionSwitchView,{ "severity" : severity, "actionStartTime_s" : startTime, "actionDuration_s" : duration,"scenario" : scenario,
                                                                       "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                        "builderMode" : true
-                                                                       })
-        return v_action
+                                                                       });
+        return v_action;
       } else {
         if (v_severityForm.status == Component.Error){
           console.log("Error : " + v_severityForm.errorString() );
@@ -384,10 +405,10 @@ import com.biogearsengine.ui.scenario 1.0
         console.log("Error : Action switch component not ready");
       }
     }
-    function add_binary_builder(componentType) {
+    function add_binary_builder(componentType, startTime = 0, duration = 0) {
         var v_binaryForm = Qt.createComponent(componentType, scenario);
         if ( v_binaryForm.status == Component.Ready)  {
-          var v_action = v_binaryForm.createObject(actionSwitchView,{ "scenario" : scenario, "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true, "builderMode" : true})
+          var v_action = v_binaryForm.createObject(actionSwitchView,{ "scenario" : scenario, "actionStartTime_s" : startTime, "actionDuration_s" : duration, "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true, "builderMode" : true})
           return v_action;
         } else {
           if (v_binaryForm.status == Component.Error){
@@ -397,14 +418,28 @@ import com.biogearsengine.ui.scenario 1.0
           console.log("Error : Action switch component not ready");
         }
     }
-    function add_pain_stimulus_builder(props, scenario) {
+    function add_pain_stimulus_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let location = "";
+      let painScore = 0.0;
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="Severity"){
+            painScore = parseFloat(param[1]);
+          } else if (param[0] === "Location"){
+            location = param[1].replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3');    //formats "LeftLeg" as "Left Leg" but leaves "pH" as "pH"
+          }
+        }
+      }
       var v_painStimulusForm = Qt.createComponent("UIPainStimulus.qml");
       if ( v_painStimulusForm.status == Component.Ready)  {
-        var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "location" : props.location, "intensity" : props.painScore, "scenario" : scenario,
+        var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "location" : location, "intensity" : painScore, "scenario" : scenario,
+                                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                                 "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                                 "builderMode" : true
-                                                                              })
-        return v_painStimulus
+                                                                              });
+        return v_painStimulus;
       } else {
         if (v_painStimulusForm.status == Component.Error){
           console.log("Error : " + v_painStimulusForm.errorString() );
@@ -414,14 +449,28 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
-    function add_hemorrhage_builder(props, scenario) {
+    function add_hemorrhage_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let compartment = "";
+      let rate = 0.0;
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="InitialRate"){
+            rate = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Compartment"){
+            compartment = param[1];
+          }
+        }
+      }
       var v_hemorrhageForm = Qt.createComponent("UIHemorrhage.qml");
       if ( v_hemorrhageForm.status == Component.Ready)  {
-        var v_hemorrhage = v_hemorrhageForm.createObject(actionSwitchView,{ "compartment" : props.compartment, "rate" : props.rate, "scenario" : scenario,
-                                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
-                                                                                "builderMode" : true
-                                                                              })
-        return v_hemorrhage
+        var v_hemorrhage = v_hemorrhageForm.createObject(actionSwitchView,{ "compartment" : compartment, "rate" : rate, "scenario" : scenario,
+                                                                            "actionStartTime_s" : startTime, "actionDuration_s" : duration,
+                                                                            "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                            "builderMode" : true
+                                                                              });
+        return v_hemorrhage;
       } else {
         if (v_hemorrhageForm.status == Component.Error){
           console.log("Error : " + v_hemorrhageForm.errorString() );
@@ -431,14 +480,31 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
-    function add_tension_pneumothorax_builder(props, scenario) {
+    function add_tension_pneumothorax_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let severity = 0.0;
+      let type = -1
+      let side = -1
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="Severity"){
+            severity = parseFloat(param[1]);
+          } else if (param[0] === "Side"){
+            side = param[1]=="Left" ? 0 : 1;
+          } else if (param[0] === "Type") {
+            type = param[1]=="Open" ? 0 : 1
+          }
+        }
+      }
       var v_pneumothoraxForm = Qt.createComponent("UITensionPneumothorax.qml");
       if ( v_pneumothoraxForm.status == Component.Ready)  {
-        var v_pneumothorax = v_pneumothoraxForm.createObject(actionSwitchView,{ "severity" : props.severity, "type" : props.type, "side" : props.side, "scenario" : scenario,
+        var v_pneumothorax = v_pneumothoraxForm.createObject(actionSwitchView,{ "severity" : severity, "type" : type, "side" : side, "scenario" : scenario,
+                                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                                 "builderMode" : true
-                                                                              })
-        return v_pneumothorax
+                                                                              });
+        return v_pneumothorax;
       } else {
         if (v_pneumothoraxForm.status == Component.Error){
           console.log("Error : " + v_pneumothoraxForm.errorString() );
@@ -449,14 +515,28 @@ import com.biogearsengine.ui.scenario 1.0
       }
     }
 
-    function add_traumatic_brain_injury_builder(props, scenario) {
+    function add_traumatic_brain_injury_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let severity = 0.0;
+      let type = -1;
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="Severity"){
+            severity = parseFloat(param[1]);
+          } else if (param[0] === "Type") {
+            type = parseInt(param[1]);
+          }
+        }
+      }
       var v_brainInjuryForm = Qt.createComponent("UITraumaticBrainInjury.qml");
       if ( v_brainInjuryForm.status == Component.Ready)  {
-        var v_brainInjury = v_brainInjuryForm.createObject(actionSwitchView,{ "severity" : props.severity, "type" : props.type, "scenario" : scenario,
-                                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
-                                                                                "builderMode" : true
-                                                                              })
-        return v_brainInjury
+        var v_brainInjury = v_brainInjuryForm.createObject(actionSwitchView,{ "severity" : severity, "type" : type, "scenario" : scenario,
+                                                                              "actionStartTime_s" : startTime, "actionDuration_s" : duration,
+                                                                              "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                              "builderMode" : true
+                                                                              });
+        return v_brainInjury;
       } else {
         if (v_brainInjuryForm.status == Component.Error){
           console.log("Error : " + v_brainInjuryForm.errorString() );
@@ -467,14 +547,28 @@ import com.biogearsengine.ui.scenario 1.0
       }
     }
 
-    function add_tourniquet_builder(props, scenario) {
+    function add_tourniquet_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let compartment = "";
+      let tState = -1;
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="tState"){
+            tState = parseInt(param[1]);
+          } else if (param[1] === "Compartment") {
+            compartment = param[1];
+          }
+        }
+      }
       var v_tourniquetForm = Qt.createComponent("UITourniquet.qml");
       if ( v_tourniquetForm.status == Component.Ready)  {
-        var v_tourniquet = v_tourniquetForm.createObject(actionSwitchView,{ "compartment" : props.compartment, "tState" : props.tState, "scenario" : scenario,
-                                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
-                                                                                "builderMode" : true
-                                                                              })
-        return v_tourniquet
+        var v_tourniquet = v_tourniquetForm.createObject(actionSwitchView,{ "compartment" : compartment, "tState" : tState, "scenario" : scenario,
+                                                                            "actionStartTime_s" : startTime, "actionDuration_s" : duration,
+                                                                            "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                            "builderMode" : true
+                                                                              });
+        return v_tourniquet;
       } else {
         if (v_tourniquetForm.status == Component.Error){
           console.log("Error : " + v_tourniquetForm.errorString() );
@@ -485,14 +579,31 @@ import com.biogearsengine.ui.scenario 1.0
       }
     }
 
-    function add_infection_builder(props, scenario) {
+    function add_infection_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let severity = -1;
+      let location = "";
+      let mic = 0.0;
+      if (props!==""){
+        let params = props.split(";")
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="Severity"){
+            severity = param[1] == "Mild" ? 1 : param[1]=="Moderate" ? 2 : 3;
+          } else if (param[0] === "MinimumInhibitoryConcentration") {
+            mic = parseFloat(param[1].split(',')[0])
+          } else if (param[0] === "Location"){
+            location = param[1].replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3') ;   //formats "LeftLeg" as "Left Leg" but leaves "pH" as "pH"
+          }
+        }
+      }
       var v_infectionForm = Qt.createComponent("UIInfection.qml");
       if ( v_infectionForm.status == Component.Ready)  {
-        var v_infection = v_infectionForm.createObject(actionSwitchView,{ "mic" : props.mic, "severity" : props.severity, "location" : props.location, "scenario" : scenario,
-                                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
-                                                                                "builderMode" : true
-                                                                              })
-        return v_infection
+        var v_infection = v_infectionForm.createObject(actionSwitchView,{ "mic" : mic, "severity" : severity, "location" : location, "scenario" : scenario,
+                                                                          "actionStartTime_s" : startTime, "actionDuration_s" : duration,
+                                                                          "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                          "builderMode" : true
+                                                                          });
+        return v_infection;
       } else {
         if (v_infectionForm.status == Component.Error){
           console.log("Error : " + v_infectionForm.errorString() );
@@ -503,13 +614,42 @@ import com.biogearsengine.ui.scenario 1.0
       }
     }
 
-    function add_consume_meal_builder(props, scenario) {
+    function add_consume_meal_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let mealName = "";
+      let carbohydrate = 0.0;
+      let fat = 0.0;
+      let protein = 0.0;
+      let sodium = 0.0;
+      let water = 0.0;
+      let calcium = 0.0;
+      if (props!==""){
+        let params = props.split(";")
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=")
+          if (param[0]==="Carbohydrate"){
+            carbohydrate = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Fat"){
+            fat = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Protein"){
+            protein = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Sodium"){
+            sodium = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Water"){
+            water = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Calcium"){
+            calcium = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Name") {
+            mealName = param[1];
+          }
+        }
+      }
       var v_mealForm = Qt.createComponent("UIConsumeMeal.qml");
       if ( v_mealForm.status == Component.Ready)  {
-        var v_meal = v_mealForm.createObject(actionSwitchView,{ "name" : props.mealName, "scenario" : scenario, 
-                                                                "carbs_g" : props.carbohydrate, "fat_g" : props.fat,
-                                                                "protein_g" : props.protein,  "sodium_mg" : props.sodium,  
-                                                                "water_ml" : props.water,  "calcium_mg" : props.calcium, 
+        var v_meal = v_mealForm.createObject(actionSwitchView,{ "name" : mealName, "scenario" : scenario, 
+                                                                "carbs_g" : carbohydrate, "fat_g" : fat,
+                                                                "protein_g" : protein,  "sodium_mg" : sodium,  
+                                                                "water_ml" : water,  "calcium_mg" : calcium, 
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
                                                                 })
@@ -523,15 +663,38 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
-    function add_drug_administration_builder(props, scenario) {
+    function add_drug_administration_builder(scenario, type, props = "", startTime = 0, duration = 0) {
+      let adminRoute = "";
+      let rate = 0.0;
+      let concentration = 0.0;
+      let dose = 0.0;
+      let drug = "";
+      if (props!==""){
+        let params = props.split(";")
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=")
+          if (param[0]==="Dose"){
+            dose = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Rate"){
+            rate = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Concentration"){
+            concentration = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Substance"){
+            drug = param[1];
+          } else if (param[0] === "AdminRoute") {
+            adminRoute = param[1];
+          }
+        }
+      }
       var v_drugActionForm = Qt.createComponent("UIDrugAdministration.qml");
       if ( v_drugActionForm.status == Component.Ready)  {
-        var v_drugAction = v_drugActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "adminRoute" : props.adminRoute, 
-                                                                "rate" : props.rate, "concentration" : props.concentration,
+        var v_drugAction = v_drugActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "actionSubClass" : type, "adminRoute" : adminRoute, "drug" : drug, 
+                                                                "rate" : rate, "concentration" : concentration, "dose" : dose,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
-                                                                })
-        return v_drugAction
+                                                                });
+        return v_drugAction;
       } else {
         if (v_drugActionForm.status == Component.Error){
           console.log("Error : " + v_drugActionForm.errorString() );
@@ -541,15 +704,32 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
-    function add_compound_infusion_builder(props, scenario) {
+    function add_compound_infusion_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let rate = 0.0;
+      let volume = 0.0;
+      let compound = "";
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="Rate"){
+            rate = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "BagVolume") {
+            volume = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "SubstanceCompound") {
+            compound = param[1];
+          }
+        }
+      }
       var v_compoundActionForm = Qt.createComponent("UICompoundInfusion.qml");
       if ( v_compoundActionForm.status == Component.Ready)  {
-        var v_compoundAction = v_compoundActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "compound" : "",
-                                                                "rate" : props.rate, "volume" : props.volume,
+        var v_compoundAction = v_compoundActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "compound" : compound,
+                                                                "rate" : rate, "volume" : volume,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
-                                                                })
-        return v_compoundAction
+                                                                });
+        return v_compoundAction;
       } else {
         if (v_compoundActionForm.status == Component.Error){
           console.log("Error : " + v_compoundActionForm.errorString() );
@@ -559,15 +739,32 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
-    function add_transfusion_builder(props, scenario) {
+    function add_transfusion_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let rate = 0.0;
+      let volume = 0.0;
+      let compound = "";
+      if (props!==""){
+        let params = props.split(";");
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=");
+          if (param[0]==="Rate"){
+            rate = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "BagVolume") {
+            volume = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "SubstanceCompound") {
+            compound = param[1];
+          }
+        }
+      }
       var v_transfusionActionForm = Qt.createComponent("UITransfusion.qml");
       if ( v_transfusionActionForm.status == Component.Ready)  {
-        var v_transfusionAction = v_transfusionActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "blood_type" : "",
-                                                                "rate" : props.rate, "volume" : props.volume,
+        var v_transfusionAction = v_transfusionActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "blood_type" : compound,
+                                                                "rate" : rate, "volume" : volume,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
-                                                                })
-        return v_transfusionAction
+                                                                });
+        return v_transfusionAction;
       } else {
         if (v_transfusionActionForm.status == Component.Error){
           console.log("Error : " + v_transfusionActionForm.errorString() );
@@ -577,18 +774,76 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
-    function add_anesthesia_machine_builder(props, scenario){
+    function add_anesthesia_machine_builder(scenario, props = "", startTime = 0, duration = 0){
       var v_machineForm = Qt.createComponent("UIAnesthesiaMachine.qml");
+      let connection = "";
+      let primaryGas = "";
+      let o2Source = "";
+      let leftChamberSub = "";
+      let rightChamberSub = "";
+      let inletFlow_L_Per_min = 5.0;
+      let ieRatio = 0.5;
+      let pMax_cmH2O = 10.0;
+      let peep_cmH2O = 1.0;
+      let respirationRate_Per_min = 12.0;
+      let reliefPressure_cmH2O = 50.0;
+      let o2Frac = 0.25;
+      let leftChamberFraction = 0.0;
+      let rightChamberFraction = 0.0;
+      let bottle1_mL = 0.0;
+      let bottle2_mL = 0.0;
+      if (props!==""){
+        let params = props.split(";")
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=")
+          if (param[0]==="Connection"){
+            connection = param[1]
+          } else if (param[0] === "PrimaryGas"){
+            primaryGas = param[1]
+          } else if (param[0] === "OxygenSource"){
+            o2Source = param[1]
+          } else if (param[0] === "LeftChamber-Substance"){
+            leftChamberSub = param[1]
+          } else if (param[0] === "RightChamber-Substance"){
+            rightChamberSub = param[1]
+          } else if (param[0] === "InletFlow"){
+            inletFlow_L_Per_min = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "InspiratoryExpiratoryRatio"){
+            ieRatio = parseFloat(param[1]);
+          } else if (param[0] === "VentilatorPressure"){
+            pMax_cmH2O = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "PositiveEndExpiredPressure"){
+            peep_cmH2O = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "RespiratoryRate"){
+            respirationRate_Per_min = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "ReliefValvePressure"){
+            reliefPressure_cmH2O = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "OxygenFraction"){
+            o2Frac = parseFloat(param[1]);
+          } else if (param[0] === "LeftChamber-SubstanceFraction"){
+            leftChamberFraction = parseFloat(param[1]);
+          } else if (param[0] === "RightChamber-SubstanceFraction"){
+            rightChamberFraction = parseFloat(param[1]);
+          } else if (param[0] === "OxygenBottleOne-Volume"){
+            bottle1_mL = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "OxygenBottleTwo-Volume"){
+            bottle2_mL = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "Calcium"){
+            calcium = parseFloat(param[1].split(',')[0]);
+          }
+        }
+      }
       if ( v_machineForm.status == Component.Ready)  {
-        var v_machineAction = v_machineForm.createObject(actionSwitchView,{ "scenario" : scenario, "connection" : props.connection, "primaryGas" : props.primaryGas, "o2Source" : props.o2Source,
-                                                                  "leftChamberSub" : props.leftChamberSub, "rightChamberSub" : props.rightChamberSub, "inletFlow_L_Per_min" : props.inletFlow_L_Per_min,
-                                                                  "ieRatio" : props.ieRatio, "pMax_cmH2O" : props.pMax_cmH2O, "peep_cmH2O" : props.peep_cmH2O, "respirationRate_Per_min" : props.respirationRate_Per_min,
-                                                                  "reliefPressure_cmH2O" : props.reliefPressure_cmH2O, "o2Fraction" : props.o2Frac, "leftChamberFraction" : props.leftChamberFraction,
-                                                                  "rightChamberFraction" : props.rightChamberFraction, "bottle1_mL" : props.bottle1_mL,"bottle2_mL" : props.bottle2_mL,
+        var v_machineAction = v_machineForm.createObject(actionSwitchView,{ "scenario" : scenario, "connection" : connection, "primaryGas" : primaryGas, "o2Source" : o2Source,
+                                                                  "leftChamberSub" : leftChamberSub, "rightChamberSub" : rightChamberSub, "inletFlow_L_Per_min" : inletFlow_L_Per_min,
+                                                                  "ieRatio" : ieRatio, "pMax_cmH2O" : pMax_cmH2O, "peep_cmH2O" : peep_cmH2O, "respirationRate_Per_min" : respirationRate_Per_min,
+                                                                  "reliefPressure_cmH2O" : reliefPressure_cmH2O, "o2Fraction" : o2Frac, "leftChamberFraction" : leftChamberFraction,
+                                                                  "rightChamberFraction" : rightChamberFraction, "bottle1_mL" : bottle1_mL,"bottle2_mL" : bottle2_mL,
+                                                                  "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                   "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true, "builderMode" : true
-                                                               })
+                                                               });
 
-        return v_machineAction
+        return v_machineAction;
       } else {
         if (v_machineForm.status == Component.Error){
           console.log("Error : " + v_machineForm.errorString() );
@@ -598,35 +853,102 @@ import com.biogearsengine.ui.scenario 1.0
       }
     }
 
-    function add_exercise_builder(props, scenario) {
+    function add_exercise_builder(scenario, type, props = "", startTime = 0, duration = 0) {
       var v_exerciseActionForm = Qt.createComponent("UIExercise.qml");
+      console.log(props.split(";"))
       if ( v_exerciseActionForm.status == Component.Ready)  {
-        if (props.type==="Cycling"){
-          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : props.type, 
-                                                                "property_1" : props.cadence, "property_2" : props.power, "weight" : props.weight,
+        if (type===EventModel.CyclingExercise){
+          let cadence = 0.0;
+          let power = 0.0;
+          let weight = 0.0;
+          let params = props.split(";");
+          if (props!==""){
+            let params = props.split(";")
+            for (let i = 0; i < params.length; ++i){
+              let param = params[i].split("=")
+              if (param[0]==="Cadence"){
+                cadence = parseInt(param[1])
+              } else if (param[0] === "Power") {
+                power = parseFloat(param[1].split(',')[0]);
+              } else if (param[0] === "AddedWeight"){
+                weight = parseFloat(param[1].split(',')[0]);
+              }
+            }
+          }
+          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Cycling", 
+                                                                "property_1" : cadence, "property_2" : power, "weight" : props.weight,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
                                                                 })
-        } else if (props.type==="Running"){
-          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : props.type, 
-                                                                "property_1" : props.velocity, "property_2" : props.incline, "weight" : props.weight,
+        } else if (type===EventModel.RunningExercise){
+          let velocity = 0.0;
+          let incline = 0.0;
+          let weight = 0.0;
+          if (props!==""){
+            let params = props.split(";")
+            for (let i = 0; i < params.length; ++i){
+              let param = params[i].split("=")
+              if (param[0]==="Incline"){
+                incline = parseInt(param[1])
+              } else if (param[0] === "Speed") {
+                velocity = parseFloat(param[1].split(',')[0]);
+              } else if (param[0] === "AddedWeight"){
+                weight = parseFloat(param[1].split(',')[0]);
+              }
+            }
+          }
+          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Running", 
+                                                                "property_1" : velocity, "property_2" : incline, "weight" : props.weight,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
                                                                 })
-        } else if (props.type==="Strength"){
-          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : props.type, 
-                                                                "property_2" : props.repetitions, "weight" : props.weight,
+        } else if (type===EventModel.StrengthExercise){
+          let repetitions = 0.0;
+          let weight = 0.0;
+          if (props!==""){
+            let params = props.split(";")
+            for (let i = 0; i < params.length; ++i){
+              let param = params[i].split("=")
+              if (param[0]==="Repetitions"){
+                repetitions = parseInt(param[1])
+              } else if (param[0] === "Weight") {
+                weight = parseFloat(param[1].split(',')[0]);
+              }
+            }
+          }
+          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Strength", 
+                                                                "property_2" : repetitions, "weight" : weight,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
                                                                 })
-        } else {
-          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : props.type, 
-                                                                "property_1" : props.intensity, "property_2" : props.power,
+        } else if (type == EventModel.GenericExercise) {
+          let intensity = 0.0;
+          let power = 0.0;
+          let subType = -1
+          if (props!==""){
+            let params = props.split(";")
+            for (let i = 0; i < params.length; ++i){
+              let param = params[i].split("=")
+              if (param[0]==="Intensity"){
+                intensity = parseFloat(param[1].split(',')[0]);
+                subType = 0
+              } else if (param[0] === "DesiredWorkRate") {
+                power = parseFloat(param[1].split(',')[0]);
+                subType = 1
+              }
+            }
+          }
+          var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Generic", 
+                                                                "property_1" : intensity, "property_2" : power, "genericSubType" : subType,
+                                                                "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                 "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
                                                                 "builderMode" : true
                                                                 })
         }
-        return v_exerciseAction
+        return v_exerciseAction;
       } else {
         if (v_exerciseActionForm.status == Component.Error){
           console.log("Error : " + v_exerciseActionForm.errorString() );
