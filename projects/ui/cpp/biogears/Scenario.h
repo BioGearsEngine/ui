@@ -215,7 +215,7 @@ private:
   QVariantList _volatile_drugs_list; //Gaseous subs with PK/PD that can be added to ventilator
   QVariantList _compounds_list; //Compounds
   QVariantList _transfusions_list; //Blood products
-  QVariantList _components_list;        //Subs that can be components of compounds
+  QVariantList _components_list; //Subs that can be components of compounds
   QVariantList _ambient_gas_list; //Gases that can be added to environment
   QVariantList _ambient_aerosol_list; //Aerosolized liquids that can be added to environment
   QVariantList _nutrition_list;

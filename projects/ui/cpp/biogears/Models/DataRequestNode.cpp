@@ -89,7 +89,7 @@ DataRequestNode* DataRequestNode::parent()
 //------------------------------------------------------------------------------------
 DataRequestNode* DataRequestNode::child(int index)
 {
-  if (0 <= index && index <= _children.size()) {
+  if (0 <= index && index < _children.size()) {
     return _children[index];
   }
   return nullptr;
