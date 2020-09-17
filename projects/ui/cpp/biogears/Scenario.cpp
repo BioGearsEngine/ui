@@ -425,6 +425,7 @@ Scenario& Scenario::load_patient(QString file)
       emit patientConditionsChanged(get_physiology_conditions());
       emit stateLoad(stateBaseName);
       emit physiologyChanged(_physiology_model);//OK Matt We have to talk about this
+      emit dataRequestModelChanged(_data_request_tree);
     } else {
       _initialized = true;
     }
