@@ -125,8 +125,6 @@ QVariantList DataRequestTree::encode_requests(CDM::ScenarioData* scenario)
 {
   QVariantList requests;
   QString request;
-  DataRequestNode* compartmentNode = static_cast<DataRequestNode*>(index(0, 0, QModelIndex()).internalPointer());
-  compartmentNode->collapsed(false);
   if (scenario->DataRequests().present()) {
     for (auto& req : scenario->DataRequests().get().DataRequest()) {
       if (auto gasCompartmentReq = dynamic_cast<CDM::GasCompartmentDataRequestData*>(&req)) {
@@ -157,18 +155,9 @@ QVariantList DataRequestTree::encode_requests(CDM::ScenarioData* scenario)
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_gas_compartment_request(CDM::GasCompartmentDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=GasCompartment";
-  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
-  if (req->Substance().present()) {
-    request += ("SUBSTANCE=" + req->Substance().get() + ";");
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Substance().present() ? "SubstanceQuantity" : req->Name();  //There is no "SubstanceQuantity" name field in the DataRequest schema, so check if optional sub is present.  Otherwise, use request name
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex gasIndex = index(0, 0, index(0, 0, QModelIndex())); //Gas branch is 0th element inside the Compartment branch  (0th element of top level)
   DataRequestNode* gasNode = static_cast<DataRequestNode*>(gasIndex.internalPointer());
@@ -181,32 +170,33 @@ QString DataRequestTree::encode_gas_compartment_request(CDM::GasCompartmentDataR
       compartmentNode->collapsed(false);
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
-        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+        if (searchString == compartmentNode->children()[j]->name().toStdString()) {
           compartmentNode->children()[j]->checked(true);
+          request = dataPath(index(j, 0, compartmentIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+          request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
           break;
         }
       }
       break;
     }
   }
-
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())+";"));
+  }
+  if (req->Substance().present()) {
+    request.append(QString::fromStdString("SUBSTANCE=" + req->Substance().get() + "," + req->Name() + ";"));    //Name will the substance quantity (e.g. Partial Pressure)
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_liquid_compartment_request(CDM::LiquidCompartmentDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=LiquidCompartment;";
-  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()) + ";");
-  }
-  if (req->Substance().present()) {
-    request += ("SUBSTANCE=" + req->Substance().get() + ";");
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Substance().present() ? "SubstanceQuantity" : req->Name(); //There is no "SubstanceQuantity" name field in the DataRequest schema, so check if optional sub is present.  Otherwise, use request name
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex liquidIndex = index(1, 0, index(0, 0, QModelIndex())); //Liquid branch is 1st element inside the Compartment branch  (0th element of top level)
   DataRequestNode* liquidNode = static_cast<DataRequestNode*>(liquidIndex.internalPointer());
@@ -219,28 +209,33 @@ QString DataRequestTree::encode_liquid_compartment_request(CDM::LiquidCompartmen
       compartmentNode->collapsed(false);
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
-        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+        if (searchString == compartmentNode->children()[j]->name().toStdString()) {
           compartmentNode->children()[j]->checked(true);
+          request = dataPath(index(j, 0, compartmentIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+          request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
           break;
         }
       }
       break;
     }
   }
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())+";"));
+  }
+  if (req->Substance().present()) {
+    request.append(QString::fromStdString("SUBSTANCE=" + req->Substance().get() + "," + req->Name() + ";")); //Name will the substance quantity (e.g. Partial Pressure)
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_thermal_compartment_request(CDM::ThermalCompartmentDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=ThermalCompartment";
-  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Name();
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex thermalIndex = index(2, 0, index(0, 0, QModelIndex())); //Thermal branch is 2nd element inside the Compartment branch  (0th element of top level)
   DataRequestNode* thermalNode = static_cast<DataRequestNode*>(thermalIndex.internalPointer());
@@ -253,28 +248,30 @@ QString DataRequestTree::encode_thermal_compartment_request(CDM::ThermalCompartm
       compartmentNode->collapsed(false);
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
-        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+        if (searchString == compartmentNode->children()[j]->name().toStdString()) {
           compartmentNode->children()[j]->checked(true);
+          request = dataPath(index(j, 0, compartmentIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+          request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
           break;
         }
       }
       break;
     }
   }
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_tissue_compartment_request(CDM::TissueCompartmentDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=TissueCompartment";
-  request += ("NAME=" + req->Compartment() + "," + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Name();
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex tissueIndex = index(3, 0, index(0, 0, QModelIndex())); //Tissue branch is 3rd element inside the Compartment branch  (0th element of top level)
   DataRequestNode* tissueNode = static_cast<DataRequestNode*>(tissueIndex.internalPointer());
@@ -287,104 +284,106 @@ QString DataRequestTree::encode_tissue_compartment_request(CDM::TissueCompartmen
       compartmentNode->collapsed(false);
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
-        if (req->Name() == compartmentNode->children()[j]->name().toStdString()) {
+        if (searchString == compartmentNode->children()[j]->name().toStdString()) {
           compartmentNode->children()[j]->checked(true);
+          request = dataPath(index(j, 0, compartmentIndex)) + QString("|");  //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+          request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
           break;
         }
       }
       break;
     }
   }
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_environment_request(CDM::EnvironmentDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=Environment";
-  request += ("NAME=" + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
-  return QString::fromStdString(request);
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+ 
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_patient_request(CDM::PatientDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=Patient";
-  request += ("NAME=" + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Name();
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex patientIndex = index(2, 0, QModelIndex()); //Patient branch is 2nd element inside top level
   DataRequestNode* patientNode = static_cast<DataRequestNode*>(patientIndex.internalPointer());
   patientNode->collapsed(false);
   for (int i = 0; i < patientNode->children().size(); ++i) {
     //Only one level of data beneath patient -- check which request we are calling
-    if (patientNode->children()[i]->name().toStdString() == req->Name()) {
+    if (searchString == patientNode->children()[i]->name().toStdString()) {
       patientNode->children()[i]->checked(true);
+      request = dataPath(index(i, 0, patientIndex)) + QString("|");  //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+      request.append(patientNode->children()[i]->type() + QString("|"));   //Pass the scalar type (e.g. MassPerVolume)
       break;
     }
     break;
   }
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_physiology_request(CDM::PhysiologyDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=Physiology";
-  request += ("NAME=" + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Name();
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex physiologyIndex = index(3, 0, QModelIndex()); //Physiology branch is 3rd element inside top level
   DataRequestNode* physiologyNode = static_cast<DataRequestNode*>(physiologyIndex.internalPointer());
   physiologyNode->collapsed(false);
   bool foundRequest = false;
-  int childIndex = 0;
-  DataRequestNode* childNode;
-  while (!foundRequest && childIndex < physiologyNode->children().size()) {
+  int section = 0;
+  QModelIndex sectionIndex;
+  DataRequestNode* sectionNode;
+  while (!foundRequest && section < physiologyNode->children().size()) {
     //Data request model nests requests according to physiology type (Cardiovascular, Respiratory ,etc).  This structure is not present in the schema (everything is
     // under physiology).  So we need to search through each of our physiology sub-sections to find this request
-    childNode = static_cast<DataRequestNode*>(index(childIndex, 0, physiologyIndex).internalPointer());   //Physioloy sub-type (Cardiovascular, Respiratory, ...)
-    for (int i = 0; i < childNode->children().size(); ++i) {
-      //Search children within sub-type (e.g. Cardiovacular->Heart Rate, Blood Pressure, ...)
-      if (childNode->children()[i]->name().toStdString() == req->Name()) {
-        childNode->collapsed(false);    //Show physiology type in open view
-        childNode->children()[i]->checked(true);    //Request check box will be checked
-        foundRequest = true;  //Stop searching
+    sectionIndex = index(section, 0, physiologyIndex);
+    sectionNode = static_cast<DataRequestNode*>(sectionIndex.internalPointer()); //Physioloy sub-type (Cardiovascular, Respiratory, ...)
+    for (int i = 0; i < sectionNode->children().size(); ++i) {
+      //Search children within section (e.g. Cardiovacular->Heart Rate, Blood Pressure, ...)
+      if (searchString == sectionNode->children()[i]->name().toStdString()) {
+        sectionNode->collapsed(false); //Show physiology type in open view
+        sectionNode->children()[i]->checked(true); //Request check box will be checked
+        foundRequest = true; //Stop searching
+        request = dataPath(index(i, 0, sectionIndex)) + QString("|");    //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+        request.append(sectionNode->children()[i]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
         break;
       }
     }
-    ++childIndex;
+    ++section;
   }
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData* req)
 {
-  //Format request string that will be used to create Request Component in Scenario Builder
-  std::string request = "TYPE=Substance";
-  request += ("NAME=" + req->Substance() + "," + req->Name() + ";");
-  if (req->Unit().present()) {
-    request += ("UNIT=" + req->Unit().get() + ";");
-  }
-  if (req->Precision().present()) {
-    request += ("PRECISION=" + std::to_string(req->Precision().get()));
-  }
+  //Initialize request string to be passed to builder and establish name of request for which we are searching
+  QString request = "";
+  std::string searchString = req->Name();
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex substanceGroupIndex = index(4, 0, QModelIndex()); //substance branch is 4th element inside top level
   DataRequestNode* substanceGroupNode = static_cast<DataRequestNode*>(substanceGroupIndex.internalPointer());
@@ -397,15 +396,23 @@ QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData*
       substanceNode->collapsed(false);
       for (int j = 0; j < substanceNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
-        if (req->Name() == substanceNode->children()[j]->name().toStdString()) {
+        if (searchString == substanceNode->children()[j]->name().toStdString()) {
           substanceNode->children()[j]->checked(true);
+          request = dataPath(index(j, 0, substanceIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
+          request.append(substanceNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
           break;
         }
       }
       break;
     }
   }
-  return QString::fromStdString(request);
+  if (req->Unit().present()) {
+    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  }
+  if (req->Precision().present()) {
+    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+  }
+  return request;
 }
 //------------------------------------------------------------------------------------
 CDM::DataRequestData* DataRequestTree::decode_request(QString request)
@@ -591,7 +598,7 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
     qMakePair(QString("OutFlow"), QString("VolumePerTime")),
     qMakePair(QString("Pressure"), QString("Pressure")),
     qMakePair(QString("Volume"), QString("Volume")),
-    qMakePair(QString("Substance Quantity"), QString("")) };
+    qMakePair(QString("SubstanceQuantity"), QString("")) };
 
   for (auto gas : comps->GetGasCompartments()) {
     auto gasNode = cGasTree->appendChild(QString::fromStdString(gas->GetName()));
@@ -603,15 +610,15 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
     qMakePair(QString("pH"), QString("")),
     qMakePair(QString("Pressure"), QString("Pressure")),
     qMakePair(QString("Volume"), QString("Volume")),
-    qMakePair(QString("Substance Quantity"), QString("")),
-    qMakePair(QString("Water Volume Fraction"), QString("")) };
+    qMakePair(QString("SubstanceQuantity"), QString("")),
+    qMakePair(QString("WaterVolumeFraction"), QString("")) };
   for (auto liquid : comps->GetLiquidCompartments()) {
     auto liquidNode = cLiquidTree->appendChild(QString::fromStdString(liquid->GetName()));
     auto propNode = liquidNode->appendChildren(cLiquidRequests);
   }
   //--Thermal subtree-- loop over thermal compartment names, add a node for each one and then nest available suboptions beneath them
-  QList<QPair<QString, QString>> cThermalRequests = { qMakePair(QString("Heat Transfer Rate In"), QString("Power")),
-    qMakePair(QString("Heat Transfer Rate Out"), QString("Power")),
+  QList<QPair<QString, QString>> cThermalRequests = { qMakePair(QString("HeatTransferRateIn"), QString("Power")),
+    qMakePair(QString("HeatTransferRateOut"), QString("Power")),
     qMakePair(QString("Temperature"), QString("Temperature")),
     qMakePair(QString("Heat"), QString("Energy")) };
   for (auto thermal : comps->GetThermalCompartments()) {
@@ -620,15 +627,15 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
   }
   //--Tissue subtree-- loop over tissue compartment names, add a node for each one and then nest available suboptions beneath them
   QList<QPair<QString, QString>> cTissueRequests = {
-    qMakePair(QString("Acidic Phospholipid Concentration"), QString("MassPerMass")),
-    qMakePair(QString("Matrix Volume"), QString("Volume")),
-    qMakePair(QString("Membrane Potential"), QString("ElectricPotential")),
-    qMakePair(QString("Neutral Lipids Volume Fraction"), QString("")),
-    qMakePair(QString("Neutral Phospholipids Volume Fraction"), QString("")),
-    qMakePair(QString("Reflection Coefficient"), QString("")),
-    qMakePair(QString("Tissue To Plasma Albumin Ratio"), QString("")),
-    qMakePair(QString("Tissue To Plasma Alpha-Acid Glycoprotein Ratio"), QString("")),
-    qMakePair(QString("Tissue To Plasma Lipoprotein Ratio"), QString("")),
+    qMakePair(QString("AcidicPhospholipidConcentration"), QString("MassPerMass")),
+    qMakePair(QString("MatrixVolume"), QString("Volume")),
+    qMakePair(QString("MembranePotential"), QString("ElectricPotential")),
+    qMakePair(QString("NeutralLipidsVolumeFraction"), QString("")),
+    qMakePair(QString("NeutralPhospholipidsVolumeFraction"), QString("")),
+    qMakePair(QString("ReflectionCoefficient"), QString("")),
+    qMakePair(QString("TissueToPlasmaAlbuminRatio"), QString("")),
+    qMakePair(QString("TissueToPlasmaAlpha-AcidGlycoproteinRatio"), QString("")),
+    qMakePair(QString("TissueToPlasmaLipoproteinRatio"), QString("")),
     qMakePair(QString("Total Mass"), QString("Mass")),
   };
   for (auto tissue : comps->GetTissueCompartments()) {
@@ -639,162 +646,162 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
 
   //================  Patient Sub-Tree  =========================================================
   auto pAge = patientTree->appendChild(QString("Age"), QString("Time"));
-  auto pAlveoliSA = patientTree->appendChild(QString("Alveoli Surface Area"), QString("Area"));
-  auto pBMR = patientTree->appendChild(QString("Basal Metabolic Rate"), QString("Power"));
-  auto pBloodVolumeBase = patientTree->appendChild(QString("Blood Volume Baseline"), QString("Volume"));
-  auto pBodyDensity = patientTree->appendChild(QString("Body Density"), QString("MassPerVolume"));
-  auto pBodyFatFraction = patientTree->appendChild(QString("Body Fat Fraction"));
-  auto pDiastolicBase = patientTree->appendChild(QString("Diastolic Arterial Pressure Baseline"), QString("Pressure"));
-  auto pExpiratoryReserve = patientTree->appendChild(QString("Expiratory Reserve Volume"), QString("Volume"));
-  auto pFunctionalCapacity = patientTree->appendChild(QString("Functional Residual Capacity"), QString("Volume"));
-  auto pHeartRateBase = patientTree->appendChild(QString("Heart Rate Baseline"), QString("Frequency"));
-  auto pHeartRateMax = patientTree->appendChild(QString("Heart Rate Maximum"), QString("Frequency"));
-  auto pHeartRateMin = patientTree->appendChild(QString("Heart Rate Minimum"), QString("Frequency"));
-  auto pInspiratoryCapacity = patientTree->appendChild(QString("Inspiratory Capacity"), QString("Volume"));
-  auto pInspiratoryReserve = patientTree->appendChild(QString("Inspitatory Reserve Volume"), QString("Volume"));
-  auto pLeanBodyMass = patientTree->appendChild(QString("Lean Body Mass"), QString("Mass"));
-  auto pMaxWorkRate = patientTree->appendChild(QString("Maximum Work Rate"), QString("Power"));
-  auto pMeanPressureBase = patientTree->appendChild(QString("Mean Arterial Pressure Baseline"), QString("Pressure"));
-  auto pMuscleMass = patientTree->appendChild(QString("Muscle Mass"), QString("Mass"));
-  auto pPain = patientTree->appendChild(QString("Pain Susceptibility"));
-  auto pResidual = patientTree->appendChild(QString("Residual Volume"), QString("Volume"));
-  auto pRespiratoryBase = patientTree->appendChild(QString("Respiration Rate Baseline"), QString("Frequency"));
-  auto pRightLungRatio = patientTree->appendChild(QString("Right Lung Ratio"), QString(""));
-  auto pSkinSA = patientTree->appendChild(QString("Skin Surface Area"), QString("Area"));
-  auto pSystolicBase = patientTree->appendChild(QString("Systolic Arterial Pressure Baseline"), QString("Pressure"));
-  auto pTidalBase = patientTree->appendChild(QString("Tidal Volume Baseline"), QString("Volume"));
-  auto pTotalCapacity = patientTree->appendChild(QString("Total Lung Capacity"), QString("Volume"));
-  auto pVentilationBase = patientTree->appendChild(QString("Total Ventilation Baseline"), QString("Volume"));
-  auto pVital = patientTree->appendChild(QString("Vital Capacity"), QString("Volume"));
+  auto pAlveoliSA = patientTree->appendChild(QString("AlveoliSurfaceArea"), QString("Area"));
+  auto pBMR = patientTree->appendChild(QString("BasalMetabolicRate"), QString("Power"));
+  auto pBloodVolumeBase = patientTree->appendChild(QString("BloodVolumeBaseline"), QString("Volume"));
+  auto pBodyDensity = patientTree->appendChild(QString("BodyDensity"), QString("MassPerVolume"));
+  auto pBodyFatFraction = patientTree->appendChild(QString("BodyFatFraction"));
+  auto pDiastolicBase = patientTree->appendChild(QString("DiastolicArterialPressureBaseline"), QString("Pressure"));
+  auto pExpiratoryReserve = patientTree->appendChild(QString("ExpiratoryReserveVolume"), QString("Volume"));
+  auto pFunctionalCapacity = patientTree->appendChild(QString("FunctionalResidualCapacity"), QString("Volume"));
+  auto pHeartRateBase = patientTree->appendChild(QString("HeartRateBaseline"), QString("Frequency"));
+  auto pHeartRateMax = patientTree->appendChild(QString("HeartRateMaximum"), QString("Frequency"));
+  auto pHeartRateMin = patientTree->appendChild(QString("HeartRateMinimum"), QString("Frequency"));
+  auto pInspiratoryCapacity = patientTree->appendChild(QString("InspiratoryCapacity"), QString("Volume"));
+  auto pInspiratoryReserve = patientTree->appendChild(QString("InspitatoryReserveVolume"), QString("Volume"));
+  auto pLeanBodyMass = patientTree->appendChild(QString("LeanBodyMass"), QString("Mass"));
+  auto pMaxWorkRate = patientTree->appendChild(QString("MaximumWorkRate"), QString("Power"));
+  auto pMeanPressureBase = patientTree->appendChild(QString("MeanArterialPressureBaseline"), QString("Pressure"));
+  auto pMuscleMass = patientTree->appendChild(QString("MuscleMass"), QString("Mass"));
+  auto pPain = patientTree->appendChild(QString("PainSusceptibility"));
+  auto pResidual = patientTree->appendChild(QString("ResidualVolume"), QString("Volume"));
+  auto pRespiratoryBase = patientTree->appendChild(QString("RespirationRateBaseline"), QString("Frequency"));
+  auto pRightLungRatio = patientTree->appendChild(QString("RightLungRatio"), QString(""));
+  auto pSkinSA = patientTree->appendChild(QString("SkinSurface rea"), QString("Area"));
+  auto pSystolicBase = patientTree->appendChild(QString("SystolicArterialPressureBaseline"), QString("Pressure"));
+  auto pTidalBase = patientTree->appendChild(QString("TidalVolumeBaseline"), QString("Volume"));
+  auto pTotalCapacity = patientTree->appendChild(QString("TotalLungCapacity"), QString("Volume"));
+  auto pVentilationBase = patientTree->appendChild(QString("TotalVentilationBaseline"), QString("Volume"));
+  auto pVital = patientTree->appendChild(QString("VitalCapacity"), QString("Volume"));
 
   //================  Physiology Sub-Tree  =========================================================
   //--Blood Chemistry Sub-tree
-  auto phyBloodChemistry = physiologyTree->appendChild(QString("Blood Chemistry"));
-  auto bcArterialPH = phyBloodChemistry->appendChild(QString("Arterial Blood pH"));
-  auto bcArterialCO2 = phyBloodChemistry->appendChild(QString("Arterial Carbon Dioxide Pressure"), QString("Pressure"));
-  auto bcArterialO2 = phyBloodChemistry->appendChild(QString("Arterial Oxygen Pressure"), QString("Pressure"));
-  auto bcBloodDensity = phyBloodChemistry->appendChild(QString("Blood Density"), QString("MassPerVolume"));
-  auto bcBloodHeat = phyBloodChemistry->appendChild(QString("Blood Specific Heat"), QString("HeatCapacitancePerMass"));
-  auto bcBloodUrea = phyBloodChemistry->appendChild(QString("Blood Urea Nitrogen Concentration"), QString("MassPerVolume"));
-  auto bcCO2Sat = phyBloodChemistry->appendChild(QString("Carbon Dioxide Saturation"));
-  auto bcCOSat = phyBloodChemistry->appendChild(QString("Carbon Monoxide Saturation"));
+  auto phyBloodChemistry = physiologyTree->appendChild(QString("BloodChemistry"));
+  auto bcArterialPH = phyBloodChemistry->appendChild(QString("ArterialBloodPH"));
+  auto bcArterialCO2 = phyBloodChemistry->appendChild(QString("ArterialCarbonDioxidePressure"), QString("Pressure"));
+  auto bcArterialO2 = phyBloodChemistry->appendChild(QString("ArterialOxygenPressure"), QString("Pressure"));
+  auto bcBloodDensity = phyBloodChemistry->appendChild(QString("BloodDensity"), QString("MassPerVolume"));
+  auto bcBloodHeat = phyBloodChemistry->appendChild(QString("BloodSpecificHeat"), QString("HeatCapacitancePerMass"));
+  auto bcBloodUrea = phyBloodChemistry->appendChild(QString("BloodUreaNitrogenConcentration"), QString("MassPerVolume"));
+  auto bcCO2Sat = phyBloodChemistry->appendChild(QString("CarbonDioxideSaturation"));
+  auto bcCOSat = phyBloodChemistry->appendChild(QString("CarbonMonoxideSaturation"));
   auto bcHematocrit = phyBloodChemistry->appendChild(QString("Hematocrit"));
-  auto bcHemoglobin = phyBloodChemistry->appendChild(QString("Hemoglobin Content"), QString("Mass"));
-  auto bcHemoglobinLost = phyBloodChemistry->appendChild(QString("Hemoglobin Lost to Urine"), QString("Mass"));
-  auto bcInflammation = phyBloodChemistry->appendChild(QString("Inflammatory Response"));
+  auto bcHemoglobin = phyBloodChemistry->appendChild(QString("HemoglobinContent"), QString("Mass"));
+  auto bcHemoglobinLost = phyBloodChemistry->appendChild(QString("HemoglobinLostToUrine"), QString("Mass"));
+  auto bcInflammation = phyBloodChemistry->appendChild(QString("InflammatoryResponse"));
   //--Inflammation options
-  auto inAutonomic = bcInflammation->appendChild(QString("Autonomic Response Level"));
-  auto inBloodPathogen = bcInflammation->appendChild(QString("Blood Pathogen"));
+  auto inAutonomic = bcInflammation->appendChild(QString("AutonomicResponseLevel"));
+  auto inBloodPathogen = bcInflammation->appendChild(QString("BloodPathogen"));
   auto inBloodCatecholamines = bcInflammation->appendChild(QString("Catecholamines"));
-  auto inBloodcNOS = bcInflammation->appendChild(QString("Constitutive NOS"));
-  auto inBloodNOS = bcInflammation->appendChild(QString("Inducible NOS"));
-  auto inBloodPreNOS = bcInflammation->appendChild(QString("Inducible NOSPre"));
-  auto inTime = bcInflammation->appendChild(QString("Inflammation Time"));
-  auto inBloodIL6 = bcInflammation->appendChild(QString("Interleukin 6"));
-  auto inBloodIL10 = bcInflammation->appendChild(QString("Interleukin 10"));
-  auto inBloodIL12 = bcInflammation->appendChild(QString("Interleukin 12"));
-  auto inLocalBarrier = bcInflammation->appendChild(QString("Local Barrier"));
-  auto inLocalMacropage = bcInflammation->appendChild(QString("Local Macrophage"));
-  auto inLocalNeutrophil = bcInflammation->appendChild(QString("Local Neutrophil"));
-  auto inLocalPathogen = bcInflammation->appendChild(QString("Local Pathogen"));
-  auto inBloodActiveMacropage = bcInflammation->appendChild(QString("Macrophage Active"));
-  auto inBloodRestingMacropage = bcInflammation->appendChild(QString("Macrophage Resting"));
-  auto inBloodActiveNeutrophil = bcInflammation->appendChild(QString("Neutrophil Active"));
-  auto inBloodRestingNeutrophil = bcInflammation->appendChild(QString("Neutrophil Resting"));
+  auto inBloodcNOS = bcInflammation->appendChild(QString("ConstitutiveNOS"));
+  auto inBloodNOS = bcInflammation->appendChild(QString("InducibleNOS"));
+  auto inBloodPreNOS = bcInflammation->appendChild(QString("InducibleNOSPre"));
+  auto inTime = bcInflammation->appendChild(QString("InflammationTime"));
+  auto inBloodIL6 = bcInflammation->appendChild(QString("Interleukin6"));
+  auto inBloodIL10 = bcInflammation->appendChild(QString("Interleukin10"));
+  auto inBloodIL12 = bcInflammation->appendChild(QString("Interleukin12"));
+  auto inLocalBarrier = bcInflammation->appendChild(QString("LocalBarrier"));
+  auto inLocalMacropage = bcInflammation->appendChild(QString("LocalMacrophage"));
+  auto inLocalNeutrophil = bcInflammation->appendChild(QString("LocalNeutrophil"));
+  auto inLocalPathogen = bcInflammation->appendChild(QString("LocalPathogen"));
+  auto inBloodActiveMacropage = bcInflammation->appendChild(QString("MacrophageActive"));
+  auto inBloodRestingMacropage = bcInflammation->appendChild(QString("MacrophageResting"));
+  auto inBloodActiveNeutrophil = bcInflammation->appendChild(QString("NeutrophilActive"));
+  auto inBloodRestingNeutrophil = bcInflammation->appendChild(QString("NeutrophilResting"));
   auto inBloodNO3 = bcInflammation->appendChild(QString("Nitrate"));
-  auto inBloodNO = bcInflammation->appendChild(QString("Nitric Oxide"));
-  auto inTissueIntegrity = bcInflammation->appendChild(QString("Tissue Integrity"));
-  auto inBloodTNF = bcInflammation->appendChild(QString("Tumor Necrosis Factor"));
+  auto inBloodNO = bcInflammation->appendChild(QString("NitricOxide"));
+  auto inTissueIntegrity = bcInflammation->appendChild(QString("TissueIntegrity"));
+  auto inBloodTNF = bcInflammation->appendChild(QString("TumorNecrosisFactor"));
   //Resume blood chemistry sub-tree
-  auto bcO2Sat = phyBloodChemistry->appendChild(QString("Oxygen Arterial Saturation"));
-  auto bcO2SatVen = phyBloodChemistry->appendChild(QString("Oxygen Venous Saturation"));
-  auto bcPhosphate = phyBloodChemistry->appendChild(QString("Phosphate Concentration"), QString("AmountPerVolume"));
-  auto bcPlasma = phyBloodChemistry->appendChild(QString("Plasma Volume"), QString("Volume"));
-  auto bcPulmArterialCO2 = phyBloodChemistry->appendChild(QString("Pulmonary Arterial Carbon Dioxide Pressure"), QString("Pressure"));
-  auto bcPulmArterialO2 = phyBloodChemistry->appendChild(QString("Pulmonary Arterial Oxygen Pressure"), QString("Pressure"));
-  auto bcPulmVenousCO2 = phyBloodChemistry->appendChild(QString("Pulmonary Venous Carbon Dioxide Pressure"), QString("Pressure"));
-  auto bcPulmVenousO2 = phyBloodChemistry->appendChild(QString("Pulmonary Venous Oxygen Pressure"), QString("Pressure"));
-  auto bcPulseOx = phyBloodChemistry->appendChild(QString("Pulse Oximetry"), QString(""));
-  auto bcRBCach = phyBloodChemistry->appendChild(QString("Red Blood Cell Acetylcholinesterase"), QString("AmountPerVolume"));
-  auto bcRBC = phyBloodChemistry->appendChild(QString("Red Blood Cell Count"), QString("AmountPerVolume"));
-  auto bcShunt = phyBloodChemistry->appendChild(QString("Shunt Fraction"));
-  auto bcSID = phyBloodChemistry->appendChild(QString("Strong Ion Difference"), QString("AmountPerVolume"));
-  auto bcBilirubin = phyBloodChemistry->appendChild(QString("Total Bilirubin"), QString("MassPerVolume"));
-  auto bcTotalProtein = phyBloodChemistry->appendChild(QString("Total Protein Concentration"), QString("MassPerVolume"));
-  auto bcVenousCO2 = phyBloodChemistry->appendChild(QString("Venous Carbon Dioxide Pressure"), QString("Pressure"));
-  auto bcVenousO2 = phyBloodChemistry->appendChild(QString("Venous Oxygen Pressure"), QString("Pressure"));
-  auto bcLipid = phyBloodChemistry->appendChild(QString("Volume Fraction Neutral Lipids in Plasma"));
-  auto bcPhospholipid = phyBloodChemistry->appendChild(QString("Volume Fraction Neutral Phospholipids in Plasma"));
-  auto bcWBC = phyBloodChemistry->appendChild(QString("White Blood Cell Count"), QString("AmountPerVolume"));
+  auto bcO2Sat = phyBloodChemistry->appendChild(QString("OxygenSaturation"));
+  auto bcO2SatVen = phyBloodChemistry->appendChild(QString("OxygenVenousSaturation"));
+  auto bcPhosphate = phyBloodChemistry->appendChild(QString("PhosphateConcentration"), QString("AmountPerVolume"));
+  auto bcPlasma = phyBloodChemistry->appendChild(QString("PlasmaVolume"), QString("Volume"));
+  auto bcPulmArterialCO2 = phyBloodChemistry->appendChild(QString("PulmonaryArterialCarbonDioxidePressure"), QString("Pressure"));
+  auto bcPulmArterialO2 = phyBloodChemistry->appendChild(QString("PulmonaryArterialOxygenPressure"), QString("Pressure"));
+  auto bcPulmVenousCO2 = phyBloodChemistry->appendChild(QString("PulmonaryVenousCarbonDioxidePressure"), QString("Pressure"));
+  auto bcPulmVenousO2 = phyBloodChemistry->appendChild(QString("PulmonaryVenousOxygenPressure"), QString("Pressure"));
+  auto bcPulseOx = phyBloodChemistry->appendChild(QString("PulseOximetry"), QString(""));
+  auto bcRBCach = phyBloodChemistry->appendChild(QString("RedBloodCellAcetylcholinesterase"), QString("AmountPerVolume"));
+  auto bcRBC = phyBloodChemistry->appendChild(QString("RedBloodCellCount"), QString("AmountPerVolume"));
+  auto bcShunt = phyBloodChemistry->appendChild(QString("ShuntFraction"));
+  auto bcSID = phyBloodChemistry->appendChild(QString("StrongIonDifference"), QString("AmountPerVolume"));
+  auto bcBilirubin = phyBloodChemistry->appendChild(QString("TotalBilirubin"), QString("MassPerVolume"));
+  auto bcTotalProtein = phyBloodChemistry->appendChild(QString("TotalProteinConcentration"), QString("MassPerVolume"));
+  auto bcVenousCO2 = phyBloodChemistry->appendChild(QString("VenousCarbonDioxidePressure"), QString("Pressure"));
+  auto bcVenousO2 = phyBloodChemistry->appendChild(QString("VenousOxygenPressure"), QString("Pressure"));
+  auto bcLipid = phyBloodChemistry->appendChild(QString("VolumeFractionNeutralLipidsinPlasma"));
+  auto bcPhospholipid = phyBloodChemistry->appendChild(QString("VolumeFractionNeutralPhospholipidsinPlasma"));
+  auto bcWBC = phyBloodChemistry->appendChild(QString("WhiteBloodCellCount"), QString("AmountPerVolume"));
   //Cardiovascular sub-tree
   auto phyCardio = physiologyTree->appendChild(QString("Cardiovascular"));
-  auto cvArterial = phyCardio->appendChild(QString("Arterial Pressure"), QString("Pressure"));
-  auto cvBloodVolume = phyCardio->appendChild(QString("Blood Volume"), QString("Volume"));
-  auto cvCardiacOutput = phyCardio->appendChild(QString("Cardiac Output"), QString("VolumePerTime"));
-  auto cvCVP = phyCardio->appendChild(QString("Central Venous Pressure"), QString("Pressure"));
-  auto cvCBF = phyCardio->appendChild(QString("Cerebral Blood Flow"), QString("VolumePerTime"));
-  auto cvPerfusion = phyCardio->appendChild(QString("Cerebral Perfusion Pressure"), QString("Pressure"));
-  auto cvDiastolic = phyCardio->appendChild(QString("Diastolic Arterial Pressure"), QString("Pressure"));
-  auto cvEjectionFraction = phyCardio->appendChild(QString("Heart Ejection Fraction"));
-  auto cvHeartRate = phyCardio->appendChild(QString("Heart Rate"), QString("Frequency"));
-  auto cvHeartVolume = phyCardio->appendChild(QString("Heart Stroke Volume"), QString("Volume"));
-  auto cvICP = phyCardio->appendChild(QString("Intracranial Pressure"), QString("Pressure"));
-  auto cvMAP = phyCardio->appendChild(QString("Mean Arterial Pressure"), QString("Pressure"));
-  auto cvMeanCVP = phyCardio->appendChild(QString("Mean Central Venous Pressure"), QString("Pressure"));
-  auto cvSkinFlow = phyCardio->appendChild(QString("Mean Skin Blood Flow"), QString("VolumePerTime"));
-  auto cvPulmPressure = phyCardio->appendChild(QString("Pulmonary Arterial Pressure"), QString("Pressure"));
-  auto cvPulmWedge = phyCardio->appendChild(QString("Pulmonary Capillaries Wedge Pressure"), QString("Pressure"));
-  auto cvPulmDiastolic = phyCardio->appendChild(QString("Pulmonary Diastolic Arterial Pressure"), QString("Pressure"));
-  auto cvPulmMAP = phyCardio->appendChild(QString("Pulmonary Mean Arterial Pressure"), QString("Pressure"));
-  auto cvPulmCapFlow = phyCardio->appendChild(QString("Pulmonary Mean Capillaries Flow"), QString("VolumePerTime"));
-  auto cvPulmShuntFlow = phyCardio->appendChild(QString("Pulmonary Mean Shunt Flow"), QString("VolumePerTime"));
-  auto cvPulmSystolic = phyCardio->appendChild(QString("Pulmonary Systolic Arterial Pressure"), QString("Pressure"));
-  auto cvPulmResistance = phyCardio->appendChild(QString("Pulmonary Vascular Resistance"), QString("FlowResistance"));
-  auto cvPulmResistanceIndex = phyCardio->appendChild(QString("Pulmonary Vascular Resistance Index"), QString("PressureTimePerVolumeArea"));
-  auto cvPulsePressure = phyCardio->appendChild(QString("Pulse Pressure"), QString("Pressure"));
-  auto cvSVR = phyCardio->appendChild(QString("Systemic Vascular Resistance"), QString("FlowResistance"));
-  auto cvSAP = phyCardio->appendChild(QString("Systolic Arterial Pressure"), QString("Pressure"));
+  auto cvArterial = phyCardio->appendChild(QString("ArterialPressure"), QString("Pressure"));
+  auto cvBloodVolume = phyCardio->appendChild(QString("BloodVolume"), QString("Volume"));
+  auto cvCardiacOutput = phyCardio->appendChild(QString("CardiacOutput"), QString("VolumePerTime"));
+  auto cvCVP = phyCardio->appendChild(QString("CentralVenousPressure"), QString("Pressure"));
+  auto cvCBF = phyCardio->appendChild(QString("CerebralBloodFlow"), QString("VolumePerTime"));
+  auto cvPerfusion = phyCardio->appendChild(QString("CerebralPerfusionPressure"), QString("Pressure"));
+  auto cvDiastolic = phyCardio->appendChild(QString("DiastolicArterialPressure"), QString("Pressure"));
+  auto cvEjectionFraction = phyCardio->appendChild(QString("HeartEjectionFraction"));
+  auto cvHeartRate = phyCardio->appendChild(QString("HeartRate"), QString("Frequency"));
+  auto cvHeartVolume = phyCardio->appendChild(QString("HeartStrokeVolume"), QString("Volume"));
+  auto cvICP = phyCardio->appendChild(QString("IntracranialPressure"), QString("Pressure"));
+  auto cvMAP = phyCardio->appendChild(QString("MeanArterialPressure"), QString("Pressure"));
+  auto cvMeanCVP = phyCardio->appendChild(QString("MeanCentralVenousPressure"), QString("Pressure"));
+  auto cvSkinFlow = phyCardio->appendChild(QString("MeanSkinBloodFlow"), QString("VolumePerTime"));
+  auto cvPulmPressure = phyCardio->appendChild(QString("PulmonaryArterialPressure"), QString("Pressure"));
+  auto cvPulmWedge = phyCardio->appendChild(QString("PulmonaryCapillariesWedgePressure"), QString("Pressure"));
+  auto cvPulmDiastolic = phyCardio->appendChild(QString("PulmonaryDiastolicArterialPressure"), QString("Pressure"));
+  auto cvPulmMAP = phyCardio->appendChild(QString("PulmonaryMeanArterialPressure"), QString("Pressure"));
+  auto cvPulmCapFlow = phyCardio->appendChild(QString("PulmonaryMeanCapillaryFlow"), QString("VolumePerTime"));
+  auto cvPulmShuntFlow = phyCardio->appendChild(QString("PulmonaryMeanShuntFlow"), QString("VolumePerTime"));
+  auto cvPulmSystolic = phyCardio->appendChild(QString("PulmonarySystolicArterialPressure"), QString("Pressure"));
+  auto cvPulmResistance = phyCardio->appendChild(QString("PulmonaryVascularResistance"), QString("FlowResistance"));
+  auto cvPulmResistanceIndex = phyCardio->appendChild(QString("PulmonaryVascularResistanceIndex"), QString("PressureTimePerVolumeArea"));
+  auto cvPulsePressure = phyCardio->appendChild(QString("PulsePressure"), QString("Pressure"));
+  auto cvSVR = phyCardio->appendChild(QString("SystemicVascularResistance"), QString("FlowResistance"));
+  auto cvSAP = phyCardio->appendChild(QString("SystolicArterialPressure"), QString("Pressure"));
   //--Drug sub-tree
   auto phyDrug = physiologyTree->appendChild(QString("Drugs"));
-  auto drugAntibiotic = phyDrug->appendChild(QString("Antibiotic Activity"));
-  auto drugBronchodilation = phyDrug->appendChild(QString("Bronchodilation Level"));
-  auto drugCNS = phyDrug->appendChild(QString("Central Nervous Response"));
-  auto drugFever = phyDrug->appendChild(QString("Fever Change"), QString("Temperature"));
-  auto drugHeartRate = phyDrug->appendChild(QString("Heart Rate Change"), QString("Frequency"));
-  auto drugHemorrhage = phyDrug->appendChild(QString("Hemorrhage Reduction"));
-  auto drugMAP = phyDrug->appendChild(QString("Mean Blood Pressure Change"), QString("Pressure"));
-  auto drugNeuro = phyDrug->appendChild(QString("Neurmuscular Block Level"));
-  auto drugPain = phyDrug->appendChild(QString("Pain Tolerance Change"));
-  auto drugPulse = phyDrug->appendChild(QString("Pulse Pressure Change"), QString("Pressure"));
-  auto drugRespiration = phyDrug->appendChild(QString("Respiration Rate Change"), QString("Frequency"));
-  auto drugSedation = phyDrug->appendChild(QString("Sedation Level"));
-  auto drugTidalVolume = phyDrug->appendChild(QString("Tidal Volume Change"), QString("Volume"));
-  auto drugTubular = phyDrug->appendChild(QString("Tubular Permeability Change"));
+  auto drugAntibiotic = phyDrug->appendChild(QString("AntibioticActivity"));
+  auto drugBronchodilation = phyDrug->appendChild(QString("BronchodilationLevel"));
+  auto drugCNS = phyDrug->appendChild(QString("CentralNervousResponse"));
+  auto drugFever = phyDrug->appendChild(QString("FeverChange"), QString("Temperature"));
+  auto drugHeartRate = phyDrug->appendChild(QString("HeartRateChange"), QString("Frequency"));
+  auto drugHemorrhage = phyDrug->appendChild(QString("HemorrhageReduction"));
+  auto drugMAP = phyDrug->appendChild(QString("MeanBloodPressureChange"), QString("Pressure"));
+  auto drugNeuro = phyDrug->appendChild(QString("NeurmuscularBlockLevel"));
+  auto drugPain = phyDrug->appendChild(QString("PainToleranceChange"));
+  auto drugPulse = phyDrug->appendChild(QString("PulsePressureChange"), QString("Pressure"));
+  auto drugRespiration = phyDrug->appendChild(QString("RespirationRateChange"), QString("Frequency"));
+  auto drugSedation = phyDrug->appendChild(QString("SedationLevel"));
+  auto drugTidalVolume = phyDrug->appendChild(QString("TidalVolumeChange"), QString("Volume"));
+  auto drugTubular = phyDrug->appendChild(QString("TubularPermeabilityChange"));
   //--Energy sub-tree
   auto phyEnergy = physiologyTree->appendChild(QString("Energy"));
-  auto energyAchieved = phyEnergy->appendChild(QString("Achieved Exercise Level"));
-  auto energyChloride = phyEnergy->appendChild(QString("Chloride Lost to Sweat"), QString("Mass"));
-  auto energyCore = phyEnergy->appendChild(QString("Core Temperature"), QString("Temperature"));
-  auto energyCreatinine = phyEnergy->appendChild(QString("Creatinine Production Rate"), QString("AmountPerTime"));
-  auto energyDeficit = phyEnergy->appendChild(QString("Energy Deficit"), QString("Power"));
-  auto energyDemand = phyEnergy->appendChild(QString("Exercise Energy Demand"), QString("Power"));
-  auto energyMapDelta = phyEnergy->appendChild(QString("Exercise Mean Arterial Pressure Delta"), QString("Pressure"));
-  auto energyFatigue = phyEnergy->appendChild(QString("Fatigue Level"));
-  auto energyLactate = phyEnergy->appendChild(QString("Lactate Production Rate"), QString("AmountPerTime"));
-  auto energyPotassium = phyEnergy->appendChild(QString("Potassium Lost to Sweat"), QString("Mass"));
-  auto energySkin = phyEnergy->appendChild(QString("Skin Temperature"), QString("Temperature"));
-  auto energySodium = phyEnergy->appendChild(QString("Sodium Lost to Sweat"), QString("Mass"));
-  auto energyMetabolic = phyEnergy->appendChild(QString("Total Metabolic Rate"), QString("Power"));
-  auto energyWorkRate = phyEnergy->appendChild(QString("Total Work Fraction of Max"));
+  auto energyAchieved = phyEnergy->appendChild(QString("AchievedExerciseLevel"));
+  auto energyChloride = phyEnergy->appendChild(QString("ChlorideLosttoSweat"), QString("Mass"));
+  auto energyCore = phyEnergy->appendChild(QString("CoreTemperature"), QString("Temperature"));
+  auto energyCreatinine = phyEnergy->appendChild(QString("CreatinineProductionRate"), QString("AmountPerTime"));
+  auto energyDeficit = phyEnergy->appendChild(QString("EnergyDeficit"), QString("Power"));
+  auto energyDemand = phyEnergy->appendChild(QString("ExerciseEnergyDemand"), QString("Power"));
+  auto energyMapDelta = phyEnergy->appendChild(QString("ExerciseMeanArterialPressureDelta"), QString("Pressure"));
+  auto energyFatigue = phyEnergy->appendChild(QString("FatigueLevel"));
+  auto energyLactate = phyEnergy->appendChild(QString("LactateProductionRate"), QString("AmountPerTime"));
+  auto energyPotassium = phyEnergy->appendChild(QString("PotassiumLosttoSweat"), QString("Mass"));
+  auto energySkin = phyEnergy->appendChild(QString("SkinTemperature"), QString("Temperature"));
+  auto energySodium = phyEnergy->appendChild(QString("SodiumLosttoSweat"), QString("Mass"));
+  auto energyMetabolic = phyEnergy->appendChild(QString("TotalMetabolicRate"), QString("Power"));
+  auto energyWorkRate = phyEnergy->appendChild(QString("TotalWorkFractionofMax"));
   //--Endocrine sub-tree
   auto phyEndo = physiologyTree->appendChild(QString("Endocrine"));
-  auto endoGlucagon = phyEndo->appendChild(QString("Glucagon Synthesis Rate"), QString("AmountPerTime"));
-  auto endoInsulin = phyEndo->appendChild(QString("Insulin Synthesis Rate"), QString("AmountPerTime"));
+  auto endoGlucagon = phyEndo->appendChild(QString("GlucagonSynthesisRate"), QString("AmountPerTime"));
+  auto endoInsulin = phyEndo->appendChild(QString("InsulinSynthesisRate"), QString("AmountPerTime"));
   //--Gastrointestinal sub-tree
   auto phyGI = physiologyTree->appendChild(QString("Gastrointestinal"));
-  auto giChyme = phyGI->appendChild(QString("Chyme Absorption Rate"), QString("VolumePerTime"));
-  //--Stomach contents sub-tree
-  auto giStomach = phyGI->appendChild(QString("Stomach Contents"));
+  auto giChyme = phyGI->appendChild(QString("ChymeAbsorptionRate"), QString("VolumePerTime"));
+  //--Stomachcontents sub-tree
+  auto giStomach = phyGI->appendChild(QString("StomachContents"));
   auto calcium = giStomach->appendChild(QString("Calcium"), QString("Mass"));
   auto carbs = giStomach->appendChild(QString("Carbohydrate"), QString("Mass"));
   auto fat = giStomach->appendChild(QString("Fat"), QString("Mass"));
@@ -803,133 +810,133 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
   auto water = giStomach->appendChild(QString("Water"), QString("Volume"));
   //--Hepatic sub-tree
   auto phyHep = physiologyTree->appendChild(QString("Hepatic"));
-  auto hepGluc = phyHep->appendChild(QString("Hepatic Gluconeogenisis Rate"), QString("MassPerTime"));
-  auto hepKetones = phyHep->appendChild(QString("Ketone Production Rate"), QString("AmountPerTime"));
+  auto hepGluc = phyHep->appendChild(QString("HepaticGluconeogenisisRate"), QString("MassPerTime"));
+  auto hepKetones = phyHep->appendChild(QString("KetoneProductionRate"), QString("AmountPerTime"));
   //--Nervous sub-tree
   auto phyNervous = physiologyTree->appendChild(QString("Nervous"));
-  auto nervousLapses = phyNervous->appendChild(QString("Attention Lapses"));
-  auto nervousDebt = phyNervous->appendChild(QString("Biological Debt"));
-  auto nervousCompliance = phyNervous->appendChild(QString("Compliance Scale"));
-  auto nervousHeartElastance = phyNervous->appendChild(QString("Heart Elastance Scale"));
-  auto nervousHeartRate = phyNervous->appendChild(QString("Heart Rate Scale"));
-  auto nervousLeftEye = phyNervous->appendChild(QString("Left Eye Pupillary Response"));
-  auto nervousPain = phyNervous->appendChild(QString("Pain Visual Analogue Scale"));
-  auto nervousrReactionTime = phyNervous->appendChild(QString("Reaction Time"), QString("Time"));
-  auto nervousExtrasplanchnicRes = phyNervous->appendChild(QString("Resistance Scale Extrasplanchnic"));
-  auto nervousMuscleRes = phyNervous->appendChild(QString("Resistance Scale Muscle"));
-  auto nervousMyocardiumRes = phyNervous->appendChild(QString("Resistance Scale Myocardium"));
-  auto nervousSplanchnicRes = phyNervous->appendChild(QString("Resistance Scale Splanchnic"));
-  auto nervousRAS = phyNervous->appendChild(QString("Richmond Agitation Sedation Scale"));
-  auto nervousRightEye = phyNervous->appendChild(QString("Right Eye Pupillary Response"));
-  auto nervousSleepTime = phyNervous->appendChild(QString("Sleep Time"), QString("Time"));
-  auto nervousWakeTime = phyNervous->appendChild(QString("Wake Time"), QString("Time"));
+  auto nervousLapses = phyNervous->appendChild(QString("AttentionLapses"));
+  auto nervousDebt = phyNervous->appendChild(QString("BiologicalDebt"));
+  auto nervousCompliance = phyNervous->appendChild(QString("ComplianceScale"));
+  auto nervousHeartElastance = phyNervous->appendChild(QString("HeartElastanceScale"));
+  auto nervousHeartRate = phyNervous->appendChild(QString("HeartRateScale"));
+  auto nervousLeftEye = phyNervous->appendChild(QString("LeftEyePupillaryResponse"));
+  auto nervousPain = phyNervous->appendChild(QString("PainVisualAnalogueScale"));
+  auto nervousrReactionTime = phyNervous->appendChild(QString("ReactionTime"), QString("Time"));
+  auto nervousExtrasplanchnicRes = phyNervous->appendChild(QString("ResistanceScaleExtrasplanchnic"));
+  auto nervousMuscleRes = phyNervous->appendChild(QString("ResistanceScaleMuscle"));
+  auto nervousMyocardiumRes = phyNervous->appendChild(QString("ResistanceScaleMyocardium"));
+  auto nervousSplanchnicRes = phyNervous->appendChild(QString("ResistanceScaleSplanchnic"));
+  auto nervousRAS = phyNervous->appendChild(QString("RichmondAgitationSedationScale"));
+  auto nervousRightEye = phyNervous->appendChild(QString("RightEyePupillaryResponse"));
+  auto nervousSleepTime = phyNervous->appendChild(QString("SleepTime"), QString("Time"));
+  auto nervousWakeTime = phyNervous->appendChild(QString("WakeTime"), QString("Time"));
   //--Renal sub-tree
   auto phyRenal = physiologyTree->appendChild(QString("Renal"));
-  auto renalFiltration = phyRenal->appendChild(QString("Filtration Fraction"));
-  auto renalGFR = phyRenal->appendChild(QString("Glomerular Filtration Rate"), QString("VolumePerTime"));
-  auto renalLeftAfferentRes = phyRenal->appendChild(QString("Left Afferent Arteriole Resistance"), QString("FlowResistance"));
-  auto renalLeftBowmansHydro = phyRenal->appendChild(QString("Left Bowmans Capsule Hydrostatic Pressure"), QString("Pressure"));
-  auto renalLeftBowmansOsmotic = phyRenal->appendChild(QString("Left Bowmans Capsule Osmotic Pressure"), QString("Pressure"));
-  auto renalLeftGlomHydro = phyRenal->appendChild(QString("Left Glomerular Capillaries Hydrostatic Pressure"), QString("Pressure"));
-  auto renalLeftGlomOsmotic = phyRenal->appendChild(QString("Left Glomerular Capillaries Osmotic Pressure"), QString("Pressure"));
-  auto renalLeftGlomCoef = phyRenal->appendChild(QString("Left Glomerular Filtration Coefficient"), QString("VolumePerTimePressure"));
-  auto renalLeftGlomRate = phyRenal->appendChild(QString("Left Glomerular Filtration Rate"), QString("VolumePerTime"));
-  auto renalLeftGlomSA = phyRenal->appendChild(QString("Left Glomerular Filtration Surface Area"), QString("Area"));
-  auto renalLeftGlomPerm = phyRenal->appendChild(QString("Left Glomerular Fluid Permeability"), QString("VolumePerTimePressure"));
-  auto renalLeftFraction = phyRenal->appendChild(QString("Left Filtration Fraction"));
-  auto renalLeftNetFraction = phyRenal->appendChild(QString("Left Net Filtration Fraction"));
-  auto renalLeftNetReabsorption = phyRenal->appendChild(QString("Left Net Reabsorption Pressure"), QString("Pressue"));
-  auto renalLeftPeriHydro = phyRenal->appendChild(QString("Left Peritubular Capillaries Hydrostatic Pressure"), QString("Pressure"));
-  auto renalLeftPeriOsmotic = phyRenal->appendChild(QString("Left Peritubular Capillaries Osmotic Pressure"), QString("Pressure"));
-  auto renalLeftReabsCoef = phyRenal->appendChild(QString("Left Reabsorption Filtration Coefficient"), QString("VolumePerTimePressure"));
-  auto renalLeftReabsRate = phyRenal->appendChild(QString("Left Reabsorption Rate"), QString("VolumePerTime"));
-  auto renalLeftTubularHydro = phyRenal->appendChild(QString("Left Tubular Hydrostatic Pressure"), QString("Pressure"));
-  auto renalLeftTubularOsmotic = phyRenal->appendChild(QString("Left Tubular Osmotic Pressure"), QString("Pressure"));
-  auto renalLeftTubularSA = phyRenal->appendChild(QString("Left Tubular Reabsorption Filtration Surface Area"), QString("Area"));
-  auto renalLeftTubularPerm = phyRenal->appendChild(QString("Left Tubular Reabsorption Fluid Permeability"), QString("VolumePerTimePressure"));
-  auto renalMeanUrineOutput = phyRenal->appendChild(QString("Meane Urine Output"), QString("VolumePerTime"));
-  auto renalBloodFlow = phyRenal->appendChild(QString("Renal Blood Flow"), QString("VolumePerTime"));
-  auto renalPlasmaFlow = phyRenal->appendChild(QString("Renal Plasma Flow"), QString("VolumePerTime"));
-  auto renalResistance = phyRenal->appendChild(QString("Renal Vascular Resistance"), QString("FlowResistance"));
-  auto renalRightAfferentRes = phyRenal->appendChild(QString("Right Afferent Arteriole Resistance"), QString("FlowResistance"));
-  auto renalRightBowmansHydro = phyRenal->appendChild(QString("Right Bowmans Capsule Hydrostatic Pressure"), QString("Pressure"));
-  auto renalRightBowmansOsmotic = phyRenal->appendChild(QString("Right Bowmans Capsule Osmotic Pressure"), QString("Pressure"));
-  auto renalRightGlomHydro = phyRenal->appendChild(QString("Right Glomerular Capillaries Hydrostatic Pressure"), QString("Pressure"));
-  auto renalRightGlomOsmotic = phyRenal->appendChild(QString("Right Glomerular Capillaries Osmotic Pressure"), QString("Pressure"));
-  auto renalRightGlomCoef = phyRenal->appendChild(QString("Right Glomerular Filtration Coefficient"), QString("VolumePerTimePressure"));
-  auto renalRightGlomRate = phyRenal->appendChild(QString("Right Glomerular Filtration Rate"), QString("VolumePerTime"));
-  auto renalRightGlomSA = phyRenal->appendChild(QString("Right Glomerular Filtration Surface Area"), QString("Area"));
-  auto renalRightGlomPerm = phyRenal->appendChild(QString("Right Glomerular Fluid Permeability"), QString("VolumePerTimePressure"));
-  auto renalRightFraction = phyRenal->appendChild(QString("Right Filtration Fraction"));
-  auto renalRightNetFraction = phyRenal->appendChild(QString("Right Net Filtration Fraction"));
-  auto renalRightNetReabsorption = phyRenal->appendChild(QString("Right Net Reabsorption Pressure"), QString("Pressue"));
-  auto renalRightPeriHydro = phyRenal->appendChild(QString("Right Peritubular Capillaries Hydrostatic Pressure"), QString("Pressure"));
-  auto renalRightPeriOsmotic = phyRenal->appendChild(QString("Right Peritubular Capillaries Osmotic Pressure"), QString("Pressure"));
-  auto renalRightReabsCoef = phyRenal->appendChild(QString("Right Reabsorption Filtration Coefficient"), QString("VolumePerTimePressure"));
-  auto renalRightReabsRate = phyRenal->appendChild(QString("Right Reabsorption Rate"), QString("VolumePerTime"));
-  auto renalRightTubularHydro = phyRenal->appendChild(QString("Right Tubular Hydrostatic Pressure"), QString("Pressure"));
-  auto renalRightTubularOsmotic = phyRenal->appendChild(QString("Right Tubular Osmotic Pressure"), QString("Pressure"));
-  auto renalRightTubularSA = phyRenal->appendChild(QString("Right Tubular Reabsorption Filtration Surface Area"), QString("Area"));
-  auto renalRightTubularPerm = phyRenal->appendChild(QString("Right Tubular Reabsorption Fluid Permeability"), QString("VolumePerTimePressure"));
-  auto renalUrineRate = phyRenal->appendChild(QString("Urination Rate"), QString("VolumePerTime"));
-  auto renalUrineOsmoles = phyRenal->appendChild(QString("Urine Osmolality"), QString("Osmolality"));
-  auto renalUrineOsmolars = phyRenal->appendChild(QString("Urine Osmolarity"), QString("Osmolarity"));
-  auto renalUrineProduction = phyRenal->appendChild(QString("Urine Production Rate"), QString("VolumePerTime"));
-  auto renalUrineSG = phyRenal->appendChild(QString("Urine Specific Gravity"));
-  auto renalUrineVolume = phyRenal->appendChild(QString("Urine Volume"), QString("Volume"));
-  auto renalUrineUrea = phyRenal->appendChild(QString("Urine Urea Nitrogen Concentration"), QString("MassPerVolume"));
+  auto renalFiltration = phyRenal->appendChild(QString("FiltrationFraction"));
+  auto renalGFR = phyRenal->appendChild(QString("GlomerularFiltrationRate"), QString("VolumePerTime"));
+  auto renalLeftAfferentRes = phyRenal->appendChild(QString("LeftAfferentArterioleResistance"), QString("FlowResistance"));
+  auto renalLeftBowmansHydro = phyRenal->appendChild(QString("LeftBowmansCapsuleHydrostaticPressure"), QString("Pressure"));
+  auto renalLeftBowmansOsmotic = phyRenal->appendChild(QString("LeftBowmansCapsuleOsmoticPressure"), QString("Pressure"));
+  auto renalLeftGlomHydro = phyRenal->appendChild(QString("LeftGlomerularCapillariesHydrostaticPressure"), QString("Pressure"));
+  auto renalLeftGlomOsmotic = phyRenal->appendChild(QString("LeftGlomerularCapillariesOsmoticPressure"), QString("Pressure"));
+  auto renalLeftGlomCoef = phyRenal->appendChild(QString("LeftGlomerularFiltrationCoefficient"), QString("VolumePerTimePressure"));
+  auto renalLeftGlomRate = phyRenal->appendChild(QString("LeftGlomerularFiltrationRate"), QString("VolumePerTime"));
+  auto renalLeftGlomSA = phyRenal->appendChild(QString("LeftGlomerularFiltrationSurfaceArea"), QString("Area"));
+  auto renalLeftGlomPerm = phyRenal->appendChild(QString("LeftGlomerularFluidPermeability"), QString("VolumePerTimePressure"));
+  auto renalLeftFraction = phyRenal->appendChild(QString("LeftFiltrationFraction"));
+  auto renalLeftNetFraction = phyRenal->appendChild(QString("LeftNetFiltrationFraction"));
+  auto renalLeftNetReabsorption = phyRenal->appendChild(QString("LeftNetReabsorptionPressure"), QString("Pressue"));
+  auto renalLeftPeriHydro = phyRenal->appendChild(QString("LeftPeritubularCapillariesHydrostaticPressure"), QString("Pressure"));
+  auto renalLeftPeriOsmotic = phyRenal->appendChild(QString("LeftPeritubularCapillariesOsmoticPressure"), QString("Pressure"));
+  auto renalLeftReabsCoef = phyRenal->appendChild(QString("LeftReabsorptionFiltrationCoefficient"), QString("VolumePerTimePressure"));
+  auto renalLeftReabsRate = phyRenal->appendChild(QString("LeftReabsorptionRate"), QString("VolumePerTime"));
+  auto renalLeftTubularHydro = phyRenal->appendChild(QString("LeftTubularHydrostaticPressure"), QString("Pressure"));
+  auto renalLeftTubularOsmotic = phyRenal->appendChild(QString("LeftTubularOsmoticPressure"), QString("Pressure"));
+  auto renalLeftTubularSA = phyRenal->appendChild(QString("LeftTubularReabsorptionFiltrationSurfaceArea"), QString("Area"));
+  auto renalLeftTubularPerm = phyRenal->appendChild(QString("LeftTubularReabsorptionFluidPermeability"), QString("VolumePerTimePressure"));
+  auto renalMeanUrineOutput = phyRenal->appendChild(QString("MeaneUrineOutput"), QString("VolumePerTime"));
+  auto renalBloodFlow = phyRenal->appendChild(QString("RenalBloodFlow"), QString("VolumePerTime"));
+  auto renalPlasmaFlow = phyRenal->appendChild(QString("RenalPlasmaFlow"), QString("VolumePerTime"));
+  auto renalResistance = phyRenal->appendChild(QString("RenalVascularResistance"), QString("FlowResistance"));
+  auto renalRightAfferentRes = phyRenal->appendChild(QString("RightAfferentArterioleResistance"), QString("FlowResistance"));
+  auto renalRightBowmansHydro = phyRenal->appendChild(QString("RightBowmansCapsuleHydrostaticPressure"), QString("Pressure"));
+  auto renalRightBowmansOsmotic = phyRenal->appendChild(QString("RightBowmansCapsuleOsmoticPressure"), QString("Pressure"));
+  auto renalRightGlomHydro = phyRenal->appendChild(QString("RightGlomerularCapillariesHydrostaticPressure"), QString("Pressure"));
+  auto renalRightGlomOsmotic = phyRenal->appendChild(QString("RightGlomerularCapillariesOsmoticPressure"), QString("Pressure"));
+  auto renalRightGlomCoef = phyRenal->appendChild(QString("RightGlomerularFiltrationCoefficient"), QString("VolumePerTimePressure"));
+  auto renalRightGlomRate = phyRenal->appendChild(QString("RightGlomerularFiltrationRate"), QString("VolumePerTime"));
+  auto renalRightGlomSA = phyRenal->appendChild(QString("RightGlomerularFiltrationSurfaceArea"), QString("Area"));
+  auto renalRightGlomPerm = phyRenal->appendChild(QString("RightGlomerularFluidPermeability"), QString("VolumePerTimePressure"));
+  auto renalRightFraction = phyRenal->appendChild(QString("RightFiltrationFraction"));
+  auto renalRightNetFraction = phyRenal->appendChild(QString("RightNetFiltrationFraction"));
+  auto renalRightNetReabsorption = phyRenal->appendChild(QString("RightNetReabsorptionPressure"), QString("Pressue"));
+  auto renalRightPeriHydro = phyRenal->appendChild(QString("RightPeritubularCapillariesHydrostaticPressure"), QString("Pressure"));
+  auto renalRightPeriOsmotic = phyRenal->appendChild(QString("RightPeritubularCapillariesOsmoticPressure"), QString("Pressure"));
+  auto renalRightReabsCoef = phyRenal->appendChild(QString("RightReabsorptionFiltrationCoefficient"), QString("VolumePerTimePressure"));
+  auto renalRightReabsRate = phyRenal->appendChild(QString("RightReabsorptionRate"), QString("VolumePerTime"));
+  auto renalRightTubularHydro = phyRenal->appendChild(QString("RightTubularHydrostaticPressure"), QString("Pressure"));
+  auto renalRightTubularOsmotic = phyRenal->appendChild(QString("RightTubularOsmoticPressure"), QString("Pressure"));
+  auto renalRightTubularSA = phyRenal->appendChild(QString("RightTubularReabsorptionFiltrationSurfaceArea"), QString("Area"));
+  auto renalRightTubularPerm = phyRenal->appendChild(QString("RightTubularReabsorptionFluidPermeability"), QString("VolumePerTimePressure"));
+  auto renalUrineRate = phyRenal->appendChild(QString("UrinationRate"), QString("VolumePerTime"));
+  auto renalUrineOsmoles = phyRenal->appendChild(QString("UrineOsmolality"), QString("Osmolality"));
+  auto renalUrineOsmolars = phyRenal->appendChild(QString("UrineOsmolarity"), QString("Osmolarity"));
+  auto renalUrineProduction = phyRenal->appendChild(QString("UrineProductionRate"), QString("VolumePerTime"));
+  auto renalUrineSG = phyRenal->appendChild(QString("UrineSpecificGravity"));
+  auto renalUrineVolume = phyRenal->appendChild(QString("UrineVolume"), QString("Volume"));
+  auto renalUrineUrea = phyRenal->appendChild(QString("UrineUreaNitrogenConcentration"), QString("MassPerVolume"));
   //--Respiratory sub-tree
   auto phyResp = physiologyTree->appendChild(QString("Respiratory"));
-  auto respAlveolarGradient = phyResp->appendChild(QString("Alveolar Arterial Gradient"), QString("Pressure"));
-  auto respCarrico = phyResp->appendChild(QString("Carrico Index"), QString("Pressure"));
-  auto respEndCO2Frac = phyResp->appendChild(QString("End Tidal Carbon Dioxide Fraction"));
-  auto respEndCO2Pressure = phyResp->appendChild(QString("End Tidal Carbon Dioxide Pressure"), QString("Pressure"));
-  auto respExpiratory = phyResp->appendChild(QString("Expiratory Flow"), QString("VolumePerTime"));
-  auto respIERatio = phyResp->appendChild(QString("Inspiratory Expiratory Ratio"));
-  auto respInspiratory = phyResp->appendChild(QString("Inspiratory Flow"), QString("VolumePerTime"));
-  auto respPleural = phyResp->appendChild(QString("Mean Pleural Pressure"), QString("Pressure"));
-  auto respCompliance = phyResp->appendChild(QString("Pulmonary Compliance"), QString("FlowCompliance"));
-  auto respResistance = phyResp->appendChild(QString("Pulmonary Resistance"), QString("FlowResistance"));
-  auto respDriverFrequency = phyResp->appendChild(QString("Respiration Driver Frequency"), QString("Frequency"));
-  auto respDriverPressure = phyResp->appendChild(QString("Respiration Driver Pressure"), QString("Pressure"));
-  auto respMusclePressure = phyResp->appendChild(QString("Respiration Muscle Pressure"), QString("Pressure"));
-  auto respRate = phyResp->appendChild(QString("Respiration Rate"), QString("Frequency"));
-  auto respVent = phyResp->appendChild(QString("Specific Ventilation"));
-  auto respTidal = phyResp->appendChild(QString("Tidal Volume"), QString("Volume"));
-  auto respAlveolarVent = phyResp->appendChild(QString("Total Alveolar Ventilation"), QString("VolumePerTime"));
-  auto respDeadVent = phyResp->appendChild(QString("Total Dead Space Ventilation"), QString("VolumePerTime"));
-  auto respTotalVolume = phyResp->appendChild(QString("Total Lung Volume"), QString("Volume"));
-  auto respPulmonaryVent = phyResp->appendChild(QString("Total Pulmonary Ventilation"), QString("VolumePerTime"));
-  auto respTranspulmonary = phyResp->appendChild(QString("Transpulmonary Pressure"), QString("Pressure"));
+  auto respAlveolarGradient = phyResp->appendChild(QString("AlveolarArterialGradient"), QString("Pressure"));
+  auto respCarrico = phyResp->appendChild(QString("CarricoIndex"), QString("Pressure"));
+  auto respEndCO2Frac = phyResp->appendChild(QString("EndTidalCarbonDioxideFraction"));
+  auto respEndCO2Pressure = phyResp->appendChild(QString("EndTidalCarbonDioxidePressure"), QString("Pressure"));
+  auto respExpiratory = phyResp->appendChild(QString("ExpiratoryFlow"), QString("VolumePerTime"));
+  auto respIERatio = phyResp->appendChild(QString("InspiratoryExpiratoryRatio"));
+  auto respInspiratory = phyResp->appendChild(QString("InspiratoryFlow"), QString("VolumePerTime"));
+  auto respPleural = phyResp->appendChild(QString("MeanPleuralPressure"), QString("Pressure"));
+  auto respCompliance = phyResp->appendChild(QString("PulmonaryCompliance"), QString("FlowCompliance"));
+  auto respResistance = phyResp->appendChild(QString("PulmonaryResistance"), QString("FlowResistance"));
+  auto respDriverFrequency = phyResp->appendChild(QString("RespirationDriverFrequency"), QString("Frequency"));
+  auto respDriverPressure = phyResp->appendChild(QString("RespirationDriverPressure"), QString("Pressure"));
+  auto respMusclePressure = phyResp->appendChild(QString("RespirationMusclePressure"), QString("Pressure"));
+  auto respRate = phyResp->appendChild(QString("RespirationRate"), QString("Frequency"));
+  auto respVent = phyResp->appendChild(QString("SpecificVentilation"));
+  auto respTidal = phyResp->appendChild(QString("TidalVolume"), QString("Volume"));
+  auto respAlveolarVent = phyResp->appendChild(QString("TotalAlveolarVentilation"), QString("VolumePerTime"));
+  auto respDeadVent = phyResp->appendChild(QString("TotalDeadSpaceVentilation"), QString("VolumePerTime"));
+  auto respTotalVolume = phyResp->appendChild(QString("TotalLungVolume"), QString("Volume"));
+  auto respPulmonaryVent = phyResp->appendChild(QString("TotalPulmonaryVentilation"), QString("VolumePerTime"));
+  auto respTranspulmonary = phyResp->appendChild(QString("TranspulmonaryPressure"), QString("Pressure"));
   //--Tissue sub-tree
   auto phyTissue = physiologyTree->appendChild(QString("Tissue"));
-  auto tisCO2 = phyTissue->appendChild(QString("Carbon Dioxide Production Rate"), QString("VolumePerTime"));
-  auto tisDehydration = phyTissue->appendChild(QString("Dehydration Fraction"));
-  auto tisExtracellularVolume = phyTissue->appendChild(QString("Extracellular Fluid Volume"), QString("Volume"));
-  auto tisExtravascularVolume = phyTissue->appendChild(QString("Extravascular Fluid Volume"), QString("Volume"));
-  auto tisIntracellularPh = phyTissue->appendChild(QString("Intracellular Fluid PH"));
-  auto tisIntracellularVolume = phyTissue->appendChild(QString("Intracellular Fluid Volume"), QString("Volume"));
-  auto tisGlycogen = phyTissue->appendChild(QString("Liver Glycogen"), QString("Mass"));
-  auto tisMuscle = phyTissue->appendChild(QString("Muscle Glycogen"), QString("Mass"));
-  auto tisO2 = phyTissue->appendChild(QString("Oxygen Consumption Rate"), QString("VolumePerTime"));
-  auto tisRatio = phyTissue->appendChild(QString("Respiratory Exchange Ratio"));
-  auto tisFat = phyTissue->appendChild(QString("Stored Fat"), QString("Mass"));
-  auto tisProtein = phyTissue->appendChild(QString("Stored Protein"), QString("Mass"));
-  auto tisTotalFluid = phyTissue->appendChild(QString("Total Body Fluid Volume"), QString("Volume"));
-  //================  Substance Sub-Tree  =========================================================
-  // Make common list available to all substances.  Then loop over substances, add substance to tree, and assign it list of requets
-  QList<QPair<QString, QString>> subRequests = { qMakePair(QString("Alveolar Transfer"), QString("VolumePerTime")),
-    qMakePair(QString("Area Under Curve"), QString("TimeMassPerVolume")),
-    qMakePair(QString("Blood Concentration"), QString("MassPerVolume")),
-    qMakePair(QString("End Tidal Fraction"), QString("Fraction")),
-    qMakePair(QString("End Tidal Pressure"), QString("Pressure")),
-    qMakePair(QString("Effect Site Concentration"), QString("MassPerVolume")),
-    qMakePair(QString("Mass in Body"), QString("Mass")),
-    qMakePair(QString("Mass in Blood"), QString("Mass")),
-    qMakePair(QString("Mass in Tissue"), QString("Mass")),
-    qMakePair(QString("Plasma Concentration"), QString("MassPerVolume")),
-    qMakePair(QString("Systemic Mass Cleared"), QString("Mass")),
-    qMakePair(QString("Tissue Concentration"), QString("MassPerVolume")) };
+  auto tisCO2 = phyTissue->appendChild(QString("CarbonDioxideProductionRate"), QString("VolumePerTime"));
+  auto tisDehydration = phyTissue->appendChild(QString("DehydrationFraction"));
+  auto tisExtracellularVolume = phyTissue->appendChild(QString("ExtracellularFluidVolume"), QString("Volume"));
+  auto tisExtravascularVolume = phyTissue->appendChild(QString("ExtravascularFluidVolume"), QString("Volume"));
+  auto tisIntracellularPh = phyTissue->appendChild(QString("IntracellularFluidPH"));
+  auto tisIntracellularVolume = phyTissue->appendChild(QString("IntracellularFluidVolume"), QString("Volume"));
+  auto tisGlycogen = phyTissue->appendChild(QString("LiverGlycogen"), QString("Mass"));
+  auto tisMuscle = phyTissue->appendChild(QString("MuscleGlycogen"), QString("Mass"));
+  auto tisO2 = phyTissue->appendChild(QString("OxygenConsumptionRate"), QString("VolumePerTime"));
+  auto tisRatio = phyTissue->appendChild(QString("RespiratoryExchangeRatio"));
+  auto tisFat = phyTissue->appendChild(QString("StoredFat"), QString("Mass"));
+  auto tisProtein = phyTissue->appendChild(QString("StoredProtein"), QString("Mass"));
+  auto tisTotalFluid = phyTissue->appendChild(QString("TotalBodyFluidVolume"), QString("Volume"));
+  //==================================SubstanceSub-Tree==================================================================================
+  //Make common list of requests available to all substances. Then loop over substances, add substance to tree, and assign it to list of requests
+  QList<QPair<QString, QString>> subRequests = { qMakePair(QString("AlveolarTransfer"), QString("VolumePerTime")),
+    qMakePair(QString("AreaUnderCurve"), QString("TimeMassPerVolume")),
+    qMakePair(QString("BloodConcentration"), QString("MassPerVolume")),
+    qMakePair(QString("EndTidalFraction"), QString("Fraction")),
+    qMakePair(QString("EndTidalPressure"), QString("Pressure")),
+    qMakePair(QString("EffectSiteConcentration"), QString("MassPerVolume")),
+    qMakePair(QString("MassInBody"), QString("Mass")),
+    qMakePair(QString("MassInBlood"), QString("Mass")),
+    qMakePair(QString("MassInTissue"), QString("Mass")),
+    qMakePair(QString("PlasmaConcentration"), QString("MassPerVolume")),
+    qMakePair(QString("SystemicMassCleared"), QString("Mass")),
+    qMakePair(QString("TissueConcentration"), QString("MassPerVolume")) };
 
   for (auto sub : subs->GetSubstances()) {
     auto subEntry = substanceTree->appendChild(QString::fromStdString(sub->GetName()), QString(""));

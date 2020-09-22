@@ -15,10 +15,11 @@ UIScenarioBuilderForm {
 		clear();
 	}
   function loadExisting(events, requests){
-    eventModel = events
-    activeRequestsModel.requestQueue = requests;
+    eventModel = events   
+    activeRequestsModel.loadRequests(requests)
     launch();
     builderModel.loadActions()
+    
   }
 	function launch(){
     requestView.loadSource = true;   //Request view will load its delegates using updated model information (either from reset or pulled from an existing scenario that we are editing)
@@ -39,6 +40,10 @@ UIScenarioBuilderForm {
     root.bgRequests.resetData();     //Sets all collapsed roles to true and check states to 0 for nodes in Data Request Model
     requestView.loadSource = false;  //Need to unload component from loader in model so that view releases all delegates and we will be able to get updated model info the next time the window opens
     tabBar.currentIndex = 0;
+	}
+  function displayFormat (role) {
+		let formatted = role.replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3')     //Formats BloodVolume as "Blood Volume", but formats pH as "pH"
+		return formatted
 	}
 	function seconds_to_clock_time(time_s) {
     var v_seconds = time_s % 60;
@@ -136,24 +141,53 @@ UIScenarioBuilderForm {
     id : activeRequestsModel
     signal invalidRequests(string err)
     property var requestQueue : []
-    function addRequest(path, unit){
+    function addRequest(path, unitClass, unit = "", precision = "", sub = "", quantity = ""){
       let splitPath = path.split(';');
       var v_requestForm = Qt.createComponent("UIDataRequest.qml");
       let requestRoot = splitPath.shift();    //removes first element in split path array and assigns to request type
       let requestLeaf = splitPath.pop();        //removes last element in split path array and assign to request name
       let requestBranches = splitPath;        //whatever is left over (maybe nothing) when we remove root and leaf
       if ( v_requestForm.status == Component.Ready)  {
-        var v_request = v_requestForm.createObject(activeRequestView, { "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches, "unitClass" : unit,
-                                                                        "requestLeaf" : requestLeaf, "width" : activeRequestView.width-activeRequestView.scrollWidth
-                                                                });
+        var v_request = v_requestForm.createObject(null, {  "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches, "unitClass" : unitClass,
+                                                            "unitValue" : unit, "precisionValue" : precision, "substanceValue" : sub, "quantityValue" : quantity,
+                                                            "requestLeaf" : requestLeaf, "scrollWidth" : activeRequestView.scrollWidth
+                                                          });
         activeRequestsModel.append(v_request);
       } else {
         if (v_requestForm.status == Component.Error){
           console.log("Error : " + v_requestForm.errorString() );
-          return null;
         }
         console.log("Error : Data request component not ready");
-        return null;
+      }
+    }
+    function loadRequests(requests){
+      for (let i = 0; i < requests.length; ++i){
+        let req = requests[i];
+        if (req.indexOf('|') == -1){
+          continue;   //valid request found by data tree will be formatted "PathString|ScalarType|Unit;Precision;Substance(opt)}
+        }
+        else {
+          let unitInput = ""
+          let precisionInput = ""
+          let subInput = ""
+          let quantityInput = ""
+          let reqSplit = req.split('|');
+          let pathId = reqSplit[0];       //This is the path through the menu to get to the request:  E.g. Physiology;Cardiovascular;HeartRate
+          let scalarType = reqSplit[1];
+          let options = reqSplit[2].split(";");   //breaks Unit;Precision;Substance options to [Unit, Precision, Substance]
+          for (let i = 0; i < options.length; ++i){
+            let opt = options[i].split('=');    //split option into [Label, value], e.g. UNIT=mg --> [UNIT, mg]
+            if (opt[0] == "UNIT"){
+              unitInput = opt[1]
+            } else if (opt[0] == "PRECISION"){
+              precisionInput = opt[1]
+            } else if (opt[0] == "SUBSTANCE"){
+              subInput = opt[1].split(",")[0]   //sub data stored as SUBSTANCE=SubName,Quantity  
+              quantityInput = displayFormat(opt[1].split(",")[1])      //format string to have white space to match list model (PartialPressure->Partial Pressure)
+            }
+          }
+          addRequest(pathId, scalarType, unitInput, precisionInput, subInput, quantityInput)
+        }
       }
     }
     function removeRequest(path){
@@ -324,7 +358,6 @@ UIScenarioBuilderForm {
       }
     }
     function adjustFade(state, index){
-      console.log(state, index)
       for (let i = 0; i < builderModel.count; i++){
         if (state == "ON"){
           if (i != index){

@@ -287,11 +287,14 @@ Window {
       } // end list view container
       Rectangle { 
         id : requestPanel
-        Layout.preferredHeight : parent.height
-        Layout.preferredWidth : 2 * parent.width / 3
+        //Layout.preferredHeight : parent.height
+        Layout.fillHeight : true
+        Layout.fillWidth : true
+        Layout.maximumWidth : 2 * parent.width / 3
         ListView {
           id : activeRequestView
-          width : parent.width
+          anchors.left : parent.left
+          anchors.right : parent.right
           anchors.top : parent.top
           anchors.topMargin : 5
           anchors.bottom : parent.bottom
@@ -720,7 +723,7 @@ Window {
           }
         }
         Text {
-          text : model.data(index, DataRequestModel.NameRole)
+          text : root.displayFormat(model.data(index, DataRequestModel.NameRole))
           font.pixelSize : 16
           height : parent.height
           verticalAlignment : Text.AlignVCenter
@@ -786,7 +789,7 @@ Window {
       CheckBox {
         x : 15 + indentLevel * 45
         height : parent.height
-        text : model.data(index, DataRequestModel.NameRole)
+        text : root.displayFormat(model.data(index, DataRequestModel.NameRole))
         font.pixelSize : 18
         checkable : true
         checked : model.data(index, Qt.CheckStateRole)

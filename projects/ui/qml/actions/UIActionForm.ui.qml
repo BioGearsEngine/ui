@@ -19,9 +19,6 @@ Rectangle {
   signal selected()     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
   signal editing()      //notifies action model that this action is being edited so that other actions in scenario window fade in opacity
   signal buildSet(var action)
-  onEditing : {
-    console.log(actionType + " editing")
-  }
 
   property Scenario scenario
   property string buildParams : ""

@@ -6,12 +6,20 @@ import com.biogearsengine.ui.scenario 1.0
 
 Column {
 	id : root
-  spacing : 2
+  spacing : 5
+  anchors.left : parent ? parent.left : undefined
+  anchors.right : parent ? parent.right : undefined
+  anchors.rightMargin : scrollWidth
+  property double scrollWidth : 0   //Override if data request is inside a view with a scroll bar so that request is not drawn over scroll area
   property string pathId : ""   //unique to each request, used to search for requests to remove when unchecked in menu
   property string requestRoot : ""    //Top level request catergory, e.g. compartment, physiology, substance, etc.
   property var requestBranches : []    //Intermediate tiers of data (e.g. compartment type, compartment name, substance name, physiology subsection
   property string requestLeaf : ""  //Request name
   property string unitClass : ""
+  property string precisionValue : ""
+  property string unitValue : ""
+  property string substanceValue: ""      //only required for substance quantities
+  property string quantityValue : ""      //only required for substance quantities
   property string header : {
     if (requestRoot == "Compartment"){
       if (requestLeaf == "SubstanceQuantity"){
@@ -32,7 +40,8 @@ Column {
     }
   }
   Rectangle {
-    width : parent.width
+    anchors.left : parent.left
+    anchors.right : parent.right
     height : 20
     color : "transparent"
     Text {
@@ -46,14 +55,16 @@ Column {
   }
   Loader {
     id : requestLoader
+    anchors.left : parent.left
+    anchors.right : parent.right
     height : 30
-    width : parent.width
     sourceComponent : requestLeaf ==='SubstanceQuantity' ? subQuantityRequest : scalarQuantityRequest
   }
   Rectangle {
     color : "black"
-    width : parent.width
-    height : 2
+    anchors.left : parent.left
+    anchors.right : parent.right
+    height: 2
   }
   //Component used by requestLoader when a simple scalar reqeust is being made
   Component {
@@ -81,19 +92,21 @@ Column {
         sourceComponent : unitClass == "" ? null : comboInput
         property var _label_text : "Unit"
         property var _combo_model : units[unitClass]
+        property string _initial_text : root.unitValue
         Layout.preferredHeight : scalarLayout.height
         Layout.preferredWidth  : 0.3 * scalarLayout.width - spacing * 2
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target : unitCombo.item
-          onActivated : {root.unitValue = target.currentText }
+          onActivated : {console.log('activate'); root.unitValue = target.currentText }
         }
       }
       Loader {
         id : precisionCombo
         sourceComponent : comboInput
         property var _label_text : "Precision"
-        property var _combo_model : 6
+        property var _combo_model : ["0", "1", "2", "3", "4", "5", "6"]
+        property string _initial_text : root.precisionValue
         Layout.preferredHeight : scalarLayout.height
         Layout.preferredWidth  :  0.3 * scalarLayout.width - spacing * 2
         Layout.alignment : Qt.AlignHCenter
@@ -102,7 +115,7 @@ Column {
           onActivated : {root.precisionValue = target.currentText }
         }
       }
-    } 
+    }
   }
   //Component used by requestLoader for Compartment substance quantity requests (more data--need to choose substance and request type)
   Component {
@@ -115,8 +128,9 @@ Column {
         sourceComponent : comboInput
         property var _label_text : "Substance"
         property var _combo_model : scenario.get_components()
+        property string _initial_text : root.substanceValue
         Layout.preferredHeight : subLayout.height
-        Layout.preferredWidth  : subLayout.width / 4 - spacing * 3
+        Layout.preferredWidth  : 200 //subLayout.width / 4 - spacing * 3
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target : subCombo.item
@@ -129,21 +143,21 @@ Column {
         property var _sub_quantity_model : requestBranches[0] === 'Gas' ? gasSubQuantities : requestBranches[0] === 'Liquid' ? liquidSubQuantities : tissueSubQuantities
         property var _label_text : "Quantity"
         property var _combo_model : Object.keys(_sub_quantity_model)
+        property string _initial_text : root.quantityValue
         Layout.preferredHeight : subLayout.height
-        Layout.preferredWidth  : subLayout.width / 4 - spacing * 3
+        Layout.preferredWidth  : 200 //subLayout.width / 4 - spacing * 3
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target: quantityCombo.item
-          onActivated : { unitCombo._combo_model = units[quantityCombo._sub_quantity_model[quantityCombo.item.currentText]]; 
-                          unitCombo.item.currentIndex = -1;
-                          root.quantityValue = target.currentText}
+          onActivated : { root.quantityValue = target.currentText }
         }
       }
       Loader {
         id : unitCombo
         sourceComponent : comboInput
         property var _label_text : "Unit"
-        property var _combo_model : null
+        property var _combo_model : quantityValue == "" ? null : units[quantityCombo._sub_quantity_model[quantityValue]]   //Quantity value will be empty when creating new scenario but defined when loading existing
+        property string _initial_text : root.unitValue
         Layout.preferredWidth : subLayout.width / 4 - spacing * 3
         Layout.preferredHeight : subLayout.height
         Layout.alignment : Qt.AlignHCenter
@@ -156,7 +170,8 @@ Column {
         id : precisionCombo
         sourceComponent : comboInput
         property var _label_text : "Precision"
-        property var _combo_model : 6
+        property var _combo_model : ["0", "1", "2", "3", "4", "5", "6"]
+        property string _initial_text : root.precisionValue
         Layout.preferredWidth : subLayout.width / 4 - spacing * 3
         Layout.preferredHeight : subLayout.height
         Layout.alignment : Qt.AlignHCenter
@@ -165,14 +180,15 @@ Column {
           onActivated : {root.precisionValue = target.currentText }
         }
       }
-    } 
+    }
   }
   //Component used to stand up all unit/precision/substance/substance parameter combo selection widgets
   Component {
     id : comboInput
     ComboBox {
       id : comboBox
-      currentIndex : -1
+      currentIndex : setCurrentIndex()
+      property string initialText : _initial_text
       bottomInset : 0
       topInset : 0
       model : _combo_model
@@ -220,6 +236,14 @@ Column {
         border.color : "black"
         border.width : 1
       }
+      function setCurrentIndex(){
+        for (let i = 0; i < model.length; ++i){
+          if (model[i]===initialText){
+            return i;
+          }
+        }
+        return -1;
+      }
     }
   }
 
@@ -246,7 +270,7 @@ Column {
                           'VolumePerTime' : ['mL/s','mL/min','mL/hr','mL/day','L/s','L/min','L/day','m^3/s'],
                           'VolumePerTimePressure' : ['mL/s mmHg','mL/min mmHg','L/s mmHg','L/min mmHg']
                          })
-  property var gasSubQuantities : ({'Partial Pressure' : '','Volume' : 'Volume','Volume Fraction':''})
+  property var gasSubQuantities : ({'Partial Pressure' : 'Pressure','Volume' : 'Volume','Volume Fraction':''})
   property var liquidSubQuantities : ({'Concentration' : 'MassPerVolume', 'Mass' : 'Mass','Mass Cleared' : 'Mass', 'Mass Deposited' : 'Mass', 'Mass Excreted' : 'Mass',
                                         'Molarity' : 'AmountPerVolume', 'Partial Pressure' : 'Pressure', 'Saturation' : ''})
   property var tissueSubQuantities : ({'Mass' : 'Mass', 'TissueConcentration' : 'MassPerVolume', 'Tissue Molarity' : 'AmountPerVolume', 'Extravascular Concentration' : 'MassPerVolume',

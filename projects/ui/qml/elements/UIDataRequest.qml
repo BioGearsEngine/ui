@@ -4,11 +4,6 @@ import QtQuick.Controls 2.5
 UIDataRequestForm {
   id: root
   
-  property string precisionValue : ""
-  property string unitValue : ""
-  property string substanceValue: ""      //only required for substance quantities
-  property string quantityValue : ""      //only required for substance quantities
-
   //Helper function to format request name
   function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3')     //Formats BloodVolume as "Blood Volume", but formats pH as "pH"
