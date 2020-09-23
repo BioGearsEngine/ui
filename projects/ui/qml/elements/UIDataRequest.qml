@@ -4,6 +4,7 @@ import QtQuick.Controls 2.5
 UIDataRequestForm {
   id: root
   
+  signal substanceQuantityChanged(string sub, string quantity)
   //Helper function to format request name
   function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3')     //Formats BloodVolume as "Blood Volume", but formats pH as "pH"
@@ -16,7 +17,7 @@ UIDataRequestForm {
     let precision = "PRECISION=" + precisionValue;
     if (requestRoot === "Compartment"){
       type += (requestBranches[0] + requestRoot)  //E.g. "TYPE=GasCompartment"
-      if (requestLeaf === "SubstanceQuantity"){
+      if (requestLeaf.includes("SubstanceQuantity")){
         name += (requestBranches[1] + "," + quantityValue)    //E.g. "NAME="VenaCava,PartialPressure"  (sub stored in 'substanceValue')
       } else {
         name += (requestBranches[1] + "," + requestLeaf)      //E.g. "NAME=Aorta,Volume"
@@ -30,14 +31,14 @@ UIDataRequestForm {
       }
     }
     let output = type + ";" + name + ";" + unit + ";" + precision
-    if (requestLeaf == "SubstanceQuantity"){
+    if (requestLeaf.includes("SubstanceQuantity")){
       output += (";" + "SUBSTANCE=" + substanceValue)
     }
     return output;
   }
-  //Connected to "save" function in scenario builder. Emits 
+  //Connected to "save" function in scenario builder. 
   function isValid(){
-    if (requestLeaf === "SubstanceQuantity"){
+    if (requestLeaf.includes("SubstanceQuantity")){
       if (unitValue === "" || precisionValue === "" || substanceValue === "" || quantityValue === ""){
         return false
       }

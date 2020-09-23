@@ -40,12 +40,6 @@ Item {
         }
       }
       Action {
-        text : "Load Scenario"
-        onTriggered : {
-          dialog.item.visible = checked
-        }
-      }
-      Action {
         text : "Save State"
         onTriggered : {
           let saveAs = false

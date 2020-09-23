@@ -392,10 +392,9 @@ import com.biogearsengine.ui.scenario 1.0
       }
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
-        var v_action = v_severityForm.createObject(actionSwitchView,{ "severity" : severity, "actionStartTime_s" : startTime, "actionDuration_s" : duration,"scenario" : scenario,
-                                                                      "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
-                                                                       "builderMode" : true
-                                                                       });
+        var v_action = v_severityForm.createObject(null,{ "severity" : severity, "actionStartTime_s" : startTime, "actionDuration_s" : duration,"scenario" : scenario,
+                                                          "builderMode" : true
+                                                          });
         return v_action;
       } else {
         if (v_severityForm.status == Component.Error){
@@ -408,7 +407,7 @@ import com.biogearsengine.ui.scenario 1.0
     function add_binary_builder(componentType, startTime = 0, duration = 0) {
         var v_binaryForm = Qt.createComponent(componentType, scenario);
         if ( v_binaryForm.status == Component.Ready)  {
-          var v_action = v_binaryForm.createObject(actionSwitchView,{ "scenario" : scenario, "actionStartTime_s" : startTime, "actionDuration_s" : duration, "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true, "builderMode" : true})
+          var v_action = v_binaryForm.createObject(actionSwitchView,{ "scenario" : scenario, "actionStartTime_s" : startTime, "actionDuration_s" : duration, "width" : actionSwitchView.width - actionSwitchView.scrollWidth, "builderMode" : true})
           return v_action;
         } else {
           if (v_binaryForm.status == Component.Error){
@@ -436,7 +435,7 @@ import com.biogearsengine.ui.scenario 1.0
       if ( v_painStimulusForm.status == Component.Ready)  {
         var v_painStimulus = v_painStimulusForm.createObject(actionSwitchView,{ "location" : location, "intensity" : painScore, "scenario" : scenario,
                                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                                "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                                "width" : actionSwitchView.width - actionSwitchView.scrollWidth,
                                                                                 "builderMode" : true
                                                                               });
         return v_painStimulus;
@@ -467,7 +466,7 @@ import com.biogearsengine.ui.scenario 1.0
       if ( v_hemorrhageForm.status == Component.Ready)  {
         var v_hemorrhage = v_hemorrhageForm.createObject(actionSwitchView,{ "compartment" : compartment, "rate" : rate, "scenario" : scenario,
                                                                             "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                            "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                            "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                             "builderMode" : true
                                                                               });
         return v_hemorrhage;
@@ -501,7 +500,7 @@ import com.biogearsengine.ui.scenario 1.0
       if ( v_pneumothoraxForm.status == Component.Ready)  {
         var v_pneumothorax = v_pneumothoraxForm.createObject(actionSwitchView,{ "severity" : severity, "type" : type, "side" : side, "scenario" : scenario,
                                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                                 "builderMode" : true
                                                                               });
         return v_pneumothorax;
@@ -533,7 +532,7 @@ import com.biogearsengine.ui.scenario 1.0
       if ( v_brainInjuryForm.status == Component.Ready)  {
         var v_brainInjury = v_brainInjuryForm.createObject(actionSwitchView,{ "severity" : severity, "type" : type, "scenario" : scenario,
                                                                               "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                              "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                              "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                               "builderMode" : true
                                                                               });
         return v_brainInjury;
@@ -565,7 +564,7 @@ import com.biogearsengine.ui.scenario 1.0
       if ( v_tourniquetForm.status == Component.Ready)  {
         var v_tourniquet = v_tourniquetForm.createObject(actionSwitchView,{ "compartment" : compartment, "tState" : tState, "scenario" : scenario,
                                                                             "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                            "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                            "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                             "builderMode" : true
                                                                               });
         return v_tourniquet;
@@ -600,7 +599,7 @@ import com.biogearsengine.ui.scenario 1.0
       if ( v_infectionForm.status == Component.Ready)  {
         var v_infection = v_infectionForm.createObject(actionSwitchView,{ "mic" : mic, "severity" : severity, "location" : location, "scenario" : scenario,
                                                                           "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                          "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                          "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                           "builderMode" : true
                                                                           });
         return v_infection;
@@ -650,7 +649,7 @@ import com.biogearsengine.ui.scenario 1.0
                                                                 "protein_g" : protein,  "sodium_mg" : sodium,  
                                                                 "water_ml" : water,  "calcium_mg" : calcium, 
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 })
         return v_meal
@@ -691,7 +690,7 @@ import com.biogearsengine.ui.scenario 1.0
         var v_drugAction = v_drugActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "actionSubClass" : type, "adminRoute" : adminRoute, "drug" : drug, 
                                                                 "rate" : rate, "concentration" : concentration, "dose" : dose,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 });
         return v_drugAction;
@@ -726,7 +725,7 @@ import com.biogearsengine.ui.scenario 1.0
         var v_compoundAction = v_compoundActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "compound" : compound,
                                                                 "rate" : rate, "volume" : volume,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 });
         return v_compoundAction;
@@ -761,7 +760,7 @@ import com.biogearsengine.ui.scenario 1.0
         var v_transfusionAction = v_transfusionActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "blood_type" : compound,
                                                                 "rate" : rate, "volume" : volume,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 });
         return v_transfusionAction;
@@ -840,7 +839,7 @@ import com.biogearsengine.ui.scenario 1.0
                                                                   "reliefPressure_cmH2O" : reliefPressure_cmH2O, "o2Fraction" : o2Frac, "leftChamberFraction" : leftChamberFraction,
                                                                   "rightChamberFraction" : rightChamberFraction, "bottle1_mL" : bottle1_mL,"bottle2_mL" : bottle2_mL,
                                                                   "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                  "width" : actionSwitchView.width - actionSwitchView.scrollWidth,  "Layout.fillWidth" : true, "builderMode" : true
+                                                                  "width" : actionSwitchView.width - actionSwitchView.scrollWidth, "builderMode" : true
                                                                });
 
         return v_machineAction;
@@ -855,7 +854,6 @@ import com.biogearsengine.ui.scenario 1.0
 
     function add_exercise_builder(scenario, type, props = "", startTime = 0, duration = 0) {
       var v_exerciseActionForm = Qt.createComponent("UIExercise.qml");
-      console.log(props.split(";"))
       if ( v_exerciseActionForm.status == Component.Ready)  {
         if (type===EventModel.CyclingExercise){
           let cadence = 0.0;
@@ -878,7 +876,7 @@ import com.biogearsengine.ui.scenario 1.0
           var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Cycling", 
                                                                 "property_1" : cadence, "property_2" : power, "weight" : props.weight,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 })
         } else if (type===EventModel.RunningExercise){
@@ -901,7 +899,7 @@ import com.biogearsengine.ui.scenario 1.0
           var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Running", 
                                                                 "property_1" : velocity, "property_2" : incline, "weight" : props.weight,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 })
         } else if (type===EventModel.StrengthExercise){
@@ -921,7 +919,7 @@ import com.biogearsengine.ui.scenario 1.0
           var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Strength", 
                                                                 "property_2" : repetitions, "weight" : weight,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 })
         } else if (type == EventModel.GenericExercise) {
@@ -944,7 +942,7 @@ import com.biogearsengine.ui.scenario 1.0
           var v_exerciseAction = v_exerciseActionForm.createObject(actionSwitchView,{ "scenario" : scenario, "type" : "Generic", 
                                                                 "property_1" : intensity, "property_2" : power, "genericSubType" : subType,
                                                                 "actionStartTime_s" : startTime, "actionDuration_s" : duration,
-                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,  "Layout.fillWidth" : true,
+                                                                "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
                                                                 "builderMode" : true
                                                                 })
         }

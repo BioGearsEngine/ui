@@ -158,6 +158,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 0
         Label {
+          id : itemLabel
           font.pixelSize : 18
           text : "Severity"
           leftPadding : 5
@@ -168,11 +169,13 @@ UIActionForm {
           to : 1
           stepSize : 0.05
           value : root.severity
+          Layout.fillWidth : true
           onMoved : {
             root.severity = value
           }
         }
         Label {
+          id : unitLabel
           text : "%1".arg(root.severity)
           font.pixelSize: 18
         }

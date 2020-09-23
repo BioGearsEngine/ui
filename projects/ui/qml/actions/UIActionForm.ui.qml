@@ -206,7 +206,6 @@ Rectangle {
 
     sourceComponent : controlsSummary
     state  : "collapsedControls"
-
     states : [
       State {
         name: "expandedControls"

@@ -22,7 +22,7 @@ Column {
   property string quantityValue : ""      //only required for substance quantities
   property string header : {
     if (requestRoot == "Compartment"){
-      if (requestLeaf == "SubstanceQuantity"){
+      if (requestLeaf.includes("SubstanceQuantity")){
         return requestBranches[0] + " Compartment Data Request: " + requestBranches[1] + " (Substance Quantity)"
       } else {
         return requestBranches[0] + " Compartment Data Request: " + requestBranches[1]
@@ -40,12 +40,12 @@ Column {
     }
   }
   Rectangle {
-    anchors.left : parent.left
-    anchors.right : parent.right
+    anchors.left : parent ? parent.left : undefined
+    anchors.right : parent ? parent.right : undefined
     height : 20
     color : "transparent"
     Text {
-      anchors.left : parent.left
+      anchors.left : parent ? parent.left : undefined
       height : parent.height
       text : header
       font.pointSize : 12
@@ -55,15 +55,15 @@ Column {
   }
   Loader {
     id : requestLoader
-    anchors.left : parent.left
-    anchors.right : parent.right
+    anchors.left : parent ? parent.left : undefined
+    anchors.right : parent ? parent.right : undefined
     height : 30
-    sourceComponent : requestLeaf ==='SubstanceQuantity' ? subQuantityRequest : scalarQuantityRequest
+    sourceComponent : requestLeaf.includes('SubstanceQuantity') ? subQuantityRequest : scalarQuantityRequest
   }
   Rectangle {
     color : "black"
-    anchors.left : parent.left
-    anchors.right : parent.right
+    anchors.left : parent ? parent.left : undefined
+    anchors.right : parent ? parent.right : undefined
     height: 2
   }
   //Component used by requestLoader when a simple scalar reqeust is being made
@@ -134,7 +134,8 @@ Column {
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target : subCombo.item
-          onActivated : {root.substanceValue = target.currentText }
+          onActivated : { root.substanceValue = target.currentText; 
+                          root.substanceQuantityChanged(root.substanceValue, root.quantityValue) }
         }
       }
       Loader {
@@ -149,21 +150,31 @@ Column {
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target: quantityCombo.item
-          onActivated : { root.quantityValue = target.currentText }
+          onActivated : { root.quantityValue = target.currentText; 
+                          root.substanceQuantityChanged(root.substanceValue, root.quantityValue);
+                          if (quantityCombo._sub_quantity_model[quantityValue]==""){
+                            unitCombo._has_unit = false;
+                            unitValue = "unitless"
+                          } else {
+                            unitCombo._has_unit = true;
+                            unitValue = ""
+                          }
+          }
         }
       }
       Loader {
         id : unitCombo
-        sourceComponent : comboInput
+        sourceComponent : _has_unit ? comboInput : undefined
+        property bool _has_unit : true    //false for quantities like Volume Fraction or Saturation 
         property var _label_text : "Unit"
-        property var _combo_model : quantityValue == "" ? null : units[quantityCombo._sub_quantity_model[quantityValue]]   //Quantity value will be empty when creating new scenario but defined when loading existing
+        property var _combo_model : quantityValue === "" ? null : units[quantityCombo._sub_quantity_model[quantityValue]]   //Quantity value will be empty when creating new scenario but defined when loading existing
         property string _initial_text : root.unitValue
         Layout.preferredWidth : subLayout.width / 4 - spacing * 3
         Layout.preferredHeight : subLayout.height
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target : unitCombo.item
-          onActivated : {root.unitValue = target.currentText }
+          onActivated : {root.unitValue = target.currentText}
         }
       }
       Loader {
@@ -237,9 +248,11 @@ Column {
         border.width : 1
       }
       function setCurrentIndex(){
-        for (let i = 0; i < model.length; ++i){
-          if (model[i]===initialText){
-            return i;
+        if (model){
+          for (let i = 0; i < model.length; ++i){
+            if (model[i]===initialText){
+              return i;
+            }
           }
         }
         return -1;

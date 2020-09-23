@@ -10,22 +10,10 @@ UIScenarioBuilderForm {
 	signal validScenario (string type, var data)
 	signal invalidScenario(string errorStr)
 	signal resetScenario()
+  signal requestMenuReady()
+  signal readyToClose()
 
 	onClosing : {
-		clear();
-	}
-  function loadExisting(events, requests){
-    eventModel = events   
-    activeRequestsModel.loadRequests(requests)
-    launch();
-    builderModel.loadActions()
-    
-  }
-	function launch(){
-    requestView.loadSource = true;   //Request view will load its delegates using updated model information (either from reset or pulled from an existing scenario that we are editing)
-		root.showNormal();
-	}
-	function clear(){
     for (let i = 0; i < builderModel.count; ++i){
       if (builderModel.get(i).objectName != "scenarioEnd" && builderModel.get(i).objectName != "scenarioStart"){
         builderModel.remove(i,1)
@@ -35,12 +23,31 @@ UIScenarioBuilderForm {
         builderModel.get(i).opacity = 1.0 //Make sure our start component isn't still ghosted out
       }
     }
+    //eventModel.clear_events()
     builderModel.scenarioLength_s = 0.0;
+    activeRequestsModel.requestQueue.length = 0
     activeRequestsModel.clear();
     root.bgRequests.resetData();     //Sets all collapsed roles to true and check states to 0 for nodes in Data Request Model
-    requestView.loadSource = false;  //Need to unload component from loader in model so that view releases all delegates and we will be able to get updated model info the next time the window opens
-    tabBar.currentIndex = 0;
+    contentLoader.showContent = false
+    while (contentLoader.status != Loader.Null){
+      close.accepted = false
+    }
+    close.accepted = true
 	}
+  onRequestMenuReady : {
+    
+  }
+  function launch(){
+    //windowContent.requestView.loadSource = true;   //Request view will load its delegates using updated model information (either from reset or pulled from an existing scenario that we are editing)
+    contentLoader.showContent = true
+	}
+
+  function loadExisting(events, requests){
+    eventModel = events   
+    activeRequestsModel.requestQueue = requests
+    launch();
+  }
+	
   function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3')     //Formats BloodVolume as "Blood Volume", but formats pH as "pH"
 		return formatted
@@ -121,6 +128,8 @@ UIScenarioBuilderForm {
   }
 
   eventModel : EventModel {
+    //C++ model -- we use the add_event function to append actions from scenario builder to _events vector (used when saving scenario to write to xml in Scenario.cpp)
+    // When loading an existing scenario, we assign this model to an existing model derived from the file and stand up all actions from it
   }
 
   patientModel : FolderListModel {
@@ -140,7 +149,9 @@ UIScenarioBuilderForm {
   activeRequestsModel : ObjectModel {
     id : activeRequestsModel
     signal invalidRequests(string err)
+    signal substanceQuantityLoaded(string pathId, string sub, string quantity, string unit, string precision)
     property var requestQueue : []
+    property var subRequestQueue : []
     function addRequest(path, unitClass, unit = "", precision = "", sub = "", quantity = ""){
       let splitPath = path.split(';');
       var v_requestForm = Qt.createComponent("UIDataRequest.qml");
@@ -150,21 +161,31 @@ UIScenarioBuilderForm {
       if ( v_requestForm.status == Component.Ready)  {
         var v_request = v_requestForm.createObject(null, {  "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches, "unitClass" : unitClass,
                                                             "unitValue" : unit, "precisionValue" : precision, "substanceValue" : sub, "quantityValue" : quantity,
-                                                            "requestLeaf" : requestLeaf, "scrollWidth" : activeRequestView.scrollWidth
+                                                            "requestLeaf" : requestLeaf, "scrollWidth" : windowContent.requestView.scrollWidth
                                                           });
         activeRequestsModel.append(v_request);
+        return(v_request);
       } else {
         if (v_requestForm.status == Component.Error){
           console.log("Error : " + v_requestForm.errorString() );
         }
         console.log("Error : Data request component not ready");
+        return null
       }
     }
-    function loadRequests(requests){
-      for (let i = 0; i < requests.length; ++i){
-        let req = requests[i];
+    function loadRequests(){
+      let subQRequests = []   //need to queue these and proces later because they have their own sub-list models that must be initialized
+      for (let i = 0; i < requestQueue.length; ++i){
+        let req = requestQueue[i];
         if (req.indexOf('|') == -1){
+          requestQueue.splice(i,1)
+          --i;
           continue;   //valid request found by data tree will be formatted "PathString|ScalarType|Unit;Precision;Substance(opt)}
+        }
+        if (req.includes("SUBSTANCEQ")){
+          subRequestQueue.push(requestQueue.splice(i,1)[0]);    //splice returns an array (of size 1 in this case), so we need to grab element 0 from the result and append the string to subRequest
+          --i;
+          continue;
         }
         else {
           let unitInput = ""
@@ -174,21 +195,45 @@ UIScenarioBuilderForm {
           let reqSplit = req.split('|');
           let pathId = reqSplit[0];       //This is the path through the menu to get to the request:  E.g. Physiology;Cardiovascular;HeartRate
           let scalarType = reqSplit[1];
-          let options = reqSplit[2].split(";");   //breaks Unit;Precision;Substance options to [Unit, Precision, Substance]
+          let options = reqSplit[2].split(";");   //breaks Unit;Precision;SubstanceQ options to [Unit, Precision, SubstanceQ]
           for (let i = 0; i < options.length; ++i){
             let opt = options[i].split('=');    //split option into [Label, value], e.g. UNIT=mg --> [UNIT, mg]
             if (opt[0] == "UNIT"){
               unitInput = opt[1]
             } else if (opt[0] == "PRECISION"){
               precisionInput = opt[1]
-            } else if (opt[0] == "SUBSTANCE"){
-              subInput = opt[1].split(",")[0]   //sub data stored as SUBSTANCE=SubName,Quantity  
-              quantityInput = displayFormat(opt[1].split(",")[1])      //format string to have white space to match list model (PartialPressure->Partial Pressure)
             }
           }
           addRequest(pathId, scalarType, unitInput, precisionInput, subInput, quantityInput)
         }
       }
+    }
+    function loadSubRequests(){
+      for (let i = 0; i < subRequestQueue.length; ++i){
+        let req = subRequestQueue[i]
+        let unitInput = ""
+        let precisionInput = ""
+        let subInput = ""
+        let quantityInput = ""
+        let reqSplit = req.split('|');
+        let pathId = reqSplit[0];       //This is the path through the menu to get to the request:  E.g. Physiology;Cardiovascular;HeartRate
+        let scalarType = reqSplit[1];
+        let options = reqSplit[2].split(";");   //breaks Unit;Precision;SubstanceQ options to [Unit, Precision, SubstanceQ]
+        for (let i = 0; i < options.length; ++i){
+          let opt = options[i].split('=');    //split option into [Label, value], e.g. UNIT=mg --> [UNIT, mg]
+          if (opt[0] == "UNIT"){
+            unitInput = opt[1]
+          } else if (opt[0] == "PRECISION"){
+            precisionInput = opt[1]
+          } else if (opt[0] == "SUBSTANCEQ"){
+            subInput = opt[1].split(",")[0]   //sub quantity data stored as SUBSTANCE=SubName,Quantity--only compartment data requests can have substance quantity option
+            quantityInput = displayFormat(opt[1].split(",")[1])      //format string to have white space to match list model (PartialPressure->Partial Pressure)
+          }
+        }
+        activeRequestsModel.substanceQuantityLoaded(pathId, subInput, quantityInput, unitInput, precisionInput)
+      }
+      requestQueue.length = 0 //clear queue--all requests will be re-written when we save
+      subRequestQueue.length = 0
     }
     function removeRequest(path){
       //Can't bind menu element to index in active request model because menu elements are destroyed when menu section is collapsed, which removes bindings.
@@ -223,7 +268,7 @@ UIScenarioBuilderForm {
 
   builderModel : ActionModel {
     id : builderModel
-    actionSwitchView : scenarioView
+    property double itemWidth : 0 // set when primary loader loads window content
     property double scenarioLength_s : 0     //Time at which the scenario ends
     property double scenarioLengthOverride_s : 0 //User provided value
     property alias scenarioEndItem : scenarioEnd.item
@@ -232,7 +277,7 @@ UIScenarioBuilderForm {
     Loader {
       id : scenarioEnd
       objectName : "scenarioEnd"
-      sourceComponent : root.timeEndComponent
+      sourceComponent : contentLoader.status == Loader.Ready ? root.timeEndComponent : undefined
       onLoaded : {
         item.scenarioLength_s = Qt.binding(function () { return builderModel.scenarioLength_s });
       }
@@ -240,16 +285,17 @@ UIScenarioBuilderForm {
     Loader {
       id : initialPatient
       objectName : "scenarioStart"
-      sourceComponent : root.timeStartComponent
+      sourceComponent : contentLoader.status == Loader.Ready ? root.timeStartComponent : undefined
     }
     function createAction(actionElement){
       if (builderModel.get(0).objectName !== "scenarioEnd"){
         return;   //Make sure any actions added have been fully set up before adding new actions
       }
+      console.log(itemWidth)
       var newAction = actionElement.makeAction(bg_scenario)
       newAction.viewLoader.state = "expandedBuilder";
       builderModel.insert(0, newAction); //Adding every new action to the top initially for editing
-      let v_timeGap = root.timeGapComponent.createObject(builderModel.actionSwitchView);
+      let v_timeGap = root.timeGapComponent.createObject(null);
       builderModel.insert(1, v_timeGap);
       setConnections(newAction, v_timeGap)
       newAction.editing();
@@ -258,13 +304,14 @@ UIScenarioBuilderForm {
     function loadAction(buildFunc) {
       let loadedAction = buildFunc()
       builderModel.insert(0, loadedAction);
-      let v_timeGap = root.timeGapComponent.createObject(builderModel.actionSwitchView);
+      let v_timeGap = root.timeGapComponent.createObject(null);
       builderModel.insert(1, v_timeGap);
       setConnections(loadedAction, v_timeGap)
       loadedAction.buildSet(loadedAction)
       loadedAction.viewLoader.state = "collapsedBuilder"
     }
     function setConnections(action, timeGap){
+      action.width = Qt.binding(function() { return builderModel.itemWidth})
       action.currentSelection = Qt.binding(function() { return actionSwitchView.currentIndex === action.ObjectModel.index} );
       timeGap.index = Qt.binding(function() { return builderModel.count - timeGap.ObjectModel.index -1 }) //E.g. count = 4, timeGap model index = 2 --> timeGap prop index = 1 (first time gap)
       action.selected.connect(function() {actionSwitchView.currentIndex = action.ObjectModel.index});
@@ -349,11 +396,11 @@ UIScenarioBuilderForm {
       refreshScenarioLength()
     }
     function removeAction(){
-      if (scenarioView.currentIndex !== -1){
-        builderModel.remove(scenarioView.currentIndex, 2);   //Remove two items to get time block associated with action
+      if (windowContent.scenarioView.currentIndex !== -1){
+        builderModel.remove(windowContent.scenarioView.currentIndex, 2);   //Remove two items to get time block associated with action
         builderModel.updateTimeComponents();
         builderModel.refreshScenarioLength();
-        scenarioView.currentIndex = -1;
+        windowContent.scenarioView.currentIndex = -1;
         builderModel.adjustFade("OFF", -1)
       }
     }
@@ -393,7 +440,7 @@ UIScenarioBuilderForm {
       }
       updateTimeComponents();
       refreshScenarioLength();
-      scenarioView.currentIndex = -1;
+      windowContent.scenarioView.currentIndex = -1;
     }
     function setActionQueue(){
       //Add actions to event model.  They are in reverse chronological order, so count backwards (seems more efficient than trying to put in front and forcing array to shift elements on every addition)
