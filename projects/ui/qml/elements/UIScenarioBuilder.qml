@@ -12,46 +12,44 @@ UIScenarioBuilderForm {
 	signal resetScenario()
   signal requestMenuReady()
   signal readyToClose()
+  property bool editingAction : false
 
 	onClosing : {
-    for (let i = 0; i < builderModel.count; ++i){
-      if (builderModel.get(i).objectName != "scenarioEnd" && builderModel.get(i).objectName != "scenarioStart"){
-        builderModel.remove(i,1)
-        --i;
-      }
-      else {
-        builderModel.get(i).opacity = 1.0 //Make sure our start component isn't still ghosted out
-      }
-    }
-    //eventModel.clear_events()
+    builderModel.unsetConnections() //Unset all connections in action timeline before clearing model
+    builderModel.clear()
     builderModel.scenarioLength_s = 0.0;
     activeRequestsModel.requestQueue.length = 0
     activeRequestsModel.clear();
     root.bgRequests.resetData();     //Sets all collapsed roles to true and check states to 0 for nodes in Data Request Model
-    contentLoader.showContent = false
+    contentLoader.showContent = false     //Flags top level loader to set its source component to undefined so that all visible items are unloaded and reset
+    //Do not close the window until the Loader that controls the window content is finished unloading
     while (contentLoader.status != Loader.Null){
       close.accepted = false
     }
     close.accepted = true
 	}
-  onRequestMenuReady : {
-    
-  }
+  /***Open window--set content loader to active***/
   function launch(){
-    //windowContent.requestView.loadSource = true;   //Request view will load its delegates using updated model information (either from reset or pulled from an existing scenario that we are editing)
-    contentLoader.showContent = true
+    contentLoader.showContent = true    //Flags top level loader to set it source component to windowContent and load all visible items (which will be reset)
 	}
-
-  function loadExisting(events, requests){
+  /***Called from MenuArea when Load Scenario option is selected.  Inputs events, requests, and sampling are received from scenarioFileLoaded signal
+      emitted by Scenario::edit_scenario function***/
+  function loadExisting(events, requests, sampling){
     eventModel = events   
     activeRequestsModel.requestQueue = requests
+    root.scenarioName = events.get_timeline_name();
+    root.scenarioInput = events.get_patient_name().split('.')[0];   //trim off the ".xml"
+    root.isPatientFile = !events.get_patient_name().includes('@')   //engine state files have '@', patient files do not
+    let sampleSplit = sampling.split(';')
+    root.samplingFrequency = (Number(sampleSplit[0]).toFixed(0)).toString() + ";" + sampleSplit[1]    //Qml inteprets an int as "0.0000", so we need to get it to a number and trim it
     launch();
   }
-	
+	/***Helper function to format camel case text for display***/
   function displayFormat (role) {
 		let formatted = role.replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3')     //Formats BloodVolume as "Blood Volume", but formats pH as "pH"
 		return formatted
 	}
+  /***Helper function to convert length of time to clock time for display purposes***/
 	function seconds_to_clock_time(time_s) {
     var v_seconds = time_s % 60;
     var v_minutes = Math.floor(time_s / 60) % 60;
@@ -63,6 +61,7 @@ UIScenarioBuilderForm {
 
     return "%1:%2:%3".arg(v_hours).arg(v_minutes).arg(v_seconds);
   }
+  /***Helper function to convert clock time displayed on timeline components to length in seconds for comparison purposes***/
   function clock_time_to_seconds(timeString){
     let timeUnits = timeString.split(':');    //splits into [hh, mm, ss]
     try {
@@ -77,20 +76,28 @@ UIScenarioBuilderForm {
       return null;
     }
   }
+  /***Save all scenario data.  Triggered when Save button is clicked.  Make sure that we are not currently editing action and that data requests are
+      valid before calling create_scenario function in Scenario.cpp.  If successful, close window.***/
   function saveScenario(){
-    //If time end component is not at top of model, then we are still editing an action
-    if (builderModel.get(0).objectName !== "scenarioEnd"){
-      root.warningMessage.text = "Action editing in process";
-      root.warningMessage.open();
+    //If we are still editing an action, then do not trigger Save
+    if (root.editingAction){
+      windowContent.warningMessage.text = "Action editing in process";
+      windowContent.warningMessage.open();
       return;
     }
-    //Make sure that data requests are valid before saving.  If not, request model will trigger warning
+    //Make sure that data requests are valid before saving.
     if (activeRequestsModel.setRequestQueue()){
       builderModel.setActionQueue()
       let prefix = isPatientFile ? "" : "./states/";
-      let initialParameters = prefix + scenarioInput;
-      bg_scenario.create_scenario(root.scenarioName, isPatientFile, initialParameters + ".xml", eventModel, activeRequestsModel.requestQueue);
-      root.close();
+      eventModel.set_timeline_name(root.scenarioName);
+      eventModel.set_patient_name(prefix + root.scenarioInput + ".xml");
+      let accepted = bg_scenario.create_scenario(eventModel, activeRequestsModel.requestQueue, root.samplingFrequency);
+      //If save was successful, we can close window.  If not, return and keep window open
+      if (accepted){
+        root.close();
+      } else {
+        return;
+      }
     }
   }
 
@@ -125,7 +132,9 @@ UIScenarioBuilderForm {
     ListElement { name : "Tourniquet"; section : "Interventions"; property var makeAction : function(scenario) { return builderModel.add_tourniquet_builder(scenario) } }
     ListElement { name : "Inhaler"; section : "Interventions"}
     ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var makeAction : function(props) { return builderModel.add_anesthesia_machine_builder(scenario)}}
-  }
+    ListElement { name : "Patient Assessment"; section : "Write Data"; property var makeAction : function(props) { return builderModel.add_patient_assessment_builder(scenario)}}
+    ListElement { name : "Serialize State"; section : "Write Data"; property var makeAction : function(props) { return builderModel.add_serialize_state_builder(scenario)}}
+ }
 
   eventModel : EventModel {
     //C++ model -- we use the add_event function to append actions from scenario builder to _events vector (used when saving scenario to write to xml in Scenario.cpp)
@@ -152,6 +161,8 @@ UIScenarioBuilderForm {
     signal substanceQuantityLoaded(string pathId, string sub, string quantity, string unit, string precision)
     property var requestQueue : []
     property var subRequestQueue : []
+    /***Add a data request to the active request view.  This function can be called by checking the box associated with the request in the request menu
+        or by loading a request from a scenario file***/
     function addRequest(path, unitClass, unit = "", precision = "", sub = "", quantity = ""){
       let splitPath = path.split(';');
       var v_requestForm = Qt.createComponent("UIDataRequest.qml");
@@ -173,18 +184,22 @@ UIScenarioBuilderForm {
         return null
       }
     }
+    /***Load data requests from Scenario file.  Substance quantity data requests (which occupy sub-menus inside Request List View) are cached to be 
+        loaded later (once other active requests have been processed).  Request Queue was set in root.loadExisting function.  Loop over requests and
+        decode request strings to get information about request type, unit, and precision.  Call addRequest function with this data to add request
+        to active request list***/
     function loadRequests(){
       let subQRequests = []   //need to queue these and proces later because they have their own sub-list models that must be initialized
       for (let i = 0; i < requestQueue.length; ++i){
         let req = requestQueue[i];
         if (req.indexOf('|') == -1){
-          requestQueue.splice(i,1)
-          --i;
+          requestQueue.splice(i,1) //remove invalid requests from queue
+          --i;    //step loop back 1 iteration because the array was resized
           continue;   //valid request found by data tree will be formatted "PathString|ScalarType|Unit;Precision;Substance(opt)}
         }
         if (req.includes("SUBSTANCEQ")){
           subRequestQueue.push(requestQueue.splice(i,1)[0]);    //splice returns an array (of size 1 in this case), so we need to grab element 0 from the result and append the string to subRequest
-          --i;
+          --i;   //step loop back 1 iteration because the array was resized
           continue;
         }
         else {
@@ -208,6 +223,10 @@ UIScenarioBuilderForm {
         }
       }
     }
+    /***Substance Quantity data requests (in Compartment menu) need to be loaded from Scenario file separately because they inhabit sub-menus that are 
+        distinct from request menu stood up based off data from DataRequestTree.  These requests cannot be loaded at the same time as the other data
+        requests because the active request list view detects multiple sources changing its indexing (which causes an error).  This function therefore
+        is not called until all other data requests have been loaded (confirmed by checking the list view count == number of non-sub quantity requests)***/
     function loadSubRequests(){
       for (let i = 0; i < subRequestQueue.length; ++i){
         let req = subRequestQueue[i]
@@ -235,6 +254,7 @@ UIScenarioBuilderForm {
       requestQueue.length = 0 //clear queue--all requests will be re-written when we save
       subRequestQueue.length = 0
     }
+    /***Remove a request from the active data request list***/
     function removeRequest(path){
       //Can't bind menu element to index in active request model because menu elements are destroyed when menu section is collapsed, which removes bindings.
       //Instead, search for full path name that traverses tree from root to menu item (guaranteed to be unique)
@@ -246,6 +266,8 @@ UIScenarioBuilderForm {
         }
       }
     }
+    /***When Save button clicked, check that all the data requests have required input.  If all are valid, return true and data request list will be 
+        passed to Scenario.cpp.  If false, return to scenario window and show a message to user that one of the requests is invalid***/
     function setRequestQueue(){
       let errMsg = "Invalid Data Requests:";    //for reporting id's of invalid requests
       activeRequestsModel.requestQueue.length = 0;   //clears any requests we had from previous calls
@@ -271,36 +293,21 @@ UIScenarioBuilderForm {
     property double itemWidth : 0 // set when primary loader loads window content
     property double scenarioLength_s : 0     //Time at which the scenario ends
     property double scenarioLengthOverride_s : 0 //User provided value
-    property alias scenarioEndItem : scenarioEnd.item
-    property alias initialPatientItem : initialPatient.item
-    //The scenario end component and initial patient component are in the model at startup
-    Loader {
-      id : scenarioEnd
-      objectName : "scenarioEnd"
-      sourceComponent : contentLoader.status == Loader.Ready ? root.timeEndComponent : undefined
-      onLoaded : {
-        item.scenarioLength_s = Qt.binding(function () { return builderModel.scenarioLength_s });
-      }
-    }
-    Loader {
-      id : initialPatient
-      objectName : "scenarioStart"
-      sourceComponent : contentLoader.status == Loader.Ready ? root.timeStartComponent : undefined
-    }
+    /***Creates a new action with blank input fields and a time component***/
     function createAction(actionElement){
-      if (builderModel.get(0).objectName !== "scenarioEnd"){
+      if (root.editingAction){
         return;   //Make sure any actions added have been fully set up before adding new actions
       }
-      console.log(itemWidth)
       var newAction = actionElement.makeAction(bg_scenario)
       newAction.viewLoader.state = "expandedBuilder";
       builderModel.insert(0, newAction); //Adding every new action to the top initially for editing
       let v_timeGap = root.timeGapComponent.createObject(null);
       builderModel.insert(1, v_timeGap);
       setConnections(newAction, v_timeGap)
-      newAction.editing();
+      newAction.editing(newAction.modelIndex);
       actionSwitchView.currentIndex = 0; //New action gets focus
     }
+    /***Creates a new action based on input from a scenario file and a time component with the duration of the action***/
     function loadAction(buildFunc) {
       let loadedAction = buildFunc()
       builderModel.insert(0, loadedAction);
@@ -310,19 +317,43 @@ UIScenarioBuilderForm {
       loadedAction.buildSet(loadedAction)
       loadedAction.viewLoader.state = "collapsedBuilder"
     }
+    /***Set signal connections and property bindings on action that has just been added to model.  Width must be bound because so that action re-centers
+        itself correctly when the size of the window changes***/
     function setConnections(action, timeGap){
       action.width = Qt.binding(function() { return builderModel.itemWidth})
-      action.currentSelection = Qt.binding(function() { return actionSwitchView.currentIndex === action.ObjectModel.index} );
+      action.currentSelection = Qt.binding(function() { return actionSwitchView.currentIndex == action.ObjectModel.index} );  //When true, action will have highlighted boundary (see ActionForm.ui)
+      action.modelIndex = Qt.binding(function() { return action.ObjectModel.index} )  //Allow each action to track its position in the model (used when emitting selected and editing signals)
       timeGap.index = Qt.binding(function() { return builderModel.count - timeGap.ObjectModel.index -1 }) //E.g. count = 4, timeGap model index = 2 --> timeGap prop index = 1 (first time gap)
-      action.selected.connect(function() {actionSwitchView.currentIndex = action.ObjectModel.index});
-      action.editing.connect(function () {builderModel.adjustFade("ON", action.ObjectModel.index) } );
-      action.buildSet.connect(builderModel.setViewIndex);
-      action.remove.connect(removeAction);
+      action.selected.connect(setCurrentIndex);   //When action is selected, update the current index of the view
+      action.editing.connect(setEditingView);     //When editing an action, adjust view settings (like fade)
+      action.buildSet.connect(builderModel.setViewIndex); //When an action has had its input set, determine its relative place in model view
+      action.remove.connect(removeAction);    //When "remove" option clicked in action pop-up menu, remove it from model
     }
+    /***Signals and property bindings must be disconnected/unset before removing the action from the model.  Otherwise, items might persist because another
+        element is holding on to the connection.  Loop over all elements in model: Even indexed items are action blocks and odd indexed items are time gap
+        components.  "Disconnect" function removes signal connections, and explicitly setting properties that were bound by Qt.binding function removes the 
+        binding.  This function is called just prior to clearing model when window is closing***/
+    function unsetConnections(){
+      for (let i = 0; i < builderModel.count; ++i){
+        let element = builderModel.get(i);
+        if (i % 2 == 0){
+          element.selected.disconnect(setCurrentIndex);
+          element.buildSet.disconnect(setViewIndex);
+          element.editing.disconnect(setEditingView);
+          element.remove.disconnect(removeAction)
+          element.width = 0;
+          element.currentSelection = false;
+          element.modelIndex = -1;
+        } else {
+          element.index = -1;
+        }
+      }
+    }
+    /***This function is called when loading actions from a scenario file.  The eventModel will be set based on scenario input (see root.LoadExisting).
+        Loop over all actions in event model and call the appropriate build action according to the event type***/
     function loadActions(){
       for (let i = 0; i < eventModel.get_event_count(); ++i){
         let event = eventModel.get_event(i);
-        var action;
         switch (event.Type){
           case EventModel.AcuteRespiratoryDistress :
             builderModel.loadAction(function() {return add_single_range_builder("UIAcuteRespiratoryDistress.qml", bg_scenario, event.Params, event.StartTime, event.Duration);});
@@ -372,14 +403,20 @@ UIScenarioBuilderForm {
               builderModel.loadAction(function() {return add_drug_administration_builder(bg_scenario, event.SubType, event.Params, event.StartTime, event.Duration);});
             }
             break;
+          case EventModel.PainStimulus :
+            builderModel.loadAction(function() {return add_pain_stimulus_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.PatientAssessmentRequest :
+            builderModel.loadAction(function() {return add_patient_assessment_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.SerializeState : 
+            builderModel.loadAction(function() {return add_serialize_state_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
           case EventModel.TensionPneumothorax :
             builderModel.loadAction(function() {return add_tension_pneumothorax_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
             break;
           case EventModel.Tourniquet :
             builderModel.loadAction(function() {return add_tourniquet_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
-            break;
-          case EventModel.PainStimulus :
-            builderModel.loadAction(function() {return add_pain_stimulus_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
             break;
           case EventModel.AdvanceTime :
             //We should only get an AdvanceTime action when we are extending out the scenario beyond the duration of the last action, which would be the last action in the queue
@@ -395,35 +432,58 @@ UIScenarioBuilderForm {
       updateTimeComponents()  
       refreshScenarioLength()
     }
+    /***Remove an action from the build model.  This function can be called by "Remove" button in window or from pop-up menu activated by right-clicking
+        on action***/
     function removeAction(){
       if (windowContent.scenarioView.currentIndex !== -1){
         builderModel.remove(windowContent.scenarioView.currentIndex, 2);   //Remove two items to get time block associated with action
         builderModel.updateTimeComponents();
         builderModel.refreshScenarioLength();
         windowContent.scenarioView.currentIndex = -1;
-        builderModel.adjustFade("OFF", -1)
+        builderModel.adjustFade("OFF", -1);
+        root.editingAction = false;
       }
     }
+    /***Sync model view index with the index of the currently selected object***/
+    function setCurrentIndex(ind){
+      actionSwitchView.currentIndex = ind;
+    }
+    /***When we are editing an action, adjust the opacity of other elements in model view and lock other elements from editing unti this one has been
+        finished***/
+    function setEditingView(ind){
+      builderModel.adjustFade("ON", ind);
+      root.editingAction = true;
+    }
+    /***Turn fade on/off depending on whether an action is currently being edited or not***/
     function adjustFade(state, index){
-      for (let i = 0; i < builderModel.count; i++){
-        if (state == "ON"){
+      if (state == "ON"){
+        for (let i = 0; i < builderModel.count; ++i){
           if (i != index){
             builderModel.get(i).opacity = 0.25;
           }
-        } else {
-          builderModel.get(i).opacity = 1.0;
         }
+        actionSwitchView.headerItem.opacity = 0.25;
+        actionSwitchView.footerItem.opacity = 0.25;
+      } else {
+        for (let i = 0; i < builderModel.count; ++i){
+         builderModel.get(i).opacity = 1.0;
+        }
+        actionSwitchView.headerItem.opacity = 1.0;
+        actionSwitchView.footerItem.opacity = 1.0;
       }
     }
+    /***When an action has been fully defined and set, it must be placed in chronological order in the model view.  This function searches across
+        model elements, comparing start times, until it reaches the appropriate location for the action being set***/
     function setViewIndex(action){
+      root.editingAction = false;   //this function called when build is set, so we are done editing
       //When we edit an action (in particular it's start time) we need to make sure that we percolate it up/down to the right location in the view area
-      let newIndex = 1;
+      let newIndex = 0;
       adjustFade("OFF", 0);
       let actionIndex = action.ObjectModel.index;  //where the action currently resides in the view
-      let startIndex = actionIndex == 0 ? 3 : 1; //If object is at index 0, then it has just been created. There is a time block (not visible) and the end sim block below it, so the first action to compare this action to is at index 3.  If this action has already been placed in list, then the end sim block occupies index 0 and the first action for comparison is at index 1 
+      let startIndex = actionIndex == 0 ? 2 : 0; //If object is at index 0, then it has just been created. There is a time block (not visible) and the end sim block below it, so the first action to compare this action to is at index 2.  If this action has already been placed in list, then the first action for comparison is at index 0 
       let actionTime = action.actionStartTime_s;   //the time the action is to be applied
-      if (builderModel.count > 4){
-        //<=4 means there is only one action so far (objects in model are initial patient, action time gap, action, and simulation length)  
+      if (builderModel.count > 2){
+        //<=2 means there is only one action so far (this action and it's companion time block)  
         for (let i = startIndex; i < builderModel.count-1; i+=2){
           if (i == actionIndex){
             continue; //Don't compare against itself
@@ -442,22 +502,26 @@ UIScenarioBuilderForm {
       refreshScenarioLength();
       windowContent.scenarioView.currentIndex = -1;
     }
+    /***When Save button is clicked, we add actions in view to the event model (defined in C++) so that we can access actions in Scenario.cpp
+        and create Scenario file***/
     function setActionQueue(){
       //Add actions to event model.  They are in reverse chronological order, so count backwards (seems more efficient than trying to put in front and forcing array to shift elements on every addition)
-      //Very bottom item (count-1) is the initial patient, next lowest item (count -2) is time to first action, so we start at index (count - 3) and add every other item to skip over time gaps (can't add them as AdvanceTime
+      //Very bottom item (count-1) is the time to first action, so we start at index (count - 2) and add every other item to skip over time gaps (can't add them as AdvanceTime
       //actions yet because we do not know where "Deactivate" functions go yet)
       eventModel.clear_events();    //empty event model, we will reconstruct queue from scratch based on what is inside the scenario builder
-      for (let i = builderModel.count-3; i >= 0; i-=2){
+      for (let i = builderModel.count-2; i >= 0; i-=2){
         let action = builderModel.get(i);
         eventModel.add_event(action.actionType, action.actionClass, action.actionSubClass, action.buildParams, action.actionStartTime_s, action.actionDuration_s);
       }
       //Push back last advance time action -- set its "start time" to scenario length so that it will be guaranteed to be at end of sorted queue (calculate duration in Scenario.cpp after "deactivate" actions are accounted for)
       eventModel.add_event("Advance Time", EventModel.AdvanceTime, -1, "", builderModel.scenarioLength_s, 0.0);
     }
+    /***When an action has been moved in the model view, the components showing the time between actions must be updated. Loop over odd-indexed items 
+        (which are the time components) and adjust the time based on the difference between the start times of adjacent actions***/
     function updateTimeComponents(){
-      for (let i = 2; i < builderModel.count; i+=2){
-        //time blocks are always the even indexed objects in model (skippint 0, 1, 2 because that is where sim length and action are 
-        if (i == builderModel.count-2){
+      for (let i = 1; i < builderModel.count; i+=2){
+        //time blocks are always the odd indexed objects in model (skipping 0 because that is where first action is)
+        if (i == builderModel.count-1){
           //bottom time block, so it's time is just whatever start time the action above it has
           builderModel.get(i).blockTime_s = builderModel.get(i-1).actionStartTime_s;
         } else {
@@ -468,9 +532,11 @@ UIScenarioBuilderForm {
         }
       }
     }
+    /***When an action has been edited, the length of the scenario must be updated.  Compare the new scenario length against override set by user (done
+        by clicking "Extend Scenario" arrow in Scenario Length component***/
     function refreshScenarioLength(){
       let newScenarioLength_s = 0
-      for (let i = 1; i < builderModel.count-1; i+=2){
+      for (let i = 0; i < builderModel.count; i+=2){
         let actionStart = builderModel.get(i).actionStartTime_s;
         let actionDuration = builderModel.get(i).actionDuration_s;
         if (actionStart + actionDuration > newScenarioLength_s){
@@ -484,10 +550,10 @@ UIScenarioBuilderForm {
       }
       //Update final advance time (only if there is an action there, which happens when count > 2 (start and final block always there)
       let finalActionStart = 0;
-      if (builderModel.count > 2){
-        finalActionStart = builderModel.get(1).actionStartTime_s;
+      if (builderModel.count > 0){
+        finalActionStart = builderModel.get(0).actionStartTime_s;
       }
-      scenarioEnd.item.finalAdvanceTime_s = scenarioLength_s - finalActionStart;
+      actionSwitchView.headerItem.finalAdvanceTime_s = scenarioLength_s - finalActionStart;
     }
   }
   

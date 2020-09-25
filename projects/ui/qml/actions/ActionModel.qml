@@ -956,4 +956,54 @@ import com.biogearsengine.ui.scenario 1.0
         return null;
       }
     }
+    function add_serialize_state_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let fileName = ""
+      if (props!=""){
+        let params = props.split(';')
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split('=')
+          if (param[0]=="Filename"){
+            let temp1 = param[1].replace("./states/", "");
+            let temp2 = temp1.replace(".xml","")
+            fileName = temp2
+          }
+        }
+      }
+      var v_serializeForm = Qt.createComponent("UISerialize.qml");
+      if ( v_serializeForm.status == Component.Ready)  {
+        var v_serialize = v_serializeForm.createObject(actionSwitchView,{ "fileName" : fileName, "scenario" : scenario, "actionStartTime_s" : startTime, 
+                                                                          "actionDuration_s" : duration, "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
+                                                                          "builderMode" : true
+                                                                        });
+        return v_serialize;
+      } else {
+        if (v_serializeForm.status == Component.Error){
+          console.log("Error : " + v_serializeForm.errorString() );
+          return null;
+        }
+        console.log("Error : Action switch component not ready");
+        return null;
+      }
+    }
+    function add_patient_assessment_builder(scenario, props = "", startTime = 0, duration = 0) {
+      let type_str = ""
+      if (props != ""){
+        type_str = props.split("=")[1].replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3');
+      }
+      var v_serializeForm = Qt.createComponent("UIPatientAssessment.qml");
+      if ( v_serializeForm.status == Component.Ready)  {
+        var v_serialize = v_serializeForm.createObject(actionSwitchView,{ "type_str" : type_str, "scenario" : scenario, "actionStartTime_s" : startTime, 
+                                                                          "actionDuration_s" : duration, "width" : actionSwitchView.width-actionSwitchView.scrollWidth,
+                                                                            "builderMode" : true
+                                                                        });
+        return v_serialize;
+      } else {
+        if (v_serializeForm.status == Component.Error){
+          console.log("Error : " + v_serializeForm.errorString() );
+          return null;
+        }
+        console.log("Error : Action switch component not ready");
+        return null;
+      }
+    }
   }

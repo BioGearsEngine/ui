@@ -522,7 +522,7 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       if (bolusData->AdminTime().present()) {
         double time = biogears::Convert(bolusData->AdminTime().get().value(), biogears::CCompoundUnit(bolusData->AdminTime().get().unit()->c_str()), biogears::CCompoundUnit("s"));
         ev.params.append(asprintf("AdminTime=%f,%s;", time, "s").c_str());
-      }     
+      }
       ev.params.append(asprintf("Substance=%s;", bolusData->Substance().c_str()).c_str());
       return true;
     }
@@ -630,13 +630,13 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.params.append(asprintf("Type=CompleteBloodCount").c_str());
       break;
     case CDM::enumPatientAssessment::ComprehensiveMetabolicPanel:
-      ev.params.append(asprintf("Type=ComprehensiveMetabolicPanel").c_str());
+      ev.params.append(asprintf("Type=MetabolicPanel").c_str());
       break;
     case CDM::enumPatientAssessment::PulmonaryFunctionTest:
       ev.params.append(asprintf("Type=PulmonaryFunctionTest").c_str());
       break;
     case CDM::enumPatientAssessment::SequentialOrganFailureAssessment:
-      ev.params.append(asprintf("Type=SequentialOrganFailureAssessment").c_str());
+      ev.params.append(asprintf("Type=SOFA").c_str());
       break;
     case CDM::enumPatientAssessment::Urinalysis:
       ev.params.append(asprintf("Type=Urinalysis").c_str());
@@ -1026,8 +1026,8 @@ bool EventTree::process_action(Event& ev, CDM::SerializeStateData* action)
   ev.description = "Serializes the current simulation state to disk";
 
   std::string param_str;
-  param_str = asprintf("filename=%s", action->Filename().c_str());
-  param_str += asprintf("type=%s", (action->Type() == CDM::enumSerializationType::Load) ? "Load" : "Save");
+  param_str = asprintf("Filename=%s;", action->Filename().c_str());
+  param_str += asprintf("Type=%s", (action->Type() == CDM::enumSerializationType::Load) ? "Load" : "Save");
   ev.params = param_str.c_str();
 
   return true;
@@ -1036,6 +1036,18 @@ bool EventTree::process_action(Event& ev, CDM::SerializeStateData* action)
 void EventTree::encode_actions(CDM::ScenarioData* scenario)
 {
   double sim_time_s = 0.0;
+  if (scenario->Name().present()) {
+    _timeline_name = QString::fromStdString(scenario->Name().get());
+  } else {
+    _timeline_name = "";
+  }
+  if (scenario->InitialParameters().present() && scenario->InitialParameters().get().PatientFile().present()) {
+    _patient_name = QString::fromStdString(scenario->InitialParameters().get().PatientFile().get());
+  } else if (scenario->EngineStateFile().present()) {
+    _patient_name = QString::fromStdString(scenario->EngineStateFile().get());
+  } else {
+    _patient_name = "";
+  }
   for (auto& action : scenario->Action()) {
     Event ev;
 
@@ -1059,10 +1071,8 @@ void EventTree::encode_actions(CDM::ScenarioData* scenario)
           sim_time_s += (timeValue * 3600.0);
         }
       } else {
-        if (ev.eType != EventTree::PatientAssessmentRequest) { //Assessments not currently supported in scenario builder
-          ev.startTime = sim_time_s;
-          _events.push_back(ev);
-        }     
+        ev.startTime = sim_time_s;
+        _events.push_back(ev);
       }
     } else {
       _validity = false;
@@ -1314,6 +1324,12 @@ biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceMan
     break;
   case EventTypes::PainStimulus:
     action = decode_pain_stimulus(ev);
+    break;
+  case EventTypes::PatientAssessmentRequest:
+    action = decode_patient_assessment(ev);
+    break;
+  case EventTypes::SerializeState:
+    action = decode_serialize_state(ev);
     break;
   case EventTypes::TensionPneumothorax:
     action = decode_tension_pneumothorax(ev);
@@ -1753,6 +1769,28 @@ biogears::SEPainStimulus* EventTree::decode_pain_stimulus(Event& ev)
       action->SetLocation(nameSplit[1]);
     }
   }
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SEPatientAssessmentRequest* EventTree::decode_patient_assessment(Event& ev)
+{
+  biogears::SEPatientAssessmentRequest* action = new biogears::SEPatientAssessmentRequest();
+  //Assessment param is Type=t; where t corresponds to patient request enum
+  int type = std::stoi(biogears::split(ev.params.toStdString(), '=')[1]);
+  action->SetType((CDM::enumPatientAssessment::value)type);
+  return action;
+}
+//-----------------------------------------------------------------------------
+biogears::SESerializeState* EventTree::decode_serialize_state(Event& ev)
+{
+  biogears::SESerializeState* action = new biogears::SESerializeState();
+  //Event param is FileName=Name;
+  std::string baseName = biogears::split(ev.params.toStdString(), '=')[1];
+  baseName.pop_back();  //remove ";" at last char
+  std::string fileName = "./states/" + baseName +  ".xml";
+
+  action->SetFilename(fileName);
+  action->SetType(CDM::enumSerializationType::Save); //Options are Save and Load.  Clearly we want to save here.
   return action;
 }
 //-----------------------------------------------------------------------------

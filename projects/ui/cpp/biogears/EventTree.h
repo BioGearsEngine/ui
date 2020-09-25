@@ -41,6 +41,7 @@
 #include <biogears/cdm/patient/actions/SENeedleDecompression.h>
 #include <biogears/cdm/patient/actions/SEPainStimulus.h>
 #include <biogears/cdm/patient/actions/SEPatientAssessmentRequest.h>
+#include <biogears/cdm/scenario/SESerializeState.h>
 #include <biogears/cdm/patient/actions/SESubstanceBolus.h>
 #include <biogears/cdm/patient/actions/SESubstanceCompoundInfusion.h>
 #include <biogears/cdm/patient/actions/SESubstanceInfusion.h>
@@ -195,7 +196,11 @@ public:
   Q_INVOKABLE void add_event(QString name, int type, int subType, QString params, double startTime_s, double duration_s);
   Q_INVOKABLE Event get_event(int index) { return _events[index]; };
   Q_INVOKABLE int get_event_count() { return _events.size(); };
-  Q_INVOKABLE void clear_events() { return _events.clear(); }
+  Q_INVOKABLE void clear_events() { return _events.clear(); };
+  Q_INVOKABLE QString get_timeline_name() { return _timeline_name; };
+  Q_INVOKABLE QString get_patient_name() { return _patient_name; }; 
+  Q_INVOKABLE void set_timeline_name(QString tName) { _timeline_name = tName; };
+  Q_INVOKABLE void set_patient_name(QString pName) { _patient_name = pName; }; 
 
   void Source(QString source);
   QString Source() const;
@@ -246,6 +251,8 @@ private:
   biogears::SEInfection* decode_infection(Event& ev);
   biogears::SENeedleDecompression* decode_needle_decompression(Event& ev);
   biogears::SEPainStimulus* decode_pain_stimulus(Event& ev);
+  biogears::SEPatientAssessmentRequest* decode_patient_assessment(Event& ev);
+  biogears::SESerializeState* decode_serialize_state(Event& ev);
   biogears::SETensionPneumothorax* decode_tension_pneumothorax(Event& ev);
   biogears::SETourniquet* decode_tourniquet(Event& ev);
   biogears::SEBrainInjury* decode_traumatic_brain_injury(Event& ev);
@@ -254,6 +261,8 @@ private:
   double _duration;
   bool _validity;
   QString _source;
+  QString _timeline_name;
+  QString _patient_name;
   CDM::ScenarioData _data;
   std::vector<Event> _events;
 };

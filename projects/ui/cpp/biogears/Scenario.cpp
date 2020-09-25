@@ -32,13 +32,12 @@
 #include <biogears/container/concurrent_queue.tci.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
-
 #include <biogears/cdm/patient/assessments/SEComprehensiveMetabolicPanel.h>
 #include <biogears/cdm/patient/assessments/SEPatientAssessment.h>
 #include <biogears/cdm/patient/assessments/SEUrinalysis.h>
-
 #include <biogears/cdm/scenario/SEAction.h>
 #include <biogears/cdm/scenario/SEScenarioInitialParameters.h>
+
 #include <chrono>
 namespace bio {
 Scenario::Scenario(QObject* parent)
@@ -1056,24 +1055,39 @@ void Scenario::export_patient(const biogears::SEPatient* patient)
   return;
 }
 
-void Scenario::create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* eventTree, QVariantList requests)
+bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QString sampling)
 {
+  QString scenarioFile = QFileDialog::getSaveFileName(nullptr, "Save Scenario", "./Scenarios", "Scenario (*.xml)");
+  if (scenarioFile.isNull()) {
+    return false;
+  }
   eventTree->sort_events(); //Get actions in right order
-
+  //Set scenario name
   auto buildScenario = std::make_unique<biogears::SEScenario>(_engine->GetSubstances());
-  buildScenario->SetName(name.toStdString());
+  buildScenario->SetName(eventTree->get_timeline_name().toStdString());
+  //Set initial patient/state file name
+  std::string initialParams = eventTree->get_patient_name().toStdString();
+  if (initialParams.find('@') != std::string::npos) {
+    buildScenario->SetEngineStateFile(initialParams);
+  } else {
+    buildScenario->GetInitialParameters().SetPatientFile(initialParams);
+  }
+  //Set sampling frequency
+  std::string frequencyStr = sampling.toStdString();
+  size_t pos = frequencyStr.find(';');
+  double frequency_Hz = std::stod(frequencyStr.substr(0,pos));
+  std::cout << frequencyStr.substr(pos, frequencyStr.length());
+  if (frequencyStr.substr(pos+1, frequencyStr.length()) == "s") {
+    frequency_Hz = 1.0 / frequency_Hz;
+  }
+  buildScenario->GetDataRequestManager().SetSamplesPerSecond(frequency_Hz);
 
   biogears::SEAction* action;
   //Set up re-usable Advance Time event to apply between adjacent actions
   Event advanceTime;
   advanceTime.typeName = "AdvanceTime";
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
-
-  if (isPatientFile) {
-    buildScenario->GetInitialParameters().SetPatientFile(initialParams.toStdString());
-  } else {
-    buildScenario->SetEngineStateFile(initialParams.toStdString());
-  }
+ 
   for (int i = 0; i < eventTree->get_events().size() - 1; ++i) {
     //Stopping before size-1 becasue eventTree[size -1] so that our final "next event" does not exceed loop bounds (last event, which is an advance time, is still processed)
     Event thisEvent = eventTree->get_events()[i];
@@ -1103,8 +1117,7 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
     buildScenario->GetDataRequestManager().CreateFromBind(*_data_request_tree->decode_request(requests[i].toString()), _engine->GetSubstanceManager());
   }
 
-  std::string fileLoc = "./Scenarios/" + buildScenario->GetName() + ".xml";
-  std::string fullPath = biogears::ResolvePath(fileLoc);
+  std::string fullPath = biogears::ResolvePath(scenarioFile.toStdString());
   biogears::CreateFilePath(fullPath);
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
@@ -1114,6 +1127,7 @@ void Scenario::create_scenario(QString name, bool isPatientFile, QString initial
   CDM::Scenario(stream, *sceData, info);
   stream.close();
   _engine->GetLogger()->Info("Saved scenario: " + fullPath);
+  return true;
 }
 
 void Scenario::edit_scenario()
@@ -1134,7 +1148,16 @@ void Scenario::edit_scenario()
   EventTree* events = new EventTree();
   events->encode_actions(scenarioData);
   QVariantList requests = _data_request_tree->encode_requests(scenarioData);
-  emit scenarioFileLoaded(events, requests);
+  std::string sampling = "";
+  if (scenarioData->DataRequests()->SamplesPerSecond().present()) {
+    double frequency = scenarioData->DataRequests()->SamplesPerSecond().get();
+    if (frequency < 1.0) {
+      sampling = std::to_string(std::round(1.0 / frequency)) + ";s";
+    } else {
+      sampling = std::to_string(std::round(frequency)) + ";Hz";
+    }
+  }
+  emit scenarioFileLoaded(events, requests, QString::fromStdString(sampling));
 }
 
 void Scenario::create_substance(QVariantMap substanceData)

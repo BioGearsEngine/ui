@@ -13,6 +13,8 @@ Window {
   property alias actionDelegate : actionListDelegate
   property alias contentLoader : contentLoader
   property alias windowContent : contentLoader.item
+  property bool windowReady : contentLoader.status == Loader.Ready
+  property string samplingFrequency : "1;s"
   property string scenarioInput : "DefaultTemplateMale"
   property string scenarioName : "TestScenario"
   property bool isPatientFile : true     //false ---> input = engine state file
@@ -38,7 +40,7 @@ Window {
     onLoaded : {
       builderModel.actionSwitchView = item.scenarioView
       root.showNormal();
-      builderModel.itemWidth = Qt.binding(function() { return item.scenarioView.width - item.scenarioView.scrollWidth } )
+      builderModel.itemWidth = Qt.binding(function() { if (windowReady) {return item.scenarioView.width - item.scenarioView.scrollWidth;} else {return 0} } )
       builderModel.loadActions()
       activeRequestsModel.loadRequests()
     }
@@ -174,6 +176,8 @@ Window {
               currentIndex : -1
               spacing : 5
               model : builderModel
+              header : timeEndComponent
+              footer : timeStartComponent
               ScrollBar.vertical : ScrollBar {
                 id : scenarioScroll
                 policy : ScrollBar.AlwaysOn
@@ -190,6 +194,7 @@ Window {
             }
           }
           Item {
+          //Grouped separately from other controls defined below because it is in the first column (other are in second)
             id : addButtonArea
             Layout.preferredWidth : parent.width * 0.2
             Layout.preferredHeight : parent.height * 0.075
@@ -209,37 +214,35 @@ Window {
               }
             }
           }
-
-          RowLayout {
-            id : scenarioButtonArea
-            Layout.preferredWidth : parent.width * 0.8
+          Item {
+            //Item container breaks binding loop that can occur by putting RowLayout inside of GridLayou
+            id : controlsWrapper
+            Layout.maximumWidth : parent.width * 0.8
+            Layout.fillWidth : true
             Layout.preferredHeight : parent.height * 0.075
             Layout.row : 2
             Layout.column : 1
-            Button {
-              id : removeButton
-              Layout.alignment : Qt.AlignHCenter
-              Layout.preferredHeight : parent.height
-              Layout.preferredWidth : parent.width / 5
-              text : "Remove Action"
-              onClicked : {
-                builderModel.removeAction()
-              }
-            }
             RowLayout {
-              //Wrapping input in an item to break a binding loop (width of text input subcomponents depend on parent width, which depends on width of input subcomponents...)
-              id : scenarioNameWrapper
-              Layout.preferredWidth : parent.width / 3
-              Layout.preferredHeight : parent.height
-              Layout.alignment : Qt.AlignHCenter
-              spacing : 0
+              id : scenarioButtonArea
+              width : parent.width
+              height : parent.height
+              Button {
+                id : removeButton
+                Layout.alignment : Qt.AlignHCenter
+                Layout.preferredHeight : parent.height
+                Layout.preferredWidth : parent.width / 6
+                text : "Remove Action"
+                onClicked : {
+                  builderModel.removeAction()
+                }
+              }
               Label {
                 id : nameLabel
                 text : "Scenario Name:  "
                 font.pixelSize : 18
                 bottomPadding : 8
                 Layout.fillHeight : true
-                Layout.preferredWidth : parent.width / 2
+                Layout.preferredWidth : parent.width / 6
                 Layout.alignment : Qt.AlignRight
                 verticalAlignment : Text.AlignVCenter
                 horizontalAlignment : Text.AlignRight
@@ -247,13 +250,92 @@ Window {
               TextField {
                 id : nameInput
                 placeholderText: "Name"
+                text : root.scenarioName
                 font.pixelSize : 18
                 Layout.fillHeight : true
-                Layout.preferredWidth : parent.width / 2
-                horizontalAlignment : Text.AlignCenter
+                Layout.preferredWidth : parent.width / 7
+                horizontalAlignment : Text.AlignHCenter
                 Layout.alignment : Qt.AlignLeft
                 onEditingFinished : {
                   root.scenarioName = text
+                }
+              }
+              Label {
+                id : samplingLabel
+                text : "Sampling Frequency:  "
+                font.pixelSize : 18
+                bottomPadding : 8
+                Layout.fillHeight : true
+                Layout.preferredWidth : parent.width / 6
+                Layout.alignment : Qt.AlignRight
+                verticalAlignment : Text.AlignVCenter
+                horizontalAlignment : Text.AlignRight
+              }
+              ComboBox {
+                id : samplingCombo
+                currentIndex : setCurrentIndex()
+                Layout.alignment : Qt.AlignLeft | Qt.AlignVCenter
+                Layout.preferredHeight : parent.height * 0.65
+                Layout.preferredWidth : parent.width / 8
+                bottomInset : 0
+                topInset : 0
+                model : ["50;Hz", "10;Hz", "5;Hz", "1;s", "10;s", "30;s", "60;s"]
+                flat : false
+                contentItem : Text {
+                  width : samplingCombo.width
+                  height : samplingCombo.height
+                  text : samplingCombo.displayText.replace(";", " ")
+                  font.pointSize : 12
+                  verticalAlignment : Text.AlignVCenter
+                  horizontalAlignment : Text.AlignHCenter
+                }
+                delegate : ItemDelegate {
+                  width : samplingCombo.popup.width
+                  contentItem : Text {
+                    width : parent.width
+                    text : modelData.replace(";", " ")
+                    font.pointSize : 12
+                    verticalAlignment : Text.AlignVCenter
+                    horizontalAlignment : Text.AlignHCenter
+                    }
+                  background : Rectangle {
+                    anchors.fill : parent
+                    color : "transparent"
+                    border.color : "green"
+                    border.width : samplingCombo.highlightedIndex === index ? 2 : 0
+                  }
+                }
+                popup : Popup {
+                  y : samplingCombo.height
+                  x : 0
+                  padding : 0
+                  width : samplingCombo.width - samplingCombo.indicator.width
+                  implicitHeight : contentItem.implicitHeight
+                  contentItem : ListView {
+                    clip : true
+                    implicitHeight : contentHeight
+                    model : samplingCombo.popup.visible ? samplingCombo.delegateModel : null
+                    currentIndex : samplingCombo.highlightedIndex
+                  }
+                }
+                background : Rectangle {
+                  id : samplingBackground
+                  //Height and width of this rectangle established by Layout preferred dimensions assigned in Loader
+                  border.color : "black"
+                  border.width : 1
+                }
+                onActivated : {
+                  root.samplingFrequency = currentText;
+                }
+                function setCurrentIndex(){
+                  if (model){
+                    for (let i = 0; i < model.length; ++i){
+                      if (model[i]===root.samplingFrequency){
+                        return i;
+                      }
+                    }
+                  }
+                  return -1;
                 }
               }
             }
@@ -327,10 +409,11 @@ Window {
                 policy : ScrollBar.AlwaysOn
               }
               onCountChanged : {
-                console.log(count)
-                console.log(activeRequestsModel.requestQueue.length)
-                console.log(activeRequestsModel.subRequestQueue.length)
-                if (count == activeRequestsModel.requestQueue.length){
+                //When loading from file, we need to make sure that it is impossible for substane quantity requests (which reside in sub-menus distint from Data Request Model) to
+                // load to list view concurrently with other requests.  Thus, we wait until the list view count matches the requestQueue count (meaning all standard requests have 
+                // been loaded), and then we call to load substance quantity menus and requests
+                if (count == activeRequestsModel.requestQueue.length && activeRequestsModel.subRequestQueue.length > 0){
+                  forceLayout();    //force layout update just to be safe
                   activeRequestsModel.loadSubRequests()
                 }
               }
@@ -374,7 +457,7 @@ Window {
     Rectangle {
       id : delegateWrapper
       height : delegateText.height * 1.4
-      width : windowContent.actionView.width - windowContent.actionView.scrollWidth //aligns with ListView preferred width
+      width : windowReady ? windowContent.actionView.width - windowContent.actionView.scrollWidth : 0 //aligns with ListView preferred width
       Layout.alignment : Qt.AlignLeft
       color : ListView.isCurrentItem ? "lightskyblue" : "transparent"
       border.color: "lightskyblue"
@@ -406,7 +489,7 @@ Window {
       id : timeColumn
       property double blockTime_s : 0
       property int index : -1   //Note that this index counts up from the bottom of the scenario builder
-      width : windowContent.scenarioView.width - windowContent.scenarioView.scrollWidth
+      width : windowReady ? windowContent.scenarioView.width - windowContent.scenarioView.scrollWidth : 0
       height : 60
       spacing : 0
       states : [
@@ -441,26 +524,26 @@ Window {
       }
     }
   }
-  //Component used to create scenario start time block
+  //Component used to create patient input block
   Component {
     id : timeStartComponent
     Rectangle {
       id : startRectangle
       height : 40
-      width : windowContent.scenarioView.width - windowContent.scenarioView.scrollWidth
+      width : windowReady ? windowContent.scenarioView.width - windowContent.scenarioView.scrollWidth : 0
       color : "transparent"
       Rectangle {
         id : textRectangle
         height : parent.height
         width : parent.width / 3
-        anchors.horizontalCenter : parent.horizontalCenter
+        anchors.horizontalCenter : windowReady ? parent.horizontalCenter : undefined
         color : "transparent"
         border.color : "black"
         border.width : 2
         radius : 15
         Text {
           anchors.centerIn : parent
-          font.pointSize : 14
+          font.pixelSize : 18
           text : "Input: " + root.scenarioInput
         } 
         ToolTip {
@@ -522,7 +605,7 @@ Window {
             title : "Engine State"
             Repeater {
               id : stateSubMenu
-              model : root.stateModel.status == FolderListModel.Ready ? root.patientModel : null
+              model : root.stateModel.status == FolderListModel.Ready ? root.stateModel : null
               delegate : MenuItem {
                 id : stateDelegate
                 text : model.fileBaseName
@@ -555,9 +638,9 @@ Window {
     id : timeEndComponent
     Column {
       id : timeEndColumn
-      property double scenarioLength_s : 0.0
+      property double scenarioLength_s : builderModel.scenarioLength_s
       property double finalAdvanceTime_s : 0.0
-      width : windowContent.scenarioView.width - windowContent.scenarioView.scrollWidth
+      width : contentLoader.status==Loader.Ready ? windowContent.scenarioView.width - windowContent.scenarioView.scrollWidth : 0
       spacing : 0
       states : [
         State {
@@ -572,14 +655,9 @@ Window {
         }   
       ]
       Rectangle {
-        width : parent.width
-        height : builderModel.get(0).objectName==="scenarioEnd" ? 0 : 2
-        color : "black"
-      }
-      Rectangle {
         height : 2 * parent.height / 5
         width : parent.width / 3
-        anchors.horizontalCenter : parent.horizontalCenter
+        anchors.horizontalCenter : windowReady ? parent.horizontalCenter : undefined
         color : "transparent"
         border.color : "black"
         border.width : 2
@@ -661,9 +739,9 @@ Window {
           source : "icons/move-up.png"
           sourceSize.width : 15
           sourceSize.height: parent.height - 10
-          anchors.right : parent.right
+          anchors.right : windowReady ? parent.right : undefined
           anchors.rightMargin : 15
-          anchors.verticalCenter : parent.verticalCenter
+          anchors.verticalCenter : windowReady ? parent.verticalCenter : undefined
           ToolTip {
             visible : extendMouseArea.containsMouse
             delay : 200
@@ -689,13 +767,13 @@ Window {
         color : "black"
         width : 2
         height : parent.height / 5
-        anchors.horizontalCenter : parent.horizontalCenter
+        anchors.horizontalCenter : windowReady ? parent.horizontalCenter : undefined
       }
       Text {
         id : timeText
         height : parent.height / 5
         font.pointSize : 12
-        anchors.horizontalCenter : parent.horizontalCenter
+        anchors.horizontalCenter : windowReady ? parent.horizontalCenter : undefined
         horizontalAlignment : Text.AlignHCenter
         text : root.seconds_to_clock_time(parent.finalAdvanceTime_s)
       }
@@ -703,7 +781,7 @@ Window {
         color : "black"
         width : 2
         height : parent.height / 5
-        anchors.horizontalCenter : parent.horizontalCenter
+        anchors.horizontalCenter : windowReady ? parent.horizontalCenter : undefined
       }
     }
   }//end time component
@@ -819,12 +897,41 @@ Window {
       width : parent.width 
       height : 30
       CheckBox {
+        id : leafCheckBox
         x : 15 + indentLevel * 45
         height : parent.height
+        width : parent.width - x - 15   //extra padding so text doesn't run into scroll bar
         text : root.displayFormat(model.data(index, DataRequestModel.NameRole))
         font.pixelSize : 16
         checkable : true
         checked : model.data(index, Qt.CheckStateRole)
+        contentItem : Text {
+            id : textContent
+            anchors.left : leafCheckBox.indicator.right
+            leftPadding : 5
+            text : width > 0 ? leafCheckBox.text : ""    //Text elide does not work correctly on loading unless a width non-zero (width = 0 happens momentarily while building components
+            font : leafCheckBox.font
+            width : leafCheckBox.width - leafCheckBox.indicator.width - leftPadding
+            height : parent.height
+            elide : Text.ElideRight
+            verticalAlignment : Text.AlignVCenter
+            MouseArea {
+              id : leafMouseArea
+              width : parent.width
+              height : leafCheckBox.height
+              cursorShape : Qt.PointingHandCursor
+              hoverEnabled : true
+            }
+            ToolTip {
+              x : 10
+              y : leafCheckBox.height / 2
+              visible : (leafMouseArea.containsMouse && leafCheckBox.contentItem.truncated)
+              delay : 500
+              timeout : 2000
+              text : leafCheckBox.text
+              font.pointSize : 10
+            }
+          }
         onClicked : {
           model.setData(index, checkState, Qt.CheckStateRole)
           if (checkState == Qt.Checked){
@@ -853,7 +960,6 @@ Window {
       }
       function loadSubstanceQuantity(loadPath, substance, quantity, unit, precision){
         if (loadPath===leafWrapper.path){
-          //console.log(loadPath)
           let requestPath = leafWrapper.path + "-" + subModel.count
           subModel.append({"substance" : substance, "quantity" : quantity, "unit" : unit, "precision" : precision, "path" : requestPath})
         }
@@ -909,11 +1015,13 @@ Window {
         delegate : CheckBox {
           id : subCheckBox
           x : 15 + (indentLevel + 1 ) * 45
+          width : ListView.view.width - x - 15  //extra padding so text doesn't run into scroll bar
           text : model.substance + " - " + model.quantity
           contentItem : Text {
+            id : subContent
             anchors.left : subCheckBox.indicator.right
             leftPadding : 5
-            text : width > 0 ? subCheckBox.text : ""    //Text elide does not work correctly on loading unless a width is explictly set
+            text : width > 0 ? subCheckBox.text : ""    //Text elide does not work correctly on loading unless width is non-zero (width = 0 happens momentarily while building components)
             font : subCheckBox.font
             width : subCheckBox.width - subCheckBox.indicator.width - leftPadding
             height : parent.height
@@ -936,7 +1044,6 @@ Window {
               font.pointSize : 10
             }
           }
-          width : ListView.view.width - x
           font.pixelSize : 16
           checkable : true
           tristate : true

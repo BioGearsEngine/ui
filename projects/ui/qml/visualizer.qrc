@@ -83,6 +83,8 @@
         <file alias="UIAcuteRespiratoryDistress.qml">actions/UIAcuteRespiratoryDistress.qml</file>
         <file alias="UIDataRequest.qml">elements/UIDataRequest.qml</file>
         <file alias="UIDataRequestForm.ui.qml">elements/UIDataRequestForm.ui.qml</file>
+        <file alias="UIPatientAssessment.qml">actions/UIPatientAssessment.qml</file>
+        <file alias="UISerialize.qml">actions/UISerialize.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>

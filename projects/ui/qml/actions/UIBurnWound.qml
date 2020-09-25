@@ -263,7 +263,7 @@ UIActionForm {
         Layout.column : 2
         Layout.preferredHeight : severityWrapper.height   //recs need preferred dimension explicity stated (not sure why fill width/height not enough to accomplish this)
         Layout.fillWidth : true
-        Layout.maximumWidth : grid.Width / 3
+        Layout.maximumWidth : grid.width / 3
         Layout.fillHeight : true
       }
     }

@@ -136,7 +136,7 @@ UIActionForm {
       anchors.centerIn : parent
       signal clear()
       onClear : {
-        locationCombo.currentIndex = -1
+        locationCombo.item.currentIndex = -1
         root.location = ""
         root.intensity = 0
         startTimeLoader.item.clear()

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QString>
 #include <QVariant>
 #include <QtQuick>
@@ -84,7 +85,7 @@ public:
   Q_INVOKABLE QVariantMap edit_patient();
   Q_INVOKABLE void export_patient(); //Export current patient (uses save_patient)
   Q_INVOKABLE Scenario& load_patient(QString);
-  Q_INVOKABLE void create_scenario(QString name, bool isPatientFile, QString initialParams, EventTree* events, QVariantList requests);
+  Q_INVOKABLE bool create_scenario(EventTree* events, QVariantList requests, QString sampling);
   Q_INVOKABLE void edit_scenario();
   Q_INVOKABLE void create_substance(QVariantMap substanceData);
   Q_INVOKABLE QVariantMap edit_substance();
@@ -161,7 +162,7 @@ signals:
 
   void dataRequestModelChanged(DataRequestTree* requestTree);
   void timeAdvance(double time_s);
-  void scenarioFileLoaded(EventTree* events, QVariantList requests);
+  void scenarioFileLoaded(EventTree* events, QVariantList requests, QString sampling);
   void substanceActivated(QModelIndex subIndex);
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);

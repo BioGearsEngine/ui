@@ -309,13 +309,13 @@ UIActionForm {
         if ( mouse.button == Qt.RightButton) {
           contextMenu.popup()
         }
-        selected()
+        selected(root.modelIndex)
       }
       onDoubleClicked: { // Double Clicking Window
         if ( mouse.button === Qt.LeftButton ){
           if (exerciseLoader.state === "collapsedBuilder") {
             exerciseLoader.state = "expandedBuilder"
-            root.editing()
+            root.editing(root.modelIndex)
           } 
         } else {
           mouse.accepted = false

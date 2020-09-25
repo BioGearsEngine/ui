@@ -16,8 +16,8 @@ Rectangle {
   signal deactivate()
   signal remove( string uuid )
   signal adjust( var list)
-  signal selected()     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
-  signal editing()      //notifies action model that this action is being edited so that other actions in scenario window fade in opacity
+  signal selected(int index)     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
+  signal editing(int index)      //notifies action model that this action is being edited so that other actions in scenario window fade in opacity
   signal buildSet(var action)
 
   property Scenario scenario
@@ -30,6 +30,7 @@ Rectangle {
   property bool collapsed : true
   property bool builderMode : false
   property bool currentSelection : false
+  property int modelIndex : -1
   property double actionStartTime_s : 0.0        //Time at which this action will be applied (in Scenario Builder)
   property double actionDuration_s : 0.0          //Length of time over which action will be applied
   property Loader viewLoader : loader
@@ -244,7 +245,7 @@ Rectangle {
         if ( mouse.button == Qt.RightButton) {
           contextMenu.popup()
         }
-        selected()
+        selected(root.modelIndex)
       }
 
       onDoubleClicked: { // Double Clicking Window
@@ -252,7 +253,7 @@ Rectangle {
           if (builderMode){
             if ( loader.state === "collapsedBuilder") {
               loader.state = "expandedBuilder"
-              root.editing()
+              root.editing(root.modelIndex)
             }
           } else {
             if ( loader.state === "collapsedControls") {

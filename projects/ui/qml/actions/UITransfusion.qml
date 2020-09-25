@@ -165,7 +165,7 @@ UIActionForm {
       columnSpacing : 20
       signal clear()
       onClear : {
-        compoundCombo.currentIndex = -1
+        compoundCombo.item.currentIndex = -1
         root.compound = ""
         root.rate = 0
         root.volume = 0

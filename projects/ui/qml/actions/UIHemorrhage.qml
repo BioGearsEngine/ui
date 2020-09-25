@@ -138,7 +138,7 @@ UIActionForm {
       anchors.centerIn : parent
       signal clear()
       onClear : {
-        compartmentCombo.currentIndex = -1
+        compartmentCombo.item.currentIndex = -1
         root.compartment = ""
         root.rate = 0
         startTimeLoader.item.clear()

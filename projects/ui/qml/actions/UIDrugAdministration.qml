@@ -280,13 +280,13 @@ UIActionForm {
       if ( mouse.button == Qt.RightButton) {
         contextMenu.popup()
       }
-      selected()
+      selected(root.modelIndex)
     }
     onDoubleClicked: { // Double Clicking Window
       if ( mouse.button === Qt.LeftButton ){
         if (drugLoader.state === "collapsedBuilder") {
           drugLoader.state = "expandedBuilder"
-          root.editing()
+          root.editing(root.modelIndex)
         } 
       } else {
         mouse.accepted = false
@@ -320,10 +320,10 @@ UIActionForm {
       columnSpacing : 20
       signal clear()
       onClear : {
-        subCombo.currentIndex = -1
+        drugCombo.item.currentIndex = -1
         root.drug = ""
         root.dose = 0
-        rote.concentration = 0
+        root.concentration = 0
         root.adminRoute = ""
         bolusRadioGroup.radioGroup.checkState = Qt.Unchecked
         startTimeLoader.item.clear()
@@ -566,7 +566,7 @@ UIActionForm {
       columnSpacing : 20
       signal clear()
       onClear : {
-        subCombo.currentIndex = -1
+        drugCombo.item.currentIndex = -1
         root.drug = ""
         root.rate = 0
         root.concentration = 0
@@ -803,7 +803,7 @@ UIActionForm {
       rowSpacing : 15
       signal clear()
       onClear : {
-        subCombo.currentIndex = -1
+        drugCombo.item.currentIndex = -1
         root.adminRoute = ""
         root.drug = ""
         root.dose = 0.0

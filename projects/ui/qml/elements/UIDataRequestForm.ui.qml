@@ -98,7 +98,7 @@ Column {
         Layout.alignment : Qt.AlignHCenter
         Connections {
           target : unitCombo.item
-          onActivated : {console.log('activate'); root.unitValue = target.currentText }
+          onActivated : {root.unitValue = target.currentText }
         }
       }
       Loader {
