@@ -39,9 +39,10 @@ ApplicationWindow {
     controls.onOpenActionDrawer: {
       actionDrawer.openActionDrawer();
     }
-		controls.onPatientPhysiologyChanged : {
-			graphArea.newPhysiologyModel(model)
-		}
+   controls.onPatientPhysiologyChanged : {
+      graphArea.newPhysiologyModel(model)
+      consoleArea.clear()
+   }
     controls.onDataRequestModelChanged : {
       menuArea.newDataRequestModel(requestTree)
     }

@@ -12,6 +12,10 @@ LuaConsoleForm{
   id:root
   property LogForward feeds  
 
+  function clear() {
+     content.text = ""
+  }
+
   onFeedsChanged : {
     feeds.messageReceived.connect(messageHandler)
   }
