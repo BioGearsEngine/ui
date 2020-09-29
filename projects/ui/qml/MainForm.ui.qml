@@ -10,10 +10,8 @@ GridLayout {
     id: root
     columns: 2
     rows: 3
-
     rowSpacing:0
-    columnSpacing:5
-    
+    columnSpacing:0
     property alias scenario : controls.scenario
     property alias menuArea : menuArea
     property alias controls : controls
@@ -26,8 +24,7 @@ GridLayout {
       id: menuArea
       Layout.row : 0
       Layout.column : 0
-      Layout.fillWidth : false
-      Layout.fillHeight : false
+      Layout.preferredWidth : root.width * (1/4) - root.columnSpacing / 2;
     }
 
     ActionDrawer {
@@ -40,9 +37,9 @@ GridLayout {
       id: controls
       Layout.row : 1
       Layout.column : 0
-      Layout.fillWidth: false
-      Layout.alignment: Qt.AlignTop
-      Layout.fillHeight: false
+      Layout.fillWidth: true
+      Layout.maximumWidth : root.width * (1/4) - root.columnSpacing / 2;
+      Layout.fillHeight: true
       Layout.rowSpan : 2
     }
 
@@ -50,10 +47,11 @@ GridLayout {
       id: graphArea
       Layout.row : 0
       Layout.column : 1
-      Layout.preferredHeight:root.height * (3./4.)-10;
       Layout.rowSpan : 2
       Layout.fillWidth: true
+      Layout.maximumWidth : root.width * (3/4) - root.columnSpacing / 2;
       Layout.fillHeight: false
+      Layout.preferredHeight:root.height * (3./4.)-10;
       Layout.margins:0
     }
     LuaConsole {

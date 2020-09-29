@@ -5,15 +5,39 @@ import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.3
 import com.biogearsengine.ui.scenario 1.0
 
-Item {
+Rectangle {
   id : menuArea
   property alias wizardDialog : wizardDialog
   property alias scenarioBuilder : scenarioBuilder
-  width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
-  height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
-
+  implicitHeight : 40     //Aligns with graph area tab button
+  color : "#1A5276"
+  border.width : 0
+  border.color : "yellow"
   MenuBar {
     id: menuBar
+    anchors.left : parent.left
+    //Controls the appearance of the top level options (File, Tools, About)
+    delegate : MenuBarItem {
+      id : menuBarItem
+      height : menuArea.height
+      contentItem : Text {
+        text : menuBarItem.text
+        font.pointSize : 8
+        horizontalAlignment : Text.AlignLeft
+        verticalAlignment : Text.AlignVCenter
+        color : "white"
+      }
+      background : Rectangle {
+        height : menuArea.height
+        color : menuBarItem.highlighted ? "#2980b9" : "#1A5276"
+      }
+    }
+    //Menu bar background
+    background : Rectangle {
+      height : menuArea.height
+      color : "transparent"
+      anchors.fill : parent
+    }
    //----------------File Menu-------------------
     Menu {
       id : fileMenu
@@ -44,17 +68,15 @@ Item {
           scenarioBuilder.showNormal()
         }
       }
-
-      delegate : MenuItem {
+     delegate : MenuItem {
         id : fileMenuItem
         contentItem : Text {
           text : fileMenuItem.text
+          color : fileMenuItem.highlighted ? "white" : "black"
           font.pointSize : 8
         }
         background : Rectangle {
-          color : "transparent"
-          border.color : "#1A5276"
-          border.width : fileMenuItem.highlighted ? 2 : 0
+          color : fileMenuItem.highlighted ? "#2980b9" : "transparent"
         }
       }
     }
@@ -67,12 +89,11 @@ Item {
         id : toolsMenuItem
         contentItem : Text {
           text : toolsMenuItem.text
+          color : toolsMenuItem.highlighted ? "white" : "black"
           font.pointSize : 8
         }
         background : Rectangle {
-          color : "transparent"
-          border.color : "#1A5276"
-          border.width : toolsMenuItem.highlighted ? 2 : 0
+          color : toolsMenuItem.highlighted ? "#2980b9" : "transparent"
         }
       }
       Instantiator {
@@ -91,12 +112,11 @@ Item {
               text : option  //role from toolsOptionListModel
               contentItem : Text {
                 text : toolsOptionsDelegate.text
+                color : toolsOptionsDelegate.highlighted ? "white" : "black"
                 font.pointSize : 8
               }
               background : Rectangle {
-                color : "transparent"
-                border.color : "#1A5276"
-                border.width : toolsOptionsDelegate.highlighted ? 2 : 0
+                color : toolsOptionsDelegate.highlighted ? "#2980b9" : "transparent"
               }
               onTriggered : {
                 root.parseToolsSelection(toolsDelegate.title, option)
@@ -114,7 +134,7 @@ Item {
      }
     //----------------About Menu-------------------
     Menu {
-      id : helpMenu
+      id : aboutMenu
       title : "About"
       Action {
         text : "Help"
@@ -127,38 +147,12 @@ Item {
         id : aboutMenuItem
         contentItem : Text {
           text : aboutMenuItem.text
+          color : aboutMenuItem.highlighted ? "white" : "black"
           font.pointSize : 8
         }
         background : Rectangle {
-          color : "transparent"
-          border.color : "#1A5276"
-          border.width : aboutMenuItem.highlighted ? 2 : 0
+          color : aboutMenuItem.highlighted ? "#2980b9" : "transparent"
         }
-      }
-    }
-    //Controls the appearance of the top level options (File, Tools, About)
-    delegate : MenuBarItem {
-      id : menuBarItem
-      contentItem : Text {
-        text : menuBarItem.text
-        font.pointSize : 8
-        horizontalAlignment : Text.AlignLeft
-        verticalAlignment : Text.AlignVCenter
-        color : menuBarItem.highlighted ? "white" : "black"
-      }
-      background : Rectangle {
-        anchors.fill : parent 
-        color : menuBarItem.highlighted ? "#1A5276" : "transparent"
-      }
-    }
-    background : Rectangle {
-      color : "transparent"
-      anchors.fill : parent
-      Rectangle {
-        color : "#1A5276"
-        width : parent.width
-        height : 1
-        anchors.bottom : parent.bottom
       }
     }
   }

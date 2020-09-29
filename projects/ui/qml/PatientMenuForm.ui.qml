@@ -8,6 +8,11 @@ Button {
   property alias patientMenuListModel : patientMenuListModel
   flat: true
   highlighted: false
+  implicitHeight : patientText.implicitHeight * 2
+  background : Rectangle {
+    anchors.fill : parent
+    color : "lightgray"
+  }
   Text {
     id : patientText
     anchors.fill : parent

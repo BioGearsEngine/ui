@@ -4,23 +4,24 @@ import QtQuick.Controls 2.5
 import QtQuick.Controls.Material 2.3
 
 ColumnLayout {
-    property alias value: value.text
-    property alias name: name.text
+  property alias value: value.text
+  property alias name: name.text
 
-    Layout.preferredHeight: implicitHeight
-    Layout.preferredWidth: implicitWidth
-    Text {
-        id: value
-        Layout.alignment: Qt.AlignCenter
-        text: "22"
-        font.pointSize: 14
-    }
-    Label {
-        id: name
-        text: "Age:"
-        font.pointSize: 10
-        Layout.alignment: Qt.AlignHCenter
-    }
+  implicitHeight : (value.implicitHeight + name.implicitHeight) * 1.2  //Text and laber have implicit height based on font size.  Define natural column size as 20% above combined height to give cushion 
+  Text {
+    id: value
+    Layout.alignment: Qt.AlignHCenter
+    horizontalAlignment : Text.AlignHCenter
+    text: "22"
+    font.pixelSize: 20
+  }
+  Label {
+    id: name
+    text: "Age:"
+    font.pixelSize: 14
+    Layout.alignment: Qt.AlignHCenter
+    horizontalAlignment : Text.AlignHCenter
+  }
 }
 
 

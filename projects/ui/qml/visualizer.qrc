@@ -85,6 +85,7 @@
         <file alias="UIDataRequestForm.ui.qml">elements/UIDataRequestForm.ui.qml</file>
         <file alias="UIPatientAssessment.qml">actions/UIPatientAssessment.qml</file>
         <file alias="UISerialize.qml">actions/UISerialize.qml</file>
+        <file alias="UIBioGearsButtonForm.ui.qml">elements/UIBioGearsButtonForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="play.png">img/play.png</file>
@@ -110,5 +111,8 @@
         <file alias="collapsed.png">img/collapsedOption.png</file>
         <file alias="expanded.png">img/expandedOption.png</file>
         <file alias="add_plain.png">img/add_plain.png</file>
+        <file alias="next_transparent.png">img/next_transparent.png</file>
+        <file alias="prev_transparent.png">img/prev_transparent.png</file>
+        <file alias="menu_transparent.png">img/menu_transparent.png</file>
     </qresource>
 </RCC>

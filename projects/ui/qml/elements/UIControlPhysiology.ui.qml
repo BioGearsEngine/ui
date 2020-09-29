@@ -7,12 +7,10 @@ GridLayout {
     id: root
     layoutDirection: Qt.LeftToRight
     antialiasing: false
-
-    height: implicitHeight + 20
-    width: implicitWidth + 20
-
-    columns: 2
+    columns: 3
     rows: 2
+    columnSpacing : 45
+    rowSpacing : 10
 
     property alias heartRate : heartRate
     property alias systolicBloodPressure : systolicBloodPressure

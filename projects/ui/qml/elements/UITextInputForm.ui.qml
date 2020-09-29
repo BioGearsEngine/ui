@@ -4,23 +4,24 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.3
 
 RowLayout {
-    id: root
-    property alias name: name
-    property alias value: value
-    Label {
-        id: name
-        text: "Unset"
-        font.pointSize: 8
-        font.weight: Font.DemiBold
-        font.bold: true
-    }
+  id: root
+  property alias name: name
+  property alias value: value
+  implicitHeight : name.implictHeight * 2    //Text items have implicit height based on font size.  Make this row twice as big to give some cushion 
+  Label {
+    id: name
+    text: "Unset"
+    font.pointSize: 8
+    font.weight: Font.DemiBold
+    font.bold: true
+  }
 
-    TextInput {
-        id: value
-        text: qsTr("Placeholder Text")
-        font.weight: Font.Medium
-        font.pixelSize: 10
-    }
+  TextInput {
+    id: value
+    text: qsTr("Placeholder Text")
+    font.weight: Font.Medium
+    font.pixelSize: 10
+  }
 }
 
 

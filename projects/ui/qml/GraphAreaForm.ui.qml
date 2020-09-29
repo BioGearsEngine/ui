@@ -63,38 +63,44 @@ Page {
       }
     }
   ]
-  header : RowLayout {
+  header : Rectangle {
     id : headerBar
-    Layout.fillWidth : true
-    Layout.fillHeight : true
-    Button {
+    width : parent.width
+    border.width : 0
+    height : 40
+    color : "#2980b9"
+    Rectangle {
       id : previous
-      text : "Prev"
-      display : AbstractButton.IconOnly
-      icon.source : "qrc:/icons/prev.png"
-      icon.name : "terminate"
-      icon.color : "transparent"
-      background : Rectangle {
-        color : "transparent"
-      }
-      onClicked : {
-        if (plots.currentIndex == 0) {
-          plots.currentIndex = plots.count - 1;
-        } else {
-          plots.currentIndex = plots.currentIndex - 1
+      color : "transparent"
+      height : parent.height
+      width : 40
+      anchors.left : parent.left
+      Image {
+        anchors.centerIn : parent
+        source : "icons/prev_transparent.png"
+        sourceSize.width : parent.width
+        sourceSize.height : parent.height * 0.8
+        MouseArea {
+          anchors.fill : parent
+          cursorShape : Qt.PointingHandCursor
+          onClicked : {
+            if (plots.currentIndex == 0) {
+              plots.currentIndex = plots.count - 1;
+            } else {
+              plots.currentIndex = plots.currentIndex - 1
+            }
+          }
         }
       }
     }
     SwipeView {
       id : systemSwipeView
       clip : true
-      Layout.fillWidth : true
-      Layout.preferredWidth : 200
-      Layout.preferredHeight : 40
-      Repeater { 
-        Layout.fillWidth : true
-        Layout.preferredWidth : 200
-        Layout.preferredHeight : 40
+      anchors.left : previous.right
+      anchors.right : next.right
+      height : parent.height
+      Repeater {
+        anchors.fill : parent
         model : physiologyRequestModel
         delegate : UITabButtonForm {
           text : name
@@ -107,23 +113,54 @@ Page {
         }
       }
     }
-    Button {
-      id : filterMenuButton
-      text : "Filter Menu"
-      display : AbstractButton.IconOnly
-      icon.source : "qrc:/icons/menu.png"
-      icon.name : "terminate"
-      icon.color : "transparent"
-      onClicked : {
-        let menuObject = menuInstantiator.objectAt(plots.currentIndex).item
-        if (menuObject.visible){
-          menuObject.close()
-        } else {
-          menuObject.open()
+    Rectangle {
+      id : next
+      color : "transparent"
+      height : parent.height
+      width : 40
+      anchors.right : filterMenuButton.left
+      anchors.rightMargin : 15
+      Image {
+        anchors.centerIn : parent
+        source : "icons/next_transparent.png"
+        sourceSize.width : parent.width
+        sourceSize.height : parent.height * 0.8
+        MouseArea {
+          anchors.fill : parent
+          cursorShape : Qt.PointingHandCursor
+          onClicked : {
+            if (plots.currentIndex == plots.count - 1) {
+              plots.currentIndex = 0;
+            } else {
+              plots.currentIndex = plots.currentIndex + 1
+            }
+          }
         }
       }
-      background : Rectangle {
-        color : "transparent"
+    }
+    Rectangle {
+      id : filterMenuButton
+      color : "transparent"
+      height : parent.height
+      width : 40
+      anchors.right : parent.right
+      Image {
+        anchors.centerIn : parent
+        source : "icons/menu_transparent.png"
+        sourceSize.width : parent.width
+        sourceSize.height : parent.height * 0.8
+        MouseArea {
+          anchors.fill : parent
+          cursorShape : Qt.PointingHandCursor
+          onClicked : {
+            let menuObject = menuInstantiator.objectAt(plots.currentIndex).item
+            if (menuObject.visible){          
+              menuObject.close()        
+            } else {          
+              menuObject.open()        
+            }      
+          }
+        }
       }
       Instantiator {
         id : menuInstantiator
@@ -152,24 +189,6 @@ Page {
         onObjectRemoved : {console.log('Removed menu--not desirable behavior')}
       }
     }
-    Button {
-      id : next
-      text : "Next"
-      display : AbstractButton.IconOnly
-      icon.source : "qrc:/icons/next.png"
-      icon.name : "terminate"
-      icon.color : "transparent"
-      onClicked : {
-        if (plots.currentIndex == plots.count - 1) {
-          plots.currentIndex = 0;
-        } else {
-          plots.currentIndex = plots.currentIndex + 1
-        }
-      }
-      background : Rectangle {
-        color : "transparent"
-      }
-    }
   }//end header
 
   SwipeView {
@@ -184,7 +203,7 @@ Page {
       Rectangle {
         id : vitalsBackground
         anchors.fill : parent
-        color : "#7CB342"
+        color : "#ecf0f1"
       }
       GridView {
         id : vitalsGridView
@@ -208,7 +227,7 @@ Page {
       Rectangle {
         id : cardiovascularBackground
         anchors.fill : parent
-        color : "#7CB342"
+        color : "#ecf0f1"
       }
       GridView {
           id : cardiopulmonaryGridView
@@ -232,7 +251,7 @@ Page {
       Rectangle {
         id : bloodChemistryBackground
         anchors.fill : parent
-        color : "#7CB342"
+        color : "#ecf0f1"
       }
       GridView {
         id : bloodChemistryGridView
@@ -262,7 +281,7 @@ Page {
       Rectangle {
         id : fluidBalanceBackground
         anchors.fill : parent
-        color : "#7CB342"
+        color : "#ecf0f1"
       }
       GridView {
         id : fluidBalanceGridView
@@ -294,7 +313,7 @@ Page {
       Rectangle {
         id : substanceBackground
         anchors.fill : parent
-        color : "#7CB342"
+        color : "#ecf0f1"
       }
       GridView {
         id : substanceGridView
@@ -318,7 +337,7 @@ Page {
       Rectangle {
         id : customBackground
         anchors.fill : parent
-        color : "#7CB342"
+        color : "#ecf0f1"
       }
       GridView {
         id : customGridView

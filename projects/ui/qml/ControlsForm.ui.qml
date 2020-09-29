@@ -40,35 +40,34 @@ ColumnLayout {
     id : patientMenu
     Layout.preferredWidth : root.width
   }
-
   RowLayout {
     id: configuration_row1
     Layout.fillWidth: true
     Layout.alignment: Qt.AlignHCenter
-      UITextInputForm {
-        id: age
-        name.text: "Age:"
-        value.text: "21"
-        Layout.alignment: Qt.AlignHCenter
-      }
-      UITextInputForm {
-        id: gender
-        name.text: "Gender:"
-        value.text: "Female"
-        Layout.alignment: Qt.AlignHCenter
-      }
-      UITextInputForm {
-        id: fat_pct
-        name.text: "Fat%:"
-        value.text: "0.0%"
-        Layout.alignment: Qt.AlignHCenter
-      }
-      UITextInputForm {
-        id: core_temp
-        name.text: "Temp:"
-        value.text: "100.0"
-        Layout.alignment: Qt.AlignHCenter
-      }
+    UITextInputForm {
+      id: age
+      name.text: "Age:"
+      value.text: "21"
+      Layout.alignment: Qt.AlignHCenter
+    }
+    UITextInputForm {
+      id: gender
+      name.text: "Gender:"
+      value.text: "Female"
+      Layout.alignment: Qt.AlignHCenter
+    }
+    UITextInputForm {
+      id: fat_pct
+      name.text: "Fat%:"
+      value.text: "0.0%"
+      Layout.alignment: Qt.AlignHCenter
+    }
+    UITextInputForm {
+      id: core_temp
+      name.text: "Temp:"
+      value.text: "100.0"
+      Layout.alignment: Qt.AlignHCenter
+    }
   }
   RowLayout {
     id:configuration_row2
@@ -99,20 +98,19 @@ ColumnLayout {
       Layout.alignment: Qt.AlignHCenter
     }
   }
-
   UIControlPhysiology {
     id: physiology
+    Layout.topMargin : 10
     Layout.fillWidth: true
-    Layout.preferredWidth: parent.width
+    Layout.alignment : Qt.AlignHCenter
   }
-
   UIPlaybackForm {
     id: playback_controls
+    Layout.topMargin : 10
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
     Layout.fillWidth: true
   }
-
-  Button {
+  UIBioGearsButtonForm {
     id : openDrawerButton
     contentItem : Text {
       id : drawerText
@@ -122,26 +120,22 @@ ColumnLayout {
       horizontalAlignment : Text.AlignHCenter
       verticalAlignment : Text.AlignVCenter
     }
-    background : Rectangle {
-      anchors.fill : parent
-      color : '#1A5276'
-      border.color : '#1A5276'
-      border.width : 2
-    }
     Layout.preferredWidth: root.width
     Layout.alignment: Qt.AlignHCenter
-    Layout.preferredHeight : drawerText.implicitHeight * 1.5
+    implicitHeight : drawerText.implicitHeight * 1.5
   }
 
-  Item {
+  Rectangle {
     id : actionButtonWrapper
     Layout.preferredWidth : root.width
+    color : "transparent"
+    border.width : 0
     //This item needs to exactly fill remaining space, or else scroll feature of ListView will not have correct scoll boundaries
     //Controls item height is implicit (depends entirely on objects that fill it), so we cannot bind to it without creating a loop.
     //Since parent of Controls is main window, root.parent.height gets us an absolute height from which we can subtract other item
     //heights to get remaining space for action list view.  Note that we need to subtract the height of the file menu bar, which sits
     //atop the controls area in the main window.
-    Layout.preferredHeight : root.parent.height - (patientMenu.height + configuration_row1.height + configuration_row2.height + physiology.height + playback_controls.height + openDrawerButton.height + 6 * root.spacing + root.parent.menuArea.height)
+    implicitHeight : root.parent.height - (patientMenu.height + configuration_row1.height + configuration_row2.height + physiology.height + playback_controls.height + openDrawerButton.height + 6 * root.spacing + root.parent.menuArea.height)
     z : 2
     ListView {
       id : actionSwitchView

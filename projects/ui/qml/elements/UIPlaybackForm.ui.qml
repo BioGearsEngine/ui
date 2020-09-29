@@ -18,29 +18,38 @@ ColumnLayout {
   property alias resetButton : reset
   property alias simButton: pause_play
   property alias speedButton : foward
+
   RowLayout {
     spacing: 10
+    implicitHeight : timeText.implicitHeight * 1.2 
+    Layout.alignment : Qt.AlignHCenter
     Label {
+      id : timeText
       text: "Time:"
+      font.pixelSize : 15
     }
     Text {
       text: root.simulationTime
+      font.pixelSize : 15
     }
   }
-
   RowLayout {
-
-    Button {
-        id: reset
-        text: "reset"
-        display: AbstractButton.IconOnly
-        icon.source: "qrc:/icons/reset.png"
-        icon.name: "terminate"
-        icon.color: "transparent"
-        onClicked: {root.restartClicked()}
+    spacing : 15
+    UIBioGearsButtonForm {
+      id: reset
+      implicitHeight : 40
+      implicitWidth : 75
+      text: "reset"
+      display: AbstractButton.IconOnly
+      icon.source: "qrc:/icons/reset.png"
+      icon.name: "terminate"
+      icon.color: "transparent"
+      onClicked: {root.restartClicked()}
     }
-    Button {
+    UIBioGearsButtonForm {
       id: pause_play
+      implicitHeight : 40
+      implicitWidth : 75
       property bool playing : false;
       property bool paused  : false;
       text: "Simulate"
@@ -49,7 +58,6 @@ ColumnLayout {
       icon.name: "simulate"
       icon.color: "transparent"
       state : "Stopped"
-
       onClicked: {
         console.log("UIPlaybackForm %1 %2".arg(playing).arg(paused))
         if(playing) {
@@ -64,7 +72,6 @@ ColumnLayout {
           root.playClicked()
         }
       }
-
       states: [
        State{
           name: "Stopped"
@@ -92,9 +99,10 @@ ColumnLayout {
         }
       ]
     }
-
-    Button {
+    UIBioGearsButtonForm {
       id: foward
+      implicitHeight : 40
+      implicitWidth : 75
       property int rate : 1
       text: "RateToggle"
       font.capitalization: Font.AllLowercase
@@ -102,7 +110,7 @@ ColumnLayout {
       icon.source: "icons/clock-realtime.png"
       icon.name: "rate-toggle"
       icon.color: "transparent"
-      Layout.preferredWidth: pause_play.width
+      //Layout.preferredWidth: pause_play.width
       Layout.preferredHeight: pause_play.height
       state : "realtime"
       onClicked: {
@@ -113,7 +121,6 @@ ColumnLayout {
         }
         root.rateToggleClicked(rate)
       }
-      
       states: [
         State {
           name: "realtime"
