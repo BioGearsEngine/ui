@@ -1102,6 +1102,16 @@ void EventTree::encode_actions(CDM::ScenarioData* scenario)
       }
     }
   }
+  //Some actions are active until the end of a scenario (like an infusion), and so we do not detect a deactivate action or calculate a duration
+  //Check events in list and, if duration = 0, assign duration to sim_time - start_time of action.  This will have side of effect of giving durations 
+  //to actions that are "one-timers" (e.g. bolus, consume nutrients) -- however, ScenarioBuilder knows which actions don't need durations and defaults 
+  //those durations to 0.
+  for (int i = 0; i < _events.size(); ++i) {
+    auto& ev = _events[i];
+    if (ev.duration == 0.0) {
+      ev.duration = sim_time_s - ev.startTime;
+    }
+  }
   //Add terminal advance time action (if present)
   double lastEventEnd_s = _events.back().startTime + _events.back().duration;
   if (sim_time_s > lastEventEnd_s) {

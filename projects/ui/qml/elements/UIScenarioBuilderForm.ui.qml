@@ -16,7 +16,7 @@ Window {
   property bool windowReady : contentLoader.status == Loader.Ready
   property string samplingFrequency : "1;s"
   property string scenarioInput : "DefaultTemplateMale"
-  property string scenarioName : "TestScenario"
+  property string scenarioName : ""
   property bool isPatientFile : true     //false ---> input = engine state file
   property Scenario bg_scenario
   //Non-visual elements defined in UIScenarioBuilder.qml
@@ -252,8 +252,9 @@ Window {
                 placeholderText: "Name"
                 text : root.scenarioName
                 font.pixelSize : 18
+                wrapMode : TextInput.WordWrap
                 Layout.fillHeight : true
-                Layout.preferredWidth : parent.width / 7
+                Layout.preferredWidth : parent.width / 5
                 horizontalAlignment : Text.AlignHCenter
                 Layout.alignment : Qt.AlignLeft
                 onEditingFinished : {
@@ -273,13 +274,13 @@ Window {
               }
               ComboBox {
                 id : samplingCombo
-                currentIndex : setCurrentIndex()
+                currentIndex : setCurrentIndex() == -1 ? 4 : setCurrentIndex()    //Default to 1 Hz (index 4)
                 Layout.alignment : Qt.AlignLeft | Qt.AlignVCenter
                 Layout.preferredHeight : parent.height * 0.65
                 Layout.preferredWidth : parent.width / 8
                 bottomInset : 0
                 topInset : 0
-                model : ["50;Hz", "10;Hz", "5;Hz", "1;s", "10;s", "30;s", "60;s"]
+                model : ["50;Hz", "25;Hz", "10;Hz", "5;Hz", "1;s", "10;s", "30;s", "60;s"]
                 flat : false
                 contentItem : Text {
                   width : samplingCombo.width

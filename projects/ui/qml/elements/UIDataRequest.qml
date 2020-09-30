@@ -10,6 +10,11 @@ UIDataRequestForm {
 		let formatted = role.replace(/([a-z])([A-Z])([a-z])/g, '$1 $2$3')     //Formats BloodVolume as "Blood Volume", but formats pH as "pH"
 		return formatted
 	}
+  //Helper function to make sure strings are formatted properly to be sent to data request manager (no white space)
+  function requestFormat (role){
+    let formatted = role.replace(/\s/g, '');    //removes all white space characters
+    return formatted
+  }
   function formatOutput(){
     let type = "TYPE=";
     let name = "NAME=";
@@ -18,16 +23,16 @@ UIDataRequestForm {
     if (requestRoot === "Compartment"){
       type += (requestBranches[0] + requestRoot)  //E.g. "TYPE=GasCompartment"
       if (requestLeaf.includes("SubstanceQuantity")){
-        name += (requestBranches[1] + "," + quantityValue)    //E.g. "NAME="VenaCava,PartialPressure"  (sub stored in 'substanceValue')
+        name += (requestBranches[1] + "," + requestFormat(quantityValue))    //E.g. "NAME="VenaCava,PartialPressure"  (sub stored in 'substanceValue')
       } else {
-        name += (requestBranches[1] + "," + requestLeaf)      //E.g. "NAME=Aorta,Volume"
+        name += (requestBranches[1] + "," + requestFormat(requestLeaf))      //E.g. "NAME=Aorta,Volume"
       }
     } else {
       type += requestRoot     //E.g/  "TYPE="Substance"
       if (requestRoot === "Substance") {
-        name += (requestBranches[0] + "," + requestLeaf)      //E.g. "NAME=Albuterol,PlasmaConcentration"
+        name += (requestBranches[0] + "," + requestFormat(requestLeaf))      //E.g. "NAME=Albuterol,PlasmaConcentration"
       } else {
-        name += requestLeaf       //E.g. "NAME=MeanArterialPressure"
+        name += requestFormat(requestLeaf)       //E.g. "NAME=MeanArterialPressure"
       }
     }
     let output = type + ";" + name + ";" + unit + ";" + precision
