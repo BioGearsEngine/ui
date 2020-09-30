@@ -536,7 +536,7 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
       ev.params.append(asprintf("AdminRoute=%s;", oralData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "Gastrointestinal" : "Transmucosal").c_str());
       std::string doseUnit = oralData->AdminRoute() == CDM::enumOralAdministration::Gastrointestinal ? "mg" : "ug";
       double dose = biogears::Convert(oralData->Dose().value(), biogears::CCompoundUnit(oralData->Dose().unit()->c_str()), biogears::CCompoundUnit(doseUnit));
-      ev.params.append(asprintf("Dose=%f,%s;", dose, doseUnit).c_str());
+      ev.params.append(asprintf("Dose=%f,%s;", dose, doseUnit.c_str()).c_str());
       ev.params.append(asprintf("Substance=%s;", oralData->Substance().c_str()).c_str());
       return true;
     }
