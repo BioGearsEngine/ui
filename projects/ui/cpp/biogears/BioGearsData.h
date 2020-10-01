@@ -45,7 +45,6 @@ public:
     YMaxRole,
     YMinRole,
     XIntervalRole,
-    InitializedRole
   };
   Q_ENUMS(PhysiologyRequestRoles)
 
@@ -98,7 +97,6 @@ public:
     roles[YMaxRole] = "ymax";
     roles[YMinRole] = "ymin";
     roles[XIntervalRole] = "xinterval";
-    roles[InitializedRole] = "initialized"; // initialized works side by side with enabled but differs in that it specifys if/when specifically a graph is active. Once enabled, initialized should follow
     return roles;
   }
 

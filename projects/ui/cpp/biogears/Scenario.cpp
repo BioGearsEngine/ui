@@ -13,6 +13,9 @@
 #include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
 #include <biogears/cdm/patient/SEPatient.h>
+#include <biogears/cdm/patient/assessments/SEComprehensiveMetabolicPanel.h>
+#include <biogears/cdm/patient/assessments/SEPatientAssessment.h>
+#include <biogears/cdm/patient/assessments/SEUrinalysis.h>
 #include <biogears/cdm/properties/SEScalar.h>
 #include <biogears/cdm/properties/SEScalarInversePressure.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
@@ -20,6 +23,8 @@
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/cdm/properties/SEScalarVolumePerTimeMass.h>
 #include <biogears/cdm/properties/SEUnitScalar.h>
+#include <biogears/cdm/scenario/SEAction.h>
+#include <biogears/cdm/scenario/SEScenarioInitialParameters.h>
 #include <biogears/cdm/substance/SESubstanceClearance.h>
 #include <biogears/cdm/substance/SESubstanceCompound.h>
 #include <biogears/cdm/substance/SESubstanceConcentration.h>
@@ -32,11 +37,6 @@
 #include <biogears/container/concurrent_queue.tci.h>
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
-#include <biogears/cdm/patient/assessments/SEComprehensiveMetabolicPanel.h>
-#include <biogears/cdm/patient/assessments/SEPatientAssessment.h>
-#include <biogears/cdm/patient/assessments/SEUrinalysis.h>
-#include <biogears/cdm/scenario/SEAction.h>
-#include <biogears/cdm/scenario/SEScenarioInitialParameters.h>
 
 #include <chrono>
 namespace bio {
@@ -64,7 +64,6 @@ Scenario::Scenario(QString name, QObject* parent)
 
   biogears::BioGears* engine = dynamic_cast<biogears::BioGears*>(_engine.get());
   engine->GetPatient().SetName(name.toStdString());
-  load_patient("StandardMale@0s.xml");
 }
 //-------------------------------------------------------------------------------
 void Scenario::setup_physiology_model()
@@ -417,16 +416,11 @@ Scenario& Scenario::load_patient(QString file)
     QFileInfo stateFileInfo = QFileInfo(QString::fromStdString(path));
     QString stateBaseName = stateFileInfo.baseName();
 
-    if (_initialized) {
-      emit patientMetricsChanged(get_physiology_metrics());
-      emit patientStateChanged(get_physiology_state());
-      emit patientConditionsChanged(get_physiology_conditions());
-      emit stateLoad(stateBaseName);
-      emit physiologyChanged(_physiology_model); //OK Matt We have to talk about this
-      emit dataRequestModelChanged(_data_request_tree);
-    } else {
-      _initialized = true;
-    }
+    emit patientMetricsChanged(get_physiology_metrics());
+    emit patientStateChanged(get_physiology_state());
+    emit patientConditionsChanged(get_physiology_conditions());
+    emit stateLoad(stateBaseName);
+    emit physiologyChanged(_physiology_model);
   } else {
     _engine->GetLogger()->Error("Could not load state, check the error");
   }
@@ -1075,9 +1069,9 @@ bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QStr
   //Set sampling frequency
   std::string frequencyStr = sampling.toStdString();
   size_t pos = frequencyStr.find(';');
-  double frequency_Hz = std::stod(frequencyStr.substr(0,pos));
+  double frequency_Hz = std::stod(frequencyStr.substr(0, pos));
   std::cout << frequencyStr.substr(pos, frequencyStr.length());
-  if (frequencyStr.substr(pos+1, frequencyStr.length()) == "s") {
+  if (frequencyStr.substr(pos + 1, frequencyStr.length()) == "s") {
     frequency_Hz = 1.0 / frequency_Hz;
   }
   buildScenario->GetDataRequestManager().SetSamplesPerSecond(frequency_Hz);
@@ -1087,7 +1081,7 @@ bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QStr
   Event advanceTime;
   advanceTime.typeName = "AdvanceTime";
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
- 
+
   for (int i = 0; i < eventTree->get_events().size() - 1; ++i) {
     //Stopping before size-1 becasue eventTree[size -1] so that our final "next event" does not exceed loop bounds (last event, which is an advance time, is still processed)
     Event thisEvent = eventTree->get_events()[i];

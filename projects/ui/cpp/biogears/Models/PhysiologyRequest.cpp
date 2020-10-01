@@ -122,16 +122,6 @@ void PhysiologyRequest::x_interval(double value)
   _x_interval = value;
 }
 //------------------------------------------------------------------------------------
-bool PhysiologyRequest::initialized() const
-{
-  return _initialized;
-}
-//------------------------------------------------------------------------------------
-void PhysiologyRequest::initialized(bool value)
-{
-  _initialized = value;
-}
-//------------------------------------------------------------------------------------
 bool PhysiologyRequest::custom() const
 {
   return _custom;
@@ -232,9 +222,6 @@ auto PhysiologyRequest::header(int section) const -> QString
   case 10:
     return "X Interval";
     break;
-  case 11:
-    return "Initialized";
-    break;
   default:
     return "";
   }
@@ -327,8 +314,6 @@ QVariant PhysiologyRequest::data(int role) const
     return _y_min;
   case BioGearsData::XIntervalRole:
     return _x_interval;
-  case BioGearsData::InitializedRole:
-    return _initialized;
   default:
     return QVariant();
   }

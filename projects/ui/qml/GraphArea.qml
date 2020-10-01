@@ -127,61 +127,7 @@ GraphAreaForm {
       root.state = "max"
     }
   }
-  onPhysiologyRequestModelChanged: {
-    //TODO Fix Initial Plots
-    if ( !root.initialized ){
-      root.initialized = true;
-      var vitalsReq = physiologyRequestModel.category(0)
-      for ( var i = 0; i < vitalsReq.count ; ++i){
-        if (vitalsReq.get(i).active){
-		  		physiologyRequestModel.get(0).activeRequests.append({"request": vitalsReq.get(i).request})
-		  		vitalsModel.createPlotView(vitalsReq.get(i))
-		  	}
-      }
-      var cardiopulmonaryReq = physiologyRequestModel.category(1)
-      for ( var i = 0; i < cardiopulmonaryReq.count; ++i){
-        if( cardiopulmonaryReq.get(i).active){
-          physiologyRequestModel.get(1).activeRequests.append({"request": cardiopulmonaryReq.get(i).request})
-          cardiopulmonaryModel.createPlotView(cardiopulmonaryReq.get(i))
-        }
-      }
-      var bloodChemistryReq = physiologyRequestModel.category(2)
-      for ( var i = 0; i < bloodChemistryReq.count; ++i){
-        if( bloodChemistryReq.get(i).active){
-          physiologyRequestModel.get(2).activeRequests.append({"request": bloodChemistryReq.get(i).request})
-          bloodChemistryModel.createPlotView(bloodChemistryReq.get(i))
-        }
-      }
-      var energyMetabolismReq = physiologyRequestModel.category(3)
-      for ( var i = 0; i < energyMetabolismReq.count ; ++i){
-        if(energyMetabolismReq.get(i).active){
-          physiologyRequestModel.get(3).activeRequests.append({"request": energyMetabolismReq.get(i).request})
-          energyMetabolismModel.createPlotView(energyMetabolismReq.get(i))
-        }
-      }
-      var fluidBalanceReq = physiologyRequestModel.category(4)
-      for ( var i = 0; i < fluidBalanceReq.count ; ++i){
-        if(fluidBalanceReq.get(i).active){
-          physiologyRequestModel.get(4).activeRequests.append({"request": fluidBalanceReq.get(i).request})
-          fluidBalanceModel.createPlotView(fluidBalanceReq.get(i))
-        }  
-      }
-	    var renalReq = physiologyRequestModel.category(5)
-      for ( var i = 0; i < renalReq.count ; ++i){
-        if(renalReq.get(i).active){
-          physiologyRequestModel.get(5).activeRequests.append({"request": renalReq.get(i).request})
-          renalModel.createPlotView(renalReq.get(i))
-        }  
-      }
-      var customReq = physiologyRequestModel.category(6)
-      for ( var i = 0; i < customReq.count ; ++i){
-        if( customReq.get(i).active){
-          physiologyRequestModel.get(6).activeRequests.append({"request": customReq.get(i).request})
-          customModel.createPlotView(customReq.get(i))
-        }
-      }
-    }
-  }
+  
   //Vitals//
   ObjectModel {
     id: vitalsObjectModel

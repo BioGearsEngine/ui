@@ -11,7 +11,6 @@ import com.biogearsengine.ui.scenario 1.0
 Page {
   id: root
   z : 0 // Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
-  property bool initialized : false
   property PhysiologyModel physiologyRequestModel
   property Component requestMenuComponent : requestMenuComponent
   property Component requestMenuItemComponent : requestMenuItemComponent
@@ -490,9 +489,16 @@ Page {
             modelData.setData(item, true, PhysiologyModel.EnabledRole)
             createPlotView(category, bgModel, item, title)
           } else {
-            console.log(item.row)
             modelData.setData(item, false, PhysiologyModel.EnabledRole)
             removePlotView(category, item.row, title)
+          }
+        }
+        Component.onCompleted : {
+          //Each menu item is created at startup and maintained through lifetime of program (managed by Instantiator) -- so this signal will only
+          //be emitted once per menu item.  If we have plots that we want to display at start-up, we set their enabled roles to true during initialization
+          //and, when menu item is completed, it will immediately add the plot to the graph area.
+          if (checked){
+            createPlotView(category, bgModel, item, title)
           }
         }
       }
