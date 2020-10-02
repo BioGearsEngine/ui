@@ -9,39 +9,29 @@ UIScenarioBuilderForm {
 
 	signal validScenario (string type, var data)
 	signal invalidScenario(string errorStr)
-	signal clear()
-  signal load()
-  signal requestMenuReady()
-  signal readyToClose()
+	signal clearScenario()
+  signal scenarioLoaded()
   property bool editingAction : false
 
 	onClosing : {
-    clear();
-    contentLoader.showContent = false     //Flags top level loader to set its source component to undefined so that all visible items are unloaded and reset
-    //Do not close the window until the Loader that controls the window content is finished unloading
-    while (contentLoader.status != Loader.Null){
-      close.accepted = false
-    }
+    clearScenario();
     close.accepted = true
 	}
 
   /***Reset action editor and data request editor***/
-  onClear: {
+  onClearScenario: {
     builderModel.unsetConnections();
     builderModel.clear();
     builderModel.scenarioLength_s = 0.0;
     activeRequestsModel.requestQueue.length = 0;
     activeRequestsModel.clear();
     root.bgRequests.resetData();
-    windowContent.requestView.forceLayout();
   }
-  /***Open window--set content loader to active***/
-  function launch(){
-    contentLoader.showContent = true    //Flags top level loader to set it source component to windowContent and load all visible items (which will be reset)
-	}
   /***Called from MenuArea when Load Scenario option is selected.  Inputs events, requests, and sampling are received from scenarioFileLoaded signal
       emitted by Scenario::edit_scenario function***/
-  function loadExisting(events, requests, sampling){
+  function loadScenario(events, requests, sampling){
+    scenarioLoaded(); //emit this first to force request menu to respond to data request model changes and open all the sub-menus that we need
+    requestView.forceLayout();  //this may not be necessary but I really want to make sure that request menu is finished before proceeding
     eventModel = events;   
     activeRequestsModel.requestQueue = requests;
     root.scenarioName = events.get_timeline_name();
@@ -51,8 +41,7 @@ UIScenarioBuilderForm {
     root.samplingFrequency = (Number(sampleSplit[0]).toFixed(0)).toString() + ";" + sampleSplit[1] ;   //Qml inteprets an int as "0.0000", so we need to get it to a number and trim it
     builderModel.loadActions();
     activeRequestsModel.loadRequests();
-    load();
-    //launch();
+    
   }
 	/***Helper function to format camel case text for display***/
   function displayFormat (role) {
@@ -91,8 +80,8 @@ UIScenarioBuilderForm {
   function saveScenario(){
     //If we are still editing an action, then do not trigger Save
     if (root.editingAction){
-      windowContent.warningMessage.text = "Action editing in process";
-      windowContent.warningMessage.open();
+      warningMessage.text = "Action editing in process";
+      warningMessage.open();
       return;
     }
     //Make sure that data requests are valid before saving.
@@ -182,9 +171,14 @@ UIScenarioBuilderForm {
       if ( v_requestForm.status == Component.Ready)  {
         var v_request = v_requestForm.createObject(null, {  "pathId" : path, "requestRoot" : requestRoot, "requestBranches" : requestBranches, "unitClass" : unitClass,
                                                             "unitValue" : unit, "precisionValue" : precision, "substanceValue" : sub, "quantityValue" : quantity,
-                                                            "requestLeaf" : requestLeaf, "scrollWidth" : windowContent.requestView.scrollWidth
+                                                            "requestLeaf" : requestLeaf, "scrollWidth" : requestView.scrollWidth
                                                           });
+        let itemAdded = false;
         activeRequestsModel.append(v_request);
+        //The forceLayout step below slows things down a tad, but it is crucial when loading a scenario that could potentially have dozens of requests. 
+        //Otherwise, view will queue requests to add in batch, but there's no pinpointing exactly when this happens and it will cause problems when 
+        //loading the substance quantity requests later (view detects multiple items trying to access the same index)
+        activeRequestView.forceLayout(); 
         return(v_request);
       } else {
         if (v_requestForm.status == Component.Error){
@@ -199,7 +193,6 @@ UIScenarioBuilderForm {
         decode request strings to get information about request type, unit, and precision.  Call addRequest function with this data to add request
         to active request list***/
     function loadRequests(){
-      let subQRequests = []   //need to queue these and proces later because they have their own sub-list models that must be initialized
       for (let i = 0; i < requestQueue.length; ++i){
         let req = requestQueue[i];
         if (req.indexOf('|') == -1){
@@ -232,6 +225,7 @@ UIScenarioBuilderForm {
           addRequest(pathId, scalarType, unitInput, precisionInput, subInput, quantityInput)
         }
       }
+      loadSubRequests()
     }
     /***Substance Quantity data requests (in Compartment menu) need to be loaded from Scenario file separately because they inhabit sub-menus that are 
         distinct from request menu stood up based off data from DataRequestTree.  These requests cannot be loaded at the same time as the other data
@@ -300,7 +294,7 @@ UIScenarioBuilderForm {
 
   builderModel : ActionModel {
     id : builderModel
-    property double itemWidth : 0 // set when primary loader loads window content
+    actionSwitchView : scenarioView
     property double scenarioLength_s : 0     //Time at which the scenario ends
     property double scenarioLengthOverride_s : 0 //User provided value
     /***Creates a new action with blank input fields and a time component***/
@@ -330,7 +324,7 @@ UIScenarioBuilderForm {
     /***Set signal connections and property bindings on action that has just been added to model.  Width must be bound because so that action re-centers
         itself correctly when the size of the window changes***/
     function setConnections(action, timeGap){
-      action.width = Qt.binding(function() { return builderModel.itemWidth})
+      action.width = Qt.binding(function() { return scenarioView.width - scenarioView.scrollWidth})
       action.currentSelection = Qt.binding(function() { return actionSwitchView.currentIndex == action.ObjectModel.index} );  //When true, action will have highlighted boundary (see ActionForm.ui)
       action.modelIndex = Qt.binding(function() { return action.ObjectModel.index} )  //Allow each action to track its position in the model (used when emitting selected and editing signals)
       timeGap.index = Qt.binding(function() { return builderModel.count - timeGap.ObjectModel.index -1 }) //E.g. count = 4, timeGap model index = 2 --> timeGap prop index = 1 (first time gap)
@@ -445,11 +439,11 @@ UIScenarioBuilderForm {
     /***Remove an action from the build model.  This function can be called by "Remove" button in window or from pop-up menu activated by right-clicking
         on action***/
     function removeAction(){
-      if (windowContent.scenarioView.currentIndex !== -1){
-        builderModel.remove(windowContent.scenarioView.currentIndex, 2);   //Remove two items to get time block associated with action
+      if (scenarioView.currentIndex !== -1){
+        builderModel.remove(scenarioView.currentIndex, 2);   //Remove two items to get time block associated with action
         builderModel.updateTimeComponents();
         builderModel.refreshScenarioLength();
-        windowContent.scenarioView.currentIndex = -1;
+        scenarioView.currentIndex = -1;
         builderModel.adjustFade("OFF", -1);
         root.editingAction = false;
       }
@@ -510,7 +504,7 @@ UIScenarioBuilderForm {
       }
       updateTimeComponents();
       refreshScenarioLength();
-      windowContent.scenarioView.currentIndex = -1;
+      scenarioView.currentIndex = -1;
     }
     /***When Save button is clicked, we add actions in view to the event model (defined in C++) so that we can access actions in Scenario.cpp
         and create Scenario file***/

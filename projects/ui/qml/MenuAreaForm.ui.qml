@@ -41,7 +41,7 @@ Item {
       Action {
         text : "Launch Scenario Editor"
         onTriggered : {
-          scenarioBuilder.launch()
+          scenarioBuilder.showNormal()
         }
       }
 

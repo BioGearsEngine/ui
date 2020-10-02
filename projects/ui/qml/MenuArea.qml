@@ -10,7 +10,7 @@ MenuAreaForm {
     root.scenarioBuilder.bgRequests = requestTree
   }
   onScenarioFileLoaded : {
-    scenarioBuilder.loadExisting(events, requests, sampling)
+    scenarioBuilder.loadScenario(events, requests, sampling)
   }
 
   function parseToolsSelection (dataType, mode){
