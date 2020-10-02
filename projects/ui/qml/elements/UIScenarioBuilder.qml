@@ -38,7 +38,7 @@ UIScenarioBuilderForm {
     eventModel = events   
     activeRequestsModel.requestQueue = requests
     root.scenarioName = events.get_timeline_name();
-    root.scenarioInput = events.get_patient_name().split('.')[0];   //trim off the ".xml"
+    root.scenarioInput = events.get_patient_name();
     root.isPatientFile = !events.get_patient_name().includes('@')   //engine state files have '@', patient files do not
     let sampleSplit = sampling.split(';')
     root.samplingFrequency = (Number(sampleSplit[0]).toFixed(0)).toString() + ";" + sampleSplit[1]    //Qml inteprets an int as "0.0000", so we need to get it to a number and trim it

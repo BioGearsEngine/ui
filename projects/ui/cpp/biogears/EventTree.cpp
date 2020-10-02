@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <istream>
+#include <QFileInfo>
 
 #include <biogears/cdm/properties/SEScalarTypes.h>
 #include <biogears/schema/cdm/Scenario.hxx>
@@ -1042,9 +1043,11 @@ void EventTree::encode_actions(CDM::ScenarioData* scenario)
     _timeline_name = "";
   }
   if (scenario->InitialParameters().present() && scenario->InitialParameters().get().PatientFile().present()) {
-    _patient_name = QString::fromStdString(scenario->InitialParameters().get().PatientFile().get());
+    QFileInfo initialPatient(QString::fromStdString(scenario->InitialParameters().get().PatientFile().get()));
+    _patient_name = initialPatient.baseName();
   } else if (scenario->EngineStateFile().present()) {
-    _patient_name = QString::fromStdString(scenario->EngineStateFile().get());
+    QFileInfo initialState(QString::fromStdString(scenario->EngineStateFile().get()));
+    _patient_name = initialState.baseName();
   } else {
     _patient_name = "";
   }
@@ -1113,7 +1116,11 @@ void EventTree::encode_actions(CDM::ScenarioData* scenario)
     }
   }
   //Add terminal advance time action (if present)
-  double lastEventEnd_s = _events.back().startTime + _events.back().duration;
+  double lastEventEnd_s = 0.0;
+  if (!_events.empty()) {
+    //It's possible we have a scenario with only an advance time action (like BasicStandard) so check to make sure this vector isn't empty
+    lastEventEnd_s = _events.back().startTime + _events.back().duration;
+  }
   if (sim_time_s > lastEventEnd_s) {
     Event timeExtend;
     timeExtend.startTime = lastEventEnd_s;
