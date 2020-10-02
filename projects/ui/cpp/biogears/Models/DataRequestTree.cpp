@@ -158,6 +158,7 @@ QString DataRequestTree::encode_gas_compartment_request(CDM::GasCompartmentDataR
 {
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
+  bool foundRequest = false;
   std::string searchString = req->Substance().present() ? "SubstanceQuantity" : req->Name();  //There is no "SubstanceQuantity" name field in the DataRequest schema, so check if optional sub is present.  Otherwise, use request name
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex compartmentIndex = index(0, 0, QModelIndex());
@@ -174,6 +175,7 @@ QString DataRequestTree::encode_gas_compartment_request(CDM::GasCompartmentDataR
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
         if (searchString == compartmentNode->children()[j]->name().toStdString()) {
+          foundRequest = true;
           compartmentNode->children()[j]->checked(true);
           request = dataPath(index(j, 0, compartmentIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
           request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
@@ -183,15 +185,18 @@ QString DataRequestTree::encode_gas_compartment_request(CDM::GasCompartmentDataR
       break;
     }
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get()) + ";"));
+    }
+    if (req->Substance().present()) {
+      request.append(QString::fromStdString("SUBSTANCEQ=" + req->Substance().get() + "," + req->Name() + ";")); //E.g. SUBSTANCEQ=Oxygen,PartialPressure
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())+";"));
-  }
-  if (req->Substance().present()) {
-    request.append(QString::fromStdString("SUBSTANCEQ=" + req->Substance().get() + "," + req->Name() + ";"));    //E.g. SUBSTANCEQ=Oxygen,PartialPressure
-  }
+  
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -200,6 +205,7 @@ QString DataRequestTree::encode_liquid_compartment_request(CDM::LiquidCompartmen
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
   std::string searchString = req->Substance().present() ? "SubstanceQuantity" : req->Name(); //There is no "SubstanceQuantity" name field in the DataRequest schema, so check if optional sub is present.  Otherwise, use request name
+  bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex compartmentIndex = index(0, 0, QModelIndex());
   static_cast<DataRequestNode*>(compartmentIndex.internalPointer())->collapsed(false);
@@ -215,6 +221,7 @@ QString DataRequestTree::encode_liquid_compartment_request(CDM::LiquidCompartmen
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
         if (searchString == compartmentNode->children()[j]->name().toStdString()) {
+          foundRequest = true;
           compartmentNode->children()[j]->checked(true);
           request = dataPath(index(j, 0, compartmentIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
           request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
@@ -224,15 +231,18 @@ QString DataRequestTree::encode_liquid_compartment_request(CDM::LiquidCompartmen
       break;
     }
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get()) + ";"));
+    }
+    if (req->Substance().present()) {
+      request.append(QString::fromStdString("SUBSTANCEQ=" + req->Substance().get() + "," + req->Name() + ";")); //E.g. SUBSTANCEQ=Fentanyl,Molarity
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())+";"));
-  }
-  if (req->Substance().present()) {
-    request.append(QString::fromStdString("SUBSTANCEQ=" + req->Substance().get() + "," + req->Name() + ";")); //E.g. SUBSTANCEQ=Fentanyl,Molarity
-  }
+  
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -241,6 +251,7 @@ QString DataRequestTree::encode_thermal_compartment_request(CDM::ThermalCompartm
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
   std::string searchString = req->Name();
+  bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex compartmentIndex = index(0, 0, QModelIndex());
   static_cast<DataRequestNode*>(compartmentIndex.internalPointer())->collapsed(false);
@@ -256,6 +267,7 @@ QString DataRequestTree::encode_thermal_compartment_request(CDM::ThermalCompartm
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
         if (searchString == compartmentNode->children()[j]->name().toStdString()) {
+          foundRequest = true;
           compartmentNode->children()[j]->checked(true);
           request = dataPath(index(j, 0, compartmentIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
           request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
@@ -265,12 +277,15 @@ QString DataRequestTree::encode_thermal_compartment_request(CDM::ThermalCompartm
       break;
     }
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
-  }
+ 
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -279,6 +294,7 @@ QString DataRequestTree::encode_tissue_compartment_request(CDM::TissueCompartmen
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
   std::string searchString = req->Name();
+  bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex compartmentIndex = index(0, 0, QModelIndex());
   static_cast<DataRequestNode*>(compartmentIndex.internalPointer())->collapsed(false);
@@ -294,6 +310,7 @@ QString DataRequestTree::encode_tissue_compartment_request(CDM::TissueCompartmen
       for (int j = 0; j < compartmentNode->children().size(); ++j) {
         //Now that we know compartment, figure out the name of the data request
         if (searchString == compartmentNode->children()[j]->name().toStdString()) {
+          foundRequest = true;
           compartmentNode->children()[j]->checked(true);
           request = dataPath(index(j, 0, compartmentIndex)) + QString("|");  //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
           request.append(compartmentNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
@@ -303,12 +320,15 @@ QString DataRequestTree::encode_tissue_compartment_request(CDM::TissueCompartmen
       break;
     }
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
-  }
+  
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -325,6 +345,7 @@ QString DataRequestTree::encode_patient_request(CDM::PatientDataRequestData* req
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
   std::string searchString = req->Name();
+  bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex patientIndex = index(2, 0, QModelIndex()); //Patient branch is 2nd element inside top level
   DataRequestNode* patientNode = static_cast<DataRequestNode*>(patientIndex.internalPointer());
@@ -332,18 +353,22 @@ QString DataRequestTree::encode_patient_request(CDM::PatientDataRequestData* req
   for (int i = 0; i < patientNode->children().size(); ++i) {
     //Only one level of data beneath patient -- check which request we are calling
     if (searchString == patientNode->children()[i]->name().toStdString()) {
+      foundRequest = true;
       patientNode->children()[i]->checked(true);
       request = dataPath(index(i, 0, patientIndex)) + QString("|");  //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
       request.append(patientNode->children()[i]->type() + QString("|"));   //Pass the scalar type (e.g. MassPerVolume)
       break;
     }
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
-  }
+  
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -351,12 +376,12 @@ QString DataRequestTree::encode_physiology_request(CDM::PhysiologyDataRequestDat
 {
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
-  std::string searchString = req->Name();   
+  std::string searchString = req->Name();  
+  bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex physiologyIndex = index(3, 0, QModelIndex()); //Physiology branch is 3rd element inside top level
   DataRequestNode* physiologyNode = static_cast<DataRequestNode*>(physiologyIndex.internalPointer());
   physiologyNode->collapsed(false);
-  bool foundRequest = false;
   int section = 0;
   QModelIndex sectionIndex;
   DataRequestNode* sectionNode;
@@ -378,12 +403,15 @@ QString DataRequestTree::encode_physiology_request(CDM::PhysiologyDataRequestDat
     }
     ++section;
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
-  }
+  
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -392,6 +420,7 @@ QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData*
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
   std::string searchString = req->Name();  //Note that unlike compartment substance quantity requests, Substance requests store sub name in the Name field 
+  bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex substanceGroupIndex = index(4, 0, QModelIndex()); //substance branch is 4th element inside top level
   DataRequestNode* substanceGroupNode = static_cast<DataRequestNode*>(substanceGroupIndex.internalPointer());
@@ -405,6 +434,7 @@ QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData*
       for (int j = 0; j < substanceNode->children().size(); ++j) {
         //Now that we know substance, figure out the name of the data request
         if (searchString == substanceNode->children()[j]->name().toStdString()) {
+          foundRequest = true;
           substanceNode->children()[j]->checked(true);
           request = dataPath(index(j, 0, substanceIndex)) + QString("|"); //Format request using same function that stands up data requests created in scenario builder.  Append unit/precision info below
           request.append(substanceNode->children()[j]->type() + QString("|")); //Pass the scalar type (e.g. MassPerVolume)
@@ -414,12 +444,15 @@ QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData*
       break;
     }
   }
-  if (req->Unit().present()) {
-    request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+  if (foundRequest) {
+    if (req->Unit().present()) {
+      request.append(QString::fromStdString("UNIT=" + req->Unit().get() + ";"));
+    }
+    if (req->Precision().present()) {
+      request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
+    }
   }
-  if (req->Precision().present()) {
-    request.append(QString::fromStdString("PRECISION=" + std::to_string(req->Precision().get())));
-  }
+  
   return request;
 }
 //------------------------------------------------------------------------------------
@@ -779,7 +812,7 @@ void DataRequestTree::initialize(biogears::SECompartmentManager* comps, biogears
   auto drugHeartRate = phyDrug->appendChild(QString("HeartRateChange"), QString("Frequency"));
   auto drugHemorrhage = phyDrug->appendChild(QString("HemorrhageReduction"));
   auto drugMAP = phyDrug->appendChild(QString("MeanBloodPressureChange"), QString("Pressure"));
-  auto drugNeuro = phyDrug->appendChild(QString("NeurmuscularBlockLevel"));
+  auto drugNeuro = phyDrug->appendChild(QString("NeuromuscularBlockLevel"));
   auto drugPain = phyDrug->appendChild(QString("PainToleranceChange"));
   auto drugPulse = phyDrug->appendChild(QString("PulsePressureChange"), QString("Pressure"));
   auto drugRespiration = phyDrug->appendChild(QString("RespirationRateChange"), QString("Frequency"));

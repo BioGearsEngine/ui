@@ -422,8 +422,17 @@ Window {
       Layout.preferredWidth : parent.width / 4 - 2 * spacing
       Layout.alignment : Qt.AlignHCenter
       onClicked : {
-        root.clearScenario()
-        bg_scenario.edit_scenario()
+        if (builderModel.count > 0 || activeRequestsModel.count > 0){
+          let warningDefinition = 'import QtQuick.Dialogs 1.3; MessageDialog {width : 800; title : "Overwrite?"; text : "Loading a scenario will overwrite current scenario definition.";
+              informativeText : "Do you wish to continue?"; icon : StandardIcon.Warning; standardButtons : StandardButton.Yes | StandardButton.No}'
+          let overwriteMsg = Qt.createQmlObject(warningDefinition, scenarioBuilder, 'OverwriteMessage');
+          overwriteMsg.onYes.connect(function() {root.clearScenario(); bg_scenario.edit_scenario()})
+          overwriteMsg.onNo.connect(function() {overWriteMsg.close(); return})
+          overwriteMsg.open()
+        } else {
+          root.clearScenario()
+          bg_scenario.edit_scenario()
+        }
       }
     }
     Button {
@@ -443,6 +452,7 @@ Window {
     standardButtons : StandardButton.Ok
     width : parent.width / 3
     text : ""
+    visible : false
   }
 
  //---Components loaded during runtime----------------
@@ -480,12 +490,11 @@ Window {
   //Component used to create time blocks between each action
   Component {
     id : timeGapComponent
-    Column {
+    ColumnLayout {
       id : timeColumn
       property double blockTime_s : 0
       property int index : -1   //Note that this index counts up from the bottom of the scenario builder
       width : scenarioView.width - scenarioView.scrollWidth
-      height : 60
       spacing : 0
       states : [
         State {
@@ -500,22 +509,24 @@ Window {
         }     
       ]
       Rectangle {
+        id : topLine
         color : "black"
-        width : 2
-        height : parent.height/3
-        anchors.horizontalCenter : parent.horizontalCenter
+        Layout.preferredWidth : 2
+        implicitHeight : 20
+        Layout.alignment : Qt.AlignHCenter
       }
       Text {
         id : timeText
+        Layout.alignment : Qt.AlignHCenter
         font.pointSize : 12
-        anchors.horizontalCenter : parent.horizontalCenter
         text : root.seconds_to_clock_time(parent.blockTime_s)
       }
       Rectangle {
+        id : bottomLine
         color : "black"
-        width : 2
-        height : parent.height/3
-        anchors.horizontalCenter : parent.horizontalCenter
+        Layout.preferredWidth : 2
+        implicitHeight : 20
+        Layout.alignment : Qt.AlignHCenter
       }
     }
   }
@@ -951,7 +962,6 @@ Window {
       property alias subModel : subQuantityModel
       property var subQList : []
       function loadSubstanceQuantity(loadPath, substance, quantity, unit, precision){
-        console.log(loadPath)
         if (loadPath===leafWrapper.path){
           let requestPath = leafWrapper.path + "-" + subModel.count
           subModel.append({"substance" : substance, "quantity" : quantity, "unit" : unit, "precision" : precision, "path" : requestPath})

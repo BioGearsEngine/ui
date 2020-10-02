@@ -20,12 +20,16 @@ UIScenarioBuilderForm {
 
   /***Reset action editor and data request editor***/
   onClearScenario: {
+    editingAction = false;
     builderModel.unsetConnections();
     builderModel.clear();
     builderModel.scenarioLength_s = 0.0;
     activeRequestsModel.requestQueue.length = 0;
+    activeRequestsModel.subRequestQueue.length = 0
     activeRequestsModel.clear();
     root.bgRequests.resetData();
+    scenarioInput = ""
+    scenarioName = ""
   }
   /***Called from MenuArea when Load Scenario option is selected.  Inputs events, requests, and sampling are received from scenarioFileLoaded signal
       emitted by Scenario::edit_scenario function***/
@@ -314,12 +318,12 @@ UIScenarioBuilderForm {
     /***Creates a new action based on input from a scenario file and a time component with the duration of the action***/
     function loadAction(buildFunc) {
       let loadedAction = buildFunc()
+      loadedAction.viewLoader.state = "collapsedBuilder"
       builderModel.insert(0, loadedAction);
       let v_timeGap = root.timeGapComponent.createObject(null);
       builderModel.insert(1, v_timeGap);
       setConnections(loadedAction, v_timeGap)
-      loadedAction.buildSet(loadedAction)
-      loadedAction.viewLoader.state = "collapsedBuilder"
+      loadedAction.buildSet(loadedAction) 
     }
     /***Set signal connections and property bindings on action that has just been added to model.  Width must be bound because so that action re-centers
         itself correctly when the size of the window changes***/

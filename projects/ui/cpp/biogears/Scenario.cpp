@@ -1126,7 +1126,7 @@ bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QStr
 
 void Scenario::edit_scenario()
 {
-  //Open file dialog in nutrition folder
+  //Open file dialog in scenario folder
   QString scenarioFile = QFileDialog::getOpenFileName(nullptr, "Edit Scenario", "./Scenarios", "Scenario (*.xml)");
   if (scenarioFile.isNull()) {
     return;
