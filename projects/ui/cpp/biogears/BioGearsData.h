@@ -53,10 +53,7 @@ public:
   explicit BioGearsData(QString name, BioGearsData* parent);
   ~BioGearsData() override;
 
-  void initialize();
-  void initialize_substances(const biogears::BioGearsSubstances&)
-  {
-  }
+  void initialize(const biogears::BioGearsSubstances& bgSubstances);
 
   Q_INVOKABLE int categories();
   Q_INVOKABLE BioGearsData* category(int category);

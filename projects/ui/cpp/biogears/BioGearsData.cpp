@@ -2,6 +2,7 @@
 
 #include <biogears/engine/Controller/BioGearsSubstances.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
+#include <biogears/cdm/substance/SESubstance.h>
 
 /// BioGearsData Model
 ///
@@ -55,7 +56,7 @@ BioGearsData* BioGearsData::category(int category)
   }
 }
 
-void BioGearsData::initialize()
+void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
 {
   _vitals = new BioGearsData("Vitals", this);
   _cardiopulmonary = new BioGearsData("Cardiopulmonary", this);
@@ -67,22 +68,31 @@ void BioGearsData::initialize()
   _customs = new BioGearsData("Custom", this);
 
   _vitals->append(QString("Vitals"), QString("Arterial Pressure"));
-  auto vital = _vitals->child(0);
+  auto vital = _vitals->child(0); //default display blood pressure
+  vital->enabled(true);
   {
     vital->nested(false);
     vital->append(QString("Vitals"), QString("Systolic Pressure"));
     vital->append(QString("Vitals"), QString("Diastolic Pressure"));
+    vital->append(QString("Vitals"), QString("Mean Arterial Pressure"));
   }
+  _vitals->append(QString("Vitals"), QString("Heart Rate"));
+  _vitals->child(1)->enabled(true); //default display HR
   _vitals->append(QString("Vitals"), QString("Respiration Rate"));
+  _vitals->child(2)->enabled(true); //default display RR
   _vitals->append(QString("Vitals"), QString("Oxygen Saturation"));
+  _vitals->child(3)->enabled(true); //default display O2 sat
   _vitals->append(QString("Vitals"), QString("Blood Volume"));
   _vitals->append(QString("Vitals"), QString("Central Venous Pressure"));
-  _vitals->append(QString("Vitals"), QString("Heart Rate"));
-
+  _vitals->append(QString("Vitals"), QString("Cardiac Output"));
+ 
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Cerebral Perfusion Pressure"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Intracranial Pressure"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Systemic Vascular Resistance"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Pulse Pressure"));
+  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Stroke Volume"));
+  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Cardiac Index"));
+  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Ejection Fraction"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("IE Ratio"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Total Pulmonary Ventilation"));
   _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Lung Volume"));
@@ -115,7 +125,6 @@ void BioGearsData::initialize()
   }
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption Rate"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("CO2 Production Rate"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Fatigue"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Dehydration Fraction"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Ambient Temperature"));
@@ -141,6 +150,42 @@ void BioGearsData::initialize()
   _renal->child(1)->enabled(true);
   _renal->append(QString("Renal"), QString("Glomerular Filtration Rate"));
   _renal->child(2)->enabled(true);
+
+  //Add all substances from manager -- create nodes for appropriate fields (unit/scalar values default to nullptrs)
+  //All this does is set up containers for sub data -- data will not be assigned to substance until it is active
+  for (auto sub : bgSubstances.GetSubstances()) {
+    auto subData = _substances->append(QString("Substances"), QString::fromStdString(sub->GetName()));
+    subData->nested(true);
+    subData->usable(false);   //Set all substances to non-usable (will be set when substance is activated in Biogears)
+    //Every substance should have blood concentration, mass in body, mass in blood, mass in tissue
+    auto metric = subData->append(subData->name(), QString("Blood Concentration"));
+    metric = subData->append(subData->name(), QString("Mass in Body"));
+    metric = subData->append(subData->name(), QString("Mass in Blood"));
+    metric = subData->append(subData->name(), QString("Mass in Tissue"));
+    //Only subs that are dissolved gases need alveolar transfer and end tidal.  Use relative diffusion coefficient to filter
+    if (sub->HasRelativeDiffusionCoefficient()) {
+      metric = subData->append(subData->name(), QString("Alveolar Transfer"));
+      metric = subData->append(subData->name(), QString("End Tidal Fraction"));
+    }
+    //Only subs that have PK need effect site, plasma, AUC
+    if (sub->HasPK()) {
+      metric = subData->append(subData->name(), QString("Effect Site Concentration"));
+      metric = subData->append(subData->name(), QString("Plasma Concentration"));
+      metric = subData->append(subData->name(), QString("Area Under Curve"));
+    }
+    //Assign clearances, if applicable
+    if (sub->HasClearance()) {
+      if (sub->GetClearance().HasRenalClearance()) {
+        metric = subData->append(subData->name(), QString("Renal Clearance"));
+      }
+      if (sub->GetClearance().HasIntrinsicClearance()) {
+        metric = subData->append(subData->name(), QString("Intrinsic Clearance"));
+      }
+      if (sub->GetClearance().HasSystemicClearance()) {
+        metric = subData->append(subData->name(), QString("Systemic Clearance"));
+      }
+    }
+  }
 
   _customs->append(QString("Plots"), QString("Respiratory PV Curve"));
   auto custom = _customs->child(0);
