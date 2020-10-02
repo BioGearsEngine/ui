@@ -51,6 +51,9 @@ public:
     return roles;
   }
 
+signals:
+  void requestModelUpdate(DataRequestTree* model);
+
 private:
   QString encode_gas_compartment_request(CDM::GasCompartmentDataRequestData* req);
   QString encode_liquid_compartment_request(CDM::LiquidCompartmentDataRequestData* req);

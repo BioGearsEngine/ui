@@ -109,6 +109,7 @@ void DataRequestTree::resetData()
   for (auto child : _root->children()) {
     child->reset();
   }
+  emit requestModelUpdate(this);
 }
 //------------------------------------------------------------------------------------
 DataRequestNode* DataRequestTree::appendChild(QString name, QString type)

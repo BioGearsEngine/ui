@@ -9,18 +9,14 @@ UIScenarioBuilderForm {
 
 	signal validScenario (string type, var data)
 	signal invalidScenario(string errorStr)
-	signal resetScenario()
+	signal clear()
+  signal load()
   signal requestMenuReady()
   signal readyToClose()
   property bool editingAction : false
 
 	onClosing : {
-    builderModel.unsetConnections() //Unset all connections in action timeline before clearing model
-    builderModel.clear()
-    builderModel.scenarioLength_s = 0.0;
-    activeRequestsModel.requestQueue.length = 0
-    activeRequestsModel.clear();
-    root.bgRequests.resetData();     //Sets all collapsed roles to true and check states to 0 for nodes in Data Request Model
+    clear();
     contentLoader.showContent = false     //Flags top level loader to set its source component to undefined so that all visible items are unloaded and reset
     //Do not close the window until the Loader that controls the window content is finished unloading
     while (contentLoader.status != Loader.Null){
@@ -28,6 +24,17 @@ UIScenarioBuilderForm {
     }
     close.accepted = true
 	}
+
+  /***Reset action editor and data request editor***/
+  onClear: {
+    builderModel.unsetConnections();
+    builderModel.clear();
+    builderModel.scenarioLength_s = 0.0;
+    activeRequestsModel.requestQueue.length = 0;
+    activeRequestsModel.clear();
+    root.bgRequests.resetData();
+    windowContent.requestView.forceLayout();
+  }
   /***Open window--set content loader to active***/
   function launch(){
     contentLoader.showContent = true    //Flags top level loader to set it source component to windowContent and load all visible items (which will be reset)
@@ -35,14 +42,17 @@ UIScenarioBuilderForm {
   /***Called from MenuArea when Load Scenario option is selected.  Inputs events, requests, and sampling are received from scenarioFileLoaded signal
       emitted by Scenario::edit_scenario function***/
   function loadExisting(events, requests, sampling){
-    eventModel = events   
-    activeRequestsModel.requestQueue = requests
+    eventModel = events;   
+    activeRequestsModel.requestQueue = requests;
     root.scenarioName = events.get_timeline_name();
     root.scenarioInput = events.get_patient_name();
-    root.isPatientFile = !events.get_patient_name().includes('@')   //engine state files have '@', patient files do not
-    let sampleSplit = sampling.split(';')
-    root.samplingFrequency = (Number(sampleSplit[0]).toFixed(0)).toString() + ";" + sampleSplit[1]    //Qml inteprets an int as "0.0000", so we need to get it to a number and trim it
-    launch();
+    root.isPatientFile = !events.get_patient_name().includes('@');   //engine state files have '@', patient files do not
+    let sampleSplit = sampling.split(';');
+    root.samplingFrequency = (Number(sampleSplit[0]).toFixed(0)).toString() + ";" + sampleSplit[1] ;   //Qml inteprets an int as "0.0000", so we need to get it to a number and trim it
+    builderModel.loadActions();
+    activeRequestsModel.loadRequests();
+    load();
+    //launch();
   }
 	/***Helper function to format camel case text for display***/
   function displayFormat (role) {
@@ -556,6 +566,4 @@ UIScenarioBuilderForm {
       actionSwitchView.headerItem.finalAdvanceTime_s = scenarioLength_s - finalActionStart;
     }
   }
-  
-  
 }

@@ -378,6 +378,13 @@ Window {
                       }
                       item.width = requestListView.width
                     }
+                    Connections {
+                      target : root
+                      //Only need to call clear/load at the top level because loaded components of top level nodes will get released and, the next
+                      //time they are set, will detect that the data model was changed.
+                      onClear : {requestLoader.item.toggleCollapsedView(true)}
+                      onLoad : {requestLoader.item.toggleCollapsedView(requestLoader._model_data.data(requestLoader._node_index, DataRequestModel.CollapsedRole))}
+                    }
                   }
                 }
               }
@@ -422,22 +429,41 @@ Window {
           }//end list view container
         }//end second tab
       } //end stack layout
-      Rectangle {
+      RowLayout {
         id : optionArea
-        color : 'transparent'
-        border.color : 'green'
         height : parent.height * 0.075
         width : parent.width
         anchors.bottom : parent.bottom
-        border.width : 1
+        spacing : 50
         Button {
           id : saveScenario
-          text : "Save"
-          anchors.centerIn : parent
-          height : parent.height
-          width : parent.width / 3
+          text : "Save Scenario"
+          Layout.fillHeight : true
+          Layout.preferredWidth : parent.width / 4 - 2 * spacing
+          Layout.alignment : Qt.AlignHCenter
           onClicked : {
             root.saveScenario()
+          }
+        }
+        Button {
+          id : loadScenario
+          text : "Load Scenario"
+          Layout.fillHeight : true
+          Layout.preferredWidth : parent.width / 4 - 2 * spacing
+          Layout.alignment : Qt.AlignHCenter
+          onClicked : {
+            root.clear()
+            bg_scenario.edit_scenario()
+          }
+        }
+        Button {
+          id : resetScenario
+          text : "Reset Scenario"
+          Layout.fillHeight : true
+          Layout.preferredWidth : parent.width / 4 - 2 * spacing
+          Layout.alignment : Qt.AlignHCenter
+          onClicked : {
+            root.clear()
           }
         }
       }

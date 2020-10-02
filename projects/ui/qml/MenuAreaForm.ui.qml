@@ -12,21 +12,6 @@ Item {
   width : menuBar.width       //Visible area should be the size of the menu bar.  Item wrapper is to hold non-visible
   height : menuBar.height         //components like ListModel and popups like FileDialog and ObjectBuilder
 
-
- /*  Window {
-    objectName: "wnd1"
-    visible: true
-    width: 500
-    height : 500
-   }
-
-  Window {
-    objectName: "wnd2"
-    visible: true
-    width: 500
-    height : 500
-  }
-  */
   MenuBar {
     id: menuBar
    //----------------File Menu-------------------
@@ -54,17 +39,12 @@ Item {
         }
       }
       Action {
-        text : "Create Scenario"
+        text : "Launch Scenario Editor"
         onTriggered : {
           scenarioBuilder.launch()
         }
       }
-      Action {
-        text : "Load Scenario"
-        onTriggered : {
-          scenario.edit_scenario()
-        }
-      }
+
       delegate : MenuItem {
         id : fileMenuItem
         contentItem : Text {
