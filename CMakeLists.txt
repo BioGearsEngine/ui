@@ -86,3 +86,5 @@ endif()
 install(FILES cmake/Find${ROOT_PROJECT_NAME}.cmake
         DESTINATION cmake/)
 
+
+generate_project_suffix()
