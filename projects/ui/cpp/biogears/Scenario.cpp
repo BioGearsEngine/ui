@@ -114,7 +114,7 @@ inline void update_substance_data(biogears::SESubstance* sub, int row, BioGearsD
       };
       std::function<double(void)> valueFunc = [&, sub]() {
         return (lKidney->HasSubstanceQuantity(*sub) && rKidney->HasSubstanceQuantity(*sub)) ? lKidney->GetSubstanceQuantity(*sub)->GetMassCleared(biogears::MassUnit::ug) + rKidney->GetSubstanceQuantity(*sub)->GetMassCleared(biogears::MassUnit::ug)
-                                                                                          : 0;
+                                                                                            : 0;
       };
 
       //substance->child(requestIndex)->custom(std::move(valueFunc), std::move(unitFunc));
@@ -147,9 +147,8 @@ void Scenario::setup_physiology_substances(BioGearsData* substances)
   biogears::SELiquidCompartment& rKidneyIntracellular = engine->GetCompartments().GetIntracellularFluid(*rKidney);
   biogears::SELiquidCompartment& liverIntracellular = engine->GetCompartments().GetIntracellularFluid(*liver);
 
-
   for (int i = 0; i < _engine->GetSubstances().GetSubstances().size(); ++i) {
-    auto& sub = _engine->GetSubstances().GetSubstances()[i];   //Not using range based loop because we need the index
+    auto& sub = _engine->GetSubstances().GetSubstances()[i]; //Not using range based loop because we need the index
     if ((sub->GetState() != CDM::enumSubstanceState::Liquid) && (sub->GetState() != CDM::enumSubstanceState::Gas)) {
       //Not planning to plot substances that don't meet this criteria (things like hemoglobin, antigens, etc.)
       continue;
@@ -287,8 +286,8 @@ Scenario& Scenario::load_patient(QString file)
   _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
   _engine = std::make_unique<biogears::BioGearsEngine>(&_logger);
-  _urinalysis = std::make_unique<biogears::SEUrinalysis>(&_logger);
-  _blood_panel = std::make_unique<biogears::SEComprehensiveMetabolicPanel>(&_logger);
+  _urinalysis = std::make_unique<biogears::SEUrinalysis>();
+  _blood_panel = std::make_unique<biogears::SEComprehensiveMetabolicPanel>();
   _logger.SetForward(_consoleLog);
 
   if (_engine->LoadState(path)) {
@@ -413,7 +412,7 @@ Scenario& Scenario::load_patient(QString file)
       customs->child(2)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
       customs->child(3)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
     }
-    
+
     _physiology_model->setSimulationTime(_engine->GetSimulationTime(biogears::TimeUnit::s));
     //Create file info and extract base name (e.g. Patient@0s or Patient).  We go through this process rather
     // than just taking file name because sometimes we pass only a name to LoadPatient (DefaultMale@0s.xml) and
@@ -1091,36 +1090,46 @@ bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QStr
   }
   buildScenario->GetDataRequestManager().SetSamplesPerSecond(frequency_Hz);
 
-  biogears::SEAction* action;
-  //Set up re-usable Advance Time event to apply between adjacent actions
-  Event advanceTime;
+  //Set up re-usable types
+  biogears::SEAction* action; //Decoded information from event tree stored in SEAction class, writable to xml
+  Event thisEvent; //The current biogears event being processed
+  Event nextEvent; //The next biogears event in the queue
+  Event advanceTime; //Store advance time event
   advanceTime.typeName = "AdvanceTime";
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
 
-  for (int i = 0; i < eventTree->get_events().size() - 1; ++i) {
-    //Stopping before size-1 becasue eventTree[size -1] so that our final "next event" does not exceed loop bounds (last event, which is an advance time, is still processed)
-    Event thisEvent = eventTree->get_events()[i];
+
+  //Event queue is set up such that a single Advance Time event is present at the end of the queue (no advance times between events -- taken care
+  // of by "duration" fields).  Use this terminal Advance Time as a sentinal as we loop through queue and add events to scenario file
+  int count = 0;
+  while (eventTree->get_events()[count].eType != EventTree::EventTypes::AdvanceTime) {
+    thisEvent = eventTree->get_events()[count];
+    if (count == 0 && thisEvent.startTime > 0.0) {
+      //If the first event does not start at time 0, then we need an advance time action before it
+      advanceTime.startTime = 0.0;
+      advanceTime.duration = thisEvent.startTime;
+      action = eventTree->decode_action(advanceTime, _engine->GetSubstances());
+      buildScenario->AddAction(*action);
+    }
     action = eventTree->decode_action(thisEvent, _engine->GetSubstances());
     buildScenario->AddAction(*action);
-    Event nextEvent = eventTree->get_events()[i + 1];
+    nextEvent = eventTree->get_events()[count + 1];
     //Place an advance time action between successive BG actions (unless the next action is the final advance time action in the scenario)
     if (nextEvent.eType != EventTree::EventTypes::AdvanceTime) {
       advanceTime.startTime = thisEvent.startTime; //Start at same time as action we just applied
       advanceTime.duration = nextEvent.startTime - advanceTime.startTime;
       action = eventTree->decode_action(advanceTime, _engine->GetSubstances());
       buildScenario->AddAction(*action);
-    } else {
-      //We stored end scenario time in "start time" of last advance time action to make sure it was at end of queue.
-      //Get time needed between scenario end and our last action
-      nextEvent.duration = nextEvent.startTime - (thisEvent.startTime + thisEvent.duration);
-      nextEvent.startTime = (thisEvent.startTime + thisEvent.duration); //reset start time to proper value
-      //Only add action if needed (i.e. > 0)
-      if (nextEvent.duration != 0.0) {
-        action = eventTree->decode_action(nextEvent, _engine->GetSubstances());
-        buildScenario->AddAction(*action);
-      }
     }
+    //Update count
+    ++count;
   }
+  //Now add the final advance time action to the scenario (unless it's duration is 0) -- count will be value at end of queue by this point
+  if (eventTree->get_events()[count].duration > 0) {
+    action = eventTree->decode_action(eventTree->get_events()[count], _engine->GetSubstances());
+    buildScenario->AddAction(*action);
+  }
+
   //Create requests
   for (int i = 0; i < requests.size(); ++i) {
     buildScenario->GetDataRequestManager().CreateFromBind(*_data_request_tree->decode_request(requests[i].toString()), _engine->GetSubstanceManager());
@@ -1994,7 +2003,7 @@ void Scenario::create_compound(QVariantMap compoundData)
     double concentration = compoundData[key].toList()[0].toDouble();
     auto& cUnit = biogears::MassPerVolumeUnit::GetCompoundUnit(compoundData[key].toList()[1].toString().toStdString());
     componentData->GetConcentration().SetValue(concentration, cUnit);
-    newCompound->GetComponents().push_back(componentData);
+    newCompound->GetComponents().push_back(*componentData);
   }
 
   export_compound(newCompound);
@@ -2029,8 +2038,8 @@ QVariantMap Scenario::edit_compound()
 
   //Loop over all components in the compound and put them in map with component name as key and [value, unit] pair as entry
   for (auto sub : compound->GetComponents()) {
-    QString subName = QString::fromStdString(sub->GetSubstance().GetName());
-    componentField[0] = sub->GetConcentration(biogears::MassPerVolumeUnit::mg_Per_L);
+    QString subName = QString::fromStdString(sub.GetSubstance().GetName());
+    componentField[0] = sub.GetConcentration(biogears::MassPerVolumeUnit::mg_Per_L);
     componentField[1] = "mg/L";
     compoundMap[subName] = componentField;
   }
@@ -2744,8 +2753,8 @@ void Scenario::create_substance_compound_infusion_action(QString compound, doubl
 
   //If compound components are not active, queue them for addition to physiology model (must be added to model after AdvanceTime so that substance values have been initialized)
   for (auto cmpt : subCompound->GetComponents()) {
-    if (!_engine->GetSubstances().IsActive(cmpt->GetSubstance())) {
-      _substance_queue.push_back(&cmpt->GetSubstance());
+    if (!_engine->GetSubstances().IsActive(cmpt.GetSubstance())) {
+      _substance_queue.push_back(&cmpt.GetSubstance());
     }
   }
 }

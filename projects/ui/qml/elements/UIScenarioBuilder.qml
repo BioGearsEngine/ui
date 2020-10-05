@@ -24,6 +24,7 @@ UIScenarioBuilderForm {
     builderModel.unsetConnections();
     builderModel.clear();
     builderModel.scenarioLength_s = 0.0;
+    builderModel.scenarioLengthOverride_s = 0.0;
     activeRequestsModel.requestQueue.length = 0;
     activeRequestsModel.subRequestQueue.length = 0
     activeRequestsModel.clear();
@@ -226,6 +227,9 @@ UIScenarioBuilderForm {
               precisionInput = opt[1]
             }
           }
+          if (scalarType==""){
+            unitInput = "unitless"    //If request has not unit, it won't get assigned a UNIT flag.  If we can't find a scalarType, then assign unit input to "unitless"
+          }
           addRequest(pathId, scalarType, unitInput, precisionInput, subInput, quantityInput)
         }
       }
@@ -400,15 +404,21 @@ UIScenarioBuilderForm {
             builderModel.loadAction(function() {return add_hemorrhage_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
             break;
           case EventModel.Infection :
-            builderModel.loadAction(function() {return add_infection_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
+            builderModel.loadAction(function() {return add_infection_builder(bg_scenario, event.Params, event.StartTime);});
             break;
           case EventModel.SubstanceAdministration : 
             if (event.SubType === EventModel.SubstanceCompoundInfusion){
-              builderModel.loadAction(function() {return add_compound_infusion_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
+              //Sub compound infusion has distinct build function
+              builderModel.loadAction(function() {return add_compound_infusion_builder(bg_scenario, event.Params, event.StartTime);});
             } else if (event.SubType === EventModel.Transfusion){
-              builderModel.loadAction(function() {return add_transfusion_builder(bg_scenario, event.Params, event.StartTime, event.Duration);});
-            } else {
+              //Transfusion has distinct build function
+              builderModel.loadAction(function() {return add_transfusion_builder(bg_scenario, event.Params, event.StartTime);});
+            } else if (event.SubType === EventModel.SubstanceInfusion) {
+              //Infusion has a duration value to set
               builderModel.loadAction(function() {return add_drug_administration_builder(bg_scenario, event.SubType, event.Params, event.StartTime, event.Duration);});
+            } else {
+              //Else include bolus and oral dose, which do not need a duration set
+              builderModel.loadAction(function() {return add_drug_administration_builder(bg_scenario, event.SubType, event.Params, event.StartTime);});
             }
             break;
           case EventModel.PainStimulus :
@@ -436,8 +446,7 @@ UIScenarioBuilderForm {
           default : 
             console.log(event.TypeName + " not added to scenario")
         }
-      }
-      updateTimeComponents()  
+      } 
       refreshScenarioLength()
     }
     /***Remove an action from the build model.  This function can be called by "Remove" button in window or from pop-up menu activated by right-clicking

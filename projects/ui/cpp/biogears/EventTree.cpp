@@ -1105,16 +1105,6 @@ void EventTree::encode_actions(CDM::ScenarioData* scenario)
       }
     }
   }
-  //Some actions are active until the end of a scenario (like an infusion), and so we do not detect a deactivate action or calculate a duration
-  //Check events in list and, if duration = 0, assign duration to sim_time - start_time of action.  This will have side of effect of giving durations 
-  //to actions that are "one-timers" (e.g. bolus, consume nutrients) -- however, ScenarioBuilder knows which actions don't need durations and defaults 
-  //those durations to 0.
-  for (int i = 0; i < _events.size(); ++i) {
-    auto& ev = _events[i];
-    if (ev.duration == 0.0) {
-      ev.duration = sim_time_s - ev.startTime;
-    }
-  }
   //Add terminal advance time action (if present)
   double lastEventEnd_s = 0.0;
   if (!_events.empty()) {
@@ -1127,6 +1117,16 @@ void EventTree::encode_actions(CDM::ScenarioData* scenario)
     timeExtend.duration = sim_time_s - lastEventEnd_s;
     timeExtend.eType = EventTree::AdvanceTime;
     _events.push_back(timeExtend);
+  }
+  //Some actions are active until the end of a scenario (like an infusion), and so we do not detect a deactivate action or calculate a duration
+  //Check events in list and, if duration = 0, assign duration to sim_time - start_time of action.  This will have side of effect of giving durations
+  //to actions that are "one-timers" (e.g. bolus, consume nutrients) -- however, ScenarioBuilder knows which actions don't need durations and defaults
+  //those durations to 0.  NOTE: This must be done after setting the terminal advance time action
+  for (int i = 0; i < _events.size(); ++i) {
+    auto& ev = _events[i];
+    if (ev.duration == 0.0) {
+      ev.duration = sim_time_s - ev.startTime;
+    }
   }
 }
 //-----------------------------------------------------------------------------
@@ -1273,7 +1273,7 @@ void EventTree::add_event(QString name, int type, int subType, QString params, d
 //-----------------------------------------------------------------------------
 void EventTree::sort_events()
 {
-  //Implementing a fairly naive insertion sort.  The event list comring from scenario builder is mostly ordered (only "deactivate" actions
+  //Implementing a fairly naive insertion sort.  The event list coming from scenario builder is mostly ordered (only "deactivate" actions
   // are potentially out of order), so I don't think we'll hit the worst case number of comparisons.  Plus the list probably isn't going to be too long.
   for (unsigned int i = 1; i < _events.size(); ++i) {
     Event tempEvent = _events[i];
@@ -1284,6 +1284,22 @@ void EventTree::sort_events()
     }
     _events[compIndex + 1] = tempEvent;
   }
+  //Now that queue is sorted, determine the start time and duration of the terminal Advance Time event (which will be at the back of the queue because
+  // scenario builder sets its start time to the scenario length, which is guaranteed to be greater than any other action)
+  if (_events.size() > 1) {
+    Event& time = _events.back();
+    Event lastAction = _events[_events.size() - 2];
+    time.duration = time.startTime - (lastAction.startTime + lastAction.duration); //time's "start" was set to scenario length, so it's duration is the difference between scenario length and whenever the last action ends
+    time.startTime = (lastAction.startTime + lastAction.duration); //reset start time to proper value
+  } else {
+    //If there is only 1 event in queue, then it is just a single Advance Time (like in BasicStandard)
+    Event& time = _events.back();
+    time.duration = time.startTime;   //"Start time" was set to scenario length in scenario builder -- no other actions, so duration is all of scenario
+    time.startTime = 0;               //No other actions, so we must start at 0
+  }
+  
+
+
 }
 //-----------------------------------------------------------------------------
 biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceManager& subMgr)
