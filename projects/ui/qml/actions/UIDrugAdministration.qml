@@ -297,6 +297,7 @@ UIActionForm {
       MenuItem {
         id : removeItem
         text : "Remove"
+        font.pointSize : 10
         onTriggered: {
           root.remove( root.uuid )
         }

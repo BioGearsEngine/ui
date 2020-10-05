@@ -114,5 +114,7 @@
         <file alias="next_transparent.png">img/next_transparent.png</file>
         <file alias="prev_transparent.png">img/prev_transparent.png</file>
         <file alias="menu_transparent.png">img/menu_transparent.png</file>
+        <file alias="openIndicatorBlue.png">img/openIndicatorBlue.png</file>
+        <file alias="openIndicatorWhite.png">img/openIndicatorWhite.png</file>
     </qresource>
 </RCC>

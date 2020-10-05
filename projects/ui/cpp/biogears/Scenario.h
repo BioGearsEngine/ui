@@ -50,7 +50,7 @@ class Scenario : public QObject, public biogears::Runnable {
   Q_PROPERTY(double isPaused READ is_paused NOTIFY pausedToggled)
   Q_PROPERTY(double isThrottled READ is_throttled NOTIFY throttledToggled)
 
-  Q_PROPERTY(QtLogForward* feeds READ getLogFoward NOTIFY loggerChanged)
+  Q_PROPERTY(QtLogForward* feeds READ getLogForward NOTIFY loggerChanged)
 public:
   Scenario(QObject* parent = Q_NULLPTR);
   Scenario(QString name, QObject* parent = Q_NULLPTR);
@@ -110,7 +110,7 @@ public:
   Q_INVOKABLE QVariantList get_components();
   Q_INVOKABLE QVariantList get_nutrition();
 
-  Q_INVOKABLE QtLogForward* getLogFoward();
+  Q_INVOKABLE QtLogForward* getLogForward();
 
   bool is_running() const;
   bool is_paused() const;

@@ -281,7 +281,7 @@ Item {
 						function hydrationBorderColor() {
 							var hydrationBorder = root.goodBorderColor
 							if (root.dehydrationFraction >= 0.2) {
-								hydrationBorder = rood.criticalBorderColor
+								hydrationBorder = root.criticalBorderColor
 							} else if (root.dehydrationFraction >= 0.1) {
 								hydrationBorder = root.warningBorderColor
 							}

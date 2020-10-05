@@ -287,6 +287,7 @@ Rectangle {
         MenuItem {
           id : removeItem
           text : "Remove"
+          font.pointSize : 10
           onTriggered: {
             if (root.active){
               root.deactivate()

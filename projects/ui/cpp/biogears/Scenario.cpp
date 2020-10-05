@@ -716,7 +716,7 @@ QVariantList Scenario::get_nutrition()
   return _nutrition_list;
 }
 //---------------------------------------------------------------------------------
-QtLogForward* Scenario::getLogFoward()
+QtLogForward* Scenario::getLogForward()
 {
   return _consoleLog;
 }

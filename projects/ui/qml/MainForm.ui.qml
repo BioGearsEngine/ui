@@ -29,6 +29,7 @@ GridLayout {
 
     ActionDrawer {
       id: actionDrawer
+      width : controls.width
       scenario : root.scenario
       controls : root.controls
       actionModel : root.actionModel

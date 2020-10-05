@@ -11,13 +11,13 @@ ColumnLayout {
   signal rateToggleClicked(int speed)
 
   property string simulationTime : "0:00:00"
-  property alias rate : foward.rate
+  property alias rate : forward.rate
   property alias playing : pause_play.playing;
   property alias paused  : pause_play.paused;
 
   property alias resetButton : reset
   property alias simButton: pause_play
-  property alias speedButton : foward
+  property alias speedButton : forward
 
   RowLayout {
     spacing: 10
@@ -39,24 +39,32 @@ ColumnLayout {
       id: reset
       implicitHeight : 40
       implicitWidth : 75
+      padding : 5
       text: "reset"
       display: AbstractButton.IconOnly
-      icon.source: "qrc:/icons/reset.png"
-      icon.name: "terminate"
-      icon.color: "transparent"
+      contentItem : Image {
+        id : resetImage
+        fillMode : Image.PreserveAspectFit
+        source: "icons/reset.png"
+        height : 30
+      }
       onClicked: {root.restartClicked()}
     }
     UIBioGearsButtonForm {
       id: pause_play
       implicitHeight : 40
       implicitWidth : 75
+      padding : 5
       property bool playing : false;
       property bool paused  : false;
       text: "Simulate"
       display: AbstractButton.IconOnly
-      icon.source: "qrc:/icons/play.png"
-      icon.name: "simulate"
-      icon.color: "transparent"
+      contentItem : Image {
+        id : pausePlayImage
+        fillMode : Image.PreserveAspectFit
+        source: "icons/play.png"
+        height : 30
+      }
       state : "Stopped"
       onClicked: {
         console.log("UIPlaybackForm %1 %2".arg(playing).arg(paused))
@@ -75,24 +83,21 @@ ColumnLayout {
       states: [
        State{
           name: "Stopped"
-          PropertyChanges { target: pause_play; icon.source: "icons/play.png" }
-          PropertyChanges { target: pause_play; icon.name: "Play" }
+          PropertyChanges { target: pausePlayImage; source: "icons/play.png" }
           PropertyChanges { target: pause_play; text: "Play" }
           PropertyChanges { target: pause_play; playing: false }
           PropertyChanges { target: pause_play; paused: false }
        }
         ,State {
           name: "Simulating"
-          PropertyChanges { target: pause_play; icon.source: "icons/pause.png" }
-          PropertyChanges { target: pause_play; icon.name: "Pause" }
+          PropertyChanges { target: pausePlayImage; source: "icons/pause.png" }
           PropertyChanges { target: pause_play; text: "Pause" }
           PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: false }
           }
         ,State {
           name: "Paused"
-          PropertyChanges { target: pause_play; icon.source: "icons/play.png" }
-          PropertyChanges { target: pause_play; icon.name: "Resume" }
+          PropertyChanges { target: pausePlayImage; source: "icons/play.png" }
           PropertyChanges { target: pause_play; text: "Resume" }
           PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: true }
@@ -100,18 +105,19 @@ ColumnLayout {
       ]
     }
     UIBioGearsButtonForm {
-      id: foward
+      id: forward
       implicitHeight : 40
       implicitWidth : 75
       property int rate : 1
-      text: "RateToggle"
       font.capitalization: Font.AllLowercase
       display: AbstractButton.IconOnly
-      icon.source: "icons/clock-realtime.png"
-      icon.name: "rate-toggle"
-      icon.color: "transparent"
-      //Layout.preferredWidth: pause_play.width
-      Layout.preferredHeight: pause_play.height
+      padding : 5
+      contentItem : Image {
+        id : forwardImage
+        fillMode : Image.PreserveAspectFit
+        source: "icons/clock-realtime.png"
+        height : 30
+      }
       state : "realtime"
       onClicked: {
         if(rate == 2) {
@@ -124,13 +130,13 @@ ColumnLayout {
       states: [
         State {
           name: "realtime"
-          PropertyChanges { target: foward; icon.source: "icons/clock-realtime.png" }
-          PropertyChanges { target: foward; rate: 1 }
+          PropertyChanges { target: forwardImage; source: "icons/clock-realtime.png" }
+          PropertyChanges { target: forward; rate: 1 }
         }
         ,State {
           name: "max"
-          PropertyChanges { target: foward; icon.source: "icons/clock-max.png" }
-          PropertyChanges { target: foward; rate: 2 }
+          PropertyChanges { target: forwardImage; source: "icons/clock-max.png" }
+          PropertyChanges { target: forward; rate: 2 }
         }
       ]
     }

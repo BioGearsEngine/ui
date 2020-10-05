@@ -8,11 +8,27 @@ Brief:  A standard button for BioGears interface
 */
 Button {
   id : root
+  property string primary : "#4CAF50"
+  property string secondary : "#339933"
   padding : 0
   background : Rectangle {
+    id : background
     anchors.fill : parent
     radius : 5
-    color : "#27ae60"
+    color : primary
+  }
+  contentItem : Text {
+    text : root.text
+    color : "white"
+    font : root.font
+    horizontalAlignment : Text.AlignHCenter
+    verticalAlignment: Text.AlignVCenter
+  }
+  onPressed : {
+    background.color = secondary
+  }
+  onReleased : {
+    background.color = primary
   }
 }
 

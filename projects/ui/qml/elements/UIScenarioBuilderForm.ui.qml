@@ -36,425 +36,397 @@ Window {
   property alias requestView : requestListView
   property alias warningMessage : warningMessage
 
-  TabBar {
-    id : tabBar
-    width : parent.width
-    TabButton {
-      text : "Set Actions"
-      font.pointSize : 16
-    }
-    TabButton {
-      text : "Set Data Requests"
-      font.pointSize : 16
-    }
-  }
-  StackLayout {
-    id: builderStack
-    width : parent.width
-    height : parent.height - tabBar.height - optionArea.height
-    anchors.top : tabBar.bottom
-    anchors.bottom : optionArea.top
-    currentIndex : tabBar.currentIndex
-    //-----First Tab--------------------
-    GridLayout {
-      id : actionLayout
-      Layout.preferredWidth : parent.width
-      Layout.preferredHeight : parent.height
-      rows : 3
-      columns : 2
-      rowSpacing : 0
-      Rectangle {
-        id : actionLabel
-        color : "transparent"
-        Layout.row : 0
-        Layout.column : 0
-        Layout.preferredHeight : parent.height * 0.05
-        Layout.preferredWidth : parent.width * 0.2
-        Layout.alignment : Qt.AlignBottom
-        Label {
-          id : actionLabelText
-          anchors.bottom : parent.bottom
-          anchors.horizontalCenter : parent.horizontalCenter
-          text : "Actions"
-          verticalAlignment : Text.AlignBottom
-          horizontalAlignment : Text.AlignHCenter
-          font.pointSize : 14
-        }  
-      }
-      Rectangle {
-        id : scenarioLabel
-        color : "transparent"
-        Layout.row : 0
-        Layout.column : 1
-        Layout.preferredHeight : parent.height * 0.05
-        Layout.preferredWidth : parent.width * 0.8
-        Layout.alignment : Qt.AlignBottom
-        Label {
-          id : scenarioLabelText
-          anchors.bottom : parent.bottom
-          anchors.horizontalCenter : parent.horizontalCenter
-          text : "Timeline"
-          verticalAlignment : Text.AlignBottom
-          horizontalAlignment : Text.AlignHCenter
-          font.pointSize : 14
-        }  
-      }
-      Rectangle {
-        Layout.row : 1
-        Layout.column : 0
-        Layout.preferredHeight : parent.height * 0.875
-        Layout.preferredWidth : parent.width * 0.2
-        color : "transparent"
-        border.color : "grey"
-        border.width : 2
-        ListView {
-          id : actionListView
-          property double scrollWidth : actionScroll.width
-          anchors.fill : parent
-          model : actionModel
-          delegate : actionDelegate
-          currentIndex : -1
-          clip : true
-          ScrollBar.vertical : ScrollBar {
-            id : actionScroll
-            policy : ScrollBar.AlwaysOn
-          }
-          section {
-            property : "section"
-            delegate : Rectangle {
-              color : "navy"
-              width : parent.width - actionListView.scrollWidth
-              height : childrenRect.height
-              Text {
-                anchors.horizontalCenter : parent.horizontalCenter
-                text : section
-                font.pixelSize : 20
-                color : "white"
-              }
-            }
-          }
-        }
-      }
-      Rectangle {
-        id : scenario
-        color : 'transparent'
-        Layout.preferredHeight : parent.height * 0.875
-        Layout.preferredWidth : parent.width * 0.8
-        border.width : 1
-        Layout.row : 1
-        Layout.column : 1
-        ListView {
-          id : scenarioListView
-          property double scrollWidth : scenarioScroll.width
-          anchors.top : parent.top
-          anchors.topMargin : 15
-          anchors.bottom : parent.bottom
-          anchors.left : parent.left
-          anchors.right : parent.right
-          clip : true
-          currentIndex : -1
-          spacing : 5
-          model : builderModel
-          header : timeEndComponent
-          footer : timeStartComponent
-          ScrollBar.vertical : ScrollBar {
-            id : scenarioScroll
-            policy : ScrollBar.AlwaysOn
-          }
-          move : Transition {
-            NumberAnimation {properties: "x,y"; duration : 500; easing.type: Easing.Linear}
-          }
-          moveDisplaced : Transition {
-            NumberAnimation {properties : "y"; duration : 500; easing.type : Easing.Linear}
-          }
-          addDisplaced : Transition {
-            NumberAnimation {properties : "y"; duration : 500; easing.type : Easing.Linear}
-          }
-        }
-      }
-      Item {
-      //Grouped separately from other controls defined below because it is in the first column (other are in second)
-        id : addButtonArea
-        Layout.preferredWidth : parent.width * 0.2
-        Layout.preferredHeight : parent.height * 0.075
-        Layout.row : 2
-        Layout.column : 0
-        Button {
-          id : addButton
-          width : parent.width / 2
-          height : parent.height
-          anchors.centerIn : parent
-          text : "Add"
-          onClicked : {
-            if (actionView.currentIndex!==-1){
-              builderModel.createAction(actionModel.get(actionView.currentIndex))
-            }
-            actionView.currentIndex = -1
-          }
-        }
-      }
-      Item {
-        //Item container breaks binding loop that can occur by putting RowLayout inside of GridLayou
-        id : controlsWrapper
-        Layout.maximumWidth : parent.width * 0.8
+  Page {
+    id : windowPage
+    anchors.fill : parent
+    header : GridLayout {
+      id : headerLayout
+      rowSpacing : 10
+      columnSpacing : 10
+      rows : 2
+      columns : 3
+      TabBar {
+        id : tabBar
         Layout.fillWidth : true
-        Layout.preferredHeight : parent.height * 0.075
-        Layout.row : 2
-        Layout.column : 1
-        RowLayout {
-          id : scenarioButtonArea
-          width : parent.width
-          height : parent.height
-          Button {
-            id : removeButton
-            Layout.alignment : Qt.AlignHCenter
-            Layout.preferredHeight : parent.height
-            Layout.preferredWidth : parent.width / 6
-            text : "Remove Action"
-            onClicked : {
-              builderModel.removeAction()
-            }
+        implicitHeight : 40
+        Layout.row : 0
+        Layout.column : 0
+        Layout.columnSpan : 3
+        TabButton {
+          text : "Set Actions"
+          font.pixelSize : 18
+          background : Rectangle {
+            color: tabBar.currentIndex == 0 ? "#2980b9" : "lightgray"
           }
-          Label {
-            id : nameLabel
-            text : "Scenario Name:  "
-            font.pixelSize : 18
-            bottomPadding : 8
-            Layout.fillHeight : true
-            Layout.preferredWidth : parent.width / 6
-            Layout.alignment : Qt.AlignRight
+          contentItem : Text {
+            text : parent.text
+            font : parent.font
+            color : tabBar.currentIndex == 0 ? "white" : "darkgray"
             verticalAlignment : Text.AlignVCenter
-            horizontalAlignment : Text.AlignRight
-          }
-          TextField {
-            id : nameInput
-            placeholderText: "Name"
-            text : root.scenarioName
-            font.pixelSize : 18
-            wrapMode : TextInput.WordWrap
-            Layout.fillHeight : true
-            Layout.preferredWidth : parent.width / 5
             horizontalAlignment : Text.AlignHCenter
-            Layout.alignment : Qt.AlignLeft
-            onEditingFinished : {
-              root.scenarioName = text
-            }
           }
-          Label {
-            id : samplingLabel
-            text : "Sampling Frequency:  "
-            font.pixelSize : 18
-            bottomPadding : 8
-            Layout.fillHeight : true
-            Layout.preferredWidth : parent.width / 6
-            Layout.alignment : Qt.AlignRight
+        }
+        TabButton {
+          text : "Set Data Requests"
+          font.pixelSize : 18
+          background : Rectangle {
+            color: tabBar.currentIndex == 1 ? "#2980b9" : "lightgray"
+          }
+          contentItem : Text {
+            text : parent.text
+            font : parent.font
+            color : tabBar.currentIndex == 1 ? "white" : "gray"
             verticalAlignment : Text.AlignVCenter
-            horizontalAlignment : Text.AlignRight
-          }
-          ComboBox {
-            id : samplingCombo
-            currentIndex : setCurrentIndex() == -1 ? 4 : setCurrentIndex()    //Default to 1 Hz (index 4)
-            Layout.alignment : Qt.AlignLeft | Qt.AlignVCenter
-            Layout.preferredHeight : parent.height * 0.65
-            Layout.preferredWidth : parent.width / 8
-            bottomInset : 0
-            topInset : 0
-            model : ["50;Hz", "25;Hz", "10;Hz", "5;Hz", "1;s", "10;s", "30;s", "60;s"]
-            flat : false
-            contentItem : Text {
-              width : samplingCombo.width
-              height : samplingCombo.height
-              text : samplingCombo.displayText.replace(";", " ")
-              font.pointSize : 12
-              verticalAlignment : Text.AlignVCenter
-              horizontalAlignment : Text.AlignHCenter
-            }
-            delegate : ItemDelegate {
-              width : samplingCombo.popup.width
-              contentItem : Text {
-                width : parent.width
-                text : modelData.replace(";", " ")
-                font.pointSize : 12
-                verticalAlignment : Text.AlignVCenter
-                horizontalAlignment : Text.AlignHCenter
-                }
-              background : Rectangle {
-                anchors.fill : parent
-                color : "transparent"
-                border.color : "green"
-                border.width : samplingCombo.highlightedIndex === index ? 2 : 0
-              }
-            }
-            popup : Popup {
-              y : samplingCombo.height
-              x : 0
-              padding : 0
-              width : samplingCombo.width - samplingCombo.indicator.width
-              implicitHeight : contentItem.implicitHeight
-              contentItem : ListView {
-                clip : true
-                implicitHeight : contentHeight
-                model : samplingCombo.popup.visible ? samplingCombo.delegateModel : null
-                currentIndex : samplingCombo.highlightedIndex
-              }
-            }
-            background : Rectangle {
-              id : samplingBackground
-              //Height and width of this rectangle established by Layout preferred dimensions assigned in Loader
-              border.color : "black"
-              border.width : 1
-            }
-            onActivated : {
-              root.samplingFrequency = currentText;
-            }
-            function setCurrentIndex(){
-              if (model){
-                for (let i = 0; i < model.length; ++i){
-                  if (model[i]===root.samplingFrequency){
-                    return i;
-                  }
-                }
-              }
-              return -1;
-            }
+            horizontalAlignment : Text.AlignHCenter
           }
         }
-      }//end button area
-    } //end first tab
-    //------Second Tab-----------
-    GridLayout {
-      id : dataRequestLayout
-      rows : 1
-      columns : 2
-      Layout.fillWidth : true
-      Layout.fillHeight : true
-      Layout.preferredHeight : parent.height
-      Layout.preferredWidth : parent.width
-      columnSpacing : 0
-      Rectangle {
-        id : requestMenu
-        Layout.preferredHeight : parent.height
-        Layout.preferredWidth : parent.width / 3
-        ListView {
-          id : requestListView
-          anchors.fill : parent
-          property double scrollWidth : requestScroll.width
-          model : DelegateModel {
-            id : requestModel
-            model : root.bgRequests
-            //rootIndex defaults to topmost node, which is what we want
-            delegate : Component {
-              Loader {
-                id : requestLoader
-                width : requestListView.width - requestListView.scrollWidth
-                sourceComponent : dataRequestNode
-                property var _model_data : root.bgRequests
-                property var _node_index : requestModel.modelIndex(index)
-                property int _indent_level : 0
-                onLoaded : {
-                  if (!_model_data.data(_node_index, DataRequestModel.CollapsedRole)){
-                    item.toggleCollapsedView(_model_data.data(_node_index, DataRequestModel.CollapsedRole))
-                  }
-                  item.width = requestListView.width
-                }
-                Connections {
-                  target : root
-                  //Only need to call clear/load at the top level because loaded components of top level nodes will get released and, the next
-                  //time they are set, will detect that the data model was changed.
-                  onClearScenario : {requestLoader.item.toggleCollapsedView(true)}
-                  onScenarioLoaded : {requestLoader.item.toggleCollapsedView(requestLoader._model_data.data(requestLoader._node_index, DataRequestModel.CollapsedRole))}
-                }
-              }
-            }
-          }
-          currentIndex : -1
-          clip : true
-          ScrollBar.vertical : ScrollBar {
-            id : requestScroll
-            policy : ScrollBar.AlwaysOn
-          }   
-        }// end list view
-      } // end list view container
-      Rectangle { 
-        id : requestPanel
-        Layout.fillHeight : true
+      }
+      RowLayout{
         Layout.fillWidth : true
-        Layout.maximumWidth : 2 * parent.width / 3
-        ListView {
-          id : activeRequestView
-          anchors.left : parent.left
-          anchors.right : parent.right
-          anchors.top : parent.top
-          anchors.topMargin : 5
-          anchors.bottom : parent.bottom
-          property double scrollWidth : activeRequestScroll.width
-          model : activeRequestsModel
-          currentIndex : -1
-          clip : true
-          ScrollBar.vertical : ScrollBar {
-            id : activeRequestScroll
-            policy : ScrollBar.AlwaysOn
+        Layout.maximumWidth : scenarioBuilder.width / 2
+        Layout.row : 1
+        Layout.column : 0
+        Label {
+          id : nameLabel
+          text : "Scenario Name:  "
+          font.pixelSize : 18
+          bottomPadding : 8
+          Layout.leftMargin : 20
+          Layout.alignment : Qt.AlignRight
+          verticalAlignment : Text.AlignVCenter
+          horizontalAlignment : Text.AlignRight
+        }
+        TextField {
+          id : nameInput
+          placeholderText: "Name"
+          text : root.scenarioName
+          font.pixelSize : 18
+          wrapMode : TextInput.WordWrap
+          Layout.fillWidth : true
+          horizontalAlignment : Text.AlignHCenter
+          Layout.alignment : Qt.AlignLeft
+          onEditingFinished : {
+            root.scenarioName = text
           }
         }
-      }//end list view container
-    }//end second tab
-  } //end stack layout
-  RowLayout {
-    id : optionArea
-    height : parent.height * 0.075
-    width : parent.width
-    anchors.bottom : parent.bottom
-    spacing : 50
-    Button {
-      id : saveScenario
-      text : "Save Scenario"
-      Layout.fillHeight : true
-      Layout.preferredWidth : parent.width / 4 - 2 * spacing
-      Layout.alignment : Qt.AlignHCenter
-      onClicked : {
-        root.saveScenario()
       }
-    }
-    Button {
-      id : loadScenario
-      text : "Load Scenario"
-      Layout.fillHeight : true
-      Layout.preferredWidth : parent.width / 4 - 2 * spacing
-      Layout.alignment : Qt.AlignHCenter
-      onClicked : {
-        if (builderModel.count > 0 || activeRequestsModel.count > 0){
-          let warningDefinition = 'import QtQuick.Dialogs 1.3; MessageDialog {width : 800; title : "Overwrite?"; text : "Loading a scenario will overwrite current scenario definition.";
-              informativeText : "Do you wish to continue?"; icon : StandardIcon.Warning; standardButtons : StandardButton.Yes | StandardButton.No}'
-          let overwriteMsg = Qt.createQmlObject(warningDefinition, scenarioBuilder, 'OverwriteMessage');
-          overwriteMsg.onYes.connect(function() {root.clearScenario(); bg_scenario.edit_scenario()})
-          overwriteMsg.onNo.connect(function() {overWriteMsg.close(); return})
-          overwriteMsg.open()
-        } else {
-          root.clearScenario()
-          bg_scenario.edit_scenario()
+      Label {
+        id :samplingLabel
+        Layout.row : 1
+        Layout.column : 1
+        text : "Sampling Frequency:  "
+        font.pixelSize : 18
+        bottomPadding : 6
+        Layout.alignment : Qt.AlignRight
+        verticalAlignment : Text.AlignVCenter
+        horizontalAlignment : Text.AlignRight
+      }
+      ComboBox {
+        id : samplingCombo
+        Layout.row : 1
+        Layout.column : 2
+        currentIndex : setCurrentIndex() == -1 ? 4 : setCurrentIndex()    //Default to 1 Hz (index 4)
+        Layout.alignment : Qt.AlignLeft | Qt.AlignVCenter
+        implicitWidth : 150
+        Layout.rightMargin : implicitWidth
+        Layout.preferredHeight : samplingLabel.height * 1.2
+        bottomInset : 0
+        topInset : 0
+        model : ["50;Hz", "25;Hz", "10;Hz", "5;Hz", "1;s", "10;s", "30;s", "60;s"]
+        flat : false
+        contentItem : Text {
+          width : samplingCombo.width
+          height : samplingCombo.height
+          text : samplingCombo.displayText.replace(";", " ")
+          font.pointSize : 12
+          verticalAlignment : Text.AlignVCenter
+          horizontalAlignment : Text.AlignHCenter
+        }
+        delegate : ItemDelegate {
+          width : samplingCombo.popup.width
+          contentItem : Text {
+            width : parent.width
+            text : modelData.replace(";", " ")
+            font.pointSize : 12
+            verticalAlignment : Text.AlignVCenter
+            horizontalAlignment : Text.AlignHCenter
+            }
+          background : Rectangle {
+            anchors.fill : parent
+            color : "transparent"
+            border.color : "green"
+            border.width : samplingCombo.highlightedIndex === index ? 2 : 0
+          }
+        }
+        popup : Popup {
+          y : samplingCombo.height
+          x : 0
+          padding : 0
+          width : samplingCombo.width - samplingCombo.indicator.width
+          implicitHeight : contentItem.implicitHeight
+          contentItem : ListView {
+            clip : true
+            implicitHeight : contentHeight
+            model : samplingCombo.popup.visible ? samplingCombo.delegateModel : null
+            currentIndex : samplingCombo.highlightedIndex
+          }
+        }
+        background : Rectangle {
+          id : samplingBackground
+          //Height and width of this rectangle established by Layout preferred dimensions assigned in Loader
+          border.color : "black"
+          border.width : 1
+        }
+        onActivated : {
+          root.samplingFrequency = currentText;
+        }
+        function setCurrentIndex(){
+          if (model){
+            for (let i = 0; i < model.length; ++i){
+              if (model[i]===root.samplingFrequency){
+                return i;
+              }
+            }
+          }
+          return -1;
         }
       }
     }
-    Button {
-      id : resetScenario
-      text : "Reset Scenario"
-      Layout.fillHeight : true
-      Layout.preferredWidth : parent.width / 4 - 2 * spacing
-      Layout.alignment : Qt.AlignHCenter
-      onClicked : {
-        root.clearScenario()
+    StackLayout {
+      id: builderStack
+      width : scenarioBuilder.width
+      height : windowPage.height - windowPage.implicitHeaderHeight - windowPage.implicitFooterHeight
+      currentIndex : tabBar.currentIndex
+      //-----First Tab-------------------- 
+      Item {
+        //Wrapping grid layout in item helps break binding loops that can occur with nested layouts (RowLayout inside StackLayout)
+        id : firstTab
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        RowLayout {
+          id : actionLayout
+          anchors.fill : parent
+          Rectangle {
+            Layout.fillHeight : true
+            Layout.preferredWidth : actionLayout.width * 0.2 - actionLayout.spacing / 2
+            color : "transparent"
+            border.color : "grey"
+            border.width : 1
+            ListView {
+              id : actionListView
+              property double scrollWidth : actionScroll.width
+              anchors.fill : parent
+              model : actionModel
+              delegate : actionDelegate
+              currentIndex : -1
+              clip : true
+              ScrollBar.vertical : ScrollBar {
+                id : actionScroll
+                policy : ScrollBar.AlwaysOn
+              }
+              section {
+                property : "section"
+                delegate : Rectangle {
+                  color : "navy"
+                  width : parent.width - actionListView.scrollWidth
+                  height : childrenRect.height
+                  Text {
+                    anchors.horizontalCenter : parent.horizontalCenter
+                    text : section
+                    font.pixelSize : 20
+                    color : "white"
+                  }
+                }
+              }
+            }
+          }
+          Rectangle {
+            id : scenario
+            Layout.fillHeight : true
+            Layout.fillWidth : true
+            Layout.maximumWidth : actionLayout.width * 0.8 - actionLayout.spacing / 2
+            color : "transparent"
+            border.color : "grey"
+            border.width : 1
+            ListView {
+              id : scenarioListView
+              property double scrollWidth : scenarioScroll.width
+              anchors.top : parent.top
+              anchors.topMargin : 15
+              anchors.bottom : parent.bottom
+              anchors.left : parent.left
+              anchors.right : parent.right
+              clip : true
+              currentIndex : -1
+              spacing : 5
+              model : builderModel
+              header : timeEndComponent
+              footer : timeStartComponent
+              ScrollBar.vertical : ScrollBar {
+                id : scenarioScroll
+                policy : ScrollBar.AlwaysOn
+              }
+              move : Transition {
+                NumberAnimation {properties: "x,y"; duration : 500; easing.type: Easing.Linear}
+              }
+              moveDisplaced : Transition {
+                NumberAnimation {properties : "y"; duration : 500; easing.type : Easing.Linear}
+              }
+              addDisplaced : Transition {
+                NumberAnimation {properties : "y"; duration : 500; easing.type : Easing.Linear}
+              }
+            }
+          }
+
+        } //end first tab content
+      } //end first tab wrapper
+      //------Second Tab-----------
+      Item {
+        //Wrapping grid layout in item helps break binding loops that can occur with nested layouts (Row inside Grid inside Stack)
+        id : secondTab
+        Layout.fillWidth : true
+        Layout.fillHeight : true
+        RowLayout {
+          id : dataRequestLayout
+          anchors.fill : parent
+          spacing : 5
+          Rectangle {
+            id : requestMenu
+            Layout.fillHeight : true
+            Layout.preferredWidth : parent.width / 3
+            border.color : "grey"
+            border.width : 1
+            ListView {
+              id : requestListView
+              anchors.topMargin : 2
+              anchors.leftMargin : 2
+              anchors.fill : parent
+              property double scrollWidth : requestScroll.width
+              model : DelegateModel {
+                id : requestModel
+                model : root.bgRequests
+                //rootIndex defaults to topmost node, which is what we want
+                delegate : Component {
+                  Loader {
+                    id : requestLoader
+                    width : requestListView.width - requestListView.scrollWidth
+                    sourceComponent : dataRequestNode
+                    property var _model_data : root.bgRequests
+                    property var _node_index : requestModel.modelIndex(index)
+                    property int _indent_level : 0
+                    onLoaded : {
+                      if (!_model_data.data(_node_index, DataRequestModel.CollapsedRole)){
+                        item.toggleCollapsedView(_model_data.data(_node_index, DataRequestModel.CollapsedRole))
+                      }
+                      item.width = requestListView.width
+                    }
+                    Connections {
+                      target : root
+                      //Only need to call clear/load at the top level because loaded components of top level nodes will get released and, the next
+                      //time they are set, will detect that the data model was changed.
+                      onClearScenario : {requestLoader.item.toggleCollapsedView(true)}
+                      onScenarioLoaded : {requestLoader.item.toggleCollapsedView(requestLoader._model_data.data(requestLoader._node_index, DataRequestModel.CollapsedRole))}
+                    }
+                  }
+                }
+              }
+              currentIndex : -1
+              clip : true
+              ScrollBar.vertical : ScrollBar {
+                id : requestScroll
+                policy : ScrollBar.AlwaysOn
+              }   
+            }// end list view
+          } // end list view container
+          Rectangle { 
+            id : requestPanel
+            Layout.fillHeight : true
+            Layout.fillWidth : true
+            Layout.maximumWidth : 2 * windowPage.width / 3
+            border.color : "grey"
+            border.width : 1
+            ListView {
+              id : activeRequestView
+              anchors.left : parent.left
+              anchors.right : parent.right
+              anchors.top : parent.top
+              anchors.topMargin : 5
+              anchors.bottom : parent.bottom
+              property double scrollWidth : activeRequestScroll.width
+              model : activeRequestsModel
+              currentIndex : -1
+              clip : true
+              ScrollBar.vertical : ScrollBar {
+                id : activeRequestScroll
+                policy : ScrollBar.AlwaysOn
+              }
+            }
+          }//end list view container
+        }//end second tab content
+      } //end second tab wrapper
+    } //end stack layout
+    footer : RowLayout {
+      id : optionArea
+      spacing : 50
+      UIBioGearsButtonForm {
+        id : saveScenario
+        text : "Save Scenario"
+        font.pixelSize : 16
+        implicitHeight : 40
+        Layout.preferredWidth : parent.width / 4 - 2 * spacing
+        Layout.alignment : Qt.AlignHCenter
+        Layout.topMargin : 5
+        Layout.bottomMargin : 5
+        onClicked : {
+          root.saveScenario()
+        }
+      }
+      UIBioGearsButtonForm {
+        id : loadScenario
+        text : "Load Scenario"
+        font.pixelSize : 16
+        implicitHeight : 40
+        Layout.preferredWidth : parent.width / 4 - 2 * spacing
+        Layout.alignment : Qt.AlignHCenter
+        Layout.topMargin : 5
+        Layout.bottomMargin : 5
+        onClicked : {
+          if (builderModel.count > 0 || activeRequestsModel.count > 0){
+            let warningDefinition = 'import QtQuick.Dialogs 1.3; MessageDialog {width : 800; title : "Overwrite?"; text : "Loading a scenario will overwrite current scenario definition.";
+                informativeText : "Do you wish to continue?"; icon : StandardIcon.Warning; standardButtons : StandardButton.Yes | StandardButton.No}'
+            let overwriteMsg = Qt.createQmlObject(warningDefinition, scenarioBuilder, 'OverwriteMessage');
+            overwriteMsg.onYes.connect(function() {root.clearScenario(); bg_scenario.edit_scenario()})
+            overwriteMsg.onNo.connect(function() {overWriteMsg.close(); return})
+            overwriteMsg.open()
+          } else {
+            root.clearScenario()
+            bg_scenario.edit_scenario()
+          }
+        }
+      }
+      UIBioGearsButtonForm {
+        id : resetScenario
+        text : "Reset Scenario"
+        font.pixelSize : 16
+        implicitHeight : 40
+        Layout.preferredWidth : parent.width / 4 - 2 * spacing
+        Layout.alignment : Qt.AlignHCenter
+        Layout.topMargin : 5
+        Layout.bottomMargin : 5
+        onClicked : {
+          root.clearScenario()
+        }
       }
     }
+    MessageDialog {
+      id : warningMessage
+      icon : StandardIcon.Critical
+      standardButtons : StandardButton.Ok
+      width : parent.width / 3
+      text : ""
+      visible : false
+    }
   }
-  MessageDialog {
-    id : warningMessage
-    icon : StandardIcon.Critical
-    standardButtons : StandardButton.Ok
-    width : parent.width / 3
-    text : ""
-    visible : false
-  }
-
  //---Components loaded during runtime----------------
  //View delegate for list of actions
   Component {
@@ -1081,11 +1053,6 @@ Window {
       }
     }
   }
-
-
-
-
-
 }
 
 /*##^## Designer {
