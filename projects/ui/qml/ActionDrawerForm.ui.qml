@@ -7,9 +7,10 @@ import com.biogearsengine.ui.scenario 1.0
 
 Drawer {
   id : actionDrawer
-  signal actionSelected (real loc)
+  signal actionSelected (int index, real loc, string name)
   property alias applyButton : applyButton
   property alias actionMenuModel : actionMenuModel
+  property alias actionDialog : actionDialog
   height : parent.height
   edge : Qt.LeftEdge
   interactive : true
@@ -57,7 +58,7 @@ Drawer {
           Layout.alignment : Qt.AlignVCenter
           color : ListView.isCurrentItem ? "#4CAF50" : "white"
           border.color: "#4CAF50"
-          border.width : 0
+          border.width : index == actionDialog.boundIndex ? 2 : 0
           Text {
             id: delegateText
             anchors.verticalCenter : parent.verticalCenter
@@ -79,8 +80,8 @@ Drawer {
             anchors.fill : parent
             onClicked : {
               actionListView.currentIndex = index;
-              root.actionSelected(actionListView.currentItem.y)
-              //func(actionMenuModel.get(index))
+              let relativeY = actionListView.currentItem.y - actionListView.contentY
+              root.actionSelected(index, relativeY, actionMenuModel.get(index).name)
             }
             onEntered : {
               actionListView.currentIndex = index;
@@ -93,38 +94,40 @@ Drawer {
           Keys.onReturnPressed : {
             if (root.opened ){
               actionListView.currentIndex = index;
-              root.addButton(actionMenuModel.get(index))      
+              //root.addButton(actionMenuModel.get(index))      
             }
           }
         }
       }
       ListModel {
         id : actionMenuModel
-        ListElement { name : "Exercise"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_exercise(actionItem)}}
-        ListElement { name : "Consume Meal"; section : "Patient Actions"; property var func : function(actionItem) {root.setup_consumeMeal(actionItem)}}
-        ListElement { name : "Acute Respiratory Distress"; section : "Insults"; property var func : function(actionItem) { root.setup_ards(actionItem)}}
-        ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(actionItem) {root.setup_acuteStress(actionItem)}}
-        ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(actionItem) {root.setup_airwayObstruction(actionItem)}}
-        ListElement { name : "Apnea"; section : "Insults"; property var func : function(actionItem) {root.setup_apnea(actionItem)}}
-        ListElement { name : "Asthma Attack"; section : "Insults"; property var func : function(actionItem) {root.setup_asthma(actionItem)}}
-        ListElement { name : "Bronchoconstriction"; section : "Insults" ; property var func : function(actionItem) {root.setup_bronchoconstriction(actionItem)}}
-        ListElement { name : "Burn"; section : "Insults"; property var func : function(actionItem) {root.setup_burn(actionItem)}}
-        ListElement { name : "Cardiac Arrest"; section : "Insults"; property var func : function(actionItem) {root.setup_cardiacArrest(actionItem)}}
-        ListElement { name : "Hemorrhage"; section : "Insults";  func : function(actionItem) {root.setup_hemorrhage(actionItem)}}
-        ListElement { name : "Infection";  section : "Insults"; property var func : function(actionItem) {root.setup_infection(actionItem)}}
-        ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(actionItem) {root.setup_painStimulus(actionItem)}}
-        ListElement { name : "Tension Pneumothorax"; section : "Insults"; property var func : function(actionItem) {root.setup_tensionPneumothorax(actionItem)}}
-        ListElement { name : "Traumatic Brain Injury"; section : "Insults"; property var func : function(actionItem) {root.setup_traumaticBrainInjury(actionItem)}}
-        ListElement { name : "Administer Drugs"; section : "Interventions"; property var func : function(actionItem) {root.setup_drugActions(actionItem)}}
-        ListElement { name : "Administer Fluids"; section : "Interventions"; property var func : function(actionItem) { root.setup_fluidInfusion(actionItem)}}
-        ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(actionItem) {root.setup_needleDecompression(actionItem)}}
-        ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(actionItem) { root.setup_tourniquet(actionItem)}}
-        ListElement { name : "Transfusion"; section : "Interventions"; property var func : function(actionItem) {root.setup_transfusion(actionItem)}}
+        ListElement { name : "Consume Meal"; section : "Nutrition"; property var func : function(props) { actionModel.add_consume_meal_action(props) }}
+        ListElement { name : "Cycling"; section : "Exercise"; property var func : function (props) {actionModel.add_exercise_action(props)}}
+        ListElement { name : "Running"; section : "Exercise"; property var func : function (props) {actionModel.add_exercise_action(props)}}
+        ListElement { name : "Strength Training"; section : "Exercise"; property var func : function (props) {actionModel.add_exercise_action(props)}}
+        ListElement { name : "Other Exercise"; section : "Exercise"; property var func : function (props) {actionModel.add_exercise_action(props)}}
+        ListElement { name : "Acute Respiratory Distress"; section : "Insults"; property var func : function(props) {actionModel.add_single_range_action("UIAcuteRespiratoryDistress.qml" ,props)}}
+        ListElement { name : "Acute Stress"; section : "Insults"; property var func : function(props) {actionModel.add_single_range_action("UIAcuteStress.qml" ,props)}}
+        ListElement { name : "Airway Obstruction"; section : "Insults"; property var func : function(props) {actionModel.add_single_range_action("UIAirwayObstruction.qml" ,props)}}
+        ListElement { name : "Apnea"; section : "Insults"; property var func : function(props) {actionModel.add_single_range_action("UIApnea.qml" ,props)}}
+        ListElement { name : "Asthma Attack"; section : "Insults"; property var func : function(props) {actionModel.add_single_range_action("UIAsthmaAttack.qml" , props)}}
+        ListElement { name : "Bronchoconstriction"; section : "Insults" ; property var func : function(props) {actionModel.add_single_range_action("UIBronchoconstriction.qml" ,props)}}
+        ListElement { name : "Burn"; section : "Insults"; property var func : function(props) {actionModel.add_single_range_action("UIBurnWound.qml" ,props)}}
+        ListElement { name : "Cardiac Arrest"; section : "Insults"; property var func : function() {actionModel.add_binary_action("UICardiacArrest.qml")}}
+        ListElement { name : "Hemorrhage"; section : "Insults";  property var func : function(props) {actionModel.add_hemorrhage_action(props)}}
+        ListElement { name : "Infection";  section : "Insults"; property var func : function(props) {actionModel.add_infection_action(props)}}
+        ListElement { name : "Pain Stimulus"; section : "Insults"; property var func : function(props) {actionModel.add_pain_stimulus_action(props)}}
+        ListElement { name : "Tension Pneumothorax"; section : "Insults"; property var func : function(props) {actionModel.add_tension_pneumothorax_action(props)}}
+        ListElement { name : "Traumatic Brain Injury"; section : "Insults"; property var func : function(props) {actionModel.add_tramatic_brain_injury_action(props)}}
+        ListElement { name : "Drug-Bolus"; section : "Administer Substances"; property var func : function(props) { actionModel.add_drug_administration_action(props) }}
+        ListElement { name : "Drug-Infusion"; section : "Administer Substances"; property var func : function(props) { actionModel.add_drug_administration_action(props) }}
+        ListElement { name : "Drug-Oral"; section : "Administer Substances"; property var func : function(props) { actionModel.add_drug_administration_action(props) }}
+        ListElement { name : "Fluids-Infusion"; section : "Administer Substances"; property var func : function(props) { actionModel.add_compound_infusion_action(props) }}
+        ListElement { name : "Transfusion"; section : "Administer Substances"; property var func : function(props){ actionModel.add_transfusion_action(props)}}
+        ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(props) {actionModel.add_needle_decompression_action(props)}}
+        ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(props) {actionModel.add_tourniquet_action(props)}}
         ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_inhaler(actionItem)}}
-        ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function(actionItem) {root.setup_anesthesia_machine(actionItem)}}
-        ListElement { name : "Diabetes (Type 1)"; section : "Conditions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
-        ListElement { name : "Diabetes (Type 2)"; section : "Conditions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
-        ListElement { name : "Bronchitis"; section : "Conditions"; property var func : function(actionItem) {root.unsupported_action(actionItem)}}
+        ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function (props) { actionModel.add_anesthesia_machine_action(props)}}
       }
     }
     UIBioGearsButtonForm {
@@ -135,15 +138,47 @@ Drawer {
         text : "Close"
     }
     UIActionDialog {
-      id : test
-      height : 250
-      width : 500
+      id : actionDialog
       x : actionDrawer.width
       visible : false
-      modal : false
+      property int boundIndex : -1
+      onApplied : {
+        if (validProps()) {
+          actionMenuModel.get(boundIndex).func(dialogItem.props)
+          boundIndex = -1
+          close();
+        } else {
+          console.log(errorString)
+        }
+      }
+      onRejected : {
+        dialogLoader.sourceComponent = undefined;
+        boundIndex = -1;
+        close();
+      }
       Connections {
         target : root
-        onActionSelected : { console.log(loc); test.y = loc; visible = true}
+        onActionSelected : {
+          if (index != actionDialog.boundIndex){
+            actionDialog.dialogLoader.sourceComponent = undefined
+            actionDialog.setContent(name) //Do this first to make sure height is updated before checking position
+            if (loc + actionDialog.height > actionDrawer.height){
+              actionDialog.y = actionDrawer.height - actionDialog.height
+            } else {
+              actionDialog.y = loc;
+            }
+            actionDialog.boundIndex = index;
+            if (actionMenuModel.get(index).name === "Cardiac Arrest"){
+              //No dialog opened for cardiac arrest, just apply action     
+              actionMenuModel.get(index).func();
+            } else {
+              actionDialog.open();
+            }
+          } else {
+            actionDialog.boundIndex = -1;
+            actionDialog.close();
+          }
+        }
       }
     }
   }

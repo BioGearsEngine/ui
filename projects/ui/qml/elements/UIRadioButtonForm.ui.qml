@@ -11,33 +11,19 @@ RowLayout {
   id: root
   //Properties -- used to customize look / functionality of component
   property real elementRatio : 0.5                //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
-  property real prefWidth : parent.width
-  property real prefHeight : root.implicitHeight
   property var buttonModel : []
-  property int colSpan : 1
-  property int rowSpan : 1
   //Property aliases -- used to access sub-components outside of form file
   property alias label: name
   property alias buttonView : buttonView
   property alias radioGroup : radioGroup
-  //Layout options
-  Layout.preferredWidth : prefWidth
-  Layout.preferredHeight : prefHeight
-  Layout.columnSpan : colSpan
-  Layout.rowSpan : rowSpan
-  Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-  spacing : 0
+  spacing : 10
 
   Label {
     id: name
-    Layout.maximumWidth : root.prefWidth * elementRatio
-    Layout.fillWidth : true
-    Layout.fillHeight : true
-    Layout.maximumHeight : root.prefHeight
     text: "Unset"
     horizontalAlignment : Text.AlignHCenter
     verticalAlignment : Text.AlignVCenter
-    font.pointSize: 12
+    font.pixelSize : 18
     font.bold: false
   }
 
@@ -48,23 +34,23 @@ RowLayout {
 
   ListView {
     id : buttonView
+    implicitHeight : contentHeight
     Layout.maximumWidth : root.prefWidth * (1.0 - elementRatio)
     Layout.fillWidth : true
-    Layout.fillHeight : true
-    Layout.maximumHeight : root.prefHeight
+    Layout.alignment : Qt.AlignVCenter | Qt.AlignRight
     orientation : ListView.Vertical
     model : buttonModel
     delegate : RadioDelegate {
       id : radioDelegate
       ButtonGroup.group : radioGroup
       text : modelData
-      height : buttonModel.length > 0 ? buttonView.height / buttonModel.length : buttonView.height
-      width : buttonView.width // buttonModel.length > 0 ? buttonView.width / buttonModel.length : buttonView.width
+      height : 1.1 * buttonText.implicitHeight
+      width : buttonView.width
       property int buttonIndex : index
       contentItem : Text {
         id : buttonText
         text : radioDelegate.text
-        font.pointSize : label.font.pointSize
+        font.pixelSize : label.font.pixelSize
         x : delegateIndicator.width
         leftPadding : 10
         horizontalAlignment : Text.AlignLeft
@@ -78,14 +64,14 @@ RowLayout {
         x : 0
         y : radioDelegate.height / 2 - height / 2
         color : "transparent"
-        border.color : "#7CB342"
+        border.color : "#2980b9"
         border.width : 2
         Rectangle {
           id : checkedDisplay
           width : 0.5 * parent.width
           height : 0.5 * parent.height
           radius : 25
-          color : "#7CB342"
+          color : "#2980b9"
           anchors.centerIn : parent
           visible : radioDelegate.checked
         }

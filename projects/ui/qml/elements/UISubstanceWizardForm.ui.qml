@@ -493,7 +493,6 @@ Page {
 		        }
           }
           function loadComponentData(){
-            console.log(parent.groupData[model.name], parent.groupData[model.name][0])
             setEntry(parent.groupData[model.name])
           }
           Component.onCompleted : {

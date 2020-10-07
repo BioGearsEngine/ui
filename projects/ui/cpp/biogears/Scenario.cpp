@@ -2223,7 +2223,7 @@ QVariantMap Scenario::load_nutrition_for_meal(QString nutritionName)
         nutritionMap["Protein"] = nutrition->GetProtein().GetValue(biogears::MassUnit::g);
       }
       if (nutrition->HasCarbohydrate()) {
-        nutritionMap["Carbohydrate"] = nutrition->GetCarbohydrate().GetValue(biogears::MassUnit::g);
+        nutritionMap["Carbohydrates"] = nutrition->GetCarbohydrate().GetValue(biogears::MassUnit::g);
       }
       if (nutrition->HasSodium()) {
         nutritionMap["Sodium"] = nutrition->GetSodium().GetValue(biogears::MassUnit::mg);

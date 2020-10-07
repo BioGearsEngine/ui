@@ -116,5 +116,6 @@
         <file alias="menu_transparent.png">img/menu_transparent.png</file>
         <file alias="openIndicatorBlue.png">img/openIndicatorBlue.png</file>
         <file alias="openIndicatorWhite.png">img/openIndicatorWhite.png</file>
+        <file alias="comboIndicatorWhite.png">img/comboIndicatorWhite.png</file>
     </qresource>
 </RCC>

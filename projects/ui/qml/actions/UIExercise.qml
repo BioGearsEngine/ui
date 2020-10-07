@@ -76,9 +76,9 @@ UIActionForm {
     let tmp =  "<b>%1 %2</b><br>".arg(type).arg(actionType)
     if (root.type == 'Generic') {
       if (root.property_1 > 0) {
-		tmp += "<br> Desired Work Rate  %1 W".arg(root.property_1)
+		  tmp += "<br> Desired Work Rate  %1 W".arg(root.property_1)
 	  } else {
-		tmp += "<br> Intensity  %1".arg(root.property_2)
+		  tmp += "<br> Intensity  %1".arg(root.property_2)
 	  }
     } else if ( root.type == 'Cycling') {
       tmp += "<br> Cadence %1 Hz<br> Power %2 W<br> WeightPack %3 kg".arg(root.property_1).arg(root.property_2).arg(root.weight)
@@ -115,9 +115,16 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 0
+        visible : {
+          if (root.type === "Generic"){
+            return root.property_1 > 0.0
+          } else {
+            return true;
+          }
+        }
         text : {
           if ( root.type == "Generic") {
-			return "Work Rate"
+			      return "Intensity"
           } else if ( root.type == "Cycling") {
             return "Cadence"
           } else if ( root.type == "Running" ) {
@@ -129,8 +136,17 @@ UIActionForm {
       }      
       Slider {
         id: property_1
+        Layout.row : 1
+        Layout.column : 1
         Layout.fillWidth : true
         Layout.columnSpan : 2
+        visible : {
+          if (root.type === "Generic"){
+            return root.property_1 > 0.0
+          } else {
+            return true;
+          }
+        }
         from : 0
         to : 100
         stepSize : 1
@@ -142,9 +158,18 @@ UIActionForm {
         }
       }
       Label {
+        Layout.row : 1
+        Layout.column : 3
+        visible : {
+          if (root.type === "Generic"){
+            return root.property_1 > 0.0
+          } else {
+            return true;
+          }
+        }
         text : {
           if ( root.type == "Generic") {
-            return "%1 W".arg(root.property_1)
+            return "%1".arg(root.property_1)
           } else if ( root.type == "Cycling") {
             return "%1 Hz".arg(root.property_1)
           } else if ( root.type == "Running" ) {
@@ -158,9 +183,16 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 0
+        visible : {
+          if (root.type === "Generic"){
+            return root.property_2 > 0.0
+          } else {
+            return true;
+          }
+        }
         text : {
           if ( root.type == "Generic") {
-            return "Intensity"
+            return "Work"
           } else if ( root.type == "Cycling") {
             return "Power Cycle"
           } else if ( root.type == "Running" ) {
@@ -173,7 +205,16 @@ UIActionForm {
       Slider {
         id: property_2
         Layout.fillWidth : true
+        Layout.row : 2
+        Layout.column : 1
         Layout.columnSpan : 2
+        visible : {
+          if (root.type === "Generic"){
+            return root.property_2 > 0.0
+          } else {
+            return true;
+          }
+        }
         from : 0
         to : 100
         stepSize : 1
@@ -185,9 +226,18 @@ UIActionForm {
         }
       }
       Label {
+        Layout.row : 2
+        Layout.column : 3
+        visible : {
+          if (root.type === "Generic"){
+            return root.property_2 > 0.0
+          } else {
+            return true;
+          }
+        }
         text : {
            if ( root.type == "Generic") {
-            return "%1".arg(property_2)
+            return "%1 W".arg(root.property_2)
           } else if ( root.type == "Cycling") {
             return "%1 W".arg(root.property_2)
           } else if ( root.type == "Running" ) {
@@ -285,20 +335,30 @@ UIActionForm {
  
   Loader {
     id : exerciseLoader
-    sourceComponent : root.builderSummary
-    state : "unset"
+    sourceComponent : root.controlsSummary
+    state : "collapsedControls"
     states : [
-       State {
-          name : "expandedBuilder"
-          PropertyChanges {target : exerciseLoader; sourceComponent : root.type==="Generic" ? genericBuilderDetails : (root.type==="Running" || root.type==="Cycling") ? cycleRunBuilderDetails : strengthBuilderDetails}
-          PropertyChanges { target : root; collapsed : false}
-        }
-        ,State {
-          name: "collapsedBuilder"
-          PropertyChanges { target : exerciseLoader; sourceComponent: root.builderSummary}
-          PropertyChanges { target : root; collapsed : true}
-          AnchorChanges { target : exerciseLoader; anchors.horizontalCenter : root.horizontalCenter}
-        }
+      State {
+        name: "expandedControls"
+        PropertyChanges { target : exerciseLoader; sourceComponent: root.controlsDetails}
+        PropertyChanges { target : root; collapsed : false}
+      }
+      ,State {
+        name: "collapsedControls"
+        PropertyChanges { target : exerciseLoader; sourceComponent: root.controlsSummary}
+        PropertyChanges { target : root; collapsed : true}
+      }
+      ,State {
+        name : "expandedBuilder"
+        PropertyChanges {target : exerciseLoader; sourceComponent : root.type==="Generic" ? genericBuilderDetails : (root.type==="Running" || root.type==="Cycling") ? cycleRunBuilderDetails : strengthBuilderDetails}
+        PropertyChanges { target : root; collapsed : false}
+      }
+      ,State {
+        name: "collapsedBuilder"
+        PropertyChanges { target : exerciseLoader; sourceComponent: root.builderSummary}
+        PropertyChanges { target : root; collapsed : true}
+        AnchorChanges { target : exerciseLoader; anchors.horizontalCenter : root.horizontalCenter}
+      }
     ]
     MouseArea {
       id: actionMouseArea
@@ -313,25 +373,49 @@ UIActionForm {
       }
       onDoubleClicked: { // Double Clicking Window
         if ( mouse.button === Qt.LeftButton ){
-          if (exerciseLoader.state === "collapsedBuilder") {
-            exerciseLoader.state = "expandedBuilder"
-            root.editing(root.modelIndex)
-          } 
+          if (builderMode){
+            if ( exerciseLoader.state === "collapsedBuilder") {
+              exerciseLoader.state = "expandedBuilder"
+              root.editing(root.modelIndex)
+            }
+          } else {
+            if ( exerciseLoader.state === "collapsedControls") {
+              exerciseLoader.state = "expandedControls"
+            } else {
+              exerciseLoader.state = "collapsedControls"
+            }
+          }
         } else {
           mouse.accepted = false
         }
       }
       Menu {
-        id : contextMenu
-        MenuItem {
-          id : removeItem
-          text : "Remove"
-          font.pointSize : 10
+      id : contextMenu
+      MenuItem {
+          visible : !builderMode
+          height : builderMode ? 0 : removeItem.height
+          text : (exerciseLoader.state === "collapsedControls")? "Configure" : "Collapse"
+          font.pointSize : root.builderMode ? 10 : 6
           onTriggered: {
-            root.remove( root.uuid )
+            //Only using this in controls instance (not in builder mode)
+            if (!builderMode) {
+              if ( exerciseLoader.state === "collapsedControls") {
+                exerciseLoader.state = "expandedControls"
+              } else {
+                exerciseLoader.state = "collapsedControls"
+              }
+            }
           }
         }
+      MenuItem {
+        id : removeItem
+        text : "Remove"
+        font.pointSize : root.builderMode ? 10 : 6
+        onTriggered: {
+          root.remove( root.uuid )
+        }
       }
+    }
     }
     Component.onCompleted : {
       viewLoader.state = "unset"   //"Unset" state in base loader class unloads anything that was already there
@@ -389,8 +473,8 @@ UIActionForm {
         Layout.fillHeight : true
         Layout.maximumWidth : grid.width / 3
         Layout.alignment : Qt.AlignVCenter | Qt.AlignHCenter
-        prefWidth : grid.width / 3
-        prefHeight : 50
+        Layout.preferredWidth: grid.width / 3
+        Layout.preferredHeight : 50
         elementRatio : 0.35
         radioGroup.checkedButton : grid.subType == -1 ? null : radioGroup.buttons[grid.subType]
         label.text : "Input Type"

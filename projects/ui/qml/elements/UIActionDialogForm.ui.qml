@@ -16,18 +16,23 @@ Dialog {
   property int colSpace: 0
   property int rowSpace : 0
   property string errorString : ""
+  property alias dialogLoader: dialogLoader
+  property alias dialogItem : dialogLoader.item
   //Base properties
   width : 500
   height : 250
-  modal : true
+  bottomPadding : 0
+  bottomInset : 0
+  bottomMargin : 0
+  modal : false
   closePolicy : Popup.NoAutoClose
   //Header
   header : Rectangle {
     id : headerBackground
     width : parent.width
-    height : 50
-    color: "#1A5276"
-    border.color: "#1A5276"
+    height : 30
+    color: "#2980b9"
+    border.color: "#2980b9"
     Text {
       id:content
       anchors.fill : parent
@@ -41,20 +46,35 @@ Dialog {
   }
   //Add standard buttons to footer
   footer : DialogButtonBox {
-    standardButtons : Dialog.Apply | Dialog.Reset | Dialog.Cancel
+    UIBioGearsButtonForm {
+      text : "Save"
+      font.pixelSize : 16
+      DialogButtonBox.buttonRole: DialogButtonBox.ApplyRole
+      implicitHeight : 30
+      implicitWidth : 80
+    }
+    UIBioGearsButtonForm {
+      text : "Reset"
+      font.pixelSize : 16
+      DialogButtonBox.buttonRole: DialogButtonBox.ResetRole
+      implicitHeight : 30
+      implicitWidth : 80
+    }
+    UIBioGearsButtonForm {
+      text : "Cancel"
+      font.pixelSize : 16
+      DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
+      implicitHeight : 30
+      implicitWidth : 80
+    }
   }
-  //Main content
-  contentItem : GridLayout {
-    id : contentGrid
-		anchors.left : parent.left;
-		anchors.right : parent.right;
+  contentItem : Loader {
+    id : dialogLoader
+    sourceComponent : undefined
+    width : root.width
     anchors.top : header.bottom
     anchors.bottom : footer.top
-    rows : numRows
-    columns : numColumns
-    columnSpacing : colSpace
-    rowSpacing : rowSpace
-  }
+  }  
 }
 
 

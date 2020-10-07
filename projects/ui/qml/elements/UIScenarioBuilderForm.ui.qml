@@ -227,7 +227,7 @@ Window {
               section {
                 property : "section"
                 delegate : Rectangle {
-                  color : "navy"
+                  color : "#2980b9"
                   width : parent.width - actionListView.scrollWidth
                   height : childrenRect.height
                   Text {

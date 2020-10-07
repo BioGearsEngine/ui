@@ -41,11 +41,9 @@ Item {
 	// 4 - Stomach Contents
 	// 5 - Oxygen Consumption Rate
 	// 6 - CO2 Production Rate
-	// 7 - Fatigue
-	// 8 - Vo2 (Oxygen Consumption)
-	// 9 - Dehydration Fraction
-	// 10 - Ambient Temperature
-	// 11 - Humidity
+	// 7 - Dehydration Fraction
+	// 8 - Ambient Temperature
+	// 9 - Humidity
 	
 	Timer {
         id : energyTimer

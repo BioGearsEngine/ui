@@ -10,7 +10,7 @@ UISpinBoxForm {
   signal spinUpdate (real value)
 
   //Emit when dialog Reset signal is detected
-  signal resetSpinBox()
+  signal resetSpin()
 
   //Handle new spin box value (adjusted for scaling if necesary) and emit spinUpdate
   spinBox.onValueModified : {
@@ -18,7 +18,7 @@ UISpinBoxForm {
   }
 
   //Handle reset signal by setting spin box value back to 0
-  onResetSpinBox : {
+  onResetSpin : {
     if (resetValue === null){
       spinBox.value = 0
     } else {
@@ -84,8 +84,8 @@ UISpinBoxForm {
   //The display text is assumed to be scaled by the maximum possible input for the spin box
   //Ex : If spin box displays 0.2 and spin.to = 100, then spin box will store 20
   //Note that the scaled value (spin.value / spin.to) is then passed to spinUpdate
-  function valueFromDecimal (text) {
-    return Number.fromLocaleString(text) * spinScale
+  function valueFromDecimal (text, locale) {
+    return Number.fromLocaleString(locale, text) * spinScale
   }
 
   //----------------------------------------------
@@ -94,7 +94,7 @@ UISpinBoxForm {
   //The display text is assumed to be scaled by the maximum possible input for the spin box
   //Ex : If spin box value = 30 and spin.to = 100, then 0.3 will be displayed.
   //Note that the scaled value (spin.value / spin.to) is then passed to spinUpdate
-  function valueToDecimal (value) {
+  function valueToDecimal (value ) {
     return Number(value/spinScale).toLocaleString('f', 2);  //Defaulting to 2 decimals for now
   }
 }

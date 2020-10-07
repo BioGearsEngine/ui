@@ -38,7 +38,7 @@ import com.biogearsengine.ui.scenario 1.0
         }
         Timer {
           id: opacityTimer
-          interval: 100; running: true; repeat: true
+          interval: 250; running: true; repeat: true
           onTriggered: {
             parent.opacity = parent.opacity - .1
             if ( parent.opacity < 0.1 ) {
@@ -69,10 +69,9 @@ import com.biogearsengine.ui.scenario 1.0
     function add_single_range_action(componentType, props) {
       var v_severityForm = Qt.createComponent(componentType);
       if ( v_severityForm.status == Component.Ready)  {
-        var v_action = v_severityForm.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
-                                                                      "severity" : props.spinnerValue,
+        var v_action = v_severityForm.createObject(actionSwitchView,{ "severity" : props.spinnerValue,
                                                                       "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
-                                                                              })
+                                                                      })
         v_action.scenario = biogears_scenario
         v_action.uuid = uuidv4()
         v_action.remove.connect(removeAction)
@@ -131,10 +130,9 @@ import com.biogearsengine.ui.scenario 1.0
     function add_hemorrhage_action(props) {
       var compartment = Qt.createComponent("UIHemorrhage.qml");
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{ "nameLong" : props.description, "namePretty" : props.description.split(":")[0],
-                                                                                "compartment" : props.location, "rate" : props.rate,
-                                                                                "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
-                                                                              })
+        var action = compartment.createObject(actionSwitchView,{  "compartment" : props.location, "rate" : props.rate,
+                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                                })
         action.scenario = biogears_scenario
         action.uuid = uuidv4()
         action.remove.connect(removeAction)
@@ -232,7 +230,7 @@ import com.biogearsengine.ui.scenario 1.0
     function add_transfusion_action(props) {
       var compartment = Qt.createComponent("UITransfusion.qml");
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{ "rate" : props.rate,  "volume" : props.bagVolume,   "blood_type" : props.type,
+        var action = compartment.createObject(actionSwitchView,{ "rate" : props.rate,  "volume" : props.bagVolume,   "blood_type" : props.compound,
                                                                   "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
         action.scenario = biogears_scenario
@@ -281,7 +279,7 @@ import com.biogearsengine.ui.scenario 1.0
         route = "Infusion";
       } else {
         type = EventModel.SubstanceOralDose
-        if (adminProps.route == "Oral"){
+        if (props.route == "Gastrointestinal"){
           route = "Gastrointestinal";
         } else {
           route = "Transmucosal";
@@ -309,11 +307,10 @@ import com.biogearsengine.ui.scenario 1.0
     function add_consume_meal_action(props) {
       var compartment = Qt.createComponent("UIConsumeMeal.qml");
       if ( compartment.status == Component.Ready)  {
-
         var action = compartment.createObject(actionSwitchView,{ "name" : props.mealName,
                                                                  "carbs_g" : props.carbohydrate, "fat_g" : props.fat,
                                                                  "protein_g" : props.protein,  "sodium_mg" : props.sodium,  
-                                                                 "water_ml" : props.water,  "calcium_mg" : props.calcium,  
+                                                                 "water_mL" : props.water,  "calcium_mg" : props.calcium,  
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
         action.scenario = biogears_scenario
@@ -361,11 +358,8 @@ import com.biogearsengine.ui.scenario 1.0
     function add_exercise_action(props) {
       var compartment = Qt.createComponent("UIExercise.qml");
       if ( compartment.status == Component.Ready)  {
-        if (props.exerciseType == "Running") {
-			    props.field_3 = props.field_3 / 100.0;
-		    }
         var action = compartment.createObject(actionSwitchView,{ "type" : props.exerciseType, "weight" : props.weightPack,
-                                                                 "property_1" : props.field_1, "property_2" : props.field_3,  
+                                                                 "property_1" : props.field_1, "property_2" : props.field_2,  
                                                                  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
         action.scenario = biogears_scenario

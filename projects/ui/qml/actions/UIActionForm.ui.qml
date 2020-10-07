@@ -50,7 +50,7 @@ Rectangle {
       }
       ,State {
         name: "expandedViewSelected"; when : (builderMode && currentSelection && !collapsed)
-        PropertyChanges { target : root; border.color : "green"; border.width : 3}
+        PropertyChanges { target : root; border.color : "#4CAF50"; border.width : 3}
       }
       ,State {
         name : "noBorder"; when : (builderMode && collapsed)
@@ -103,7 +103,7 @@ Rectangle {
               onTriggered:  actionTip.visible  = true
             }
             onClicked : {
-              selected()
+              selected(modelIndex)
             }
             onEntered: {
               infoTimer.start()
@@ -181,7 +181,7 @@ Rectangle {
       }
       ,State {
         name: "collapsedViewSelected"; when : (root.builderMode && root.currentSelection && root.collapsed)
-        PropertyChanges { target : buildSummaryWrapper; border.color : "green"; border.width : 3}
+        PropertyChanges { target : buildSummaryWrapper; border.color : "#4CAF50"; border.width : 3}
       }
     ]
       Label {
@@ -287,7 +287,7 @@ Rectangle {
         MenuItem {
           id : removeItem
           text : "Remove"
-          font.pointSize : 10
+          font.pointSize : root.builderMode ? 10 : 6
           onTriggered: {
             if (root.active){
               root.deactivate()
@@ -328,7 +328,7 @@ Rectangle {
         background : Rectangle {
           anchors.fill : parent
           color : "transparent"
-          border.color : "green"
+          border.color : "#4CAF50"
           border.width : comboBox.highlightedIndex === index ? 2 : 0
         }
       }

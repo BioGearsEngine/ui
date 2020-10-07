@@ -14,11 +14,14 @@ UIComboBoxForm {
 
   // Handle new entry seleted from menu (according to model type) and emit comboUpdate
   comboBox.onActivated : {
-    if (comboBox.model instanceof ListModel){
+    comboUpdate(comboBox.currentText)
+    /*if (comboBox.model instanceof ListModel){
       comboUpdate(comboBox.model.get(comboBox.currentIndex)[comboBox.textRole])
     } else if (comboBox.model instanceof FolderListModel) {
       comboUpdate(comboBox.model.get(comboBox.currentIndex, comboBox.textRole));
-    }
+    } else {
+      comboUpdate(comboBox.model.get(comboBox.currentIndex))
+    }*/
   }
 
   // Handle reset signal by clearing box

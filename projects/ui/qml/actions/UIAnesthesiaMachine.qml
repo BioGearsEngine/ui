@@ -513,13 +513,13 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        Layout.maximumWidth : prefWidth
-        prefWidth : grid.width / 4 - grid.columnSpacing  * 3
-        prefHeight : 50
+        Layout.preferredWidth : grid.width / 4 - grid.columnSpacing  * 3
+        Layout.maximumWidth : grid.width / 4 - grid.columnSpacing * 3
+        Layout.preferredHeight : 50
         elementRatio : 0.5
         radioGroup.checkedButton : root.connection === "" ? null : root.connection === "Mask" ? radioGroup.buttons[0] : radioGroup.buttons[1]
         label.text : "Connection"
-        label.font.pointSize : 11
+        label.font.pixelSize : 15
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ["Mask", "Tube"]
@@ -535,13 +535,13 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 4 - grid.columnSpacing * 3
-        Layout.maximumWidth : prefWidth
-        prefHeight : 50
+        Layout.preferredWidth : grid.width / 4 - grid.columnSpacing * 3
+        Layout.maximumWidth : grid.width / 4 - grid.columnSpacing * 3
+        Layout.preferredHeight : 50
         elementRatio : 0.5
         radioGroup.checkedButton : root.primaryGas === "" ? null : root.primaryGas === "Air" ? radioGroup.buttons[0] : radioGroup.buttons[1]
         label.text : "Primary Gas"
-        label.font.pointSize : 11
+        label.font.pixelSize : 15
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ["Air", "Nitrogen"]
@@ -830,8 +830,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 3 - grid.columnSpacing * 2
-        prefHeight : 75
+        Layout.preferredWidth : grid.width / 3 - grid.columnSpacing * 2
+        Layout.preferredHeight : 75
         elementRatio : 0.4
         radioGroup.checkedButton : root.o2Source === "" ? null : root.o2Source === "Wall" ? radioGroup.buttons[0] : root.o2Source === "Bottle One" ? radioGroup.buttons[1] : radioGroup.buttons[2]
         label.text : "O2 Source"

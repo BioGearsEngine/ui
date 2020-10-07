@@ -102,7 +102,7 @@ UIActionForm {
         font.pixelSize : 10
         font.bold : false
         color : "steelblue"
-        text : "[%1]".arg(root.compartment)
+        text : "[%1]".arg(root.drug)
         Layout.alignment : Qt.AlignHCenter
       }
  //Column 2
@@ -139,6 +139,7 @@ UIActionForm {
           } else if (root.adminRoute == 'Transmucosal'){
             return "%1 ug".arg(root.dose)
           }
+          return ""
         }
         visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
       }
@@ -257,19 +258,29 @@ UIActionForm {
  Loader {
   id : drugLoader
   sourceComponent : root.controlsSummary
-  state : "unset"
+  state : "collapsedControls"
   states : [
-     State {
-        name : "expandedBuilder"
-        PropertyChanges {target : drugLoader; sourceComponent : root.actionSubClass === EventModel.SubstanceBolus ? bolusBuilderDetails : root.actionSubClass === EventModel.SubstanceInfusion ? infusionBuilderDetails : oralBuilderDetails}
-        PropertyChanges { target : root; collapsed : false}
-      }
-      ,State {
-        name: "collapsedBuilder"
-        PropertyChanges { target : drugLoader; sourceComponent: root.builderSummary}
-        PropertyChanges { target : root; collapsed : true}
-        AnchorChanges { target : drugLoader; anchors.horizontalCenter : root.horizontalCenter}
-      }
+    State {
+      name: "expandedControls"
+      PropertyChanges { target : drugLoader; sourceComponent: root.controlsDetails}
+      PropertyChanges { target : root; collapsed : false}
+    }
+    ,State {
+      name: "collapsedControls"
+      PropertyChanges { target : drugLoader; sourceComponent: root.controlsSummary}
+      PropertyChanges { target : root; collapsed : true}
+    }
+    ,State {
+      name : "expandedBuilder"
+      PropertyChanges {target : drugLoader; sourceComponent : root.actionSubClass === EventModel.SubstanceBolus ? bolusBuilderDetails : root.actionSubClass === EventModel.SubstanceInfusion ? infusionBuilderDetails : oralBuilderDetails}
+      PropertyChanges { target : root; collapsed : false}
+    }
+    ,State {
+      name: "collapsedBuilder"
+      PropertyChanges { target : drugLoader; sourceComponent: root.builderSummary}
+      PropertyChanges { target : root; collapsed : true}
+      AnchorChanges { target : drugLoader; anchors.horizontalCenter : root.horizontalCenter}
+    }
   ]
   MouseArea {
     id: actionMouseArea
@@ -284,10 +295,18 @@ UIActionForm {
     }
     onDoubleClicked: { // Double Clicking Window
       if ( mouse.button === Qt.LeftButton ){
-        if (drugLoader.state === "collapsedBuilder") {
-          drugLoader.state = "expandedBuilder"
-          root.editing(root.modelIndex)
-        } 
+        if (builderMode){
+          if ( drugLoader.state === "collapsedBuilder") {
+            drugLoader.state = "expandedBuilder"
+            root.editing(root.modelIndex)
+          }
+        } else {
+          if ( drugLoader.state === "collapsedControls") {
+            drugLoader.state = "expandedControls"
+          } else {
+            drugLoader.state = "collapsedControls"
+          }
+        }
       } else {
         mouse.accepted = false
       }
@@ -295,9 +314,25 @@ UIActionForm {
     Menu {
       id : contextMenu
       MenuItem {
+          visible : !builderMode
+          height : builderMode ? 0 : removeItem.height
+          text : (drugLoader.state === "collapsedControls")? "Configure" : "Collapse"
+          font.pointSize : root.builderMode ? 10 : 6
+          onTriggered: {
+            //Only using this in controls instance (not in builder mode)
+            if (!builderMode) {
+              if ( drugLoader.state === "collapsedControls") {
+                drugLoader.state = "expandedControls"
+              } else {
+                drugLoader.state = "collapsedControls"
+              }
+            }
+          }
+        }
+      MenuItem {
         id : removeItem
         text : "Remove"
-        font.pointSize : 10
+        font.pointSize : root.builderMode ? 10 : 6
         onTriggered: {
           root.remove( root.uuid )
         }
@@ -416,12 +451,11 @@ UIActionForm {
         Layout.fillHeight : true
         Layout.maximumWidth : grid.width / 3
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 3
-        prefHeight : 75
+        Layout.preferredWidth : grid.width / 3
+        Layout.preferredHeight : 75
         elementRatio : 0.2
         radioGroup.checkedButton : setButtonState()
         label.text : "Route"
-        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Intraarterial', 'Intramuscular', 'Intravenous']
@@ -864,12 +898,11 @@ UIActionForm {
         Layout.fillHeight : true
         Layout.maximumWidth : grid.width / 3 - grid.columnSpacing * 2
         Layout.alignment : Qt.AlignVCenter | Qt.AlignHCenter
-        prefWidth : grid.width / 3
-        prefHeight : 50
+        Layout.preferredWidth : grid.width / 3
+        Layout.preferredHeight : 75
         elementRatio : 0.2
         radioGroup.checkedButton : setButtonState()
         label.text : "Route"
-        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Gastrointestinal', 'Transmucosal']

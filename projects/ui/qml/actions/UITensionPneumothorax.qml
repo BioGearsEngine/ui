@@ -248,12 +248,11 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 5
-        prefHeight : 75
+        Layout.preferredWidth : grid.width / 5
+        Layout.preferredHeight : 75
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "Type"
-        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Open', 'Closed']
@@ -276,12 +275,11 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 5
-        prefHeight : 75
+        Layout.preferredWidth : grid.width / 5
+        Layout.preferredHeight : 75
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "Side"
-        label.font.pointSize : 13
         label.horizontalAlignment : Text.AlignLeft
         label.padding : 5
         buttonModel : ['Left', 'Right']

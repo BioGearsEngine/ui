@@ -25,7 +25,7 @@ UIActionForm {
   property bool validBuildConfig : true   //No required fields and action does not have a duration
 
   fullName  : "<b>Consume <font color=\"lightsteelblue\">%1</font>  Meal</b>".arg(root.name)
-  shortName : "<b>Consume <font color=\"lightsteelblue\">%1</font> </b>".arg(root.name)
+  shortName : "<b>Consume Meal <font color=\"lightsteelblue\">%1</font> </b>".arg(root.name)
 
   //Builder mode data -- data passed to scenario builder
   buildParams : "Carboyhdrate=" + carbs_g + ",g;Fat=" + fat_g + ",g;Protein=" + protein_g + ",g;Calcium=" + calcium_mg + ",mg;Sodium=" + sodium_mg + ",mg;Water=" + water_mL + ",mL;";

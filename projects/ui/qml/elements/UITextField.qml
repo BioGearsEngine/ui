@@ -9,13 +9,13 @@ UITextFieldForm {
   //------Signals and Handlers---------------
 
   //Emit when dialog Reset signal is detected
-  signal resetTextField()
+  signal resetText()
 
   //Emit new text to dialog window when field is updated
   signal textFieldUpdate(string inputText)
 
   // Handle reset signal by clearing text from field
-  onResetTextField : {
+  onResetText : {
     if (resetValue === null){
       textField.clear();
     } else {

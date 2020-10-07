@@ -10,7 +10,7 @@ UIRadioButtonForm {
   signal radioGroupUpdate (int value)
 
   //Emit when dialog Reset signal is detected
-  signal resetRadioGroup()
+  signal resetRadio()
 
   //Handle radio button clicked and emit radioUpdate with index of button (use index because we mostly use these buttons for passing to C++ based enums, which are int based)
   radioGroup.onClicked : {
@@ -18,7 +18,7 @@ UIRadioButtonForm {
   }
   
   //Handle reset signal by unchecking all radio buttons in group
-  onResetRadioGroup : {
+  onResetRadio : {
     radioGroup.checkState = Qt.Unchecked
   }
   

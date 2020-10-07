@@ -374,7 +374,7 @@ bool EventTree::process_action(Event& ev, CDM::PatientActionData* action)
     }
     if (exercise->StrengthExercise().present()) {
       auto& strength = exercise->StrengthExercise().get();
-      ev.eSubType = EventTypes::StengthExercise;
+      ev.eSubType = EventTypes::StrengthExercise;
       ev.typeName = "Strength Exercise";
       ev.description = "Strength Exercise Action";
 
@@ -1718,7 +1718,7 @@ biogears::SEExercise* EventTree::decode_exercise(Event& ev)
     }
     action->SetRunningExercise(run);
   } break;
-  case EventTypes::StengthExercise: {
+  case EventTypes::StrengthExercise: {
     biogears::SEExercise::SEStrengthTraining strength;
     for (unsigned int i = 0; i < inputs.size(); ++i) {
       nameSplit = biogears::split(inputs[i], '=');

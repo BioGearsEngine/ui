@@ -78,8 +78,8 @@ Page {
       Image {
         anchors.centerIn : parent
         source : "icons/prev_transparent.png"
-        width : parent.width
-        height : parent.height * 0.8
+        width : parent.width * 0.8
+        fillMode : Image.PreserveAspectFit
         MouseArea {
           anchors.fill : parent
           cursorShape : Qt.PointingHandCursor
@@ -123,8 +123,8 @@ Page {
       Image {
         anchors.centerIn : parent
         source : "icons/next_transparent.png"
-        width : parent.width
-        height : parent.height * 0.8
+        width : parent.width * 0.8
+        fillMode : Image.PreserveAspectFit
         MouseArea {
           anchors.fill : parent
           cursorShape : Qt.PointingHandCursor

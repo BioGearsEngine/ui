@@ -8,7 +8,6 @@ Item {
   //Properties -- used to customize look / functionality of component
   property real prefWidth : parent.width
   property real prefHeight : root.implicitHeight
-  property int textSize : 8
   property int colSpan : 1
   property int rowSpan : 1
   property bool available : true
@@ -30,13 +29,13 @@ Item {
     State {
       //When the field is available for input but not currently being edited, set background border to grey
       name : "available-unfocused" ; when : root.available && !textField.activeFocus
-      PropertyChanges {target : backgroundRect; border.color : "grey"; border.width : 2; opacity : 1.0; enabled : true}
+      PropertyChanges {target : backgroundRect; border.color : "#2980b9"; border.width : 2; opacity : 1.0; enabled : true}
       PropertyChanges {target : textField; opacity : 1.0; enabled : true}
      },
     State {
       //When the field is available for input and being currently edited, set background to green
       name : "available-focused"; when : root.available && textField.activeFocus
-      PropertyChanges {target : backgroundRect; border.color : "green"; border.width : 3; opacity : 1.0; enabled : true}
+      PropertyChanges {target : backgroundRect; border.color : "#4CAF50"; border.width : 3; opacity : 1.0; enabled : true}
       PropertyChanges {target : textField; opacity : 1.0; enabled : true}
     },
     State {
@@ -59,9 +58,12 @@ Item {
     //Text field height is dictated by implicit height of text.  If you try to set it using height properties, the text will not respect
     // the boundaries and will appear out of place w/ respect to other alignment settings.  If you need a smaller text field, then you
     // need to set the text size smaller (or allow more space in widget for the field).
+    topInset : 0
+    bottomInset : 0
+    padding : 0
     anchors.left : parent.left
     anchors.right : parent.right
-    font.pointSize : root.textSize
+    font.pixelSize : 18
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignHCenter
     validator : validateDouble ? doubleValidator : null

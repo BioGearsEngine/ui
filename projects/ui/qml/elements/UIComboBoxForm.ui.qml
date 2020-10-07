@@ -13,21 +13,20 @@ RowLayout {
   property real elementRatio : 0.5          //Element ratio used to adjust relative sizes of label and box. Default is to split available space evenly
   property real prefWidth : parent.width
   property real prefHeight
-  property real fontSize : 12
   property int colSpan : 1
   property int rowSpan : 1
   property bool required : true
   property bool available : true
-  property string splitToken                //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
+  spacing : 20
+  property string splitToken //When we use ComboBox with a FolderModel, we often want to only use part of file name.  fileBaseName property helps get rid of file type (like .xml), but sometimes there is still info appended to name that
                                             //we do not want to display (e.g. PatientState@0s vs PatientState).  This splitToken tells which character to split the file name at.  
+  property bool folderModel : false
   //Property aliases -- used to access subcomponents outside form file
   property alias label: name
   property alias comboBox: value
   //Layout options
   Layout.preferredHeight : prefHeight ? prefHeight : root.implicitHeight   //If no preferred height, use implicit height determined by layout
   Layout.preferredWidth : prefWidth
-  Layout.columnSpan : colSpan
-  Layout.rowSpan : rowSpan
   Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
 
   //States
@@ -49,40 +48,40 @@ RowLayout {
 
   Label {
     id: name
-    Layout.maximumWidth : root.prefWidth * elementRatio
-    Layout.fillWidth : true
-    Layout.fillHeight : true
-    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1    //If no preferred height, set to -1, which flags Qml Layout to use implicit maximum height
     text: "Unset"
+    Layout.fillHeight : true
+    Layout.alignment : Qt.AlignVCenter
     verticalAlignment : Text.AlignVCenter
     horizontalAlignment : Text.AlignLeft
-    font.pointSize: root.fontSize
+    font.pixelSize : 18
   }
   ComboBox {
     id: value
     Layout.maximumWidth : root.prefWidth * (1.0 - elementRatio)
+    Layout.alignment : Qt.AlignRight | Qt.AlignVCenter
     Layout.fillWidth : true
-    Layout.fillHeight : true
-    Layout.maximumHeight : root.prefHeight ? root.prefHeight : -1     //If no preferred height, set to -1, which flags Qml Layout to use implicit maximum height
+    implicitHeight : 40
+    topInset : 0
+    bottomInset : 0
+    padding : 0
     font.weight: Font.Medium
-    font.pointSize: root.fontSize
+    font.pixelSize : 18
     editable: true 
     currentIndex : -1
     contentItem : Text {
       //Controls the look of text that is currently displayed in the combo box
+      anchors.left : value.left
+      width : value.width - indicator.width
+      height : parent.height
       text : value.displayText
       font : value.font
       verticalAlignment : Text.AlignVCenter;
       horizontalAlignment : Text.AlignHCenter;
-      anchors.fill : parent
     }
     delegate : ItemDelegate {
-      //Controls the look of text in the combo box menu.  The 'textRole' property of ComboBox MUST be set by the instantiating item.  This property tells the menu which role
-      //of the combo box model to display.  Ex:  A ListModel might have role called 'name', in which case you must set textRole : 'name' after setting the combo box model.
-      //If splitToken is defined, we assume that we want everything up to the token (not after). For example: splitToken = '@' will output StandardMale from StandardMale@0s.  
-      //If we ever want something after the token instead, we will need to revisit this code.
+      id : comboDelegate
       contentItem : Text {
-        text : splitToken ? model[value.textRole].split(splitToken)[0] : model[value.textRole]
+        text : comboDelegate.setText()
         verticalAlignment : Text.AlignVCenter;
         horizontalAlignment : Text.AlignHCenter;
         font: value.font;
@@ -90,10 +89,55 @@ RowLayout {
       height : value.height
       width : parent.width
       highlighted : value.highlightedIndex === index;
+      function setText(){
+        if (!value.textRole){
+          //Just an array of strings, so return modelData
+          return modelData
+        } else {
+          if (root.splitToken){
+            //ListModel with named roles and a delimiter we want to split on
+            return model[value.textRole].split(root.splitToken)[0]
+          }
+          else {
+            //ListModel with named roles
+            return model[value.textRole]
+          }
+        }
+      }
+    }
+    popup : Popup {
+      y : value.height
+      x : 0
+      padding : 0
+      width : value.width - value.indicator.width
+      implicitHeight : contentItem.implicitHeight
+      contentItem : ListView {
+        clip : true
+        implicitHeight : contentHeight
+        model : value.popup.visible ? value.delegateModel : null
+        currentIndex : value.highlightedIndex
+      }
     }
     background : Rectangle {
-      color : "transparent"
+      id : comboBackground
+      border.color : "#2980b9"
+      border.width : 1
     }
+    indicator: Rectangle {
+      id: indicator
+      anchors.right : parent.right
+      y: 0
+      height : value.height
+      width : height
+      color : "#2980b9"
+      border.color : "#2980b9"
+      Image {
+        source : "icons/comboIndicatorWhite.png"
+        height : parent.height / 4
+        fillMode : Image.PreserveAspectFit
+        anchors.centerIn : parent
+      }
+     }
   }
 }
 

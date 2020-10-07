@@ -146,7 +146,7 @@ public:
     GenericExercise,
     RunningExercise,
     CyclingExercise,
-    StengthExercise,
+    StrengthExercise,
     Hemorrhage,
     Infection,
     Intubation,

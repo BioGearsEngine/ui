@@ -244,8 +244,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 3
-        prefHeight : 75
+        Layout.preferredWidth : grid.width / 3
+        Layout.preferredHeight : 75
         elementRatio : 0.4
         radioGroup.checkedButton : type == -1 ? null : radioGroup.buttons[type]
         label.text : "Type"
