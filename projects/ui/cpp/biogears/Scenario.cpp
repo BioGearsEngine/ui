@@ -362,13 +362,12 @@ Scenario& Scenario::load_patient(QString file)
       }
       energy_and_metabolism->child(5)->unit_scalar(&_engine->GetTissue().GetOxygenConsumptionRate());
       energy_and_metabolism->child(6)->unit_scalar(&_engine->GetTissue().GetCarbonDioxideProductionRate());
-      energy_and_metabolism->child(7)->unit_scalar(&_engine->GetTissue().GetOxygenConsumptionRate());
-      energy_and_metabolism->child(8)->scalar(&_engine->GetTissue().GetDehydrationFraction());
+      energy_and_metabolism->child(7)->scalar(&_engine->GetTissue().GetDehydrationFraction());
       biogears::BioGears* engine_as_bg = dynamic_cast<biogears::BioGears*>(_engine.get());
       biogears::SEEnvironment& env = engine_as_bg->GetEnvironment();
       biogears::SEEnvironmentalConditions& cond = env.GetConditions();
-      energy_and_metabolism->child(9)->unit_scalar(&cond.GetAmbientTemperature());
-      energy_and_metabolism->child(10)->scalar(&cond.GetRelativeHumidity());
+      energy_and_metabolism->child(8)->unit_scalar(&cond.GetAmbientTemperature());
+      energy_and_metabolism->child(9)->scalar(&cond.GetRelativeHumidity());
     }
 
     auto fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::FLUID_BALANCE, 0, QModelIndex()).internalPointer());

@@ -125,7 +125,6 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
   }
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption Rate"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("CO2 Production Rate"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Dehydration Fraction"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Ambient Temperature"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Relative Humidity"));
