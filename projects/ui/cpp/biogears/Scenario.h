@@ -140,7 +140,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_cardiac_arrest_action(bool state);
   Q_INVOKABLE void create_needle_decompression_action(int state, int side);
   Q_INVOKABLE void create_tourniquet_action(QString compartment, int level);
-  Q_INVOKABLE void create_inhaler_action(bool active);
+  Q_INVOKABLE void create_inhaler_action();
   Q_INVOKABLE void create_anesthesia_machine_action(int connection, int primaryGas, int source, double pMax_cmH2O, double peep_cmH2O, double reliefPressure_cmH2O, double inletFlow_L_Per_min, double respirationRate_Per_min, double ieRatio, double o2Fraction, double bottle1_mL, double bottle2_mL, QString leftSub, double leftSubFraction, QString rightSub, double rightSubFraction);
 
   Q_INVOKABLE QString patient_name_and_time();

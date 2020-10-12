@@ -126,7 +126,7 @@ Drawer {
         ListElement { name : "Transfusion"; section : "Administer Substances"; property var func : function(props){ actionModel.add_transfusion_action(props)}}
         ListElement { name : "Needle Decompression"; section : "Interventions"; property var func : function(props) {actionModel.add_needle_decompression_action(props)}}
         ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(props) {actionModel.add_tourniquet_action(props)}}
-        ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {root.setup_inhaler(actionItem)}}
+        ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {actionModel.add_binary_action("UIInhaler.qml")} }
         ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function (props) { actionModel.add_anesthesia_machine_action(props)}}
       }
     }
@@ -168,7 +168,8 @@ Drawer {
               actionDialog.y = loc;
             }
             actionDialog.boundIndex = index;
-            if (actionMenuModel.get(index).name === "Cardiac Arrest"){
+            let actionName = actionMenuModel.get(index).name
+            if (actionName === "Cardiac Arrest" || actionName === "Inhaler"){
               //No dialog opened for cardiac arrest, just apply action     
               actionMenuModel.get(index).func();
             } else {

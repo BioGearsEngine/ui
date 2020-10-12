@@ -115,7 +115,7 @@ UIActionForm {
       Rectangle {
         Layout.fillWidth : true
       }
-      Button {
+      UIBioGearsButtonForm {
         id: toggle
         visible : !builderMode
         Layout.preferredWidth : parent.width * 1/4 - actionRow.spacing 

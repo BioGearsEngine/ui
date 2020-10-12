@@ -2647,11 +2647,14 @@ void Scenario::export_state(bool saveAs)
 #include <biogears/cdm/patient/actions/SEApnea.h>
 #include <biogears/cdm/patient/actions/SEAsthmaAttack.h>
 #include <biogears/cdm/patient/actions/SEBrainInjury.h>
+#include <biogears/cdm/patient/actions/SEBreathHold.h>
 #include <biogears/cdm/patient/actions/SEBronchoconstriction.h>
 #include <biogears/cdm/patient/actions/SEBurnWound.h>
 #include <biogears/cdm/patient/actions/SECardiacArrest.h>
 #include <biogears/cdm/patient/actions/SEConsumeNutrients.h>
 #include <biogears/cdm/patient/actions/SEExercise.h>
+#include <biogears/cdm/patient/actions/SEForcedExhale.h>
+#include <biogears/cdm/patient/actions/SEForcedInhale.h>
 #include <biogears/cdm/patient/actions/SEHemorrhage.h>
 #include <biogears/cdm/patient/actions/SEInfection.h>
 #include <biogears/cdm/patient/actions/SEIntubation.h>
@@ -2860,12 +2863,48 @@ void Scenario::create_cardiac_arrest_action(bool state)
 
   _action_queue.as_source().insert(std::move(action));
 }
-void Scenario::create_inhaler_action(bool state)
+void Scenario::create_inhaler_action()
 {
+  biogears::SESubstance* albuterol = _engine->GetSubstances().GetSubstance("Albuterol");
+  //Configure inhaler
   auto action = std::make_unique<biogears::SEInhalerConfiguration>(_engine->GetSubstanceManager());
   auto& inhaler = action->GetConfiguration();
-  //TODO: Make this Useful.
+  inhaler.SetSubstance(albuterol);
+  inhaler.GetMeteredDose().SetValue(90.0, biogears::MassUnit::ug);
+  inhaler.GetNozzleLoss().SetValue(0.04);
+  //Set up breath command sequence used in standard scenario Patients/Inhaler_OneActuation.xml
+  auto breathData = std::make_unique<biogears::SEConsciousRespiration>();
+  //Create first exhale command and append to breathing sequence
+  CDM::ForcedExhaleData* exhale = new CDM::ForcedExhaleData();
+  exhale->ExpiratoryReserveVolumeFraction(1.0);
+  biogears::SEScalarTime* period = new biogears::SEScalarTime();
+  period->SetValue(3.0, biogears::TimeUnit::s);
+  exhale->Period(*period->Unload());
+  breathData->AddForcedExhale().Load(*exhale);
+  //Append use inhaler command to breathing sequence
+  breathData->AddUseInhaler();
+  //Create inhale command and add to breathing sequence
+  CDM::ForcedInhaleData* inhale = new CDM::ForcedInhaleData();
+  inhale->InspiratoryCapacityFraction(1.0);
+  inhale->Period(*period->Unload());
+  breathData->AddForcedInhale().Load(*inhale);
+  //Create breath hold command and add to breathing sequence
+  CDM::BreathHoldData* hold = new CDM::BreathHoldData();
+  period->SetValue(10.0, biogears::TimeUnit::s);
+  hold->Period(*period->Unload());
+  breathData->AddBreathHold().Load(*hold);
+  //Create exhale command and add to breathing sequence
+  exhale->ExpiratoryReserveVolumeFraction(0.0);   //Period stays @ 3.0 s
+  breathData->AddForcedExhale().Load(*exhale);
+
+  //Add inhaler configuration action and breath command actions
   _action_queue.as_source().insert(std::move(action));
+  _action_queue.as_source().insert(std::move(breathData));
+  //Add albuterol to active substance queue
+  if (!_engine->GetSubstances().IsActive(*albuterol)) {
+    _substance_queue.push_back(albuterol);
+  }
+
 }
 void Scenario::create_airway_obstruction_action(double severity)
 {

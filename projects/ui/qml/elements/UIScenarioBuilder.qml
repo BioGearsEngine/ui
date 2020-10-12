@@ -134,7 +134,7 @@ UIScenarioBuilderForm {
     ListElement { name : "Transfusion"; section : "Administer Substances"; property var makeAction : function(scenario) {return builderModel.add_transfusion_builder(scenario)}}
     ListElement { name : "Needle Decompression"; section : "Interventions"; property var makeAction : function(scenario) {return builderModel.add_binary_builder("UINeedleDecompression.qml", scenario)}}
     ListElement { name : "Tourniquet"; section : "Interventions"; property var makeAction : function(scenario) { return builderModel.add_tourniquet_builder(scenario) } }
-    ListElement { name : "Inhaler"; section : "Interventions"}
+    ListElement { name : "Inhaler"; section : "Interventions"; property var makeAction : function(scenario) {return builderModel.add_binary_builder("UIInhaler.qml", scenario)}}
     ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var makeAction : function(props) { return builderModel.add_anesthesia_machine_builder(scenario)}}
     ListElement { name : "Patient Assessment"; section : "Write Data"; property var makeAction : function(props) { return builderModel.add_patient_assessment_builder(scenario)}}
     ListElement { name : "Serialize State"; section : "Write Data"; property var makeAction : function(props) { return builderModel.add_serialize_state_builder(scenario)}}
@@ -394,6 +394,8 @@ UIScenarioBuilderForm {
           case EventModel.BurnWound :
             builderModel.loadAction(function() {return add_single_range_builder("UIBurnWound.qml", bg_scenario, event.Params, event.StartTime);});
             break;
+          case EventModel.CardiacArrest :
+            builderModel.loadAction(function() {return add_binary_builder("UICardiacArrest.qml", bg_scenario, event.StartTime, event.Duration)})
           case EventModel.ConsumeNutrients :
             builderModel.loadAction(function() {return add_consume_meal_builder(bg_scenario, event.Params, event.StartTime);});
             break;
@@ -405,6 +407,9 @@ UIScenarioBuilderForm {
             break;
           case EventModel.Infection :
             builderModel.loadAction(function() {return add_infection_builder(bg_scenario, event.Params, event.StartTime);});
+            break;
+          case EventModel.InhalerConfiguration : 
+            builderModel.loadAction(function() {return add_binary_builder("UIInhaler.qml", bg_scenario, event.StartTime)})
             break;
           case EventModel.SubstanceAdministration : 
             if (event.SubType === EventModel.SubstanceCompoundInfusion){

@@ -398,7 +398,7 @@ import com.biogearsengine.ui.scenario 1.0
         console.log("Error : Action switch component not ready");
       }
     }
-    function add_binary_builder(componentType, startTime = 0, duration = 0) {
+    function add_binary_builder(componentType, scenario, startTime = 0, duration = 0) {
         var v_binaryForm = Qt.createComponent(componentType, scenario);
         if ( v_binaryForm.status == Component.Ready)  {
           var v_action = v_binaryForm.createObject(actionSwitchView,{ "scenario" : scenario, "actionStartTime_s" : startTime, "actionDuration_s" : duration, "width" : actionSwitchView.width - actionSwitchView.scrollWidth, "builderMode" : true})

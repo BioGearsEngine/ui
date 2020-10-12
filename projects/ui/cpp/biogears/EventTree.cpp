@@ -120,8 +120,8 @@ bool EventTree::process_action(Event& ev, CDM::ActionData& action)
     return process_action(ev, envrionmentActionPtr);
   } else if (auto anesthesiaMachienActionPtr = dynamic_cast<CDM::AnesthesiaMachineActionData*>(actionPtr)) {
     return process_action(ev, anesthesiaMachienActionPtr);
-  } else if (auto inhalerActionPtr = dynamic_cast<CDM::InhalerActionData*>(actionPtr)) {
-    return process_action(ev, inhalerActionPtr);
+  } else if (auto inhalerConfigPtr = dynamic_cast<CDM::InhalerConfigurationData*>(actionPtr)) {
+    return process_action(ev, inhalerConfigPtr);
   } else if (auto timeAdvanceActionPtr = dynamic_cast<CDM::AdvanceTimeData*>(actionPtr)) {
     return process_action(ev, timeAdvanceActionPtr);
   } else if (auto serialActionPtr = dynamic_cast<CDM::SerializeStateData*>(actionPtr)) {
@@ -967,43 +967,34 @@ bool EventTree::process_action(Event& ev, CDM::AnesthesiaMachineActionData* acti
   return false;
 }
 //-----------------------------------------------------------------------------
-bool EventTree::process_action(Event& ev, CDM::InhalerActionData* action)
+bool EventTree::process_action(Event& ev, CDM::InhalerConfigurationData* action)
 {
   using namespace biogears;
-  ev.eType = EventTypes::InhalerAction;
-  ev.typeName = "Inhaler Action";
-  if (auto inhalerConfig = dynamic_cast<const CDM::InhalerConfigurationData*>(action)) {
-    ev.eType = EventTypes::InhalerConfiguration;
-    ev.typeName = "Inhaler Configuration";
-    ev.description = "Change the configuration of the Inhaler Machine";
-    if (inhalerConfig->ConfigurationFile().present()) {
-      ev.params = asprintf("ConfigurationFile=%s;", inhalerConfig->ConfigurationFile().get().c_str()).c_str();
+  ev.eType = EventTypes::InhalerConfiguration;
+  ev.typeName = "Inhaler Configuration";
+  ev.description = "Change the configuration of the Inhaler Machine";
+  if (action->Configuration().present()) {
+    auto config = action->Configuration().get();
+    if (config.MeteredDose().present()) {
+      auto md = config.MeteredDose().get();
+      ev.params = asprintf("MeteredDose=%f,%s;", md.value(), md.unit()->c_str()).c_str();
     }
-    if (inhalerConfig->Configuration().present()) {
-      auto config = inhalerConfig->Configuration().get();
-      if (config.MeteredDose().present()) {
-        auto md = config.MeteredDose().get();
-        ev.params = asprintf("MeteredDose=%f,%s;", md.value(), md.unit()->c_str()).c_str();
-      }
-      if (config.NozzleLoss().present()) {
-        auto nl = config.NozzleLoss().get();
-        ev.params = asprintf("NozzleLoss=%f;", nl.value()).c_str();
-      }
-      if (config.SpacerVolume().present()) {
-        auto sv = config.SpacerVolume().get();
-        ev.params = asprintf("SpacerVolume=%f,%s;", sv.value(), sv.unit()->c_str()).c_str();
-      }
-      if (config.State().present()) {
-        ev.params = asprintf("State=%s;", ((config.State().get() == CDM::enumOnOff::On) ? "On" : "Off")).c_str();
-      }
-      if (config.Substance().present()) {
-        ev.params = asprintf("Substance=%s;", config.Substance().get().c_str()).c_str();
-      }
+    if (config.NozzleLoss().present()) {
+      auto nl = config.NozzleLoss().get();
+      ev.params = asprintf("NozzleLoss=%f;", nl.value()).c_str();
     }
-    return true;
+    if (config.SpacerVolume().present()) {
+      auto sv = config.SpacerVolume().get();
+      ev.params = asprintf("SpacerVolume=%f,%s;", sv.value(), sv.unit()->c_str()).c_str();
+    }
+    if (config.State().present()) {
+      ev.params = asprintf("State=%s;", ((config.State().get() == CDM::enumOnOff::On) ? "On" : "Off")).c_str();
+    }
+    if (config.Substance().present()) {
+      ev.params = asprintf("Substance=%s;", config.Substance().get().c_str()).c_str();
+    }
   }
-  return false;
-  ;
+  return true;
 }
 //-----------------------------------------------------------------------------
 bool EventTree::process_action(Event& ev, CDM::AdvanceTimeData* action)
@@ -1269,6 +1260,16 @@ void EventTree::add_event(QString name, int type, int subType, QString params, d
     offEvent.duration = 0.0;
     _events.push_back(offEvent);
   }
+  //Handle helper actions
+  //Inhale configuration must be followed by consious respiration commands.  We set these commands up for the user
+  if (ev.eType == EventTree::InhalerConfiguration) {
+    Event conResp;
+    conResp.eType = EventTree::ConsciousRespiration;
+    conResp.startTime = ev.startTime;
+    conResp.duration = 0.0;
+    conResp.typeName = "Concious Respiration";
+    _events.push_back(conResp);
+  }
 }
 //-----------------------------------------------------------------------------
 void EventTree::sort_events()
@@ -1340,6 +1341,9 @@ biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceMan
   case EventTypes::ConsumeNutrients:
     action = decode_consume_nutrients(ev);
     break;
+  case EventTypes::ConsciousRespiration:
+    action = decode_conscious_respiration();
+    break;
   case EventTypes::SubstanceAdministration:
     action = decode_substance_administration(ev, subMgr);
     break;
@@ -1348,6 +1352,9 @@ biogears::SEAction* EventTree::decode_action(Event& ev, biogears::SESubstanceMan
     break;
   case EventTypes::Hemorrhage:
     action = decode_hemorrhage(ev);
+    break;
+  case EventTypes::InhalerConfiguration:
+    action = decode_inhaler_configuration(subMgr);
     break;
   case EventTypes::Infection:
     action = decode_infection(ev);
@@ -1543,6 +1550,39 @@ biogears::SECardiacArrest* EventTree::decode_cardiac_arrest(Event& ev)
   return action;
 }
 //-----------------------------------------------------------------------------
+biogears::SEConsciousRespiration* EventTree::decode_conscious_respiration()
+{
+  //Set up sequence of inhale/breath hold/exhale commands for use with inhaler. The concious
+  // respiration configuration always occurs after an InhalerConfiguration event.  This process 
+  // is hidden from user -- we assume the same sequence for each inhaler use equivalent to that
+  // used in scenario file Patients/Inhaler_OneActuation
+
+  biogears::SEConsciousRespiration* action = new biogears::SEConsciousRespiration();
+ //Create first exhale command and append to breathing sequence
+  CDM::ForcedExhaleData* exhale = new CDM::ForcedExhaleData();
+  exhale->ExpiratoryReserveVolumeFraction(1.0);
+  biogears::SEScalarTime* period = new biogears::SEScalarTime();
+  period->SetValue(3.0, biogears::TimeUnit::s);
+  exhale->Period(*period->Unload());
+  action->AddForcedExhale().Load(*exhale);
+  //Append use inhaler command to breathing sequence (assumes inhaler has already been configured)
+  action->AddUseInhaler();
+  //Create inhale command and add to breathing sequence
+  CDM::ForcedInhaleData* inhale = new CDM::ForcedInhaleData();
+  inhale->InspiratoryCapacityFraction(1.0);
+  inhale->Period(*period->Unload());
+  action->AddForcedInhale().Load(*inhale);
+  //Create breath hold command and add to breathing sequence
+  CDM::BreathHoldData* hold = new CDM::BreathHoldData();
+  period->SetValue(10.0, biogears::TimeUnit::s);
+  hold->Period(*period->Unload());
+  action->AddBreathHold().Load(*hold);
+  //Create exhale command and add to breathing sequence
+  exhale->ExpiratoryReserveVolumeFraction(0.0); //Period stays @ 3.0 s
+  action->AddForcedExhale().Load(*exhale);
+  return action;
+}
+//-----------------------------------------------------------------------------
 biogears::SEConsumeNutrients* EventTree::decode_consume_nutrients(Event& ev)
 {
   biogears::SEConsumeNutrients* action = new biogears::SEConsumeNutrients();
@@ -1660,6 +1700,18 @@ biogears::SESubstanceAdministration* EventTree::decode_substance_administration(
   default:
     return nullptr;
   }
+}
+//-----------------------------------------------------------------------------
+biogears::SEInhalerConfiguration* EventTree::decode_inhaler_configuration(biogears::SESubstanceManager& subMgr)
+{
+  biogears::SESubstance* albuterol = subMgr.GetSubstance("Albuterol");
+  //Configure inhaler -- this action is always followed by a ConciousRespiration event
+  biogears::SEInhalerConfiguration* action = new biogears::SEInhalerConfiguration(subMgr);
+  action->GetConfiguration().SetSubstance(albuterol);
+  action->GetConfiguration().GetMeteredDose().SetValue(90.0, biogears::MassUnit::ug);
+  action->GetConfiguration().GetNozzleLoss().SetValue(0.04);
+
+  return action;
 }
 //-----------------------------------------------------------------------------
 biogears::SEExercise* EventTree::decode_exercise(Event& ev)

@@ -30,11 +30,15 @@
 #include <biogears/cdm/patient/actions/SEApnea.h>
 #include <biogears/cdm/patient/actions/SEAsthmaAttack.h>
 #include <biogears/cdm/patient/actions/SEBrainInjury.h>
+#include <biogears/cdm/patient/actions/SEBreathHold.h>
 #include <biogears/cdm/patient/actions/SEBronchoconstriction.h>
 #include <biogears/cdm/patient/actions/SEBurnWound.h>
 #include <biogears/cdm/patient/actions/SECardiacArrest.h>
+#include <biogears/cdm/patient/actions/SEConsciousRespiration.h>
 #include <biogears/cdm/patient/actions/SEConsumeNutrients.h>
 #include <biogears/cdm/patient/actions/SEExercise.h>
+#include <biogears/cdm/patient/actions/SEForcedExhale.h>
+#include <biogears/cdm/patient/actions/SEForcedInhale.h>
 #include <biogears/cdm/patient/actions/SEHemorrhage.h>
 #include <biogears/cdm/patient/actions/SEInfection.h>
 #include <biogears/cdm/patient/actions/SEIntubation.h>
@@ -48,6 +52,9 @@
 #include <biogears/cdm/patient/actions/SESubstanceOralDose.h>
 #include <biogears/cdm/patient/actions/SETensionPneumothorax.h>
 #include <biogears/cdm/patient/actions/SETourniquet.h>
+#include <biogears/cdm/system/equipment/Inhaler/SEInhaler.h>
+#include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerConfiguration.h>
+#include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerAction.h>
 
 
 namespace mil {
@@ -229,7 +236,7 @@ private:
   bool process_action(Event& ev, CDM::PatientActionData* action);
   bool process_action(Event& ev, CDM::EnvironmentActionData* action);
   bool process_action(Event& ev, CDM::AnesthesiaMachineActionData* action);
-  bool process_action(Event& ev, CDM::InhalerActionData* action);
+  bool process_action(Event& ev, CDM::InhalerConfigurationData* action);
   bool process_action(Event& ev, CDM::AdvanceTimeData* action);
   bool process_action(Event& ev, CDM::SerializeStateData* action);
 
@@ -244,9 +251,11 @@ private:
   biogears::SEBronchoconstriction* decode_bronchoconstriction(Event& ev);
   biogears::SEBurnWound* decode_burn_wound(Event& ev);
   biogears::SECardiacArrest* decode_cardiac_arrest(Event& ev);
+  biogears::SEConsciousRespiration* decode_conscious_respiration();
   biogears::SEConsumeNutrients* decode_consume_nutrients(Event& ev);
   biogears::SESubstanceAdministration* decode_substance_administration(Event& ev, biogears::SESubstanceManager& subMgr);
   biogears::SEExercise* decode_exercise(Event& ev);
+  biogears::SEInhalerConfiguration* decode_inhaler_configuration(biogears::SESubstanceManager& subMgr);
   biogears::SEHemorrhage* decode_hemorrhage(Event& ev);
   biogears::SEInfection* decode_infection(Event& ev);
   biogears::SENeedleDecompression* decode_needle_decompression(Event& ev);
