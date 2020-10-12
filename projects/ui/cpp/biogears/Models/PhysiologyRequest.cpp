@@ -136,22 +136,44 @@ void PhysiologyRequest::custom(std::function<double(void)>&& value, std::functio
 //------------------------------------------------------------------------------------
 biogears::SEUnitScalar const* PhysiologyRequest::unit_scalar() const
 {
-  return _unit;
+  return _unit_scalar;
 }
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::unit_scalar(biogears::SEUnitScalar* value)
 {
-  _unit = value;
+  _unit_scalar = value;
+  if (_unit_scalar->GetUnit()) {
+    _unit = _unit_scalar->GetUnit()->GetString();
+    _unit_override = false;
+  }
+  
+}
+//------------------------------------------------------------------------------------
+QString PhysiologyRequest::unit() const
+{
+  return _unit;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::unit(QString u)
+{
+  if (_unit_scalar) {
+    _unit = u;
+    if (_unit != _unit_scalar->GetUnit()->GetString()) {
+      _unit_override = true;
+    }
+  }
 }
 //------------------------------------------------------------------------------------
 biogears::SEScalar const* PhysiologyRequest::scalar() const
 {
-  return _value;
+  return _scalar;
 }
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::scalar(biogears::SEScalar* value)
 {
-  _value = value;
+  _scalar = value;
+  _unit = "";
+  _unit_override = false;
 }
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::clear()
@@ -242,14 +264,14 @@ PhysiologyRequest* PhysiologyRequest::append(QString prefix, QString name, bool 
 void PhysiologyRequest::modify(int row, const biogears::SEUnitScalar* data)
 {
   if (0 <= row && row < _children.size()) {
-    _children[row]._unit = data;
+    _children[row]._unit_scalar = data;
   }
 }
 //------------------------------------------------------------------------------------
 void PhysiologyRequest::modify(int row, const biogears::SEScalar* data)
 {
   if (0 <= row && row < _children.size()) {
-    _children[row]._value = data;
+    _children[row]._scalar = data;
   }
 }
 //------------------------------------------------------------------------------------
@@ -281,7 +303,17 @@ QVariant PhysiologyRequest::data(int role) const
       return _customValueFunc();
     } else {
       try {
-        return (_unit) ? QVariant(_unit->GetValue()) : (_value) ? QVariant(_value->GetValue()) : QVariant(0.0);
+        if (_unit_scalar) {
+          if (_unit_override) {
+            return QVariant(biogears::Convert(_unit_scalar->GetValue(), _unit_scalar->GetUnit()->GetString(), biogears::CCompoundUnit(_unit.toStdString())));
+          } else {
+            return QVariant(_unit_scalar->GetValue());
+          }
+        } else if (_scalar) {
+          return QVariant(_scalar->GetValue());
+        } else {
+          return QVariant(0.0);
+        }
       } catch (biogears::CommonDataModelException e) {
         return "NaN";
       }
@@ -290,7 +322,7 @@ QVariant PhysiologyRequest::data(int role) const
     if (_custom) {
       return _customUnitFunc();
     } else {
-      return (_unit) ? QVariant(_unit->GetUnit()->GetString()) : QVariant("");
+      return (_unit_scalar) ? QVariant(_unit) : QVariant("");
     }
   case BioGearsData::UsableRole:
     return _usable;

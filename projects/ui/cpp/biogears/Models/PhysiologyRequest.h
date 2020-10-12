@@ -50,6 +50,9 @@ public:
   biogears::SEUnitScalar const * unit_scalar() const;
   void unit_scalar(biogears::SEUnitScalar*);
 
+  QString unit() const;
+  void unit(QString u);
+
   biogears::SEScalar const* scalar() const;
   void scalar(biogears::SEScalar*);
 
@@ -79,13 +82,13 @@ public:
   }
   void scalar(biogears::SEScalar const* given)
   {
-    _value = given;
-    _unit = nullptr;
+    _scalar = given;
+    _unit_scalar = nullptr;
   };
   void unit_scalar(biogears::SEUnitScalar const* given)
   {
-    _unit = given;
-    _value = nullptr;
+    _unit_scalar = given;
+    _scalar = nullptr;
   };
 
 private:
@@ -94,6 +97,8 @@ private:
   QVector<PhysiologyRequest> _children;
   QString _prefix;
   QString _name;
+  QString _unit;
+  bool _unit_override = false;    //When user request unit different than base unit stored on _unit_scalar
   bool _usable = false;
   bool _enabled = false;
   bool _custom = false;
@@ -103,8 +108,9 @@ private:
   double _y_max;
   double _y_min;
   double _x_interval;
-  biogears::SEScalar const* _value = nullptr;
-  biogears::SEUnitScalar const* _unit = nullptr;
+  biogears::SEScalar const* _scalar = nullptr;
+  biogears::SEUnitScalar const* _unit_scalar = nullptr;
+  
 
   std::function<double(void)> _customValueFunc;
   std::function<QString(void)> _customUnitFunc;

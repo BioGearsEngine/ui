@@ -311,6 +311,7 @@ Scenario& Scenario::load_patient(QString file)
       vitals->child(2)->unit_scalar(&_engine->GetRespiratory().GetRespirationRate());
       vitals->child(3)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
       vitals->child(4)->unit_scalar(&_engine->GetCardiovascular().GetBloodVolume());
+      vitals->child(4)->unit("L");
       vitals->child(5)->unit_scalar(&_engine->GetCardiovascular().GetCentralVenousPressure());
       vitals->child(6)->unit_scalar(&_engine->GetCardiovascular().GetCardiacOutput());
     }
