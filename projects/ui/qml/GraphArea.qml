@@ -18,10 +18,10 @@ GraphAreaForm {
   property double count_1 : 0.0
   property double count_2 : 0.0
   property ObjectModel vitalsModel : vitalsObjectModel
-  property ObjectModel cardiopulmonaryModel : cardiopulmonaryObjectModel
+  property ObjectModel cardiovascularModel : cardiovascularObjectModel
   property ObjectModel bloodChemistryModel : bloodChemistryObjectModel
   property ObjectModel energyMetabolismModel : energyMetabolismObjectModel
-  property ObjectModel fluidBalanceModel : fluidBalanceObjectModel
+  property ObjectModel respiratoryModel : respiratoryObjectModel
   property ObjectModel renalModel : renalObjectModel
   property ObjectModel substanceModel : substanceObjectModel
   property ObjectModel customModel : customObjectModel
@@ -70,7 +70,6 @@ GraphAreaForm {
 	  energyMetabolismSeries.physiologyEnergyModel = (physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM))
 	  energyMetabolismSeries.physiologyVitalsModel = (physiologyRequestModel.category(PhysiologyModel.VITALS))
 	  renalSeries.physiologyRenalModel = (physiologyRequestModel.category(PhysiologyModel.RENAL))
-	  renalSeries.physiologyRenalFluidModel = (physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE))
   }
   onUrinalysisChanged : {
 	  renalSeries.urinalysisData = urinalysis;
@@ -93,10 +92,10 @@ GraphAreaForm {
 	  energyTimer.stop();
 	  renalTimer.stop();
     vitalsObjectModel.clearPlots()
-    cardiopulmonaryObjectModel.clearPlots()
+    cardiovascularObjectModel.clearPlots()
     bloodChemistryObjectModel.clearPlots()
     energyMetabolismObjectModel.clearPlots()
-    fluidBalanceObjectModel.clearPlots()
+    respiratoryObjectModel.clearPlots()
 	  renalObjectModel.clearPlots()
     substanceObjectModel.clearPlots()
     customObjectModel.clearPlots()
@@ -151,25 +150,45 @@ GraphAreaForm {
   vitalsGridView.onCellHeightChanged : {
     vitalsObjectModel.resizePlots(vitalsGridView.cellWidth, vitalsGridView.cellHeight)
   }
- //Cardiopulmonary//
+ //Cardiovascular//
   ObjectModel {
-    id: cardiopulmonaryObjectModel
+    id: cardiovascularObjectModel
     function createPlotView (model, request, title) {
-     var vitals = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-     root.createPlotViewHelper(model, request, title,cardiopulmonaryObjectModel, cardiopulmonaryGridView, 1)
+     var vitals = physiologyRequestModel.category(PhysiologyModel.CARDIOVASCULAR)
+     root.createPlotViewHelper(model, request, title,cardiovascularObjectModel, cardiovascularGridView, 1)
     }
     function resizePlots(newWidth, newHeight){
-      root.resizePlotsHelper(newWidth,newHeight,cardiopulmonaryObjectModel)
+      root.resizePlotsHelper(newWidth,newHeight,cardiovascularObjectModel)
     }
     function clearPlots() {
-      root.clearPlotsHelper(cardiopulmonaryObjectModel)
+      root.clearPlotsHelper(cardiovascularObjectModel)
     }
   }
-  cardiopulmonaryGridView.onCellWidthChanged : {
-    cardiopulmonaryObjectModel.resizePlots(cardiopulmonaryGridView.cellWidth, cardiopulmonaryGridView.cellHeight)
+  cardiovascularGridView.onCellWidthChanged : {
+    cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
   }
-  cardiopulmonaryGridView.onCellHeightChanged : {
-    cardiopulmonaryObjectModel.resizePlots(cardiopulmonaryGridView.cellWidth, cardiopulmonaryGridView.cellHeight)
+  cardiovascularGridView.onCellHeightChanged : {
+    cardiovascularObjectModel.resizePlots(cardiovascularGridView.cellWidth, cardiovascularGridView.cellHeight)
+  }
+  //Respiratory//
+  ObjectModel {
+    id: respiratoryObjectModel
+    function createPlotView (model, request, title) {
+     var vitals = physiologyRequestModel.category(PhysiologyModel.RESPIRATORY)
+     root.createPlotViewHelper(model, request, title,respiratoryObjectModel, respiratoryGridView, 1)
+    }
+    function resizePlots(newWidth, newHeight){
+      root.resizePlotsHelper(newWidth,newHeight,respiratoryObjectModel)
+    }
+    function clearPlots() {
+      root.clearPlotsHelper(respiratoryObjectModel)
+    }
+  }
+  respiratoryGridView.onCellWidthChanged : {
+    respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
+  }
+  respiratoryGridView.onCellHeightChanged : {
+    respiratoryObjectModel.resizePlots(respiratoryGridView.cellWidth, respiratoryGridView.cellHeight)
   }
   //Blood Chemistry//
   ObjectModel {
@@ -210,26 +229,6 @@ GraphAreaForm {
   }
   energyMetabolismGridView.onCellHeightChanged : {
     energyMetabolismObjectModel.resizePlots(energyMetabolismGridView.cellWidth, energyMetabolismGridView.cellHeight)
-  }
-  //Fluid Balance//
-  ObjectModel {
-    id: fluidBalanceObjectModel
-    function createPlotView (model, request, title) {
-     var vitals = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-     root.createPlotViewHelper(model, request, title,fluidBalanceObjectModel, fluidBalanceGridView, 1)
-    }
-    function resizePlots(newWidth, newHeight){
-      root.resizePlotsHelper(newWidth,newHeight,fluidBalanceObjectModel)
-    }
-    function clearPlots() {
-      root.clearPlotsHelper(fluidBalanceObjectModel)
-    }
-  }
-  fluidBalanceGridView.onCellWidthChanged : {
-    fluidBalanceObjectModel.resizePlots(fluidBalanceGridView.cellWidth, fluidBalanceGridView.cellHeight)
-  }
-  fluidBalanceGridView.onCellHeightChanged : {
-    fluidBalanceObjectModel.resizePlots(fluidBalanceGridView.cellWidth, fluidBalanceGridView.cellHeight)
   }
   //Renal - Overview//
   ObjectModel {
@@ -312,17 +311,17 @@ GraphAreaForm {
       case PhysiologyModel.VITALS:
         vitalsModel.createPlotView(model, request, title);
         break;
-      case PhysiologyModel.CARDIOPULMONARY:
-        cardiopulmonaryModel.createPlotView(model, request, title);
+      case PhysiologyModel.CARDIOVASCULAR:
+        cardiovascularModel.createPlotView(model, request, title);
+        break;
+      case PhysiologyModel.RESPIRATORY:
+        respiratoryModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.BLOOD_CHEMISTRY:
         bloodChemistryModel.createPlotView(model, request, title);
         break;
       case PhysiologyModel.ENERGY_AND_METABOLISM:
         energyMetabolismModel.createPlotView(model, request, title);
-        break;
-      case PhysiologyModel.FLUID_BALANCE:
-        fluidBalanceModel.createPlotView(model, request, title);
         break;
 	    case PhysiologyModel.RENAL:
         renalModel.createPlotView(model, request, title);
@@ -341,17 +340,17 @@ GraphAreaForm {
       case PhysiologyModel.VITALS:
         model = vitalsModel
         break;
-      case PhysiologyModel.CARDIOPULMONARY:
-        model = cardiopulmonaryModel
+      case PhysiologyModel.CARDIOVASULAR:
+        model = cardiovascularModel
+        break;
+      case PhysiologyModel.RESPIRATORY:
+        model = respiratoryModel
         break;
       case PhysiologyModel.BLOOD_CHEMISTRY:
         model = bloodChemistryModel
         break;
       case PhysiologyModel.ENERGY_AND_METABOLISM:
         model = energyMetabolismModel
-        break;
-      case PhysiologyModel.FLUID_BALANCE:
-        model = fluidBalanceModel
         break;
 		  case PhysiologyModel.RENAL:
 		    model = renalModel
@@ -385,9 +384,13 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
           currentModel = vitalsObjectModel
         break;
-        case PhysiologyModel.CARDIOPULMONARY:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-          currentModel = cardiopulmonaryObjectModel
+        case PhysiologyModel.CARDIOVASCULAR:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOVASCULAR)
+          currentModel = cardiovascularObjectModel
+        break;
+        case PhysiologyModel.RESPIRATORY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RESPIRATORY)
+          currentModel = respiratoryObjectModel
         break;
         case PhysiologyModel.BLOOD_CHEMISTRY:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
@@ -396,10 +399,6 @@ GraphAreaForm {
         case PhysiologyModel.ENERGY_AND_METABOLISM:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
-        break;
-        case PhysiologyModel.FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = fluidBalanceObjectModel
         break;
 		  case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
@@ -434,9 +433,13 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
           currentModel = vitalsObjectModel
         break;
-        case PhysiologyModel.CARDIOPULMONARY:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-          currentModel = cardiopulmonaryObjectModel
+        case PhysiologyModel.CARDIOVASCULAR:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOVASCULAR)
+          currentModel = cardiovascularObjectModel
+        break;
+        case PhysiologyModel.RESPIRATORY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RESPIRATORY)
+          currentModel = respiratoryObjectModel
         break;
         case PhysiologyModel.BLOOD_CHEMISTRY:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
@@ -445,10 +448,6 @@ GraphAreaForm {
         case PhysiologyModel.ENERGY_AND_METABOLISM:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
-        break;
-        case PhysiologyModel.FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = fluidBalanceObjectModel
         break;
 		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
@@ -483,9 +482,13 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
           currentModel = vitalsObjectModel
         break;
-        case PhysiologyModel.CARDIOPULMONARY:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-          currentModel = cardiopulmonaryObjectModel
+        case PhysiologyModel.CARDIOVASCULAR:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOVASCULAR)
+          currentModel = cardiovascularObjectModel
+        break;
+        case PhysiologyModel.RESPIRATORY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RESPIRATORY)
+          currentModel = respiratoryObjectModel
         break;
         case PhysiologyModel.BLOOD_CHEMISTRY:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
@@ -494,10 +497,6 @@ GraphAreaForm {
         case PhysiologyModel.ENERGY_AND_METABOLISM:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
-        break;
-        case PhysiologyModel.FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = fluidBalanceObjectModel
         break;
 		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
@@ -532,9 +531,13 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
           currentModel = vitalsObjectModel
         break;
-        case PhysiologyModel.CARDIOPULMONARY:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-          currentModel = cardiopulmonaryObjectModel
+        case PhysiologyModel.CARDIOVASCULAR:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOVASCULAR)
+          currentModel = cardiovascularObjectModel
+        break;
+        case PhysiologyModel.RESPIRATORY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RESPIRATORY)
+          currentModel = respiratoryObjectModel
         break;
         case PhysiologyModel.BLOOD_CHEMISTRY:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
@@ -543,10 +546,6 @@ GraphAreaForm {
         case PhysiologyModel.ENERGY_AND_METABOLISM:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
-        break;
-        case PhysiologyModel.FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = fluidBalanceObjectModel
         break;
 		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)
@@ -582,9 +581,13 @@ GraphAreaForm {
           currentCategory = physiologyRequestModel.category(PhysiologyModel.VITALS)
           currentModel = vitalsObjectModel
         break;
-        case PhysiologyModel.CARDIOPULMONARY:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOPULMONARY)
-          currentModel = cardiopulmonaryObjectModel
+        case PhysiologyModel.CARDIOVASCULAR:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.CARDIOVASCULAR)
+          currentModel = cardiovascularObjectModel
+        break;
+        case PhysiologyModel.RESPIRATORY:
+          currentCategory = physiologyRequestModel.category(PhysiologyModel.RESPIRATORY)
+          currentModel = respiratoryObjectModel
         break;
         case PhysiologyModel.BLOOD_CHEMISTRY:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.BLOOD_CHEMISTRY)
@@ -593,10 +596,6 @@ GraphAreaForm {
         case PhysiologyModel.ENERGY_AND_METABOLISM:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.ENERGY_AND_METABOLISM)
           currentModel = energyMetabolismObjectModel
-        break;
-        case PhysiologyModel.FLUID_BALANCE:
-          currentCategory = physiologyRequestModel.category(PhysiologyModel.FLUID_BALANCE)
-          currentModel = fluidBalanceObjectModel
         break;
 		    case PhysiologyModel.RENAL:
           currentCategory = physiologyRequestModel.category(PhysiologyModel.RENAL)

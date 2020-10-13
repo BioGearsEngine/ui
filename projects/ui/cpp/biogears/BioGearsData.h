@@ -17,10 +17,10 @@ class BioGearsData : public QAbstractItemModel {
 public:
   enum Categories {
     VITALS = 0,
-    CARDIOPULMONARY,
+    CARDIOVASCULAR,
+    RESPIRATORY,
     BLOOD_CHEMISTRY,
     ENERGY_AND_METABOLISM,
-    FLUID_BALANCE,
     RENAL,
     SUBSTANCES,
     CUSTOM,
@@ -114,10 +114,10 @@ private:
   PhysiologyRequest _rootRequest;
 
   BioGearsData* _vitals = nullptr;
-  BioGearsData* _cardiopulmonary = nullptr;
+  BioGearsData* _cardiovascular = nullptr;
+  BioGearsData* _respiratory = nullptr;
   BioGearsData* _blood_chemistry = nullptr;
   BioGearsData* _energy_and_metabolism = nullptr;
-  BioGearsData* _fluid_balance = nullptr;
   BioGearsData* _renal = nullptr;
   BioGearsData* _substances = nullptr;
   BioGearsData* _customs = nullptr;

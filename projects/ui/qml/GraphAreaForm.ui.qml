@@ -17,10 +17,10 @@ Page {
   property alias energyMetabolismSeries : energyMetabolismSeries
   property alias renalSeries : renalSeries 
   property alias vitalsGridView : vitalsGridView
-  property alias cardiopulmonaryGridView : cardiopulmonaryGridView
+  property alias cardiovascularGridView : cardiovascularGridView
   property alias bloodChemistryGridView : bloodChemistryGridView
   property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
-  property alias fluidBalanceGridView : fluidBalanceGridView
+  property alias respiratoryGridView : respiratoryGridView
   property alias renalGridView : renalSeries.renalGridView
   property alias substanceGridView : substanceGridView
   property alias customGridView : customGridView
@@ -221,7 +221,7 @@ Page {
       }
     }
     Item {
-      id : cardiopulmonarySeries
+      id : cardiovascularSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
       Rectangle {
@@ -230,18 +230,42 @@ Page {
         color : "#ecf0f1"
       }
       GridView {
-          id : cardiopulmonaryGridView
+          id : cardiovascularGridView
           anchors.fill : parent
           clip : true
           cellWidth : plots.width / 2
           cellHeight : plots.height / 2
-          model : cardiopulmonaryModel
+          model : cardiovascularModel
           ScrollBar.vertical : ScrollBar {
-            parent : cardiopulmonaryGridView.parent
-            anchors.top : cardiopulmonaryGridView.top
-            anchors.right : cardiopulmonaryGridView.right
-            anchors.bottom : cardiopulmonaryGridView.bottom
+            parent : cardiovascularGridView.parent
+            anchors.top : cardiovascularGridView.top
+            anchors.right : cardiovascularGridView.right
+            anchors.bottom : cardiovascularGridView.bottom
           }
+      }
+    }
+    Item {
+      id : respiratorySeries
+      Layout.fillWidth : true
+      Layout.fillHeight : true
+      Rectangle {
+        id : respiratoryBackground
+        anchors.fill : parent
+        color : "#ecf0f1"
+      }
+      GridView {
+        id : respiratoryGridView
+        anchors.fill : parent
+        clip : true
+        cellWidth : plots.width / 2
+        cellHeight : plots.height / 2
+        model : respiratoryModel
+        ScrollBar.vertical : ScrollBar {
+          parent : respiratoryGridView.parent
+          anchors.top : respiratoryGridView.top
+          anchors.right : respiratoryGridView.right
+          anchors.bottom : respiratoryGridView.bottom
+        }
       }
     }
     Item {
@@ -273,30 +297,6 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
             
-    }
-    Item {
-      id : fluidBalanceSeries
-      Layout.fillWidth : true
-      Layout.fillHeight : true
-      Rectangle {
-        id : fluidBalanceBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
-      GridView {
-        id : fluidBalanceGridView
-        anchors.fill : parent
-        clip : true
-        cellWidth : plots.width / 2
-        cellHeight : plots.height / 2
-        model : fluidBalanceModel
-        ScrollBar.vertical : ScrollBar {
-          parent : fluidBalanceGridView.parent
-          anchors.top : fluidBalanceGridView.top
-          anchors.right : fluidBalanceGridView.right
-          anchors.bottom : fluidBalanceGridView.bottom
-        }
-      }
     }
     RenalPanel {
       id : renalSeries
@@ -408,7 +408,7 @@ Page {
       property string info : _info
       property int level : _level
       property bool menuItem : false
-      title : level > 0 ? modelData.data(nodeIndex, PhysiologyModel.RequestRole) : ""   //Don't display a title for top level (e.g. "Vitals", "Cardiopulmonary", ...)
+      title : level > 0 ? modelData.data(nodeIndex, PhysiologyModel.RequestRole) : ""   //Don't display a title for top level (e.g. "Vitals", "cardiovascular", ...)
       function activateObject(objectIndex){
         //This function is currently only connected to a signal in the Substances menu (see MenuInstantiator)
         requestInstantiator.activateObject(objectIndex)

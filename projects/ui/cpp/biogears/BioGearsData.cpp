@@ -1,8 +1,8 @@
 #include "BioGearsData.h"
 
-#include <biogears/engine/Controller/BioGearsSubstances.h>
 #include <biogears/cdm/properties/SEScalarTime.h>
 #include <biogears/cdm/substance/SESubstance.h>
+#include <biogears/engine/Controller/BioGearsSubstances.h>
 
 /// BioGearsData Model
 ///
@@ -37,14 +37,14 @@ BioGearsData* BioGearsData::category(int category)
   switch (category) {
   case VITALS:
     return _vitals;
-  case CARDIOPULMONARY:
-    return _cardiopulmonary;
+  case CARDIOVASCULAR:
+    return _cardiovascular;
+  case RESPIRATORY:
+    return _respiratory;
   case BLOOD_CHEMISTRY:
     return _blood_chemistry;
   case ENERGY_AND_METABOLISM:
     return _energy_and_metabolism;
-  case FLUID_BALANCE:
-    return _fluid_balance;
   case RENAL:
     return _renal;
   case SUBSTANCES:
@@ -59,10 +59,10 @@ BioGearsData* BioGearsData::category(int category)
 void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
 {
   _vitals = new BioGearsData("Vitals", this);
-  _cardiopulmonary = new BioGearsData("Cardiopulmonary", this);
+  _cardiovascular = new BioGearsData("Cardiovascular", this);
+  _respiratory = new BioGearsData("Respiratory", this);
   _blood_chemistry = new BioGearsData("Blood Chemistry", this);
   _energy_and_metabolism = new BioGearsData("Energy and Metabolism", this);
-  _fluid_balance = new BioGearsData("Fluid Balance", this);
   _renal = new BioGearsData("Renal", this);
   _substances = new BioGearsData("Substances", this);
   _customs = new BioGearsData("Custom", this);
@@ -85,27 +85,34 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
   _vitals->append(QString("Vitals"), QString("Blood Volume"));
   _vitals->append(QString("Vitals"), QString("Central Venous Pressure"));
   _vitals->append(QString("Vitals"), QString("Cardiac Output"));
- 
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Cerebral Perfusion Pressure"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Intracranial Pressure"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Systemic Vascular Resistance"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Pulse Pressure"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Stroke Volume"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Cardiac Index"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Ejection Fraction"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("IE Ratio"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Total Pulmonary Ventilation"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Lung Volume"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Tidal Volume"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Alveolar Ventilation"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Dead Space Ventlation"));
-  _cardiopulmonary->append(QString("Cardiopulmonary"), QString("Transpulmonary Pressure"));
 
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Carbon Dioxide Saturation"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Carbon Monoxide Saturation"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Cerebral Perfusion Pressure"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Intracranial Pressure"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Systemic Vascular Resistance"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Pulse Pressure"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Stroke Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Cardiac Index"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Ejection Fraction"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Extravascular Fluid Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Extracellular Fluid Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Intracellular Fluid Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("Total Body Fluid"));
+
+  _respiratory->append(QString("Respiratory"), QString("IE Ratio"));
+  _respiratory->append(QString("Respiratory"), QString("Total Pulmonary Ventilation"));
+  _respiratory->append(QString("Respiratory"), QString("Lung Volume"));
+  _respiratory->append(QString("Respiratory"), QString("Tidal Volume"));
+  _respiratory->append(QString("Respiratory"), QString("Alveolar Ventilation"));
+  _respiratory->append(QString("Respiratory"), QString("Dead Space Ventlation"));
+  _respiratory->append(QString("Respiratory"), QString("Transpulmonary Pressure"));
+
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("Arterial O2 Pressure"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("Arterial CO2 Pressure"));
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Oxygen Saturation"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("Carbon Dioxide Saturation"));
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Blood PH"));
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Hematocrit"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("Lactate Concentration"));
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Strong Ion Difference"));
 
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Core Temperature"));
@@ -129,33 +136,24 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Ambient Temperature"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Relative Humidity"));
 
-
-  _fluid_balance->append(QString("Renal"), QString("Mean Urine Output"));
-  _fluid_balance->append(QString("Renal"), QString("Urine Production Rate"));
-  _fluid_balance->append(QString("Renal"), QString("Urine Volume"));
-  _fluid_balance->append(QString("Renal"), QString("Urine Osmolality"));
-  _fluid_balance->append(QString("Renal"), QString("Urine Osmolarity"));
-  _fluid_balance->append(QString("Renal"), QString("Glomerular Filtration Rate"));
-  _fluid_balance->append(QString("Renal"), QString("Renal Blood Flow"));
-  _fluid_balance->append(QString("Fluid Balance"), QString("Total Body Fluid"));
-  _fluid_balance->append(QString("Fluid Balance"), QString("ExtracellularFluidVolume"));
-  _fluid_balance->append(QString("Fluid Balance"), QString("IntracellularFluidVolume"));
-  _fluid_balance->append(QString("Fluid Balance"), QString("ExtravascularFluidVolume"));
-  _fluid_balance->append(QString("Renal"), QString("Left Reabsorption Rate"));
-  _fluid_balance->append(QString("Renal"), QString("Right Reabsorption Rate"));
-
   _renal->append(QString("Renal"), QString("Mean Urine Output"));
   _renal->append(QString("Renal"), QString("Urine Production Rate"));
   _renal->child(1)->enabled(true);
   _renal->append(QString("Renal"), QString("Glomerular Filtration Rate"));
   _renal->child(2)->enabled(true);
+  _renal->append(QString("Renal"), QString("Urine Volume"));
+  _renal->append(QString("Renal"), QString("Urine Osmolality"));
+  _renal->append(QString("Renal"), QString("Urine Osmolarity"));
+  _renal->append(QString("Renal"), QString("Renal Blood Flow"));
+  _renal->append(QString("Renal"), QString("Left Reabsorption Rate"));
+  _renal->append(QString("Renal"), QString("Right Reabsorption Rate"));
 
   //Add all substances from manager -- create nodes for appropriate fields (unit/scalar values default to nullptrs)
   //All this does is set up containers for sub data -- data will not be assigned to substance until it is active
   for (auto sub : bgSubstances.GetSubstances()) {
     auto subData = _substances->append(QString("Substances"), QString::fromStdString(sub->GetName()));
     subData->nested(true);
-    subData->usable(false);   //Set all substances to non-usable (will be set when substance is activated in Biogears)
+    subData->usable(false); //Set all substances to non-usable (will be set when substance is activated in Biogears)
     //Every substance should have blood concentration, mass in body, mass in blood, mass in tissue
     auto metric = subData->append(subData->name(), QString("Blood Concentration"));
     metric = subData->append(subData->name(), QString("Mass in Body"));
@@ -212,13 +210,13 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
 //------------------------------------------------------------------------------------
 BioGearsData::~BioGearsData()
 {
-//  _vitals->deleteLater();
-//  _cardiopulmonary->deleteLater();
-//  _blood_chemistry->deleteLater();
-//  _energy_and_metabolism->deleteLater();
-//  _fluid_balance->deleteLater();
-//  _substances->deleteLater();
-//  _customs->deleteLater();
+  //  _vitals->deleteLater();
+  //  _cardiopulmonary->deleteLater();
+  //  _blood_chemistry->deleteLater();
+  //  _energy_and_metabolism->deleteLater();
+  //  _fluid_balance->deleteLater();
+  //  _substances->deleteLater();
+  //  _customs->deleteLater();
 }
 //------------------------------------------------------------------------------------
 int BioGearsData::rowCount(const QModelIndex& index) const
@@ -229,14 +227,14 @@ int BioGearsData::rowCount(const QModelIndex& index) const
     } else {
       if (_vitals && _vitals == index.internalPointer()) {
         return _vitals->_rootRequest.rows();
-      } else if (_cardiopulmonary && _cardiopulmonary == index.internalPointer()) {
-        return _cardiopulmonary->_rootRequest.rows();
+      } else if (_cardiovascular && _cardiovascular == index.internalPointer()) {
+        return _cardiovascular->_rootRequest.rows();
+      } else if (_respiratory && _respiratory == index.internalPointer()) {
+        return _respiratory->_rootRequest.rows();
       } else if (_blood_chemistry && _blood_chemistry == index.internalPointer()) {
         return _blood_chemistry->_rootRequest.rows();
       } else if (_energy_and_metabolism && _energy_and_metabolism == index.internalPointer()) {
         return _energy_and_metabolism->_rootRequest.rows();
-      } else if (_fluid_balance && _fluid_balance == index.internalPointer()) {
-        return _fluid_balance->_rootRequest.rows();
       } else if (_renal && _renal == index.internalPointer()) {
         return _renal->_rootRequest.rows();
       } else if (_substances && _substances == index.internalPointer()) {
@@ -259,14 +257,14 @@ int BioGearsData::columnCount(const QModelIndex& index) const
   } else {
     if (_vitals == index.internalPointer()) {
       return _vitals->_rootRequest.columns();
-    } else if (_cardiopulmonary == index.internalPointer()) {
-      return _cardiopulmonary->_rootRequest.columns();
+    } else if (_cardiovascular == index.internalPointer()) {
+      return _cardiovascular->_rootRequest.columns();
+    } else if (_respiratory == index.internalPointer()) {
+      return _respiratory->_rootRequest.columns();
     } else if (_blood_chemistry == index.internalPointer()) {
       return _blood_chemistry->_rootRequest.columns();
     } else if (_energy_and_metabolism == index.internalPointer()) {
       return _energy_and_metabolism->_rootRequest.columns();
-    } else if (_fluid_balance == index.internalPointer()) {
-      return _fluid_balance->_rootRequest.columns();
     } else if (_renal == index.internalPointer()) {
       return _renal->_rootRequest.columns();
     } else if (_substances == index.internalPointer()) {
@@ -302,14 +300,14 @@ QVariant BioGearsData::data(const QModelIndex& index, int role) const
   if (index.internalPointer()) {
     if (_vitals == index.internalPointer()) {
       return _vitals->data(role);
-    } else if (_cardiopulmonary == index.internalPointer()) {
-      return _cardiopulmonary->data(role);
+    } else if (_cardiovascular == index.internalPointer()) {
+      return _cardiovascular->data(role);
+    } else if (_respiratory == index.internalPointer()) {
+      return _respiratory->data(role);
     } else if (_blood_chemistry == index.internalPointer()) {
       return _blood_chemistry->data(role);
     } else if (_energy_and_metabolism == index.internalPointer()) {
       return _energy_and_metabolism->data(role);
-    } else if (_fluid_balance == index.internalPointer()) {
-      return _fluid_balance->data(role);
     } else if (_renal == index.internalPointer()) {
       return _renal->data(role);
     } else if (_substances == index.internalPointer()) {
@@ -369,17 +367,17 @@ QModelIndex BioGearsData::index(int row, int column, const QModelIndex& parent) 
       case VITALS:
         childItem = _vitals;
         break;
-      case CARDIOPULMONARY:
-        childItem = _cardiopulmonary;
+      case CARDIOVASCULAR:
+        childItem = _cardiovascular;
+        break;
+      case RESPIRATORY:
+        childItem = _respiratory;
         break;
       case BLOOD_CHEMISTRY:
         childItem = _blood_chemistry;
         break;
       case ENERGY_AND_METABOLISM:
         childItem = _energy_and_metabolism;
-        break;
-      case FLUID_BALANCE:
-        childItem = _fluid_balance;
         break;
       case RENAL:
         childItem = _renal;
@@ -397,14 +395,14 @@ QModelIndex BioGearsData::index(int row, int column, const QModelIndex& parent) 
     }
   } else if (_vitals && _vitals == parent.internalPointer()) {
     return _vitals->createIndex(row, column, _vitals->child(row));
-  } else if (_cardiopulmonary && _cardiopulmonary == parent.internalPointer()) {
-    return _cardiopulmonary->createIndex(row, column, _cardiopulmonary->child(row));
+  } else if (_cardiovascular && _cardiovascular == parent.internalPointer()) {
+    return _cardiovascular->createIndex(row, column, _cardiovascular->child(row));
+  } else if (_respiratory && _respiratory == parent.internalPointer()) {
+    return _respiratory->createIndex(row, column, _respiratory->child(row));
   } else if (_blood_chemistry && _blood_chemistry == parent.internalPointer()) {
     return _blood_chemistry->createIndex(row, column, _blood_chemistry->child(row));
   } else if (_energy_and_metabolism && _energy_and_metabolism == parent.internalPointer()) {
     return _energy_and_metabolism->createIndex(row, column, _energy_and_metabolism->child(row));
-  } else if (_fluid_balance && _fluid_balance == parent.internalPointer()) {
-    return _fluid_balance->createIndex(row, column, _fluid_balance->child(row));
   } else if (_renal && _renal == parent.internalPointer()) {
     return _renal->createIndex(row, column, _renal->child(row));
   } else if (_substances && _substances == parent.internalPointer()) {
@@ -435,20 +433,20 @@ QModelIndex BioGearsData::index(QAbstractItemModel const* model) const
 {
   if (_vitals == model) {
     return createIndex(VITALS, 0, _vitals);
-  } else if (_cardiopulmonary == model) {
-    return createIndex(CARDIOPULMONARY, 0, _cardiopulmonary);
+  } else if (_cardiovascular == model) {
+    return createIndex(CARDIOVASCULAR, 0, _cardiovascular);
+  } else if (_respiratory == model) {
+    return createIndex(RESPIRATORY, 0, _respiratory);
   } else if (_blood_chemistry == model) {
     return createIndex(BLOOD_CHEMISTRY, 0, _blood_chemistry);
   } else if (_energy_and_metabolism == model) {
     return createIndex(ENERGY_AND_METABOLISM, 0, _energy_and_metabolism);
-  } else if (_fluid_balance == model) {
-    return createIndex(FLUID_BALANCE, 0, _fluid_balance);
-  } else if (_renal == model) {
+  }  else if (_renal == model) {
     return createIndex(RENAL, 0, _renal);
   } else if (_substances == model) {
     return createIndex(SUBSTANCES, 0, _substances);
   } else if (_customs == model) {
-    return createIndex(CUSTOM, 0, _fluid_balance);
+    return createIndex(CUSTOM, 0, _customs);
   } else {
     return QModelIndex();
   }
@@ -461,16 +459,15 @@ double BioGearsData::getSimulationTime()
 //------------------------------------------------------------------------------------
 void BioGearsData::setSimulationTime(double time_s)
 {
-    _simulation_time_s = time_s;
+  _simulation_time_s = time_s;
   emit timeAdvanced(_simulation_time_s);
-
 }
 //------------------------------------------------------------------------------------
 void BioGearsData::clear()
 {
   _rootRequest.clear();
 }
-  //------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
 PhysiologyRequest* BioGearsData::
   append(QString prefix, QString name)
 {

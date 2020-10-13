@@ -316,33 +316,44 @@ Scenario& Scenario::load_patient(QString file)
       vitals->child(6)->unit_scalar(&_engine->GetCardiovascular().GetCardiacOutput());
     }
 
-    auto cardiopulmonary = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CARDIOPULMONARY, 0, QModelIndex()).internalPointer());
+    auto cardiovascular = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::CARDIOVASCULAR, 0, QModelIndex()).internalPointer());
     {
-      cardiopulmonary->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
-      cardiopulmonary->child(1)->unit_scalar(&_engine->GetCardiovascular().GetIntracranialPressure());
-      cardiopulmonary->child(2)->unit_scalar(&_engine->GetCardiovascular().GetSystemicVascularResistance());
-      cardiopulmonary->child(3)->unit_scalar(&_engine->GetCardiovascular().GetPulsePressure());
-      cardiopulmonary->child(4)->unit_scalar(&_engine->GetCardiovascular().GetHeartStrokeVolume());
-      cardiopulmonary->child(5)->unit_scalar(&_engine->GetCardiovascular().GetCardiacIndex());
-      cardiopulmonary->child(6)->scalar(&_engine->GetCardiovascular().GetHeartEjectionFraction());
-      cardiopulmonary->child(7)->scalar(&_engine->GetRespiratory().GetInspiratoryExpiratoryRatio());
-      cardiopulmonary->child(8)->unit_scalar(&_engine->GetRespiratory().GetTotalPulmonaryVentilation());
-      cardiopulmonary->child(9)->unit_scalar(&_engine->GetRespiratory().GetTotalLungVolume());
-      cardiopulmonary->child(10)->unit_scalar(&_engine->GetRespiratory().GetTidalVolume());
-      cardiopulmonary->child(11)->unit_scalar(&_engine->GetRespiratory().GetTotalAlveolarVentilation());
-      cardiopulmonary->child(12)->unit_scalar(&_engine->GetRespiratory().GetTotalDeadSpaceVentilation());
-      cardiopulmonary->child(13)->unit_scalar(&_engine->GetRespiratory().GetTranspulmonaryPressure());
+      cardiovascular->child(0)->unit_scalar(&_engine->GetCardiovascular().GetCerebralPerfusionPressure());
+      cardiovascular->child(1)->unit_scalar(&_engine->GetCardiovascular().GetIntracranialPressure());
+      cardiovascular->child(2)->unit_scalar(&_engine->GetCardiovascular().GetSystemicVascularResistance());
+      cardiovascular->child(3)->unit_scalar(&_engine->GetCardiovascular().GetPulsePressure());
+      cardiovascular->child(4)->unit_scalar(&_engine->GetCardiovascular().GetHeartStrokeVolume());
+      cardiovascular->child(5)->unit_scalar(&_engine->GetCardiovascular().GetCardiacIndex());
+      cardiovascular->child(6)->scalar(&_engine->GetCardiovascular().GetHeartEjectionFraction());
+      cardiovascular->child(7)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
+      cardiovascular->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
+      cardiovascular->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
+      cardiovascular->child(10)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
+      
     }
 
+    auto respiratory = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RESPIRATORY, 0, QModelIndex()).internalPointer());
+    {
+      respiratory->child(0)->scalar(&_engine->GetRespiratory().GetInspiratoryExpiratoryRatio());
+      respiratory->child(1)->unit_scalar(&_engine->GetRespiratory().GetTotalPulmonaryVentilation());
+      respiratory->child(2)->unit_scalar(&_engine->GetRespiratory().GetTotalLungVolume());
+      respiratory->child(2)->unit("L");
+      respiratory->child(3)->unit_scalar(&_engine->GetRespiratory().GetTidalVolume());
+      respiratory->child(4)->unit_scalar(&_engine->GetRespiratory().GetTotalAlveolarVentilation());
+      respiratory->child(5)->unit_scalar(&_engine->GetRespiratory().GetTotalDeadSpaceVentilation());
+      respiratory->child(6)->unit_scalar(&_engine->GetRespiratory().GetTranspulmonaryPressure());
+    }
+    
     auto blood_chemistry = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::BLOOD_CHEMISTRY, 0, QModelIndex()).internalPointer());
     {
-
-      blood_chemistry->child(0)->scalar(&_engine->GetBloodChemistry().GetCarbonDioxideSaturation());
-      blood_chemistry->child(1)->scalar(&_engine->GetBloodChemistry().GetCarbonMonoxideSaturation());
+      blood_chemistry->child(0)->unit_scalar(&_engine->GetBloodChemistry().GetArterialOxygenPressure());
+      blood_chemistry->child(1)->unit_scalar(&_engine->GetBloodChemistry().GetArterialCarbonDioxidePressure());
       blood_chemistry->child(2)->scalar(&_engine->GetBloodChemistry().GetOxygenSaturation());
-      blood_chemistry->child(3)->scalar(&_engine->GetBloodChemistry().GetArterialBloodPH());
-      blood_chemistry->child(4)->scalar(&_engine->GetBloodChemistry().GetHematocrit());
-      blood_chemistry->child(5)->scalar(&_engine->GetBloodChemistry().GetStrongIonDifference());
+      blood_chemistry->child(3)->scalar(&_engine->GetBloodChemistry().GetCarbonDioxideSaturation());
+      blood_chemistry->child(4)->scalar(&_engine->GetBloodChemistry().GetArterialBloodPH());
+      blood_chemistry->child(5)->scalar(&_engine->GetBloodChemistry().GetHematocrit());
+      blood_chemistry->child(6)->unit_scalar(&_engine->GetSubstances().GetLactate().GetBloodConcentration());
+      blood_chemistry->child(7)->scalar(&_engine->GetBloodChemistry().GetStrongIonDifference());
     }
 
     auto energy_and_metabolism = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::ENERGY_AND_METABOLISM, 0, QModelIndex()).internalPointer());
@@ -371,29 +382,23 @@ Scenario& Scenario::load_patient(QString file)
       energy_and_metabolism->child(9)->scalar(&cond.GetRelativeHumidity());
     }
 
-    auto fluid_balance = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::FLUID_BALANCE, 0, QModelIndex()).internalPointer());
-    {
-
-      fluid_balance->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
-      fluid_balance->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
-      fluid_balance->child(2)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
-      fluid_balance->child(3)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
-      fluid_balance->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
-      fluid_balance->child(5)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
-      fluid_balance->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
-      fluid_balance->child(7)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
-      fluid_balance->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
-      fluid_balance->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
-      fluid_balance->child(10)->unit_scalar(&_engine->GetTissue().GetExtravascularFluidVolume());
-      fluid_balance->child(11)->unit_scalar(&_engine->GetRenal().GetLeftReabsorptionRate());
-      fluid_balance->child(12)->unit_scalar(&_engine->GetRenal().GetRightReabsorptionRate());
-    }
-
     auto renal = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RENAL, 0, QModelIndex()).internalPointer());
     {
       renal->child(0)->unit_scalar(&_engine->GetRenal().GetMeanUrineOutput());
+      renal->child(0)->unit("mL/min");
       renal->child(1)->unit_scalar(&_engine->GetRenal().GetUrineProductionRate());
+      renal->child(1)->unit("mL/min");
       renal->child(2)->unit_scalar(&_engine->GetRenal().GetGlomerularFiltrationRate());
+      renal->child(2)->unit("mL/min");
+      renal->child(3)->unit_scalar(&_engine->GetRenal().GetUrineVolume());
+      renal->child(4)->unit_scalar(&_engine->GetRenal().GetUrineOsmolality());
+      renal->child(5)->unit_scalar(&_engine->GetRenal().GetUrineOsmolarity());
+      renal->child(6)->unit_scalar(&_engine->GetRenal().GetRenalBloodFlow());
+      renal->child(6)->unit("L/min");
+      renal->child(7)->unit_scalar(&_engine->GetRenal().GetLeftReabsorptionRate());
+      renal->child(7)->unit("mL/min");
+      renal->child(8)->unit_scalar(&_engine->GetRenal().GetRightReabsorptionRate());
+      renal->child(8)->unit("mL/min");
     }
 
     auto substances = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::SUBSTANCES, 0, QModelIndex()).internalPointer());

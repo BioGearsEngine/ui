@@ -14,7 +14,6 @@ Item {
 	id: root
 	
 	property PhysiologyModel physiologyRenalModel
-	property PhysiologyModel physiologyRenalFluidModel
 	property Urinalysis urinalysisData
 	
 	signal urinalysisRequest()
@@ -50,43 +49,35 @@ Item {
 
 	
 	
-	// Based on BioGearsData for RENAL_OVERVIEW (physiologyRenalModel)
+	// Based on BioGearsData for RENAL (physiologyRenalModel)
 	// 0 - Mean Urine Output
 	// 1 - Urine Production Rate
 	// 2 - Glomerular Filtration Rate
-	
-	// Based on BioGearsData for RENAL_FLUID_BALANCE (physiologyRenalFluidModel)
-    // 0 - Mean Urine Output
-    // 1 - Urine Production Rate
-    // 2 - Urine Volume
-    // 3 - Urine Osmolality
-    // 4 - Urine Osmolarity
-    // 5 - Glomerular Filtration Rate
-    // 6 - Renal Blood Flow
-    // 7 - Total Body Fluid Volume
-    // 8 - Extracell Fluid Volume
-    // 9 - Intracell Fluid Volume
-    // 10 - Extravascular Fluid Volume
-    // Check ua and reabsorption rate
+	// 3 - Urine volume
+  // 4 - Urine osmolarity
+  // 5 - Urine osmolality
+  // 6 - Renal blood flow
+  // 7 - Left reabsorption rate
+  // 9 - Right reabsorption rate
 	
 	Timer {
-        id : renalTimer
-        interval : 200 // Mimic the 5 Hz plot timer
-        running : false
-        repeat : true
-        triggeredOnStart : true
+    id : renalTimer
+    interval : 200 // Mimic the 5 Hz plot timer
+    running : false
+    repeat : true
+    triggeredOnStart : true
 		// start, stop, and pause are handled in GraphForm after passing out renalTimer
 		onTriggered : {
 			let urineProdIndex = physiologyRenalModel.index(1, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
 			root.urineProductionRate = physiologyRenalModel.data(urineProdIndex, PhysiologyModel.ValueRole).toFixed(2)
-			let glomFiltRateIndex = physiologyRenalFluidModel.index(5, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.glomerularFiltrationRate = physiologyRenalFluidModel.data(glomFiltRateIndex, PhysiologyModel.ValueRole).toFixed(2)
-			let renalBloodFlowIndex = physiologyRenalFluidModel.index(6, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.renalBloodFlow = physiologyRenalFluidModel.data(renalBloodFlowIndex, PhysiologyModel.ValueRole).toFixed(2)
-			let lReabsIndex = physiologyRenalFluidModel.index(11, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.leftReabsorptionRate = physiologyRenalFluidModel.data(lReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
-			let rReabsIndex = physiologyRenalFluidModel.index(12, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.rightReabsorptionRate = physiologyRenalFluidModel.data(rReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let glomFiltRateIndex = physiologyRenalModel.index(2, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.glomerularFiltrationRate = physiologyRenalModel.data(glomFiltRateIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let renalBloodFlowIndex = physiologyRenalModel.index(6, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.renalBloodFlow = physiologyRenalModel.data(renalBloodFlowIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let lReabsIndex = physiologyRenalModel.index(7, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.leftReabsorptionRate = physiologyRenalModel.data(lReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
+			let rReabsIndex = physiologyRenalModel.index(8, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
+			root.rightReabsorptionRate = physiologyRenalModel.data(rReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
 			root.meanReabsorptionRate = (root.leftReabsorptionRate + root.rightReabsorptionRate) / 2;
 
 		}
@@ -638,8 +629,9 @@ Item {
 						border.width: 2
 						Text {
 							id: textRenalFlow
+              width : parent.width
 							font.bold: true
-							text: qsTr("RBF (mL/s): ") + root.renalBloodFlow
+							text: qsTr("RBF (L/min): ") + root.renalBloodFlow
 							anchors.verticalCenter: renalFlowBox.verticalCenter
 							anchors.horizontalCenter: renalFlowBox.horizontalCenter
 							color: "black"
@@ -657,8 +649,9 @@ Item {
 						border.width: 2
 						Text {
 							id: textUrineProd
+              width : parent.width
 							font.bold: true
-							text: qsTr("UPR (mL/s): ") + root.urineProductionRate
+							text: qsTr("UPR (mL/min): ") + root.urineProductionRate
 							anchors.verticalCenter: renalUrineProdBox.verticalCenter
 							anchors.horizontalCenter: renalUrineProdBox.horizontalCenter
 							color: "black"
@@ -676,8 +669,9 @@ Item {
 						border.width: 2
 						Text {
 							id: textGlomFilt
+              width : parent.width
 							font.bold: true
-							text: qsTr("GFR (mL/s): ") + root.glomerularFiltrationRate
+							text: qsTr("GFR (mL/min): ") + root.glomerularFiltrationRate
 							anchors.verticalCenter: renalGlomFiltBox.verticalCenter
 							anchors.horizontalCenter: renalGlomFiltBox.horizontalCenter
 							color: "black"
@@ -695,7 +689,8 @@ Item {
 						Text {
 							id: textReabs
 							font.bold: true
-							text: qsTr("Reabs. (mL/s): ") + root.meanReabsorptionRate
+              width : parent.width
+							text: qsTr("Reabs. (mL/min): ") + root.meanReabsorptionRate
 							anchors.verticalCenter: renalReabsBox.verticalCenter
 							anchors.horizontalCenter: renalReabsBox.horizontalCenter
 							color: "black"

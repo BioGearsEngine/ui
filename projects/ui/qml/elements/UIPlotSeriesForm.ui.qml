@@ -38,7 +38,6 @@ ChartView {
   }
   ValueAxis {
     id: yAxis
-    //d, e, E, f, g, G, 
     labelFormat: (max < 1.)? '%.3f' : (max < 10.)? '%.2f' : (max < 100.) ?  '%.1f' : (max < 10000.) ?  '%.0f' : '%.2e'
     tickCount : 3
   }
@@ -67,20 +66,20 @@ ChartView {
       ButtonGroup { id: rateGroup }
       Row{ 
         id: rateRow1; 
-        RadioButton{id:speed_lhz;  property int rate:  1; text: "1hz";  ButtonGroup.group:rateGroup; checked: true} 
-        RadioButton{id:speed_5hz;  property int rate:  5; text: "5hz";  ButtonGroup.group:rateGroup} 
-        RadioButton{id:speed_10hz; property int rate: 10; text: "10hz"; ButtonGroup.group:rateGroup}
+        RadioButton{id:speed_lhz;  property int rate:  1; text: "1hz";  ButtonGroup.group:rateGroup; checked: false} 
+        RadioButton{id:speed_5hz;  property int rate:  5; text: "5hz";  ButtonGroup.group:rateGroup; checked : false} 
+        RadioButton{id:speed_10hz; property int rate: 10; text: "10hz"; ButtonGroup.group:rateGroup; checked : true}
       }
       Row{
         id: rateRow2;  
-        RadioButton{id:speed_5s;  property int rate:  -5;  text: "5s" ; ButtonGroup.group:rateGroup} 
-        RadioButton{id:speed_10s; property int rate: -10;  text: "10s"; ButtonGroup.group:rateGroup}
+        RadioButton{id:speed_5s;  property int rate:  -5;  text: "5s" ; ButtonGroup.group:rateGroup; checked : false} 
+        RadioButton{id:speed_10s; property int rate: -10;  text: "10s"; ButtonGroup.group:rateGroup; checked : false}
       }
       Label { text: "Time Scale"; font.pixelSize: 16;    font.bold: true}
         Row{
-          RadioButton{ id:range_1; text: "1 min"} 
-          RadioButton{id:range_5;  text: "5 min"} 
-          RadioButton{id:range_10; text: "10 min"; checked: true}
+          RadioButton{ id:range_1; text: "1 min"; checked : true} 
+          RadioButton{id:range_5;  text: "5 min"; checked : false} 
+          RadioButton{id:range_10; text: "10 min"; checked: false}
         }
       MenuSeparator {}
       Label { text : "Scaling"; font.pixelSize: 16;    font.bold: true }

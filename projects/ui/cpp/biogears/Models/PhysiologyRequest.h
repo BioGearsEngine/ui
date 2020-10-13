@@ -103,7 +103,7 @@ private:
   bool _enabled = false;
   bool _custom = false;
   bool _nested = false;
-  int _refresh_rate = 1;
+  int _refresh_rate = 10;
   bool _auto_scale;
   double _y_max;
   double _y_min;
