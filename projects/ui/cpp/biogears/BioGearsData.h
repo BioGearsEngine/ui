@@ -9,6 +9,7 @@
 
 #include "Models/PhysiologyRequest.h"
 #include "biogears/engine/Controller/BioGearsSubstances.h"
+#include "biogears/cdm/scenario/requests/SEDataRequestManager.h"
 
 class BioGearsData : public QAbstractItemModel {
   Q_OBJECT
@@ -72,6 +73,7 @@ public:
 
   double getSimulationTime();
   void setSimulationTime(double time_s);
+  void enableFromScenario(CDM::ScenarioData* scenario);
 
   QHash<int, QByteArray> roleNames() const
   {

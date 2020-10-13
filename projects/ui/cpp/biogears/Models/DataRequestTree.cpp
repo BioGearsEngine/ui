@@ -419,7 +419,7 @@ QString DataRequestTree::encode_substance_request(CDM::SubstanceDataRequestData*
 {
   //Initialize request string to be passed to builder and establish name of request for which we are searching
   QString request = "";
-  std::string searchString = req->Name();  //Note that unlike compartment substance quantity requests, Substance requests store sub name in the Name field 
+  std::string searchString = req->Name();  //Name is the data request, sub name is stored in the Substance field
   bool foundRequest = false;
   //Set data in RequestModel so that when Scenario Builder is opened, the request menu will have the proper sub-menus opened and request options checked
   QModelIndex substanceGroupIndex = index(4, 0, QModelIndex()); //substance branch is 4th element inside top level

@@ -33,6 +33,7 @@ ColumnLayout {
 
   property alias playback : playback_controls
   property alias openDrawerButton : openDrawerButton
+  property alias loadScenarioButton : loadScenarioButton
   property alias actionSwitchView : actionSwitchView
 
 
@@ -110,21 +111,38 @@ ColumnLayout {
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
     Layout.fillWidth: true
   }
-  UIBioGearsButtonForm {
-    id : openDrawerButton
-    contentItem : Text {
-      id : drawerText
-      text : 'Add Action'
-      font.pointSize : 12
-      color : 'white'
-      horizontalAlignment : Text.AlignHCenter
-      verticalAlignment : Text.AlignVCenter
+  RowLayout { 
+    Layout.fillWidth : true
+    Layout.alignment : Qt.AlignHCenter
+    UIBioGearsButtonForm {
+      id : openDrawerButton
+      contentItem : Text {
+        id : drawerText
+        text : 'Add Actions'
+        font.pointSize : 12
+        color : 'white'
+        horizontalAlignment : Text.AlignHCenter
+        verticalAlignment : Text.AlignVCenter
+      }
+      Layout.preferredWidth: root.width / 2 - spacing
+      Layout.alignment: Qt.AlignHCenter
+      implicitHeight : drawerText.implicitHeight * 1.2
     }
-    Layout.preferredWidth: root.width
-    Layout.alignment: Qt.AlignHCenter
-    implicitHeight : drawerText.implicitHeight * 1.5
+    UIBioGearsButtonForm {
+      id : loadScenarioButton
+      contentItem : Text {
+        id : loadText
+        text : 'Load Scenario'
+        font.pointSize : 12
+        color : 'white'
+        horizontalAlignment : Text.AlignHCenter
+        verticalAlignment : Text.AlignVCenter
+      }
+      Layout.preferredWidth: root.width / 2 - spacing
+      Layout.alignment: Qt.AlignHCenter
+      implicitHeight : loadText.implicitHeight * 1.2
+    }
   }
-
   Rectangle {
     id : actionButtonWrapper
     Layout.preferredWidth : root.width

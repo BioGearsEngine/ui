@@ -4,12 +4,12 @@ import com.biogearsengine.ui.scenario 1.0
 MenuAreaForm {
   id : root
   signal newDataRequestModel(DataRequestModel requestTree)
-  signal scenarioFileLoaded(EventModel events, var requests, string sampling)
+  signal loadScenarioToBuilder(EventModel events, var requests, string sampling)
 
   onNewDataRequestModel : {
     root.scenarioBuilder.bgRequests = requestTree
   }
-  onScenarioFileLoaded : {
+  onLoadScenarioToBuilder : {
     scenarioBuilder.loadScenario(events, requests, sampling)
   }
 

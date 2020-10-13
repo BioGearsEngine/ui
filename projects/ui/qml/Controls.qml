@@ -18,7 +18,7 @@ ControlsForm {
   signal patientStateChanged(PatientState patientState )
   signal patientPhysiologyChanged(PhysiologyModel model)
   signal patientStateLoad()
-  signal scenarioFileLoaded(EventModel events, var requests, string sampling)
+  signal loadScenarioToBuilder(EventModel events, var requests, string sampling)
   signal newActiveSubstance(var subIndex)
   signal substanceDataChanged(real time_s, var subData)
   signal openActionDrawer()
@@ -49,8 +49,8 @@ ControlsForm {
       bgRequests = requestTree
       root.dataRequestModelChanged(bgRequests)
     }
-    onScenarioFileLoaded : {
-      root.scenarioFileLoaded(events, requests, sampling)
+    onLoadScenarioToBuilder : {
+      root.loadScenarioToBuilder(events, requests, sampling)
     }
     onPatientMetricsChanged: {
         root.respiratoryRate.value.text       = metrics.RespiratoryRate
@@ -168,6 +168,11 @@ ControlsForm {
   openDrawerButton.onPressed : {
     root.openActionDrawer();
   }
+
+  loadScenarioButton.onPressed : {
+    scenario.load_scenario();
+  }
+
   function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);

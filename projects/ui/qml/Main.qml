@@ -46,8 +46,8 @@ ApplicationWindow {
     controls.onDataRequestModelChanged : {
       menuArea.newDataRequestModel(requestTree)
     }
-    controls.onScenarioFileLoaded : {
-      menuArea.scenarioFileLoaded(events, requests, sampling)
+    controls.onLoadScenarioToBuilder : {
+      menuArea.loadScenarioToBuilder(events, requests, sampling)
     }
     controls.onNewActiveSubstance : {
       graphArea.newActiveSubstance(subIndex)

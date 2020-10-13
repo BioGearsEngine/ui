@@ -441,7 +441,7 @@ QModelIndex BioGearsData::index(QAbstractItemModel const* model) const
     return createIndex(BLOOD_CHEMISTRY, 0, _blood_chemistry);
   } else if (_energy_and_metabolism == model) {
     return createIndex(ENERGY_AND_METABOLISM, 0, _energy_and_metabolism);
-  }  else if (_renal == model) {
+  } else if (_renal == model) {
     return createIndex(RENAL, 0, _renal);
   } else if (_substances == model) {
     return createIndex(SUBSTANCES, 0, _substances);
@@ -484,3 +484,31 @@ PhysiologyRequest* BioGearsData::child(int row)
   return _rootRequest.child(row);
 }
 //------------------------------------------------------------------------------------
+void BioGearsData::enableFromScenario(CDM::ScenarioData* scenario)
+{
+  QString searchKey = "";
+  QString requestName = "";
+  if (scenario->DataRequests().present()) {
+    for (auto& req : scenario->DataRequests().get().DataRequest()) {
+      //Graph area only holds physiology and substance data requests (no compartment or patient)
+      if (auto physiologyReq = dynamic_cast<CDM::PhysiologyDataRequestData*>(&req)) {
+        searchKey = QString::fromStdString(physiologyReq->Name());
+        //Search vitals
+        QModelIndex vitals = index(VITALS, 0, QModelIndex());
+        for (int i = 0; i < rowCount(vitals); ++i) {
+          requestName = _vitals->child(i)->name();
+          requestName.replace(" ", "");
+          if (requestName == searchKey) {
+            _vitals->child(i)->enabled(true);
+            std::cout << requestName.toStdString() << "\n";
+          } else {
+            _vitals->child(i)->enabled(false);
+          }
+        }
+        
+      } else if (auto substanceReq = dynamic_cast<CDM::SubstanceDataRequestData*>(&req)) {
+        searchKey = QString::fromStdString(physiologyReq->Name());
+      }
+    }
+  }
+}
