@@ -15,7 +15,10 @@ public:
   ~PhysiologyRequest();
 
   QString name() const;
-  void name(const QString&);
+  void name(const QString& value);
+
+  QString display_name() const;
+  void display_name(const QString& value);
 
   bool usable() const;
   void usable(bool value);
@@ -63,7 +66,7 @@ public:
   PhysiologyRequest const* child(int row) const;
 
   QString header(int col) const;
-  PhysiologyRequest* append(QString prefix, QString name, bool enabled = false, bool usable = true);
+  PhysiologyRequest* append(QString prefix, QString name, QString display = "", bool enabled = false, bool usable = true);
   void modify(int row, const biogears::SEUnitScalar* data);
   void modify(int row, const biogears::SEScalar* data);
   void modify(int row, int refreshRate);
@@ -97,6 +100,7 @@ private:
   QVector<PhysiologyRequest> _children;
   QString _prefix;
   QString _name;
+  QString _display_name;
   QString _unit;
   bool _unit_override = false;    //When user request unit different than base unit stored on _unit_scalar
   bool _usable = false;

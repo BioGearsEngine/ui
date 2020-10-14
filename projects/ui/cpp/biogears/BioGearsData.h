@@ -74,6 +74,7 @@ public:
   double getSimulationTime();
   void setSimulationTime(double time_s);
   void enableFromScenario(CDM::ScenarioData* scenario);
+  void enableGroup(const QModelIndex& index, QVector<QString>& keys);
 
   QHash<int, QByteArray> roleNames() const
   {
@@ -100,7 +101,7 @@ public:
   }
 
   void clear(); //Remove all Children;
-  PhysiologyRequest* append(QString prefix, QString name);
+  PhysiologyRequest* append(QString prefix, QString name, QString display = "");
   PhysiologyRequest const* child(int row) const;
   PhysiologyRequest* child(int row);
 

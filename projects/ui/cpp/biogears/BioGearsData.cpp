@@ -67,58 +67,62 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
   _substances = new BioGearsData("Substances", this);
   _customs = new BioGearsData("Custom", this);
 
+  //Append function takes prefix, request name, and display name. Request name must exactly match the
+  // corresponding request name in Physiology.xsd for data request lookup from scenario to work correctly.
+  // Display name will be shown in plots.  If display name not provided, it defaults to request name with spaces
+  // inserted between words.
   _vitals->append(QString("Vitals"), QString("Arterial Pressure"));
   auto vital = _vitals->child(0); //default display blood pressure
   vital->enabled(true);
   {
     vital->nested(false);
-    vital->append(QString("Vitals"), QString("Systolic Pressure"));
-    vital->append(QString("Vitals"), QString("Diastolic Pressure"));
-    vital->append(QString("Vitals"), QString("Mean Arterial Pressure"));
+    vital->append(QString("Vitals"), QString("SystolicArterialPressure"), QString("Systolic Pressure"));
+    vital->append(QString("Vitals"), QString("DiastolicArterialPressure"), QString("Diastolic Pressure"));
+    vital->append(QString("Vitals"), QString("MeanArterialPressure"), QString("Mean Pressure"));
   }
-  _vitals->append(QString("Vitals"), QString("Heart Rate"));
+  _vitals->append(QString("Vitals"), QString("HeartRate"));
   _vitals->child(1)->enabled(true); //default display HR
-  _vitals->append(QString("Vitals"), QString("Respiration Rate"));
+  _vitals->append(QString("Vitals"), QString("RespirationRate"));
   _vitals->child(2)->enabled(true); //default display RR
-  _vitals->append(QString("Vitals"), QString("Oxygen Saturation"));
+  _vitals->append(QString("Vitals"), QString("OxygenSaturation"));
   _vitals->child(3)->enabled(true); //default display O2 sat
-  _vitals->append(QString("Vitals"), QString("Blood Volume"));
-  _vitals->append(QString("Vitals"), QString("Central Venous Pressure"));
-  _vitals->append(QString("Vitals"), QString("Cardiac Output"));
+  _vitals->append(QString("Vitals"), QString("BloodVolume"));
+  _vitals->append(QString("Vitals"), QString("CentralVenousPressure"));
+  _vitals->append(QString("Vitals"), QString("CardiacOutput"));
 
-  _cardiovascular->append(QString("Cardiovascular"), QString("Cerebral Perfusion Pressure"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Intracranial Pressure"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Systemic Vascular Resistance"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Pulse Pressure"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Stroke Volume"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Cardiac Index"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Ejection Fraction"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Extravascular Fluid Volume"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Extracellular Fluid Volume"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Intracellular Fluid Volume"));
-  _cardiovascular->append(QString("Cardiovascular"), QString("Total Body Fluid"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("CerebralPerfusionPressure"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("IntracranialPressure"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("SystemicVascularResistance"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("PulsePressure"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("HeartStrokeVolume"), QString("Stroke Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("CardiacIndex"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("EjectionFraction"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("ExtravascularFluidVolume"), QString("Extravascular Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("ExtracellularFluidVolume"), QString("Extracellular Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("IntracellularFluidVolume"), QString("Intracellular Volume"));
+  _cardiovascular->append(QString("Cardiovascular"), QString("TotalBodyFluidVolume"), QString("Total Body Volume"));
 
-  _respiratory->append(QString("Respiratory"), QString("IE Ratio"));
-  _respiratory->append(QString("Respiratory"), QString("Total Pulmonary Ventilation"));
-  _respiratory->append(QString("Respiratory"), QString("Lung Volume"));
-  _respiratory->append(QString("Respiratory"), QString("Tidal Volume"));
-  _respiratory->append(QString("Respiratory"), QString("Alveolar Ventilation"));
-  _respiratory->append(QString("Respiratory"), QString("Dead Space Ventlation"));
-  _respiratory->append(QString("Respiratory"), QString("Transpulmonary Pressure"));
+  _respiratory->append(QString("Respiratory"), QString("InspiratoryExpiratoryRatio"), QString("IE Ratio"));
+  _respiratory->append(QString("Respiratory"), QString("TotalPulmonaryVentilation"), QString("Total Ventilation"));
+  _respiratory->append(QString("Respiratory"), QString("TotalLungVolume"), QString("Lung Volume"));
+  _respiratory->append(QString("Respiratory"), QString("TidalVolume"));
+  _respiratory->append(QString("Respiratory"), QString("AlveolarVentilation"));
+  _respiratory->append(QString("Respiratory"), QString("DeadSpaceVentlation"));
+  _respiratory->append(QString("Respiratory"), QString("TranspulmonaryPressure"));
 
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Arterial O2 Pressure"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Arterial CO2 Pressure"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Oxygen Saturation"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Carbon Dioxide Saturation"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Blood PH"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("ArterialOxygenPressure"), QString("Arterial O2 Pressure"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("ArterialCarbonDioxidePressure"), QString("Arterial CO2 Pressure"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("OxygenSaturation"), QString("O2 Saturation"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("CarbonDioxideSaturation"), QString("CO2 Saturation"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("ArterialBloodPH"), QString("Blood pH"));
   _blood_chemistry->append(QString("Blood Chemistry"), QString("Hematocrit"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Lactate Concentration"));
-  _blood_chemistry->append(QString("Blood Chemistry"), QString("Strong Ion Difference"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("LactateConcentration"));
+  _blood_chemistry->append(QString("Blood Chemistry"), QString("StrongIonDifference"));
 
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Core Temperature"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Sweat Rate"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Skin Temperature"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Total Metabolic Rate"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("CoreTemperature"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("SweatRate"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("SkinTemperature"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("TotalMetabolicRate"));
   _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Stomach Contents"));
   auto stomach_contents = _energy_and_metabolism->child(4);
   {
@@ -130,23 +134,23 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
     stomach_contents->append(QString("Stomach Contents"), QString("Sodium"));
     stomach_contents->append(QString("Stomach Contents"), QString("Water"));
   }
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Oxygen Consumption Rate"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("CO2 Production Rate"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Dehydration Fraction"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Ambient Temperature"));
-  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("Relative Humidity"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("OxygenConsumptionRate"), QString("O2 Consumption"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("CarbonDioxideProductionRate"), QString("CO2 Production"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("DehydrationFraction"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("AmbientTemperature"));
+  _energy_and_metabolism->append(QString("Energy and Metabolism"), QString("RelativeHumidity"));
 
-  _renal->append(QString("Renal"), QString("Mean Urine Output"));
-  _renal->append(QString("Renal"), QString("Urine Production Rate"));
+  _renal->append(QString("Renal"), QString("MeanUrineOutput"));
+  _renal->append(QString("Renal"), QString("UrineProductionRate"));
   _renal->child(1)->enabled(true);
-  _renal->append(QString("Renal"), QString("Glomerular Filtration Rate"));
+  _renal->append(QString("Renal"), QString("GlomerularFiltrationRate"));
   _renal->child(2)->enabled(true);
-  _renal->append(QString("Renal"), QString("Urine Volume"));
-  _renal->append(QString("Renal"), QString("Urine Osmolality"));
-  _renal->append(QString("Renal"), QString("Urine Osmolarity"));
-  _renal->append(QString("Renal"), QString("Renal Blood Flow"));
-  _renal->append(QString("Renal"), QString("Left Reabsorption Rate"));
-  _renal->append(QString("Renal"), QString("Right Reabsorption Rate"));
+  _renal->append(QString("Renal"), QString("UrineVolume"));
+  _renal->append(QString("Renal"), QString("UrineOsmolality"));
+  _renal->append(QString("Renal"), QString("UrineOsmolarity"));
+  _renal->append(QString("Renal"), QString("RenalBloodFlow"));
+  _renal->append(QString("Renal"), QString("LeftReabsorptionRate"));
+  _renal->append(QString("Renal"), QString("RightReabsorptionRate"));
 
   //Add all substances from manager -- create nodes for appropriate fields (unit/scalar values default to nullptrs)
   //All this does is set up containers for sub data -- data will not be assigned to substance until it is active
@@ -155,31 +159,31 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
     subData->nested(true);
     subData->usable(false); //Set all substances to non-usable (will be set when substance is activated in Biogears)
     //Every substance should have blood concentration, mass in body, mass in blood, mass in tissue
-    auto metric = subData->append(subData->name(), QString("Blood Concentration"));
-    metric = subData->append(subData->name(), QString("Mass in Body"));
-    metric = subData->append(subData->name(), QString("Mass in Blood"));
-    metric = subData->append(subData->name(), QString("Mass in Tissue"));
+    auto metric = subData->append(subData->name(), QString("BloodConcentration"));
+    metric = subData->append(subData->name(), QString("MassInBody"));
+    metric = subData->append(subData->name(), QString("MassInBlood"));
+    metric = subData->append(subData->name(), QString("MassInTissue"));
     //Only subs that are dissolved gases need alveolar transfer and end tidal.  Use relative diffusion coefficient to filter
     if (sub->HasRelativeDiffusionCoefficient()) {
-      metric = subData->append(subData->name(), QString("Alveolar Transfer"));
-      metric = subData->append(subData->name(), QString("End Tidal Fraction"));
+      metric = subData->append(subData->name(), QString("AlveolarTransfer"));
+      metric = subData->append(subData->name(), QString("EndTidalFraction"));
     }
     //Only subs that have PK need effect site, plasma, AUC
     if (sub->HasPK()) {
-      metric = subData->append(subData->name(), QString("Effect Site Concentration"));
-      metric = subData->append(subData->name(), QString("Plasma Concentration"));
-      metric = subData->append(subData->name(), QString("Area Under Curve"));
+      metric = subData->append(subData->name(), QString("EffectSiteConcentration"));
+      metric = subData->append(subData->name(), QString("PlasmaConcentration"));
+      metric = subData->append(subData->name(), QString("AreaUnderCurve"));
     }
     //Assign clearances, if applicable
     if (sub->HasClearance()) {
       if (sub->GetClearance().HasRenalClearance()) {
-        metric = subData->append(subData->name(), QString("Renal Clearance"));
+        metric = subData->append(subData->name(), QString("RenalClearance"));
       }
       if (sub->GetClearance().HasIntrinsicClearance()) {
-        metric = subData->append(subData->name(), QString("Intrinsic Clearance"));
+        metric = subData->append(subData->name(), QString("IntrinsicClearance"));
       }
       if (sub->GetClearance().HasSystemicClearance()) {
-        metric = subData->append(subData->name(), QString("Systemic Clearance"));
+        metric = subData->append(subData->name(), QString("SystemicClearance"));
       }
     }
   }
@@ -279,7 +283,6 @@ int BioGearsData::columnCount(const QModelIndex& index) const
 QVariant BioGearsData::data(int role) const
 
 {
-
   switch (role) {
   case Qt::DisplayRole:
   case RequestRole:
@@ -469,9 +472,9 @@ void BioGearsData::clear()
 }
 //------------------------------------------------------------------------------------
 PhysiologyRequest* BioGearsData::
-  append(QString prefix, QString name)
+  append(QString prefix, QString name, QString display)
 {
-  return _rootRequest.append(prefix, name);
+  return _rootRequest.append(prefix, name, display);
 }
 //------------------------------------------------------------------------------------
 PhysiologyRequest const* BioGearsData::child(int row) const
@@ -486,29 +489,95 @@ PhysiologyRequest* BioGearsData::child(int row)
 //------------------------------------------------------------------------------------
 void BioGearsData::enableFromScenario(CDM::ScenarioData* scenario)
 {
-  QString searchKey = "";
+  QVector<QString> searchKeys; //Use vector rather than QStringList because we can remove by index in vector
   QString requestName = "";
+  //Get a list of all data request names in the scenario.  The Graph Area currently only holds physiology
+  // and substance requests (no patient, compartment, enviroment), so we only cast to those types. Format sub
+  // requests as "SubstanceName-RequestName"
   if (scenario->DataRequests().present()) {
     for (auto& req : scenario->DataRequests().get().DataRequest()) {
       //Graph area only holds physiology and substance data requests (no compartment or patient)
       if (auto physiologyReq = dynamic_cast<CDM::PhysiologyDataRequestData*>(&req)) {
-        searchKey = QString::fromStdString(physiologyReq->Name());
-        //Search vitals
-        QModelIndex vitals = index(VITALS, 0, QModelIndex());
-        for (int i = 0; i < rowCount(vitals); ++i) {
-          requestName = _vitals->child(i)->name();
-          requestName.replace(" ", "");
-          if (requestName == searchKey) {
-            _vitals->child(i)->enabled(true);
-            std::cout << requestName.toStdString() << "\n";
-          } else {
-            _vitals->child(i)->enabled(false);
-          }
-        }
-        
+        searchKeys.append(QString::fromStdString(physiologyReq->Name()));
       } else if (auto substanceReq = dynamic_cast<CDM::SubstanceDataRequestData*>(&req)) {
-        searchKey = QString::fromStdString(physiologyReq->Name());
+        searchKeys.append(QString::fromStdString(substanceReq->Substance() + "-" + substanceReq->Name()));
       }
     }
   }
+
+  //Loop over all categories (Vitals, Cardiovascular, etc) and then all data requests in each section. Set enabled to "true" if we find that
+  // request inside our searchkeys list.  Otherwise, set it to false.  Remove searchkey from list when found so that
+  // we can cut down on number of iterations as we progress through requests.
+  bool foundRequest = false;
+  for (int i = 0; i < categories() - 1; ++i) {
+    //i = enum corresponding to category.  Stopping 1 short because we are not doing custom category
+    QModelIndex catIndex = index(i, 0, QModelIndex());
+    BioGearsData* catData = category(i);
+    //Substances category handled differently than others (need to find both Substance AND request)
+    if (i == Categories::SUBSTANCES) {
+      QString substanceName;
+      QStringList subRequestPair;
+      //Loop over substances inside Substance Category
+      for (int j = 0; j < rowCount(catIndex); ++j) {
+        substanceName = _substances->child(j)->name();
+        for (int k = 0; k < searchKeys.length(); ++k) {
+          subRequestPair = searchKeys[k].split('-');    //Subtance requests formatted as "Substance-Request"
+          if (substanceName == subRequestPair[0]) {
+            //Found the right substance, now search through that substances children to find matching request
+            QModelIndex substanceIndex = index(j, 0, catIndex);
+            PhysiologyRequest* substance = static_cast<PhysiologyRequest*>(substanceIndex.internalPointer());
+            for (int m = 0; m < rowCount(substanceIndex); ++m) {
+              requestName = substance->child(m)->name();
+              if (requestName == subRequestPair[1]) {
+                substance->child(m)->enabled(true);
+                searchKeys.remove(k);
+                foundRequest = true;
+                break;
+              }
+            }
+            if (foundRequest) {
+              break;
+            };
+          }
+        }
+      }
+    } else {
+      //Loop over requests inside category
+      for (int j = 0; j < rowCount(catIndex); ++i) {
+        //Does the request have children? (Like Arterial Pressure -> [Systolic, Diastolic]?
+        foundRequest = false;
+        if (catData->child(j)->data(PhysiologyRequestRoles::ChildrenRole) > 0) {
+          //If children, search them for requests
+          PhysiologyRequest* parent = static_cast<PhysiologyRequest*>(index(i, 0, catIndex).internalPointer());
+          for (int k = 0; k < rowCount(index(i, 0, catIndex)); ++k) {
+            requestName = parent->child(k)->name();
+            for (int m = 0; m < searchKeys.length(); ++m) {
+              if (requestName == searchKeys[m]) {
+                catData->child(j)->enabled(true); //Assume that we want to enable all children of the parent
+                searchKeys.remove(m);
+                foundRequest = true;
+                break;
+              }
+            }
+            if (foundRequest) {
+              break;
+            }
+          } 
+        } else {
+          requestName = catData->child(j)->name();
+          for (int k = 0; k < searchKeys.length(); ++k) {
+            if (requestName == searchKeys[k]) {
+              _vitals->child(j)->enabled(true);
+              searchKeys.remove(k);
+              foundRequest = true;
+              break;
+            }
+          }
+        }//endIf
+        if (!foundRequest) {
+          catData->child(j)->enabled(false);
+        }
+      }//end for child in category
+    }//endIf substance
+  }//end for categories 
 }

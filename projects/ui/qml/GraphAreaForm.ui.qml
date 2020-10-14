@@ -32,6 +32,7 @@ Page {
   property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
   property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer   
   signal urinalysisRequest()
+  
 
   state : "realTime"
 
@@ -410,7 +411,7 @@ Page {
       property string info : _info
       property int level : _level
       property bool menuItem : false
-      title : level > 0 ? modelData.data(nodeIndex, PhysiologyModel.RequestRole) : ""   //Don't display a title for top level (e.g. "Vitals", "cardiovascular", ...)
+      title : level > 0 ? modelData.data(nodeIndex, PhysiologyModel.DisplayRole) : ""   //Don't display a title for top level (e.g. "Vitals", "cardiovascular", ...)
       function activateObject(objectIndex){
         //This function is currently only connected to a signal in the Substances menu (see MenuInstantiator)
         requestInstantiator.activateObject(objectIndex)
@@ -446,6 +447,7 @@ Page {
             // "objectActivated" signal.  
             if (object.item.menuItem){
               requestMenu.addItem(object.item)
+              root.onNewPhysiologyModel.connect(object.item.toggleEnabled)
             } else {
               requestMenu.addMenu(object.item)
             }   
@@ -500,11 +502,21 @@ Page {
       property string title : info.slice(0,-3)    //chops the trailing " - " sequence off the info string
       property bool menuItem : true
       property PhysiologyModel bgModel : modelData.category(_category)
+      function toggleEnabled() {
+        if (checkbox.checked != modelData.data(item, PhysiologyModel.EnabledRole)){
+          checkbox.checked = modelData.data(item, PhysiologyModel.EnabledRole)
+          if (checkbox.checked){
+            createPlotView(category, bgModel, item, title)
+          } else {
+            removePlotView(category, item.row, title)
+          }
+        }
+      }
       CheckBox {
         id : checkbox
         checkable : true
-        checked : modelData.data(item, PhysiologyModel.EnabledRole)
-        text : modelData.data(item, PhysiologyModel.RequestRole)
+        checked : false     //Menu items that need to be initialized to checked = true handled by connection between newPhysiologyModel and toggleEnabled()
+        text : modelData.data(item, PhysiologyModel.DisplayRole)
         onClicked : {
           if (checked){
             modelData.setData(item, true, PhysiologyModel.EnabledRole)
@@ -512,14 +524,6 @@ Page {
           } else {
             modelData.setData(item, false, PhysiologyModel.EnabledRole)
             removePlotView(category, item.row, title)
-          }
-        }
-        Component.onCompleted : {
-          //Each menu item is created at startup and maintained through lifetime of program (managed by Instantiator) -- so this signal will only
-          //be emitted once per menu item.  If we have plots that we want to display at start-up, we set their enabled roles to true during initialization
-          //and, when menu item is completed, it will immediately add the plot to the graph area.
-          if (checked){
-            createPlotView(category, bgModel, item, title)
           }
         }
       }

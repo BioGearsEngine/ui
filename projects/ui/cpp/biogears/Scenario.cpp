@@ -1202,7 +1202,7 @@ void Scenario::load_scenario()
   EventTree* events = new EventTree();
   //vents->encode_actions(scenarioData);
   _physiology_model->enableFromScenario(scenarioData);
-  
+  emit physiologyChanged(_physiology_model);
   
 }
 

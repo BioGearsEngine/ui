@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QVariant>
+#include <QRegularExpression>
 
 PhysiologyRequest::PhysiologyRequest()
 {
@@ -30,6 +31,16 @@ QString PhysiologyRequest::name() const
 void PhysiologyRequest::name(const QString& value)
 {
   _name = value;
+}
+//------------------------------------------------------------------------------------
+QString PhysiologyRequest::display_name() const
+{
+  return _display_name;
+}
+//------------------------------------------------------------------------------------
+void PhysiologyRequest::display_name(const QString& value)
+{
+  _display_name = value;
 }
 //------------------------------------------------------------------------------------
 bool PhysiologyRequest::usable() const
@@ -249,11 +260,17 @@ auto PhysiologyRequest::header(int section) const -> QString
   }
 }
 //------------------------------------------------------------------------------------
-PhysiologyRequest* PhysiologyRequest::append(QString prefix, QString name, bool enabled, bool usable)
+PhysiologyRequest* PhysiologyRequest::append(QString prefix, QString name, QString display, bool enabled, bool usable)
 {
   PhysiologyRequest request;
   request._prefix = prefix;
   request._name = name;
+  if (display.isEmpty()) {
+    QString temp = request._name;
+    request._display_name = temp.replace(QRegularExpression("([a-z])([A-Z])"), "\\1 \\2");
+  } else {
+    request._display_name = display;
+  }
   request._parent = this;
   request._enabled = enabled;
   request._usable = usable;
@@ -296,8 +313,9 @@ QVariant PhysiologyRequest::data(int role) const
   case BioGearsData::PrefixRole:
     return QVariant(_prefix); // PREFIX ROLE
   case BioGearsData::RequestRole:
-  case Qt::DisplayRole:
     return QVariant(_name);
+  case Qt::DisplayRole:
+    return QVariant(_display_name);
   case BioGearsData::ValueRole: //VALUE ROLE
     if (_custom) {
       return _customValueFunc();
