@@ -106,7 +106,7 @@ void BioGearsData::initialize(const biogears::BioGearsSubstances& bgSubstances)
   _respiratory->append(QString("Respiratory"), QString("TotalPulmonaryVentilation"), QString("Total Ventilation"));
   _respiratory->append(QString("Respiratory"), QString("TotalLungVolume"), QString("Lung Volume"));
   _respiratory->append(QString("Respiratory"), QString("TidalVolume"));
-  _respiratory->append(QString("Respiratory"), QString("AlveolarVentilation"));
+  _respiratory->append(QString("Respiratory"), QString("TotalAlveolarVentilation"), QString("Alveolar Ventilation"));
   _respiratory->append(QString("Respiratory"), QString("DeadSpaceVentlation"));
   _respiratory->append(QString("Respiratory"), QString("TranspulmonaryPressure"));
 
@@ -520,6 +520,7 @@ void BioGearsData::enableFromScenario(CDM::ScenarioData* scenario)
       //Loop over substances inside Substance Category
       for (int j = 0; j < rowCount(catIndex); ++j) {
         substanceName = _substances->child(j)->name();
+        foundRequest = false;
         for (int k = 0; k < searchKeys.length(); ++k) {
           subRequestPair = searchKeys[k].split('-');    //Subtance requests formatted as "Substance-Request"
           if (substanceName == subRequestPair[0]) {
@@ -531,25 +532,23 @@ void BioGearsData::enableFromScenario(CDM::ScenarioData* scenario)
               if (requestName == subRequestPair[1]) {
                 substance->child(m)->enabled(true);
                 searchKeys.remove(k);
+                --k;   //We're going to stay inside the search key loop to see if we match this same substance again, so update index after removal
                 foundRequest = true;
                 break;
               }
             }
-            if (foundRequest) {
-              break;
-            };
           }
         }
       }
     } else {
       //Loop over requests inside category
-      for (int j = 0; j < rowCount(catIndex); ++i) {
-        //Does the request have children? (Like Arterial Pressure -> [Systolic, Diastolic]?
+      for (int j = 0; j < rowCount(catIndex); ++j) {
         foundRequest = false;
+        //Does the request have children? (Like Arterial Pressure -> [Systolic, Diastolic]?
         if (catData->child(j)->data(PhysiologyRequestRoles::ChildrenRole) > 0) {
           //If children, search them for requests
-          PhysiologyRequest* parent = static_cast<PhysiologyRequest*>(index(i, 0, catIndex).internalPointer());
-          for (int k = 0; k < rowCount(index(i, 0, catIndex)); ++k) {
+          PhysiologyRequest* parent = static_cast<PhysiologyRequest*>(index(j, 0, catIndex).internalPointer());
+          for (int k = 0; k < rowCount(index(j, 0, catIndex)); ++k) {
             requestName = parent->child(k)->name();
             for (int m = 0; m < searchKeys.length(); ++m) {
               if (requestName == searchKeys[m]) {
@@ -567,7 +566,7 @@ void BioGearsData::enableFromScenario(CDM::ScenarioData* scenario)
           requestName = catData->child(j)->name();
           for (int k = 0; k < searchKeys.length(); ++k) {
             if (requestName == searchKeys[k]) {
-              _vitals->child(j)->enabled(true);
+              catData->child(j)->enabled(true);
               searchKeys.remove(k);
               foundRequest = true;
               break;
