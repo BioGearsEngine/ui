@@ -220,7 +220,6 @@ UISubstanceWizardForm {
 
 	//--Function to check PD specific data
 	function verifyPdData() {
-		debugObjects(pdData)
 		let hasShapeParam = false
 		let numModifiers = 0
 		let errorStr = ""
@@ -237,19 +236,19 @@ UISubstanceWizardForm {
 				if (key.includes("MaxEffect")){
 					let modName = key.split("MaxEffect")[0]
 					let ec50Key = modName+"EC50"
-					console.log(modName, ec50Key)
 					if (pdData[key][0]!==null && pdData[ec50Key][0]===null){
 						errorString += "Pharmacodynamics: \n\t " + modName + " cannot set Max Effect without EC50.\n*"
 						valid = false
 					} else if (pdData[key][0]===null && pdData[ec50Key][0]!==null){
 						errorString += "Pharmacodynamics: \n\t " + modName + " cannot set EC50 without Max Effect.\n*"
 						valid = false
-					} else {
-						++numModifiers
+					} else if (pdData[key][0]!==null && pdData[ec50Key][0]!==null) {
+						++numModifiers //Only increment modifiers if data is there
 					}
 				}
 			}	
 		}
+
 		//There is one required PD field (ShapeParameter).  If we have it, then input is valid (any modifiers
 		// not specified will be assigned 0).  If we do not have shape parameter, then we are valid if there are 
 		// no modifiers (meaning substance has no PD, which is fine), but invalid if we try to give modifiers

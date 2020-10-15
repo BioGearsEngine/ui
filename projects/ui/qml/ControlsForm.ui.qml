@@ -116,6 +116,7 @@ ColumnLayout {
     Layout.alignment : Qt.AlignHCenter
     UIBioGearsButtonForm {
       id : openDrawerButton
+      enabled : !root.scenarioLoaded
       contentItem : Text {
         id : drawerText
         text : 'Add Actions'
@@ -132,7 +133,7 @@ ColumnLayout {
       id : loadScenarioButton
       contentItem : Text {
         id : loadText
-        text : 'Load Scenario'
+        text : root.scenarioLoaded ? 'Clear Scenario' : 'Load Scenario'
         font.pointSize : 12
         color : 'white'
         horizontalAlignment : Text.AlignHCenter

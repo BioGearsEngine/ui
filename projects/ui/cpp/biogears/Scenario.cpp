@@ -1184,26 +1184,28 @@ void Scenario::edit_scenario()
 }
 //Loads scenario data to the active console (actions to Controls, data requests to Graph Area) so that
 // user can execute scenario.
-void Scenario::load_scenario()
+bool Scenario::load_scenario()
 {
   //Open file dialog in scenario folder
   QString scenarioFile = QFileDialog::getOpenFileName(nullptr, "Load Scenario", "./Scenarios", "Scenario (*.xml)");
   if (scenarioFile.isNull()) {
-    return;
+    return false;
   }
   //Load file and create and SENutrition object from it using serializer
   if (!QFileInfo::exists(scenarioFile)) {
     throw std::runtime_error("Unable to locate " + scenarioFile.toStdString());
+    return false;
   }
 
   std::unique_ptr<CDM::ObjectData> scenarioXML = biogears::Serializer::ReadFile(scenarioFile.toStdString(), _engine->GetLogger());
   CDM::ScenarioData* scenarioData = dynamic_cast<CDM::ScenarioData*>(scenarioXML.get());
 
   EventTree* events = new EventTree();
-  //vents->encode_actions(scenarioData);
+  events->encode_actions(scenarioData);
   _physiology_model->enableFromScenario(scenarioData);
   emit physiologyChanged(_physiology_model);
-  
+  emit loadScenarioToControls(events);
+  return true;
 }
 
 void Scenario::create_substance(QVariantMap substanceData)

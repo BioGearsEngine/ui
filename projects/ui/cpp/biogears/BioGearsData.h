@@ -74,7 +74,6 @@ public:
   double getSimulationTime();
   void setSimulationTime(double time_s);
   void enableFromScenario(CDM::ScenarioData* scenario);
-  void enableGroup(const QModelIndex& index, QVector<QString>& keys);
 
   QHash<int, QByteArray> roleNames() const
   {

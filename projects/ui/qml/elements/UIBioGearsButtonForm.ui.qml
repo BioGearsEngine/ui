@@ -11,11 +11,12 @@ Button {
   property string primary : "#4CAF50"
   property string secondary : "#339933"
   padding : 0
+  enabled : true
   background : Rectangle {
     id : background
     anchors.fill : parent
     radius : 5
-    color : primary
+    color : enabled ? primary : "gray"
   }
   contentItem : Text {
     text : root.text

@@ -49,6 +49,101 @@ import com.biogearsengine.ui.scenario 1.0
       }
     }
 
+    function loadEvents(events){
+      for (let i = 0; i < events.get_event_count(); ++i){
+        let event = events.get_event(i);
+        switch (event.Type){
+          case EventModel.AcuteRespiratoryDistress :
+            setupEvent(function() {return add_single_range_builder("UIAcuteRespiratoryDistress.qml", scenario, event.Params, event.StartTime, event.Duration); } );     
+            break;
+          case EventModel.AcuteStress : 
+            setupEvent(function() {return add_single_range_builder("UIAcuteStress.qml", biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.AirwayObstruction : 
+            setupEvent(function() {return add_single_range_builder("UIAirwayObstruction.qml", biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.AnesthesiaMachineConfiguration : 
+            setupEvent(function() {return add_anesthesia_machine_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.Apnea : 
+            setupEvent(function() {return add_single_range_builder("UIApnea.qml", biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.AsthmaAttack : 
+            setupEvent(function() {return add_single_range_builder("UIAsthmaAttack.qml", biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.BrainInjury : 
+            setupEvent(function() {return add_traumatic_brain_injury_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.Bronchoconstriction :
+            setupEvent(function() {return add_single_range_builder("UIBronchoconstriction.qml", biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.BurnWound :
+            setupEvent(function() {return add_single_range_builder("UIBurnWound.qml", biogears_scenario, event.Params, event.StartTime);});
+            break;
+          case EventModel.CardiacArrest :
+            setupEvent(function() {return add_binary_builder("UICardiacArrest.qml", biogears_scenario, event.StartTime, event.Duration)})
+          case EventModel.ConsumeNutrients :
+            setupEvent(function() {return add_consume_meal_builder(biogears_scenario, event.Params, event.StartTime);});
+            break;
+          case EventModel.Exercise :
+            setupEvent(function() {return add_exercise_builder(biogears_scenario, event.SubType, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.Hemorrhage :
+            setupEvent(function() {return add_hemorrhage_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.Infection :
+            setupEvent(function() {return add_infection_builder(biogears_scenario, event.Params, event.StartTime);});
+            break;
+          case EventModel.InhalerConfiguration : 
+            setupEvent(function() {return add_binary_builder("UIInhaler.qml", biogears_scenario, event.StartTime)})
+            break;
+          case EventModel.SubstanceAdministration : 
+            if (event.SubType === EventModel.SubstanceCompoundInfusion){
+              //Sub compound infusion has distinct build function
+              setupEvent(function() {return add_compound_infusion_builder(biogears_scenario, event.Params, event.StartTime);});
+            } else if (event.SubType === EventModel.Transfusion){
+              //Transfusion has distinct build function
+              setupEvent(function() {return add_transfusion_builder(biogears_scenario, event.Params, event.StartTime);});
+            } else if (event.SubType === EventModel.SubstanceInfusion) {
+              //Infusion has a duration value to set
+              setupEvent(function() {return add_drug_administration_builder(biogears_scenario, event.SubType, event.Params, event.StartTime, event.Duration);});
+            } else {
+              //Else include bolus and oral dose, which do not need a duration set
+              setupEvent(function() {return add_drug_administration_builder(biogears_scenario, event.SubType, event.Params, event.StartTime);});
+            }
+            break;
+          case EventModel.PainStimulus :
+            setupEvent(function() {return add_pain_stimulus_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.PatientAssessmentRequest :
+            setupEvent(function() {return add_patient_assessment_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.SerializeState : 
+            setupEvent(function() {return add_serialize_state_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.TensionPneumothorax :
+            setupEvent(function() {return add_tension_pneumothorax_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.Tourniquet :
+            setupEvent(function() {return add_tourniquet_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
+          case EventModel.AdvanceTime :
+          default : 
+            console.log(event.TypeName + " not added to scenario")
+        }
+      } 
+    }
+
+    function setupEvent(makeActionFunc){
+      let newAction = makeActionFunc()
+      newAction.builderMode = false;
+      newAction.width = Qt.binding(function() { return actionSwitchView.width })
+      newAction.viewLoader.state = "collapsedControls"
+      newAction.uuid = uuidv4()
+      newAction.remove.connect(removeAction)
+      actionSwitchModel.append(newAction)
+    }
+
     function add_binary_action(componentType) {
         var v_severityForm = Qt.createComponent(componentType);
         if ( v_severityForm.status == Component.Ready)  {

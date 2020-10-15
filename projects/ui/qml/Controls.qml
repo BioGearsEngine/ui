@@ -28,6 +28,7 @@ ControlsForm {
   property DataRequestModel bgRequests
   property Scenario scenario : biogears_scenario
   property ObjectModel actionModel : actionSwitchModel
+  property bool scenarioLoaded : false
   
   function requestUrinalysis() {
 	  root.scenario.request_urinalysis();
@@ -51,6 +52,9 @@ ControlsForm {
     }
     onLoadScenarioToBuilder : {
       root.loadScenarioToBuilder(events, requests, sampling)
+    }
+    onLoadScenarioToControls : {
+      actionSwitchModel.loadEvents(events)
     }
     onPatientMetricsChanged: {
         root.respiratoryRate.value.text       = metrics.RespiratoryRate
@@ -141,8 +145,8 @@ ControlsForm {
   ActionModel {
     id : actionSwitchModel
     actionSwitchView : root.actionSwitchView
-    
   }
+
   playback.onRestartClicked: {
     patientMenu.loadState(patientMenu.patientText.text.split(" ")[1]+".xml");
     let l_simulation_time_s = scenario.time_s
@@ -170,7 +174,12 @@ ControlsForm {
   }
 
   loadScenarioButton.onPressed : {
-    scenario.load_scenario();
+    if (root.scenarioLoaded){
+      actionModel.clear();
+      root.scenarioLoaded = false;
+    } else {
+      scenarioLoaded = scenario.load_scenario();
+    }
   }
 
   function uuidv4() {

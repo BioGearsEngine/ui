@@ -87,7 +87,7 @@ public:
   Q_INVOKABLE Scenario& load_patient(QString);
   Q_INVOKABLE bool create_scenario(EventTree* events, QVariantList requests, QString sampling);
   Q_INVOKABLE void edit_scenario();
-  Q_INVOKABLE void load_scenario();
+  Q_INVOKABLE bool load_scenario();
   Q_INVOKABLE void create_substance(QVariantMap substanceData);
   Q_INVOKABLE QVariantMap edit_substance();
   Q_INVOKABLE void export_substance();
@@ -164,6 +164,7 @@ signals:
   void dataRequestModelChanged(DataRequestTree* requestTree);
   void timeAdvance(double time_s);
   void loadScenarioToBuilder(EventTree* events, QVariantList requests, QString sampling);
+  void loadScenarioToControls(EventTree* events);
   void substanceActivated(QModelIndex subIndex);
   void physiologyChanged(BioGearsData* model);
   void stateLoad(QString stateBaseName);
