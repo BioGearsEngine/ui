@@ -18,40 +18,40 @@ Rectangle {
     anchors.left : root.left
     anchors.right : root.right
     anchors.top : root.top
-    height: root.height * .75
+    height: root.height * .93
     
     // contentWidth : consoleArea.contentWidth
 
     TextArea {  
       id: consoleArea
-      height: root.height * .75
+      height: root.height * .93
       width : root.width
       readOnly : true
       textFormat : TextEdit.RichText
       placeholderText :"--> Results Here\n"
     }
   }
+  //Removing Until we have real LUA Scripting
+  // RowLayout {
+  //   id : inputRow
+  //   anchors.top : consoleView.bottom
+  //   anchors.left : root.left
+  //   anchors.right : root.right 
 
-  RowLayout {
-    id : inputRow
-    anchors.top : consoleView.bottom
-    anchors.left : root.left
-    anchors.right : root.right 
-
-    TextInput {
-      id:input
-      text :":\> Place Holder"
-      clip:true
-      Layout.maximumHeight : 25
-      Layout.preferredHeight : 25
-      Layout.fillWidth : true
-    }
-    Button {
-      text : "Submit"
-      Layout.fillWidth : true
-      Layout.preferredWidth : 50
-      Layout.maximumWidth  : 75
-      Layout.maximumHeight : 25
-    }
-  }
+  //   TextInput {
+  //     id:input
+  //     text :":\> Place Holder"
+  //     clip:true
+  //     Layout.maximumHeight : 25
+  //     Layout.preferredHeight : 25
+  //     Layout.fillWidth : true
+  //   }
+  //   Button {
+  //     text : "Submit"
+  //     Layout.fillWidth : true
+  //     Layout.preferredWidth : 50
+  //     Layout.maximumWidth  : 75
+  //     Layout.maximumHeight : 25
+  //   }
+  // }
 }

@@ -50,9 +50,9 @@ GridLayout {
       Layout.column : 1
       Layout.rowSpan : 2
       Layout.fillWidth: true
-      Layout.maximumWidth : root.width * (3/4) - root.columnSpacing / 2;
+      Layout.maximumWidth : root.width * (4/5) - root.columnSpacing / 2;
       Layout.fillHeight: false
-      Layout.preferredHeight:root.height * (3./4.)-10;
+      Layout.preferredHeight:root.height * (4./5.)-10;
       Layout.margins:0
     }
     LuaConsole {
@@ -61,7 +61,7 @@ GridLayout {
       Layout.column : 1
       Layout.fillWidth: true
       Layout.fillHeight: true
-      Layout.preferredHeight : root.height * (1./4.) - 10;
+      Layout.preferredHeight : root.height * (1./5.) - 10;
       Layout.margins:0
       Layout.alignment : Qt.AlignTop
       feeds : root.scenario.feeds
