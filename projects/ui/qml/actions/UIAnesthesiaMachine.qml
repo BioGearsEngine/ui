@@ -71,23 +71,19 @@ UIActionForm {
       anchors.centerIn : parent 
       //Row 1
       Label {
-        font.pixelSize : 10
+        font.pointSize : 12
+        Layout.columnSpan : 4
+        Layout.fillWidth : true
         font.bold : true
         color : "blue"
-        text : "%1".arg(actionType)
+        text : "%1 [%2]".arg(actionType).arg(root.connection)
       }      
-      Label {
-        font.pixelSize : 10
-        font.bold : false
-        color : "steelblue"
-        text : "[%1]".arg(root.connection)
-        Layout.alignment : Qt.AlignHCenter
-      }
       //Row 2
       Label {
         Layout.row : 1
         Layout.column : 0
         text : "Maximum Pressure"
+        font.pointSize : 10
       }      
       Slider {
         id: pMaxSlider
@@ -109,12 +105,14 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 3
         text : "%1 cmH2O".arg(root.pMax_cmH2O)
+        font.pointSize : 10
       }
       //Row 3
       Label {
         Layout.row : 2
         Layout.column : 0
         text : "PEEP"
+        font.pointSize : 10
       }      
       Slider {
         id: peepSlider
@@ -136,12 +134,14 @@ UIActionForm {
         Layout.row : 2
         Layout.column : 3
         text :  "%1 cmH2O".arg(root.peep_cmH2O)
+        font.pointSize : 10
       }
       //Row 4
       Label {
         Layout.row : 3
         Layout.column : 0
         text : "Respiration Rate"
+        font.pointSize : 10
       }      
       Slider {
         id: respirationRateSlider
@@ -163,12 +163,14 @@ UIActionForm {
         Layout.row : 3
         Layout.column : 3
         text : "%1 /min".arg(respirationRate_Per_min)
+        font.pointSize : 10
       }
       //Row 5
       Label {
         Layout.row : 4
         Layout.column : 0
         text : "Inlet Flow"
+        font.pointSize : 10
       }      
       Slider {
         id: inletFlowSlider
@@ -190,6 +192,7 @@ UIActionForm {
         Layout.row : 4
         Layout.column : 3
         text : "%1 L/min".arg(inletFlow_L_Per_min)
+        font.pointSize : 10
       }
       //Row 6
       Label {

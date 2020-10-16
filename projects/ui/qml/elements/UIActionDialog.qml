@@ -176,7 +176,7 @@ UIActionDialogForm {
         Layout.column : 0 
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Connection"
         comboBox.model : ["Mask", "Tube"]
         onComboUpdate : {
@@ -190,7 +190,7 @@ UIActionDialogForm {
         Layout.column : 1
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Primary Gas"
         comboBox.model : ["Nitrogen", "Air"]
         onComboUpdate : {
@@ -204,7 +204,7 @@ UIActionDialogForm {
         Layout.column : 0
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Inlet Flow (L/min)"
         spinBox.value : anesthesiaAction.props.inletFlow
         spinMax : 150
@@ -223,7 +223,7 @@ UIActionDialogForm {
         Layout.column : 1
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
         Layout.fillWidth : true
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "IE Ratio"
         spinBox.value : anesthesiaAction.props.ieRatio
         spinMax : 200
@@ -242,7 +242,7 @@ UIActionDialogForm {
         Layout.column : 0
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Max Pressure (cmH2O)"
         spinBox.value : anesthesiaAction.props.pMax
         spinMax : 200
@@ -261,7 +261,7 @@ UIActionDialogForm {
         Layout.column : 1
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "PEEP (cmH2O)"
         spinBox.value : anesthesiaAction.props.peep
         spinMax : 50
@@ -280,7 +280,7 @@ UIActionDialogForm {
         Layout.column : 0
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Respiration Rate (1/min)"
         spinBox.value : anesthesiaAction.props.respirationRate
         spinMax : 200
@@ -299,7 +299,7 @@ UIActionDialogForm {
         Layout.column : 1
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Relief Pressure (cmH2O)"
         spinBox.value : anesthesiaAction.props.reliefPressure
         spinMax : 150
@@ -317,7 +317,7 @@ UIActionDialogForm {
         Layout.column : 0
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "O2 Fraction"
         spinBox.value : anesthesiaAction.props.o2Frac
         spinMax : 100
@@ -336,7 +336,7 @@ UIActionDialogForm {
         Layout.column : 1
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "O2 Source"
         comboBox.model : ["Wall", "Bottle One", "Bottle Two"]
         onComboUpdate : {
@@ -366,7 +366,7 @@ UIActionDialogForm {
         Layout.column : 0
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "O2 Bottle 1 (mL)"
         required : false
         available : false
@@ -385,7 +385,7 @@ UIActionDialogForm {
         Layout.column : 1
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width / 2 - parent.columnSpacing / 2
+        Layout.maximumWidth : parent.width / 2 - 20
         label.text : "O2 Bottle 2 (mL)"
         required : false
         available : false
@@ -493,7 +493,18 @@ UIActionDialogForm {
       Connections {
         target : root
         onReset : {
-          drugCombo.resetCombo()
+          connectionCombo.resetCombo()
+          primaryGasCombo.resetCombo()
+          inletFlowSpin.resetSpin()
+          ieRatioSpin.resetSpin()
+          maxPressureSpin.resetSpin()
+          peepSpin.resetSpin()
+          rrSpin.resetSpin()
+          reliefSpin.resetSpin()
+          o2FractionSpin.resetSpin()
+          o2SourceCombo.resetCombo()      
+          bottle1Spin.resetSpin()
+          bottle2Spin.resetSpin()
           routeRadio.resetRadio()
           doseText.resetText()
           concentrationText.resetText()
@@ -1168,7 +1179,9 @@ UIActionDialogForm {
       UIRadioButton{
         id : sideRadio
         Layout.fillWidth : true
-        Layout.alignment : Qt.AlignHCenter
+        Layout.preferredWidth : parent.width
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        spacing : 50
         objectName  : "side"
         label.text : "Side"
         buttonModel : ['Left', 'Right']
@@ -1227,10 +1240,12 @@ UIActionDialogForm {
       property var props : ({severity: 0, type : 0, side : 0})
       UIRadioButton{
         id : typeRadio
+        Layout.topMargin : 10
         Layout.row : 0
         Layout.column : 0
         Layout.fillWidth : true
-        Layout.alignment : Qt.AlignHCenter
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        spacing : 50
         objectName  : "type"
         label.text : "Type"
         buttonModel : ['Open', 'Closed']
@@ -1240,10 +1255,12 @@ UIActionDialogForm {
       }
       UIRadioButton{
         id : sideRadio
+        Layout.topMargin : 10
         Layout.row : 0
         Layout.column : 1
         Layout.fillWidth : true
-        Layout.alignment : Qt.AlignHCenter
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        spacing : 50
         objectName  : "side"
         label.text : "Side"
         buttonModel : ['Left', 'Right']
@@ -1365,6 +1382,9 @@ UIActionDialogForm {
         id : tourniquetRadio
         objectName : "level"
         label.text : "Application Level"
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter
+        spacing : 150
         buttonModel : ['Applied', 'Misapplied']
         onRadioGroupUpdate : {
           tourniquetAction.props.level = value

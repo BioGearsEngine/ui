@@ -95,7 +95,6 @@ UIActionForm {
         id: toggle
         width  : 40
         height : 20
-
         border.color : "blue"
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state

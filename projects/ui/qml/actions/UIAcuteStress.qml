@@ -31,7 +31,9 @@ UIActionForm {
       width : root.width -5
       anchors.centerIn : parent      
       Label {
-        font.pixelSize : 10
+        font.pointSize : 12
+        Layout.columnSpan : 4
+        Layout.fillWidth : true
         font.bold : true
         color : "blue"
         text : "%1".arg(actionType)
@@ -42,6 +44,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 0
         text : "Severity"
+        font.pointSize : 10
       }      
       Slider {
         id: stimulus      
@@ -60,6 +63,7 @@ UIActionForm {
       }
       Label {
         text : "%1".arg(root.severity)
+        font.pointSize : 10
       }
     
       // Column 3
@@ -69,7 +73,8 @@ UIActionForm {
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        Layout.preferredHeight : 30      
+        Layout.maximumWidth : grid.width / 4
+        implicitHeight : 30     
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {

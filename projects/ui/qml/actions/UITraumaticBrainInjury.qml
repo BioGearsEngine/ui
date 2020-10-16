@@ -35,23 +35,19 @@ UIActionForm {
       width : root.width -5
       anchors.centerIn : parent      
       Label {
-        font.pixelSize : 10
+        font.pointSize : 12
+        Layout.columnSpan : 4
         font.bold : true
+        Layout.fillWidth : true
         color : "blue"
         text : "%1".arg(actionType)
-      }      
-      Label {
-        font.pixelSize : 10
-        font.bold : false
-        color : "steelblue"
-        text : "[%1]".arg(root.compartment)
-        Layout.alignment : Qt.AlignHCenter
       }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
         text : "Severity"
+        font.pointSize : 10
       }      
       Slider {
         id: stimulus      
@@ -70,6 +66,7 @@ UIActionForm {
       }
       Label {
         text : "%1".arg(root.severity )
+        font.pointSize : 10
       }
     
       // Column 3
@@ -79,7 +76,8 @@ UIActionForm {
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        Layout.preferredHeight : 30      
+        implicitHeight : 30  
+        Layout.maximumWidth : grid.width / 4
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {

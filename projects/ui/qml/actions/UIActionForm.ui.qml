@@ -11,14 +11,14 @@ Rectangle {
   border.color: "black"
   height : viewLoader.item.height
   radius : builderMode ? 10 : 0
-
+ 
   signal activate()
   signal deactivate()
   signal remove( string uuid )
   signal adjust( var list)
   signal selected(int index)     //notifies action model in scenario builder that this action has been clicked on (for highlighting/moving purposes)
   signal editing(int index)      //notifies action model that this action is being edited so that other actions in scenario window fade in opacity
-  signal buildSet(var action)
+  signal buildSet(var action)    //notifies action model in scenario builer that this action has all parameters set
 
   property Scenario scenario
   property string buildParams : ""
@@ -29,6 +29,7 @@ Rectangle {
   property bool active : false
   property bool collapsed : true
   property bool builderMode : false
+  property bool autoRun : false             //If true, action will turn on/off action according to start time, duration, and current sim time
   property bool currentSelection : false
   property int modelIndex : -1
   property double actionStartTime_s : 0.0        //Time at which this action will be applied (in Scenario Builder)
@@ -40,6 +41,19 @@ Rectangle {
 
   property string fullName  : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>] <br> Intensity = %3".arg(actionType).arg("Identifier").arg("Value")
   property string shortName : "<b>%1</b> [<font color=\"lightsteelblue\"> %2</font>]".arg(actionType).arg("Identifier")
+
+  ListView.onAdd : { 
+    //If auto run mode, connect the checkActionStatus function to the sim time changed signal
+    // emitted by attached ListView property
+    if (autoRun){
+      ListView.view.simTimeChanged.connect(checkActionStatus)
+    }
+  }
+  ListView.onRemove : {
+    if (autoRun){
+      ListView.view.simTimeChanged.disconnect(root.checkActionStatus)
+    }
+  }
 
   //This state controls whether the highlighting of the rectangle containing this action.  It is used in scenario builder to help users move actions up/down
   // queue and select action for removal.
@@ -65,6 +79,16 @@ Rectangle {
       root.deactivate();
     }
   }
+  function checkActionStatus(value){
+    //simTime variable emitted by ControlsForm:ActionSwitchView during auto run mode
+    let simTime = ListView.view.simTime
+    if (!active && simTime > actionStartTime_s && simTime < actionStartTime_s + actionDuration_s){
+      active = true;
+    }
+    if (active && simTime > actionStartTime_s + actionDuration_s){
+      active = false;
+    }
+  }
 
   property Component controlsDetails
   property Component builderDetails
@@ -80,7 +104,7 @@ Rectangle {
         color : '#1A5276'
         text : root.shortName
         elide : Text.ElideRight
-        font.pointSize : 8
+        font.pointSize : 9
         font.bold : true
         horizontalAlignment  : Text.AlignLeft
         leftPadding : 5
@@ -142,8 +166,7 @@ Rectangle {
       Rectangle {
         id: toggle
         width  : 40
-        height : 20
-
+        height : actionLabel.height + 10
         border.color : "blue"
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state

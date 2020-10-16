@@ -33,24 +33,19 @@ UIActionForm {
       width : root.width -5
       anchors.centerIn : parent      
       Label {
-        font.pixelSize : 10
+        font.pointSize : 12
+        Layout.columnSpan : 4
+        Layout.fillWidth : true
         font.bold : true
         color : "blue"
-        text : "%1".arg(actionType)
+        text : "%1 [%2]".arg(actionType).arg(root.location)
       }      
-      Label {
-        font.pixelSize : 10
-        font.bold : false
-        color : "steelblue"
-        text : "[%1]".arg(root.location)
-        Layout.alignment : Qt.AlignCenter
-      }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
         text : "Intensity"
-        font.pixelSize : 8
+        font.pointSize : 10
       }      
       Slider {
         id: stimulus   
@@ -69,7 +64,7 @@ UIActionForm {
       }
       Label {
         text : "%1".arg(root.intensity)
-        font.pixelSize : 8
+        font.pointSize : 10
       }
       //Row 3
       Rectangle {
@@ -78,7 +73,8 @@ UIActionForm {
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        Layout.preferredHeight : 30      
+        implicitHeight : 30
+        Layout.maximumWidth : grid.width / 4
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {

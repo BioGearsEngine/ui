@@ -33,53 +33,27 @@ UIActionForm {
     GridLayout {
       id: grid
       columns : 4
-      rows    : 4
+      rows    : 3
       width : root.width -5
       anchors.centerIn : parent      
       Label {
-        font.pixelSize : 10
+        font.pointSize : 12
+        Layout.columnSpan : 4
+        Layout.fillWidth : true
         font.bold : true
         color : "blue"
-        text : "%1".arg(actionType)
+        text : "%1 [%2]".arg(actionType).arg(root.compartment)
       }      
-      Label {
-        font.pixelSize : 10
-        font.bold : false
-        color : "steelblue"
-        text : "[%1]".arg(root.compartment)
-        Layout.alignment : Qt.AlignHCenter
-      }
-      //Column 2
-      Label {
-        Layout.row : 1
-        Layout.column : 0
-        text : "Application"
-      }      
-      Slider {
-        id: stimulus      
-        Layout.fillWidth : true
-        Layout.columnSpan : 2
-        from : 0
-        to : 1
-        stepSize : 1
-        value : root.tState
-        onMoved : {
-          root.tState = value
-          if ( root.active )
-              root.active = false;
-        }
-      }
-      Label {
-        text : "%1".arg(root.tState_str )
-      }
-      // Column 3
+      // Row 3
       Rectangle {
         id: toggle      
-        Layout.row : 2
+        Layout.row : 1
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        Layout.preferredHeight : 30      
+        Layout.maximumWidth : grid.width / 4
+        implicitHeight : 30      
+        Layout.maximumWidth : grid.width / 4
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -239,8 +213,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.fillHeight : true
         Layout.alignment : Qt.AlignVCenter
-        prefWidth : grid.width / 3
-        prefHeight : 50
+        Layout.preferredWidth : grid.width / 5
+        Layout.preferredHeight : 75
         elementRatio : 0.4
         radioGroup.checkedButton : setButtonState()
         label.text : "State"

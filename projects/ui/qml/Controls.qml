@@ -54,7 +54,7 @@ ControlsForm {
       root.loadScenarioToBuilder(events, requests, sampling)
     }
     onLoadScenarioToControls : {
-      actionSwitchModel.loadEvents(events)
+      actionSwitchModel.loadAutoEvents(events)
     }
     onPatientMetricsChanged: {
         root.respiratoryRate.value.text       = metrics.RespiratoryRate
@@ -116,6 +116,7 @@ ControlsForm {
     }
     onTimeAdvance: {
       playback.simulationTime = seconds_to_clock_time(time_s)
+      actionSwitchView.simTime = time_s;
     }
     onRunningToggled : {
       if( isRunning){
@@ -145,6 +146,7 @@ ControlsForm {
   ActionModel {
     id : actionSwitchModel
     actionSwitchView : root.actionSwitchView
+
   }
 
   playback.onRestartClicked: {
@@ -179,6 +181,7 @@ ControlsForm {
       root.scenarioLoaded = false;
     } else {
       scenarioLoaded = scenario.load_scenario();
+      console.log(scenarioLoaded)
     }
   }
 

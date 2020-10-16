@@ -45,7 +45,7 @@ RowLayout {
       ButtonGroup.group : radioGroup
       text : modelData
       height : 1.1 * buttonText.implicitHeight
-      width : buttonView.width
+      width : root.prefWidth * (1.0 - root.elementRatio)
       property int buttonIndex : index
       contentItem : Text {
         id : buttonText

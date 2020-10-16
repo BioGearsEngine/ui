@@ -155,14 +155,13 @@ ColumnLayout {
     //heights to get remaining space for action list view.  Note that we need to subtract the height of the file menu bar, which sits
     //atop the controls area in the main window.
     implicitHeight : root.parent.height - (patientMenu.height + configuration_row1.height + configuration_row2.height + physiology.height + playback_controls.height + openDrawerButton.height + 6 * root.spacing + root.parent.menuArea.height)
-    z : 2
     ListView {
       id : actionSwitchView
       clip: true
       anchors.fill : parent
-      focus : true
-      spacing : 2
-      model : actionSwitchModel  //Defined in Controls.qml
+      spacing : 5
+      model : root.actionModel  //Defined in Controls.qml
+      property double simTime : 0
     }
   }
 }

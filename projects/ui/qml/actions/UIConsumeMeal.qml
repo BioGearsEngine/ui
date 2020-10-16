@@ -144,26 +144,20 @@ UIActionForm {
       width : root.width -5
       anchors.centerIn : parent
       Label {
-        font.pixelSize : 10
-        font.bold : true
+        font.pointSize : 12
+        Layout.columnSpan : 4
+        Layout.fillWidth : true
         color : "blue"
         text : "%1".arg(actionType)
         Layout.maximumHeight : root.parent.height / grid.rows
       }      
-      Label {
-        font.pixelSize : 10
-        font.bold : false
-        color : "steelblue"
-        text : "[%1]".arg(root.location)
-        Layout.alignment : Qt.AlignHCenter
-        Layout.maximumHeight : root.parent.height / grid.rows
-      }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
         text : "Carbohydrate (g)"
         Layout.maximumHeight : root.parent.height / grid.rows
+        font.pointSize : 10
       }      
       Slider {
         id: carbSlider
@@ -188,6 +182,7 @@ UIActionForm {
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "%1".arg(root.carbs_g)
+        font.pointSize : 10
       }
       //Column 3
       Label {
@@ -195,6 +190,7 @@ UIActionForm {
         Layout.column : 0
         text : "Fat (g)"
         Layout.maximumHeight : root.parent.height / grid.rows
+        font.pointSize : 10
       }      
       Slider {
         id: fatSlider
@@ -219,6 +215,7 @@ UIActionForm {
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "%1".arg(root.fat_g)
+        font.pointSize : 10
       }
     //Column 4
       Label {
@@ -226,6 +223,7 @@ UIActionForm {
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "Protein (g)"
+        font.pointSize : 10
       }      
       Slider {
         id: proteinSlider
@@ -250,6 +248,7 @@ UIActionForm {
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "%1".arg(root.protein_g)
+        font.pointSize : 10
       }
       //Column 5
       Label {
@@ -257,6 +256,7 @@ UIActionForm {
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "Calcium (mg)"
+        font.pointSize : 10
       }      
       Slider {
         id: calciumSlider
@@ -281,6 +281,7 @@ UIActionForm {
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "%1".arg(root.calcium_mg)
+        font.pointSize : 10
       }
       //Column 6
       Label {
@@ -288,6 +289,7 @@ UIActionForm {
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "Sodium (mg)"
+        font.pointSize : 10
       }      
       Slider {
         id: sodiumSlider
@@ -312,6 +314,7 @@ UIActionForm {
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "%1".arg(root.sodium_mg)
+        font.pointSize : 10
       }
       //Column 7
       Label {
@@ -319,6 +322,7 @@ UIActionForm {
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "Water (mL)"
+        font.pointSize : 10
       }      
       Slider {
         id: waterSlider
@@ -343,6 +347,7 @@ UIActionForm {
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
         text : "%1".arg(root.water_mL)
+        font.pointSize : 10
       }
       // Column 8
       Button {
