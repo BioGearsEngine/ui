@@ -208,6 +208,7 @@ Page {
       GridView {
         id : vitalsGridView
         anchors.fill : parent
+         anchors.bottomMargin : 20
         clip : true
         cellWidth : parent.width / 2
         cellHeight : parent.height / 2
@@ -217,6 +218,7 @@ Page {
           anchors.top : vitalsGridView.top
           anchors.right : vitalsGridView.right
           anchors.bottom : vitalsGridView.bottom
+         
         }
       }
     }
