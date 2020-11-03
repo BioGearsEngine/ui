@@ -16,7 +16,7 @@ Page {
   property Component requestMenuItemComponent : requestMenuItemComponent
   property alias energyMetabolismSeries : energyMetabolismSeries
   property alias renalSeries : renalSeries 
-  property alias vitalsGridView : vitalsGridView
+  property alias vitalsGridView : vitalsSeries.vitalsGridView
   property alias cardiovascularGridView : cardiovascularGridView
   property alias bloodChemistryGridView : bloodChemistryGridView
   property alias energyMetabolismGridView : energyMetabolismSeries.energyMetabolismGridView
@@ -197,31 +197,12 @@ Page {
       anchors.fill : parent
       currentIndex : 0
       clip : true
-    Item {
+	  
+	  
+    VitalsPanel {
       id : vitalsSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      Rectangle {
-        id : vitalsBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
-      GridView {
-        id : vitalsGridView
-        anchors.fill : parent
-         anchors.bottomMargin : 20
-        clip : true
-        cellWidth : parent.width / 2
-        cellHeight : parent.height / 2
-        model : vitalsModel
-        ScrollBar.vertical : ScrollBar {
-          parent : vitalsGridView.parent
-          anchors.top : vitalsGridView.top
-          anchors.right : vitalsGridView.right
-          anchors.bottom : vitalsGridView.bottom
-         
-        }
-      }
     }
     Item {
       id : cardiovascularSeries
