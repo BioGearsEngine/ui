@@ -37,15 +37,39 @@ Drawer {
         section {
           property : "section"
           delegate : Rectangle {
+			id : sectionHeader
             color : "#2980b9"
             width : parent.width
             height : childrenRect.height
             Text {
+				id : sectionText
               anchors.horizontalCenter : parent.horizontalCenter
               text : section
               font.pixelSize : 22
               color : "white"
             }
+			function sectionImage () {
+				if (sectionText.text == "Nutrition")
+					return "icons/patient.svg"
+				if (sectionText.text == "Exercise")
+					return "icons/icon-round-question_mark.svg"
+				if (sectionText.text == "Insults")
+					return "icons/burn.svg"
+				if (sectionText.text == "Administer Substances")
+					return "icons/icon-round-question_mark.svg"
+				if (sectionText.text == "Interventions")
+					return "icons/nursing.svg"
+				else
+					return "icons/icon-round-question_mark.svg"
+			}
+			Image {
+				anchors.right : parent.right
+				anchors.rightMargin : 15
+				anchors.verticalCenter : parent.verticalCenter
+				height : sectionHeader.height * 0.75
+				source : sectionImage()
+				fillMode : Image.PreserveAspectFit
+			}
           }
         }
       }

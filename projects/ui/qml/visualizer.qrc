@@ -89,20 +89,14 @@
         <file alias="UIBioGearsButtonForm.ui.qml">elements/UIBioGearsButtonForm.ui.qml</file>
     </qresource>
     <qresource prefix="/icons">
-        <file alias="play.png">img/play.png</file>
         <file alias="pause.png">img/pause.png</file>
         <file alias="stop.png">img/stop.png</file>
-        <file alias="next.png">img/next.png</file>
-        <file alias="prev.png">img/prev.png</file>
         <file alias="foward.png">img/foward.png</file>
-        <file alias="reverse.png">img/reverse.png</file>
-        <file alias="reset.png">img/reset.png</file>
         <file alias="clock-realtime.png">img/clock-realtime.png</file>
         <file alias="clock-2X.png">img/clock-2X.png</file>
         <file alias="clock-max.png">img/clock-max.png</file>
         <file alias="help.svg">img/icon-round-question_mark.svg</file>
         <file alias="help.png">img/question.png</file>
-        <file alias="menu.png">img/menu.png</file>
         <file alias="biogears_logo.png">img/biogears_logo_400_400.png</file>
         <file alias="remove.png">img/remove.png</file>
         <file alias="add.png">img/add.png</file>
@@ -112,9 +106,6 @@
         <file alias="collapsed.png">img/collapsedOption.png</file>
         <file alias="expanded.png">img/expandedOption.png</file>
         <file alias="add_plain.png">img/add_plain.png</file>
-        <file alias="next_transparent.png">img/next_transparent.png</file>
-        <file alias="prev_transparent.png">img/prev_transparent.png</file>
-        <file alias="menu_transparent.png">img/menu_transparent.png</file>
         <file alias="openIndicatorBlue.png">img/openIndicatorBlue.png</file>
         <file alias="openIndicatorWhite.png">img/openIndicatorWhite.png</file>
         <file alias="comboIndicatorWhite.png">img/comboIndicatorWhite.png</file>
@@ -128,6 +119,6 @@
 		<file alias="prev.svg">img/prev.svg</file>
 		<file alias="reverse.svg">img/reverse.svg</file>
 		<file alias="speedup.svg">img/speedup.svg</file>
-		<file alias="HospitalRoom.jpg">img/HospitalRoom.jpg</file>
+		<file alias="biogears_noBackground.png">img/biogears_noBackground.png</file>
     </qresource>
 </RCC>

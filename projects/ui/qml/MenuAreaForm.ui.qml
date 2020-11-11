@@ -10,7 +10,7 @@ Rectangle {
   property alias wizardDialog : wizardDialog
   property alias scenarioBuilder : scenarioBuilder
   implicitHeight : 40     //Aligns with graph area tab button
-  color : "#1A5276"
+  color : "#2980b9"
   border.width : 0
   border.color : "yellow"
   MenuBar {
@@ -22,14 +22,14 @@ Rectangle {
       height : menuArea.height
       contentItem : Text {
         text : menuBarItem.text
-        font.pointSize : 8
+        font.pointSize : 14
         horizontalAlignment : Text.AlignLeft
         verticalAlignment : Text.AlignVCenter
         color : "white"
       }
       background : Rectangle {
         height : menuArea.height
-        color : menuBarItem.highlighted ? "#2980b9" : "#1A5276"
+        color : menuBarItem.highlighted ? "#1A5276" : "#2980b9"
       }
     }
     //Menu bar background
@@ -73,7 +73,7 @@ Rectangle {
         contentItem : Text {
           text : fileMenuItem.text
           color : fileMenuItem.highlighted ? "white" : "black"
-          font.pointSize : 8
+          font.pointSize : 12
         }
         background : Rectangle {
           color : fileMenuItem.highlighted ? "#2980b9" : "transparent"

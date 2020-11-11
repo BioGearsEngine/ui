@@ -75,13 +75,16 @@ UIActionForm {
         Layout.columnSpan : 4
         Layout.fillWidth : true
         font.bold : true
-        color : "blue"
+        Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 [%2]".arg(actionType).arg(root.connection)
       }      
       //Row 2
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Maximum Pressure"
         font.pointSize : 10
       }      
@@ -95,6 +98,31 @@ UIActionForm {
         to : 30
         stepSize : 1
         value : root.pMax_cmH2O
+		background: Rectangle {
+			x: pMaxSlider.leftPadding
+			y: pMaxSlider.topPadding + pMaxSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: pMaxSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: pMaxSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: pMaxSlider.leftPadding + pMaxSlider.visualPosition * (pMaxSlider.availableWidth - width)
+			y: pMaxSlider.topPadding + pMaxSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: pMaxSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.pMax_cmH2O = value
           if ( root.active )
@@ -104,6 +132,7 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 3
+		color : "#34495e"
         text : "%1 cmH2O".arg(root.pMax_cmH2O)
         font.pointSize : 10
       }
@@ -111,6 +140,8 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "PEEP"
         font.pointSize : 10
       }      
@@ -124,6 +155,31 @@ UIActionForm {
         to : 10
         stepSize : 0.5
         value : root.peep_cmH2O
+		background: Rectangle {
+			x: peepSlider.leftPadding
+			y: peepSlider.topPadding + peepSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: peepSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: peepSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: peepSlider.leftPadding + peepSlider.visualPosition * (peepSlider.availableWidth - width)
+			y: peepSlider.topPadding + peepSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: peepSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.peep_cmH2O = value
           if ( root.active )
@@ -133,6 +189,7 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 3
+		color : "#34495e"
         text :  "%1 cmH2O".arg(root.peep_cmH2O)
         font.pointSize : 10
       }
@@ -140,6 +197,8 @@ UIActionForm {
       Label {
         Layout.row : 3
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Respiration Rate"
         font.pointSize : 10
       }      
@@ -153,6 +212,31 @@ UIActionForm {
         to : 20
         stepSize : 0.5
         value : root.respirationRate_Per_min
+		background: Rectangle {
+			x: respirationRateSlider.leftPadding
+			y: respirationRateSlider.topPadding + respirationRateSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: respirationRateSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: respirationRateSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: respirationRateSlider.leftPadding + respirationRateSlider.visualPosition * (respirationRateSlider.availableWidth - width)
+			y: respirationRateSlider.topPadding + respirationRateSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: respirationRateSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.respirationRate_Per_min = value
           if ( root.active )
@@ -162,6 +246,7 @@ UIActionForm {
       Label {
         Layout.row : 3
         Layout.column : 3
+		color : "#34495e"
         text : "%1 /min".arg(respirationRate_Per_min)
         font.pointSize : 10
       }
@@ -169,6 +254,8 @@ UIActionForm {
       Label {
         Layout.row : 4
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Inlet Flow"
         font.pointSize : 10
       }      
@@ -182,6 +269,31 @@ UIActionForm {
         to : 10
         stepSize : 0.25
         value : root.inletFlow_L_Per_min
+		background: Rectangle {
+			x: inletFlowSlider.leftPadding
+			y: inletFlowSlider.topPadding + inletFlowSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: inletFlowSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: inletFlowSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: inletFlowSlider.leftPadding + inletFlowSlider.visualPosition * (inletFlowSlider.availableWidth - width)
+			y: inletFlowSlider.topPadding + inletFlowSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: inletFlowSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.inletFlow_L_Per_min = value
           if ( root.active )
@@ -191,6 +303,7 @@ UIActionForm {
       Label {
         Layout.row : 4
         Layout.column : 3
+		color : "#34495e"
         text : "%1 L/min".arg(inletFlow_L_Per_min)
         font.pointSize : 10
       }
@@ -198,6 +311,8 @@ UIActionForm {
       Label {
         Layout.row : 5
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "IE Ratio"
       }      
       Slider {
@@ -210,6 +325,31 @@ UIActionForm {
         to : 2
         stepSize : 0.1
         value : root.ieRatio
+		background: Rectangle {
+			x: ieRatioSlider.leftPadding
+			y: ieRatioSlider.topPadding + ieRatioSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: ieRatioSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: ieRatioSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: ieRatioSlider.leftPadding + ieRatioSlider.visualPosition * (ieRatioSlider.availableWidth - width)
+			y: ieRatioSlider.topPadding + ieRatioSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: ieRatioSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.ieRatio = value
           if ( root.active )
@@ -219,12 +359,15 @@ UIActionForm {
       Label {
         Layout.row : 5
         Layout.column : 3
+		color : "#34495e"
         text : "%1".arg(ieRatio)
       }
       //Row 7
       Label {
         Layout.row : 6
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Oxygen Fraction"
       }      
       Slider {
@@ -237,6 +380,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.o2Fraction
+		background: Rectangle {
+			x: oxygenFractionSlider.leftPadding
+			y: oxygenFractionSlider.topPadding + oxygenFractionSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: oxygenFractionSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: oxygenFractionSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: oxygenFractionSlider.leftPadding + oxygenFractionSlider.visualPosition * (oxygenFractionSlider.availableWidth - width)
+			y: oxygenFractionSlider.topPadding + oxygenFractionSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: oxygenFractionSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.o2Fraction = value
           if ( root.active )
@@ -246,12 +414,15 @@ UIActionForm {
       Label {
         Layout.row : 6
         Layout.column : 3
+		color : "#34495e"
         text : "%1".arg(o2Fraction)
       }
       //Row 8
       Label {
         Layout.row : 7
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Relief Pressure"
       }      
       Slider {
@@ -264,6 +435,31 @@ UIActionForm {
         to : 150
         stepSize : 5
         value : root.reliefPressure_cmH2O
+		background: Rectangle {
+			x: reliefPressureSlider.leftPadding
+			y: reliefPressureSlider.topPadding + reliefPressureSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: reliefPressureSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: reliefPressureSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: reliefPressureSlider.leftPadding + reliefPressureSlider.visualPosition * (reliefPressureSlider.availableWidth - width)
+			y: reliefPressureSlider.topPadding + reliefPressureSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: reliefPressureSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.reliefPressure_cmH2O = value
           if ( root.active )
@@ -273,6 +469,7 @@ UIActionForm {
       Label {
         Layout.row : 7
         Layout.column : 3
+		color : "#34495e"
         text : "%1 cmH2O".arg(root.reliefPressure_cmH2O)
       }
       //Row 9 : Only visible if Bottle 1 defined (if invisible, it takes up 0 area)
@@ -280,6 +477,8 @@ UIActionForm {
         visible : o2Source === "Bottle One"
         Layout.column : 0
         Layout.row : 8
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Bottle 1"
       }      
       Slider {
@@ -293,6 +492,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.bottle1_mL
+		background: Rectangle {
+			x: bottle1Slider.leftPadding
+			y: bottle1Slider.topPadding + bottle1Slider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: bottle1Slider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: bottle1Slider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: bottle1Slider.leftPadding + bottle1Slider.visualPosition * (bottle1Slider.availableWidth - width)
+			y: bottle1Slider.topPadding + bottle1Slider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: bottle1Slider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.bottle1_mL = value
           if ( root.active ){
@@ -303,6 +527,7 @@ UIActionForm {
       Label {
         Layout.row : 8
         Layout.column : 3
+		color : "#34495e"
         visible : o2Source === "Bottle One"
         text : "%1 mL".arg(bottle1_mL)
       }
@@ -311,6 +536,8 @@ UIActionForm {
         visible : o2Source === "Bottle Two"
         Layout.column : 0
         Layout.row : 9
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Bottle 2"
       }      
       Slider {
@@ -324,6 +551,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.bottle2_mL
+		background: Rectangle {
+			x: bottle2Slider.leftPadding
+			y: bottle2Slider.topPadding + bottle2Slider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: bottle2Slider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: bottle2Slider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: bottle2Slider.leftPadding + bottle2Slider.visualPosition * (bottle2Slider.availableWidth - width)
+			y: bottle2Slider.topPadding + bottle2Slider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: bottle2Slider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.bottle2_mL = value
           if ( root.active ){
@@ -334,6 +586,7 @@ UIActionForm {
       Label {
         Layout.row : 9
         Layout.column : 3
+		color : "#34495e"
         visible : o2Source ==="Bottle Two"
         text : "%1 mL".arg(bottle2_mL)
       }
@@ -342,6 +595,8 @@ UIActionForm {
         visible : leftChamberSub !==""
         Layout.column : 0
         Layout.row : 10
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : leftChamberSub + " Fraction"
       }      
       Slider {
@@ -355,6 +610,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.leftChamberFraction
+		background: Rectangle {
+			x: leftSubSlider.leftPadding
+			y: leftSubSlider.topPadding + leftSubSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: leftSubSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: leftSubSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: leftSubSlider.leftPadding + leftSubSlider.visualPosition * (leftSubSlider.availableWidth - width)
+			y: leftSubSlider.topPadding + leftSubSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: leftSubSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.leftChamberFraction = value
           if ( root.active ){
@@ -365,6 +645,7 @@ UIActionForm {
       Label {
         Layout.row : 10
         Layout.column : 3
+		color : "#34495e"
         visible : leftChamberSub !==""
         text : "%1".arg(leftChamberFraction)
       }
@@ -373,6 +654,8 @@ UIActionForm {
         visible : rightChamberSub !==""
         Layout.column : 0
         Layout.row : 11
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : rightChamberSub + " Fraction"
       }      
       Slider {
@@ -386,6 +669,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.rightChamberFraction
+		background: Rectangle {
+			x: rightSubSlider.leftPadding
+			y: rightSubSlider.topPadding + rightSubSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: rightSubSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: rightSubSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: rightSubSlider.leftPadding + rightSubSlider.visualPosition * (rightSubSlider.availableWidth - width)
+			y: rightSubSlider.topPadding + rightSubSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: rightSubSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.rightChamberFraction = value
           if ( root.active ){
@@ -396,6 +704,7 @@ UIActionForm {
       Label {
         Layout.row : 11
         Layout.column : 3
+		color : "#34495e"
         visible : rightChamberSub !==""
         text : "%1".arg(rightChamberFraction)
       }
@@ -406,7 +715,9 @@ UIActionForm {
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        Layout.preferredHeight : 30      
+        Layout.preferredHeight : 30  
+		Layout.bottomMargin : 5
+		radius : pill.width * 0.6
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -420,7 +731,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+			radius : pill.width * 0.6
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -621,6 +932,31 @@ UIActionForm {
           stepSize : 0.25
           value : root.inletFlow_L_Per_min
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: flowSlider.leftPadding
+				y: flowSlider.topPadding + flowSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: flowSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: flowSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: flowSlider.leftPadding + flowSlider.visualPosition * (flowSlider.availableWidth - width)
+				y: flowSlider.topPadding + flowSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: flowSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.inletFlow_L_Per_min = value
           }
@@ -653,6 +989,31 @@ UIActionForm {
           stepSize : 0.1
           value : root.ieRatio
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: ieSlider.leftPadding
+				y: ieSlider.topPadding + ieSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: ieSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: ieSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: ieSlider.leftPadding + ieSlider.visualPosition * (ieSlider.availableWidth - width)
+				y: ieSlider.topPadding + ieSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: ieSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.ieRatio = value
           }
@@ -685,6 +1046,31 @@ UIActionForm {
           stepSize : 1
           value : root.pMax_cmH2O
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: maxSlider.leftPadding
+				y: maxSlider.topPadding + maxSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: maxSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: maxSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: maxSlider.leftPadding + maxSlider.visualPosition * (maxSlider.availableWidth - width)
+				y: maxSlider.topPadding + maxSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: maxSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.pMax_cmH2O = value
           }
@@ -718,6 +1104,31 @@ UIActionForm {
           stepSize : 0.5
           value : root.peep_cmH2O
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: peepSlider.leftPadding
+				y: peepSlider.topPadding + peepSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: peepSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: peepSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: peepSlider.leftPadding + peepSlider.visualPosition * (peepSlider.availableWidth - width)
+				y: peepSlider.topPadding + peepSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: peepSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.peep_cmH2O = value
           }
@@ -750,6 +1161,31 @@ UIActionForm {
           stepSize : 0.5
           value : root.respirationRate_Per_min
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: rrSlider.leftPadding
+				y: rrSlider.topPadding + rrSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: rrSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: rrSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: rrSlider.leftPadding + rrSlider.visualPosition * (rrSlider.availableWidth - width)
+				y: rrSlider.topPadding + rrSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: rrSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.respirationRate_Per_min = value
           }
@@ -782,6 +1218,31 @@ UIActionForm {
           stepSize : 5
           value : root.reliefPressure_cmH2O
           Layout.alignment : Qt.AlignLeft
+			  background: Rectangle {
+				x: reliefSlider.leftPadding
+				y: reliefSlider.topPadding + reliefSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: reliefSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: reliefSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: reliefSlider.leftPadding + reliefSlider.visualPosition * (reliefSlider.availableWidth - width)
+				y: reliefSlider.topPadding + reliefSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: reliefSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.reliefPressure_cmH2O = value
           }
@@ -815,6 +1276,31 @@ UIActionForm {
           stepSize : 0.01
           value : root.o2Fraction
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: O2FracSlider.leftPadding
+				y: O2FracSlider.topPadding + O2FracSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: O2FracSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: O2FracSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: O2FracSlider.leftPadding + O2FracSlider.visualPosition * (O2FracSlider.availableWidth - width)
+				y: O2FracSlider.topPadding + O2FracSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: O2FracSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.o2Fracton = value
           }
@@ -872,6 +1358,31 @@ UIActionForm {
           stepSize : 100
           value : root.o2Source === "Bottle One" ? bottle1_mL : root.o2Source === "Bottle Two" ? bottle2_mL : 0
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: bottleSlider.leftPadding
+				y: bottleSlider.topPadding + bottleSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: bottleSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: bottleSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: bottleSlider.leftPadding + bottleSlider.visualPosition * (bottleSlider.availableWidth - width)
+				y: bottleSlider.topPadding + bottleSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: bottleSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             if (root.o2Source === "Bottle One"){
               root.bottle1_mL = value

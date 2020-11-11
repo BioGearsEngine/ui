@@ -31,31 +31,61 @@ UIActionForm {
       columns : 4
       rows    : 4
       width : root.width -5
-      anchors.centerIn : parent      
+      anchors.centerIn : parent  
       Label {
         font.pointSize : 12
         Layout.columnSpan : 4
         Layout.fillWidth : true
+		Layout.leftMargin : 5
         font.bold : true
-        color : "blue"
+        color : "#34495e"
         text : "%1 [%2]".arg(actionType).arg(root.location)
       }      
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Intensity"
         font.pointSize : 10
       }      
       Slider {
-        id: stimulus   
-        Layout.fillWidth : true
-        from : 0
+        id: stimulus  
+		value : root.intensity
+		from : 0
         to : 10
         stepSize : 1
-        value : root.intensity
-        Layout.alignment : Qt.AlignLeft
-        Layout.columnSpan : 2
+		
+		Layout.columnSpan : 2
+		Layout.fillWidth : true
+		
+		background: Rectangle {
+			x: stimulus.leftPadding
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: stimulus.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: stimulus.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: stimulus.leftPadding + stimulus.visualPosition * (stimulus.availableWidth - width)
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: stimulus.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
+
         onMoved : {
           root.intensity = value
           if ( root.active )
@@ -64,6 +94,7 @@ UIActionForm {
       }
       Label {
         text : "%1".arg(root.intensity)
+		color : "#34495e"
         font.pointSize : 10
       }
       //Row 3
@@ -75,8 +106,10 @@ UIActionForm {
         Layout.fillWidth : true
         implicitHeight : 30
         Layout.maximumWidth : grid.width / 4
+		Layout.bottomMargin : 5
         color:        root.active? 'green': 'red' // background
-        opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
+        opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state   
+		radius: pill.width*0.6		
         Text {
           text:  root.active?    'On': 'Off'
           color: root.active? 'white': 'white'
@@ -92,6 +125,9 @@ UIActionForm {
           width: parent.width * .5;
           height: parent.height // square
           border.width: parent.border.width
+		  //implicitWidth: 16 //2x radius
+		  //implicitHeight: 16
+		  radius: pill.width*0.6
     
         }
         MouseArea {
@@ -173,6 +209,31 @@ UIActionForm {
           stepSize : 1
           value : root.intensity
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: stimulus.leftPadding
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: stimulus.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: stimulus.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: stimulus.leftPadding + stimulus.visualPosition * (stimulus.availableWidth - width)
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: stimulus.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.intensity = value
           }

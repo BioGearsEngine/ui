@@ -17,33 +17,33 @@ Item {
 	//property alias vitalsTimer : vitalsTimer
 	
 	Image {
-		id: hospital_background
-		source : "qrc:/icons/HospitalRoom.jpg"
-		width : root.width
-		height: root.height
-		fillMode: Image.Stretch
+		id: biogears_background
+		source : "qrc:/icons/biogears_noBackground.png"
+		width : plots.width
+		height: plots.height 
+		anchors.centerIn : parent
+		fillMode: Image.PreserveAspectFit
+		Rectangle {
+			id : colorBackground
+			anchors.fill : biogears_background
+			color : "#ecf0f1"
+			opacity : 0.95
+		}
 	}
-	
-	Rectangle {
-        id : vitalsBackground
-        anchors.fill : parent
-        color : "#4CAF50"
-		opacity : 0.5
-      }
-      GridView {
-        id : vitalsGridView
-        anchors.fill : parent
-         anchors.bottomMargin : 20
-        clip : true
-        cellWidth : parent.width / 2
-        cellHeight : parent.height / 2
-        model : vitalsModel
-        ScrollBar.vertical : ScrollBar {
-          parent : vitalsGridView.parent
-          anchors.top : vitalsGridView.top
-          anchors.right : vitalsGridView.right
-          anchors.bottom : vitalsGridView.bottom
-         
-        }
-      }
+	  GridView {
+		id : vitalsGridView
+		anchors.fill : parent
+		 anchors.bottomMargin : 20
+		clip : true
+		cellWidth : parent.width / 2
+		cellHeight : parent.height / 2
+		model : vitalsModel
+		ScrollBar.vertical : ScrollBar {
+		  parent : vitalsGridView.parent
+		  anchors.top : vitalsGridView.top
+		  anchors.right : vitalsGridView.right
+		  anchors.bottom : vitalsGridView.bottom
+		 
+		}
+	  }
 }

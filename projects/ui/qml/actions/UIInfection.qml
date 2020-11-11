@@ -42,13 +42,16 @@ UIActionForm {
         Layout.columnSpan : 4
         Layout.fillWidth : true
         font.bold : true
-        color : "blue"
+        Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 [%2]".arg(actionType).arg(root.location)
       }      
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Severity"
         font.pointSize : 10
       }      
@@ -60,7 +63,31 @@ UIActionForm {
         to : 3
         stepSize : 1
         value : root.severity
-
+		background: Rectangle {
+			x: severity.leftPadding
+			y: severity.topPadding + severity.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: severity.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: severity.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: severity.leftPadding + severity.visualPosition * (severity.availableWidth - width)
+			y: severity.topPadding + severity.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: severity.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.severity = value
           if ( root.active )
@@ -68,6 +95,7 @@ UIActionForm {
         }
       }
       Label {
+		color : "#34495e"
         text : severity_str
         font.pointSize : 10
       }
@@ -75,6 +103,8 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "MIC"
         font.pointSize : 10
       }      
@@ -86,7 +116,31 @@ UIActionForm {
         to : 500
         stepSize : 10
         value : root.mic
-
+		background: Rectangle {
+			x: mic.leftPadding
+			y: mic.topPadding + mic.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: mic.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: mic.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: mic.leftPadding + mic.visualPosition * (mic.availableWidth - width)
+			y: mic.topPadding + mic.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: mic.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.mic = value
           if ( root.active )
@@ -94,6 +148,7 @@ UIActionForm {
         }
       }
       Label {
+		color : "#34495e"
         text : "%1 mg/L".arg(root.mic)
         font.pointSize : 10
       }
@@ -106,6 +161,8 @@ UIActionForm {
         Layout.fillWidth : true
         implicitHeight : 30 
         Layout.maximumWidth : grid.width / 4
+		Layout.bottomMargin : 5
+		radius : pill.width * 0.6
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -119,7 +176,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+			radius : pill.width * 0.6
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -209,6 +266,31 @@ UIActionForm {
           stepSize : 5
           value : root.mic
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: micSlider.leftPadding
+				y: micSlider.topPadding + micSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: micSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: micSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: micSlider.leftPadding + micSlider.visualPosition * (micSlider.availableWidth - width)
+				y: micSlider.topPadding + micSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: micSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.mic = value
           }

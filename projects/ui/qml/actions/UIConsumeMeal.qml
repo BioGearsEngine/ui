@@ -147,7 +147,8 @@ UIActionForm {
         font.pointSize : 12
         Layout.columnSpan : 4
         Layout.fillWidth : true
-        color : "blue"
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(actionType)
         Layout.maximumHeight : root.parent.height / grid.rows
       }      
@@ -157,6 +158,8 @@ UIActionForm {
         Layout.column : 0
         text : "Carbohydrate (g)"
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         font.pointSize : 10
       }      
       Slider {
@@ -170,7 +173,31 @@ UIActionForm {
         to : 300          //300 g is reasonable amount for one day
         stepSize : 5
         value : root.carbs_g
-
+		background: Rectangle {
+			x: carbSlider.leftPadding
+			y: carbSlider.topPadding + carbSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: carbSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: carbSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: carbSlider.leftPadding + carbSlider.visualPosition * (carbSlider.availableWidth - width)
+			y: carbSlider.topPadding + carbSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: carbSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.carbs_g = value
           if ( root.active )
@@ -181,6 +208,8 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(root.carbs_g)
         font.pointSize : 10
       }
@@ -188,6 +217,8 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 0
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "Fat (g)"
         Layout.maximumHeight : root.parent.height / grid.rows
         font.pointSize : 10
@@ -203,7 +234,31 @@ UIActionForm {
         to : 80          //80 g is reasonable amount for one day
         stepSize : 5
         value : root.fat_g
-
+		background: Rectangle {
+			x: fatSlider.leftPadding
+			y: fatSlider.topPadding + fatSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: fatSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: fatSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: fatSlider.leftPadding + fatSlider.visualPosition * (fatSlider.availableWidth - width)
+			y: fatSlider.topPadding + fatSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: fatSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.fat_g = value
           if ( root.active )
@@ -214,6 +269,8 @@ UIActionForm {
         Layout.row : 2
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(root.fat_g)
         font.pointSize : 10
       }
@@ -222,6 +279,8 @@ UIActionForm {
         Layout.row : 3
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "Protein (g)"
         font.pointSize : 10
       }      
@@ -236,7 +295,31 @@ UIActionForm {
         to : 100          //60ish g is reasonable amount / day for sedentary person, bump up to 100 account for active
         stepSize : 5
         value : root.protein_g
-
+		background: Rectangle {
+			x: proteinSlider.leftPadding
+			y: proteinSlider.topPadding + proteinSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: proteinSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: proteinSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: proteinSlider.leftPadding + proteinSlider.visualPosition * (proteinSlider.availableWidth - width)
+			y: proteinSlider.topPadding + proteinSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: proteinSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.protein_g = value
           if ( root.active )
@@ -247,6 +330,8 @@ UIActionForm {
         Layout.row : 3
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(root.protein_g)
         font.pointSize : 10
       }
@@ -255,6 +340,8 @@ UIActionForm {
         Layout.row : 4
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "Calcium (mg)"
         font.pointSize : 10
       }      
@@ -269,7 +356,31 @@ UIActionForm {
         to : 2000         //2000 mg is reasonable upper limit for one day
         stepSize : 100
         value : root.calcium_mg
-
+		background: Rectangle {
+			x: calciumSlider.leftPadding
+			y: calciumSlider.topPadding + calciumSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: calciumSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: calciumSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: calciumSlider.leftPadding + calciumSlider.visualPosition * (calciumSlider.availableWidth - width)
+			y: calciumSlider.topPadding + calciumSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: calciumSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.calcium_mg = value
           if ( root.active )
@@ -280,6 +391,8 @@ UIActionForm {
         Layout.row : 4
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(root.calcium_mg)
         font.pointSize : 10
       }
@@ -288,6 +401,8 @@ UIActionForm {
         Layout.row : 5
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "Sodium (mg)"
         font.pointSize : 10
       }      
@@ -302,7 +417,31 @@ UIActionForm {
         to : 3000         //3000 mg is more than recommended amount, but most people go above recommendations
         stepSize : 100
         value : root.sodium_mg
-
+		background: Rectangle {
+			x: sodiumSlider.leftPadding
+			y: sodiumSlider.topPadding + sodiumSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: sodiumSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: sodiumSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: sodiumSlider.leftPadding + sodiumSlider.visualPosition * (sodiumSlider.availableWidth - width)
+			y: sodiumSlider.topPadding + sodiumSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: sodiumSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.sodium_mg = value
           if ( root.active )
@@ -313,6 +452,8 @@ UIActionForm {
         Layout.row : 5
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(root.sodium_mg)
         font.pointSize : 10
       }
@@ -321,6 +462,8 @@ UIActionForm {
         Layout.row : 6
         Layout.column : 0
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "Water (mL)"
         font.pointSize : 10
       }      
@@ -335,7 +478,31 @@ UIActionForm {
         to : 3000         //3000 mL is more than recommended amount per day
         stepSize : 100
         value : root.water_mL
-
+		background: Rectangle {
+			x: waterSlider.leftPadding
+			y: waterSlider.topPadding + waterSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: waterSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: waterSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: waterSlider.leftPadding + waterSlider.visualPosition * (waterSlider.availableWidth - width)
+			y: waterSlider.topPadding + waterSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: waterSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.water_mL = value
           if ( root.active )
@@ -346,6 +513,8 @@ UIActionForm {
         Layout.row : 6
         Layout.column : 3
         Layout.maximumHeight : root.parent.height / grid.rows
+		Layout.leftMargin : 5
+        color : "#34495e"
         text : "%1".arg(root.water_mL)
         font.pointSize : 10
       }
@@ -508,6 +677,31 @@ UIActionForm {
           stepSize : 5
           value : root.carbs_g
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: carbSlider.leftPadding
+				y: carbSlider.topPadding + carbSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: carbSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: carbSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: carbSlider.leftPadding + carbSlider.visualPosition * (carbSlider.availableWidth - width)
+				y: carbSlider.topPadding + carbSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: carbSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.carbs_g = value
           }
@@ -540,6 +734,31 @@ UIActionForm {
           stepSize : 5
           value : root.protein_g
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: proteinSlider.leftPadding
+				y: proteinSlider.topPadding + proteinSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: proteinSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: proteinSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: proteinSlider.leftPadding + proteinSlider.visualPosition * (proteinSlider.availableWidth - width)
+				y: proteinSlider.topPadding + proteinSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: proteinSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.protein_g = value
           }
@@ -572,6 +791,31 @@ UIActionForm {
           stepSize : 5
           value : root.fat_g
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: fatSlider.leftPadding
+				y: fatSlider.topPadding + fatSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: fatSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: fatSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: fatSlider.leftPadding + fatSlider.visualPosition * (fatSlider.availableWidth - width)
+				y: fatSlider.topPadding + fatSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: fatSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.fat_g = value
           }
@@ -605,6 +849,31 @@ UIActionForm {
           stepSize : 25
           value : root.sodium_mg
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: sodiumSlider.leftPadding
+				y: sodiumSlider.topPadding + sodiumSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: sodiumSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: sodiumSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: sodiumSlider.leftPadding + sodiumSlider.visualPosition * (sodiumSlider.availableWidth - width)
+				y: sodiumSlider.topPadding + sodiumSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: sodiumSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.sodium_mg = value
           }
@@ -637,6 +906,31 @@ UIActionForm {
           stepSize : 25
           value : root.calcium_mg
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: calciumSlider.leftPadding
+				y: calciumSlider.topPadding + calciumSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: calciumSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: calciumSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: calciumSlider.leftPadding + calciumSlider.visualPosition * (calciumSlider.availableWidth - width)
+				y: calciumSlider.topPadding + calciumSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: calciumSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.calcium_mg = value
           }
@@ -669,6 +963,31 @@ UIActionForm {
           stepSize : 25
           value : root.water_mL
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: waterSlider.leftPadding
+				y: waterSlider.topPadding + waterSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: waterSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: waterSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: waterSlider.leftPadding + waterSlider.visualPosition * (waterSlider.availableWidth - width)
+				y: waterSlider.topPadding + waterSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: waterSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.water_mL = value
           }

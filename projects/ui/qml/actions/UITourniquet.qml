@@ -41,7 +41,8 @@ UIActionForm {
         Layout.columnSpan : 4
         Layout.fillWidth : true
         font.bold : true
-        color : "blue"
+        Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 [%2]".arg(actionType).arg(root.compartment)
       }      
       // Row 3
@@ -52,8 +53,9 @@ UIActionForm {
         Layout.columnSpan : 2
         Layout.fillWidth : true
         Layout.maximumWidth : grid.width / 4
+		Layout.bottomMargin : 5
+		radius : pill.width * 0.6
         implicitHeight : 30      
-        Layout.maximumWidth : grid.width / 4
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -70,6 +72,7 @@ UIActionForm {
           x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
           width: parent.width * .5;
           height: parent.height // square
+		  radius : pill.width * 0.6
           border.width: parent.border.width
     
         }

@@ -36,13 +36,16 @@ UIActionForm {
         Layout.columnSpan : 4
         Layout.fillWidth : true
         font.bold : true
-        color : "blue"
+        Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 [%2]".arg(actionType).arg(root.compartment)
       }
       //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Rate"
         font.pointSize : 10
       }      
@@ -54,7 +57,31 @@ UIActionForm {
         to : 10
         stepSize : 1
         value : root.rate
-
+		background: Rectangle {
+			x: stimulus.leftPadding
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: stimulus.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: stimulus.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: stimulus.leftPadding + stimulus.visualPosition * (stimulus.availableWidth - width)
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: stimulus.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.rate = value
           if ( root.active )
@@ -62,6 +89,7 @@ UIActionForm {
         }
       }
       Label {
+		color : "#34495e"
         text : "%1 ml/min".arg(root.rate )
         font.pointSize : 10
       }
@@ -75,6 +103,8 @@ UIActionForm {
         Layout.fillWidth : true
         Layout.preferredHeight : 30
         Layout.maximumWidth : grid.width / 4
+		Layout.bottomMargin : 5
+		radius : pill.width * 0.6
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -88,7 +118,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+			radius : pill.width * 0.6
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -178,6 +208,31 @@ UIActionForm {
           stepSize : 10
           value : root.rate
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+				x: rateSlider.leftPadding
+				y: rateSlider.topPadding + rateSlider.availableHeight / 2 - height / 2
+				implicitWidth: 200
+				implicitHeight: 4
+				width: rateSlider.availableWidth
+				height: implicitHeight
+				radius: 2
+				color: "#1abc9c"
+				Rectangle {
+					width: rateSlider.visualPosition * parent.width
+					height: parent.height
+					color: "#16a085"
+					radius: 2
+				}
+			}
+			handle: Rectangle {
+				x: rateSlider.leftPadding + rateSlider.visualPosition * (rateSlider.availableWidth - width)
+				y: rateSlider.topPadding + rateSlider.availableHeight / 2 - height / 2
+				implicitWidth: 16
+				implicitHeight: 16
+				radius: 8
+				color: rateSlider.pressed ? "#8e44ad" : "#16a085"
+				//border.color: "#8e44ad"
+			}
           onMoved : {
             root.rate = value
           }

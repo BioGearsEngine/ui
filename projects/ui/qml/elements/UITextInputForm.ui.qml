@@ -14,6 +14,7 @@ RowLayout {
     font.pointSize: 8
     font.weight: Font.DemiBold
     font.bold: true
+	//color : "#34495e"
   }
 
   TextInput {
@@ -21,6 +22,7 @@ RowLayout {
     text: qsTr("Placeholder Text")
     font.weight: Font.Medium
     font.pixelSize: 10
+	//color : "#34495e"
   }
 }
 

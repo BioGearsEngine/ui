@@ -28,9 +28,9 @@ Item {
 	property double heartRate: 0.0
 	property double dehydrationFraction: 0.0
 	
-	property string goodBorderColor: "green"
-	property string warningBorderColor: "yellow"
-	property string criticalBorderColor: "red"
+	property string goodBorderColor: "#27ae60"
+	property string warningBorderColor: "#f1c40f"
+	property string criticalBorderColor: "#c0392b"
 	
 	
 	// Based on BioGearsData
@@ -75,7 +75,22 @@ Item {
 	Rectangle {
 		id : energyMetabolismBackground
 		anchors.fill : parent
-		color : Qt.rgba(0, 0.15, 0, 0.7)
+		color : "transparent"
+		
+		Image {
+			id: biogears_background
+			source : "qrc:/icons/biogears_noBackground.png"
+			width : energyMetabolismBackground.width
+			height: energyMetabolismBackground.height 
+			anchors.centerIn : parent
+			fillMode: Image.PreserveAspectFit
+			Rectangle {
+				id : colorBackground
+				anchors.fill : biogears_background
+				color : "#ecf0f1"
+				opacity : 0.95
+			}
+		}
 		
 		GridLayout {
 			id: energyPanelGrid
@@ -83,7 +98,6 @@ Item {
 			height: root.height*0.9
 			width : root.width*0.95
 			anchors.centerIn : parent
-			
 			columns: 10
 			rows: 5
 			
@@ -111,118 +125,228 @@ Item {
 				Layout.rowSpan: 5
 				Layout.preferredHeight: energyPanelGrid.prefHeight(this)
 				Layout.preferredWidth: energyPanelGrid.prefWidth(this)
-				//Layout.leftMargin: energyPanelGrid.width/50
-				//Layout.topMargin: energyPanelGrid.height/50
-				//Layout.bottomMargin: energyPanelGrid.height/50
 				
 				minimumValue: 0
 				tickmarkStepSize : 0.1
 				minorTickmarkCount : 4
 				value: fatigue
 				maximumValue: 1
+				//formatValue: function(value)
 				tickmarkAlignment  : Qt.AlignLeft
 				Text {
 					id: indexText
 					text: "Fatigue"
+					font.bold: true
 					anchors.horizontalCenter: fatigueGauge.horizontalCenter
 					anchors.top: fatigueGauge.bottom
-					color: "white"
+					color: "#34495e"
 				}
 				style: GaugeStyle {
 					valueBar: Rectangle {
 						implicitWidth: energyPanelGrid.width / 20
 						color: Qt.rgba(fatigueGauge.value / fatigueGauge.maximumValue, 1 - fatigueGauge.value / fatigueGauge.maximumValue, 0, 1)
 					}
+					
+					//foreground: null
+					
+					tickmarkLabel: Text {
+						text: styleData.value
+						color: "#34495e"
+						antialiasing: true
+					}
+
+					tickmark: Item {
+						implicitWidth: 8
+						implicitHeight: 4
+
+						Rectangle {
+							x: control.tickmarkAlignment === Qt.AlignLeft
+								|| control.tickmarkAlignment === Qt.AlignTop ? parent.implicitWidth : -28
+							width: 28
+							height: parent.height
+							color: "#34495e"
+						}
+					}
+
+					minorTickmark: Item {
+						implicitWidth: 8
+						implicitHeight: 2
+
+						Rectangle {
+							x: control.tickmarkAlignment === Qt.AlignLeft
+								|| control.tickmarkAlignment === Qt.AlignTop ? parent.implicitWidth : -28
+							width: 14
+							height: parent.height
+							color: "#34495e"
+						}
+					}
 				}
 			}
-			Gauge {
-				id: coreTempGauge
-				minimumValue: -30
-				tickmarkStepSize : 5
-				minorTickmarkCount : 4
-				orientation: Qt.Horizontal
-				value: root.coreTemp
-				maximumValue: 50
-				tickmarkAlignment  : Qt.AlignTop
-				
+			Rectangle {
+				id : coreTempBox
 				Layout.column: 1
 				Layout.row: 0
-				//Layout.alignment: Qt.AlignLeft
 				Layout.columnSpan: 6
 				Layout.rowSpan: 1
 				Layout.preferredHeight: energyPanelGrid.prefHeight(this)
 				Layout.preferredWidth: energyPanelGrid.prefWidth(this)
-				//width: energyPanelGrid.width*0.6
-				//height: energyPanelGrid.height*0.2
-				//Layout.fillWidth: true
-				//Layout.fillHeight: true
+				
+				color : "transparent"
+			
+				Gauge {
+					id: coreTempGauge
+					minimumValue: -30
+					tickmarkStepSize : 5
+					minorTickmarkCount : 4
+					orientation: Qt.Horizontal
+					value: root.coreTemp
+					maximumValue: 50
+					tickmarkAlignment  : Qt.AlignBottom
+					
+					width: parent.width
+					height: parent.height
+					anchors.topMargin : coreTempBox.height / 10
+					anchors.top : coreTempText.bottom
+					anchors.horizontalCenter : coreTempBox.horizontalCenter
+
+					
+					style: GaugeStyle {
+						valueBar: Rectangle {
+						implicitWidth: energyPanelGrid.height / 10
+						color: (root.coreTemp >= 38) ? root.criticalBorderColor : goodBorderColor
+						}
+						
+						tickmarkLabel: Text {
+							text: styleData.value
+							color: "#34495e"
+							antialiasing: true
+						}
+						
+						tickmark: Item {
+							implicitWidth: 8
+							implicitHeight: 4
+
+							Rectangle {
+								x: control.tickmarkAlignment === Qt.AlignLeft
+									|| control.tickmarkAlignment === Qt.AlignTop ? parent.implicitWidth : -28
+								width: 28
+								height: parent.height
+								color: "#34495e"
+							}
+						}
+
+						minorTickmark: Item {
+							implicitWidth: 8
+							implicitHeight: 2
+
+							Rectangle {
+								x: control.tickmarkAlignment === Qt.AlignLeft
+									|| control.tickmarkAlignment === Qt.AlignTop ? parent.implicitWidth : -14
+								width: 14
+								height: parent.height
+								color: "#34495e"
+							}
+						}
+					}
+				}
 				Text {
 					id: coreTempText
 					text: "Core Temperature (Celsius):  "
-					anchors.bottomMargin: coreTempGauge.height/50
-					anchors.bottom: coreTempGauge.bottom
-					anchors.leftMargin: coreTempGauge.width / 100
-					anchors.left: coreTempGauge.left
-					color: "white"
+					font.bold: true
+					anchors.top: coreTempBox.top
+					anchors.left: coreTempBox.left
+					color: "#34495e"
 				}
 				Text {
 					id: coreTempDispValue
 					text: root.coreTemp
 					anchors.bottom: coreTempText.bottom
 					anchors.left: coreTempText.right
-					color: "white"
-				}
-				style: GaugeStyle {
-					valueBar: Rectangle {
-					implicitWidth: energyPanelGrid.height / 10
-					color: (root.coreTemp >= 38) ? root.criticalBorderColor : goodBorderColor
-					}
+					color: "#34495e"
 				}
 			}
-			Gauge {
-				id: skinTempGauge
-				minimumValue: -30
-				tickmarkStepSize : 5
-				minorTickmarkCount : 4
-				orientation: Qt.Horizontal
-				value: root.skinTemp
-				maximumValue: 50
-				tickmarkAlignment  : Qt.AlignTop
-				
+			Rectangle {
+				id : skinTempBox
 				Layout.column: 1
 				Layout.row: 1
 				Layout.columnSpan: 6
 				Layout.rowSpan: 1
 				Layout.preferredHeight: energyPanelGrid.prefHeight(this)
 				Layout.preferredWidth: energyPanelGrid.prefWidth(this)
-				//height: energyPanelGrid.width*0.6
-				//width: energyPanelGrid.height*0.2
-				//Layout.fillWidth: true
-				//Layout.fillHeight: true
+				
+				color : "transparent"
+				
+				Gauge {
+					id: skinTempGauge
+					minimumValue: -30
+					tickmarkStepSize : 5
+					minorTickmarkCount : 4
+					orientation: Qt.Horizontal
+					value: root.skinTemp
+					maximumValue: 50
+					tickmarkAlignment  : Qt.AlignTop
+					
+					width: parent.width
+					height: parent.height
+					anchors.verticalCenter : skinTempBox.verticalCenter
+					anchors.horizontalCenter : skinTempBox.horizontalCenter
+
+					style: GaugeStyle {
+						valueBar: Rectangle {
+						implicitWidth: energyPanelGrid.height / 10
+						color: (root.skinTemp >= 35) ? root.criticalBorderColor : goodBorderColor
+						}
+						
+						tickmarkLabel: Text {
+							text: styleData.value
+							color: "#34495e"
+							antialiasing: true
+						}
+
+						tickmark: Item {
+							implicitWidth: 8
+							implicitHeight: 4
+
+							Rectangle {
+								x: control.tickmarkAlignment === Qt.AlignLeft
+									|| control.tickmarkAlignment === Qt.AlignTop ? parent.implicitWidth : -28
+								width: 28
+								height: parent.height
+								color: "#34495e"
+							}
+						}
+
+						minorTickmark: Item {
+							implicitWidth: 8
+							implicitHeight: 2
+
+							Rectangle {
+								x: control.tickmarkAlignment === Qt.AlignLeft
+									|| control.tickmarkAlignment === Qt.AlignTop ? parent.implicitWidth : -14
+								width: 14
+								height: parent.height
+								color: "#34495e"
+							}
+						}
+					}
+				}
 				Text {
 					id: skinTempText
 					text: "Skin Temperature (Celsius):  "
-					anchors.bottomMargin: skinTempGauge.height/50
-					anchors.bottom: skinTempGauge.bottom
-					anchors.leftMargin: skinTempGauge.width / 100
-					anchors.left: skinTempGauge.left
-					color: "white"
+					font.bold : true
+					anchors.bottomMargin: skinTempBox.height * 0.1
+					anchors.bottom: skinTempBox.bottom
+					anchors.left: skinTempBox.left
+					color: "#34495e"
 				}
 				Text {
 					id: skinTempDispValue
 					text: root.skinTemp
 					anchors.bottom: skinTempText.bottom
 					anchors.left: skinTempText.right
-					color: "white"
-				}
-				style: GaugeStyle {
-					valueBar: Rectangle {
-					implicitWidth: energyPanelGrid.height / 10
-					color: (root.skinTemp >= 35) ? root.criticalBorderColor : goodBorderColor
-					}
+					color: "#34495e"
 				}
 			}
-			
 			Rectangle {
 				id : rightConsole
 				Layout.column: 7
@@ -239,8 +363,9 @@ Item {
 						id: exerciseProfile
 						font.pointSize: 12
 						text: "Exercise Profile"
+						font.bold: true
 						Layout.alignment: Qt.AlignHCenter
-						color: "white"
+						color: "#34495e"
 					}
 					Rectangle {
 						id: patientMetabolism
@@ -248,21 +373,21 @@ Item {
 						Layout.preferredWidth: rightConsole.width*0.9
 						Layout.preferredHeight: rightConsole.height*0.15
 						color : "white"
-						border.color: "green"
+						border.color: root.goodBorderColor
 						border.width: 5
 						Text {
 							id: textMetabolism
 							text: "Metabolic Load: " 
 							anchors.verticalCenter: patientMetabolism.verticalCenter
 							anchors.horizontalCenter: patientMetabolism.horizontalCenter
-							color: "black"
+							color: "#34495e"
 						}
 						Text {
 							id: valueMetabolism
 							text: metabolicLoad
 							anchors.left: textMetabolism.right
 							anchors.verticalCenter: patientMetabolism.verticalCenter
-							color: "black"
+							color: "#34495e"
 						}
 					}
 				
@@ -299,7 +424,7 @@ Item {
 							text: zoneHydrationText()
 							anchors.verticalCenter: patientHydration.verticalCenter
 							anchors.horizontalCenter: patientHydration.horizontalCenter
-							color: "black"
+							color: "#34495e"
 						}
 					}
 					
@@ -339,7 +464,7 @@ Item {
 							text: zoneHRText()
 							anchors.verticalCenter: patientHR.verticalCenter
 							anchors.horizontalCenter: patientHR.horizontalCenter
-							color: "black"
+							color: "#34495e"
 						}
 					}
 					
@@ -350,21 +475,21 @@ Item {
 						Layout.preferredWidth: rightConsole.width*0.9
 						Layout.preferredHeight: rightConsole.height*0.15
 						color : "white"
-						border.color: "green"
+						border.color: root.goodBorderColor
 						border.width: 5
 						Text {
 							id: textVO2
 							text: "VO2: "
 							anchors.verticalCenter: patientVO2.verticalCenter
 							anchors.horizontalCenter: patientVO2.horizontalCenter
-							color: "black"
+							color: "#34495e"
 						}
 						Text {
 							id: valueVO2
 							text: currentVO2
 							anchors.left: textVO2.right
 							anchors.verticalCenter: patientVO2.verticalCenter
-							color: "black"
+							color: "#34495e"
 						}
 					}
 				}
@@ -378,7 +503,10 @@ Item {
 				Layout.rowSpan: 2
 				Layout.preferredHeight: energyPanelGrid.prefHeight(this)
 				Layout.preferredWidth: energyPanelGrid.prefWidth(this)
-				color : Qt.rgba(0, 0.6, 0, 0.4)
+				color : "transparent"
+				border.color : root.goodBorderColor
+				border.width : 3
+				//opacity: 0.75
 				
 				ColumnLayout {
 				
@@ -387,9 +515,12 @@ Item {
 				Text {
 					id: envText
 					text: "Environment"
+					opacity : 1.0
 					font.pointSize: 12
+					font.bold: true
 					Layout.alignment: Qt.AlignHCenter
-					color: "white"
+					Layout.topMargin : envConsole.height / 50
+					color: "#34495e"
 				}
 				
 				RowLayout {
@@ -408,7 +539,26 @@ Item {
 								implicitWidth: outerRadius * 0.03
 								implicitHeight: outerRadius * 0.9
 								antialiasing: true
-								color: Qt.rgba(0.66, 0.3, 0, 1)
+								color: "#34495e"
+							}
+							tickmark: Rectangle {
+								//visible: styleData.value < 80 || styleData.value % 10 == 0
+								implicitWidth: outerRadius * 0.02
+								antialiasing: true
+								implicitHeight: outerRadius * 0.06
+								color: "#34495e"
+							}
+							minorTickmark: Rectangle {
+								//visible: styleData.value < 80
+								implicitWidth: outerRadius * 0.01
+								antialiasing: true
+								implicitHeight: outerRadius * 0.03
+								color: "#34495e"
+							}
+							tickmarkLabel: Text {
+								text: styleData.value
+								color: "#34495e"
+								antialiasing: true
 							}
 						}
 						Text {
@@ -416,21 +566,21 @@ Item {
 							text: "Temperature (degC)"
 							anchors.horizontalCenter: parent.horizontalCenter
 							anchors.top: tempGauge.bottom
-							color: "white"
+							color: "#34495e"
 						}
 					}
 					Text {
 						id: envHumidityText
 						text: "Humidity:"
 						font.pointSize: 10
-						color: "white"
+						color: "#34495e"
 						Text {
 							id: envHumidityValue
 							text: envHumidity
 							font.pixelSize: 20
 							anchors.horizontalCenter: envHumidityText.horizontalCenter
 							anchors.top: envHumidityText.bottom
-							color: "white"
+							color: "#34495e"
 						}
 					}
 					

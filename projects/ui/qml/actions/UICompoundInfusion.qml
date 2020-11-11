@@ -39,13 +39,16 @@ UIActionForm {
         Layout.columnSpan : 4
         Layout.fillWidth : true
         font.bold : true
-        color : "blue"
+        Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 [%2]".arg(actionType).arg(root.compound)
       }      
  //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Volume"
         font.pointSize : 10
       }      
@@ -57,7 +60,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.volume
-
+		background: Rectangle {
+			x: bagVolume.leftPadding
+			y: bagVolume.topPadding + bagVolume.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: bagVolume.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: bagVolume.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: bagVolume.leftPadding + bagVolume.visualPosition * (bagVolume.availableWidth - width)
+			y: bagVolume.topPadding + bagVolume.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: bagVolume.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.volume = value
           if ( root.active )
@@ -66,12 +93,16 @@ UIActionForm {
       }
       Label {
         text : "%1 ml".arg(root.volume )
+		Layout.leftMargin : 5
+		color : "#34495e"
         font.pointSize : 10
       }
       //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Flow Rate"
         font.pointSize : 10
       }      
@@ -83,7 +114,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.rate
-
+		background: Rectangle {
+			x: flowRate.leftPadding
+			y: flowRate.topPadding + flowRate.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: flowRate.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: flowRate.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: flowRate.leftPadding + flowRate.visualPosition * (flowRate.availableWidth - width)
+			y: flowRate.topPadding + flowRate.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: flowRate.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.rate = value
           if ( root.active )
@@ -92,6 +147,7 @@ UIActionForm {
       }
       Label {
         text : "%1 ml/min".arg(root.rate )
+		color : "#34495e"
         font.pointSize : 10
       }
     
@@ -102,7 +158,9 @@ UIActionForm {
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        implicitHeight : 30    
+		Layout.bottomMargin : 5
+        implicitHeight : 30  
+		radius : pill.width*0.6
         Layout.maximumWidth : grid.width / 4
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
@@ -117,7 +175,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+			radius : pill.width*0.6
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -275,6 +333,31 @@ UIActionForm {
           stepSize : 10
           value : root.rate
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: rateSlider.leftPadding
+			y: rateSlider.topPadding + rateSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: rateSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: rateSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: rateSlider.leftPadding + rateSlider.visualPosition * (rateSlider.availableWidth - width)
+			y: rateSlider.topPadding + rateSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: rateSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.rate = value
           }
@@ -307,6 +390,31 @@ UIActionForm {
           stepSize : 25
           value : root.volume
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: volumeSlider.leftPadding
+			y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: volumeSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: volumeSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
+			y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: volumeSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.volume = value
           }

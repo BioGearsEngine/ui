@@ -70,15 +70,44 @@ Page {
     border.width : 0
     height : 40
     color : "#2980b9"
-    Rectangle {
+	
+	Rectangle {
+	id : headerTextbox
+	width : headerBar.width * 0.3
+	height : headerBar.height
+	color : "transparent"
+	anchors.horizontalCenter : parent.horizontalCenter
+	anchors.verticalCenter : parent.verticalCenter
+    SwipeView {
+      id : systemSwipeView
+      clip : true
+	  anchors.left : headerTextbox.left
+      anchors.right : headerTextbox.right
+      height : parent.height
+      Repeater {
+        anchors.fill : parent
+		model : physiologyRequestModel
+        delegate : UITabButtonForm {
+          text : name
+        }
+      }
+      currentIndex : plots.currentIndex
+      onCurrentIndexChanged : {
+        if (plots.currentIndex != currentIndex) {
+          plots.currentIndex = currentIndex;
+        }
+      }
+    }
+	}
+	Rectangle {
       id : previous
       color : "transparent"
       height : parent.height
       width : 40
-      anchors.left : parent.left
+      anchors.right : headerTextbox.left
       Image {
         anchors.centerIn : parent
-        source : "icons/prev_transparent.png"
+        source : "icons/prev.svg"
         width : parent.width * 0.8
         fillMode : Image.PreserveAspectFit
         MouseArea {
@@ -94,36 +123,16 @@ Page {
         }
       }
     }
-    SwipeView {
-      id : systemSwipeView
-      clip : true
-      anchors.left : previous.right
-      anchors.right : next.right
-      height : parent.height
-      Repeater {
-        anchors.fill : parent
-        model : physiologyRequestModel
-        delegate : UITabButtonForm {
-          text : name
-        }
-      }
-      currentIndex : plots.currentIndex
-      onCurrentIndexChanged : {
-        if (plots.currentIndex != currentIndex) {
-          plots.currentIndex = currentIndex;
-        }
-      }
-    }
     Rectangle {
       id : next
       color : "transparent"
       height : parent.height
       width : 40
-      anchors.right : filterMenuButton.left
-      anchors.rightMargin : 15
+      anchors.left : headerTextbox.right
+      //anchors.rightMargin : 15
       Image {
         anchors.centerIn : parent
-        source : "icons/next_transparent.png"
+        source : "icons/next.svg"
         width : parent.width * 0.8
         fillMode : Image.PreserveAspectFit
         MouseArea {
@@ -147,7 +156,7 @@ Page {
       anchors.right : parent.right
       Image {
         anchors.centerIn : parent
-        source : "icons/menu_transparent.png"
+        source : "icons/menu.svg"
         sourceSize.width : parent.width
         sourceSize.height : parent.height * 0.8
         MouseArea {
@@ -208,11 +217,20 @@ Page {
       id : cardiovascularSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      Rectangle {
-        id : cardiovascularBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
+      Image {
+			id: biogears_background_cardio
+			source : "qrc:/icons/biogears_noBackground.png"
+			width : plots.width
+			height: plots.height 
+			anchors.centerIn : parent
+			fillMode: Image.PreserveAspectFit
+			Rectangle {
+				id : colorBackgroundCardio
+				anchors.fill : biogears_background_cardio
+				color : "#ecf0f1"
+				opacity : 0.95
+			}
+	    }
       GridView {
           id : cardiovascularGridView
           anchors.fill : parent
@@ -232,11 +250,20 @@ Page {
       id : respiratorySeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      Rectangle {
-        id : respiratoryBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
+      Image {
+		id: biogears_background_respiratory
+		source : "qrc:/icons/biogears_noBackground.png"
+		width : plots.width
+		height: plots.height 
+		anchors.centerIn : parent
+		fillMode: Image.PreserveAspectFit
+		Rectangle {
+			id : colorBackgroundRespiratory
+			anchors.fill : biogears_background_respiratory
+			color : "#ecf0f1"
+			opacity : 0.95
+		}
+	  }
       GridView {
         id : respiratoryGridView
         anchors.fill : parent
@@ -256,11 +283,20 @@ Page {
       id : bloodChemistrySeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      Rectangle {
-        id : bloodChemistryBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
+      Image {
+		id: biogears_background_bloodChem
+		source : "qrc:/icons/biogears_noBackground.png"
+		width : plots.width
+		height: plots.height 
+		anchors.centerIn : parent
+		fillMode: Image.PreserveAspectFit
+		Rectangle {
+			id : colorBackgroundBloodChem
+			anchors.fill : biogears_background_bloodChem
+			color : "#ecf0f1"
+			opacity : 0.95
+		}
+	  }
       GridView {
         id : bloodChemistryGridView
         anchors.fill : parent
@@ -294,11 +330,20 @@ Page {
       id : substanceSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      Rectangle {
-        id : substanceBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
+      Image {
+		id: biogears_background_sub
+		source : "qrc:/icons/biogears_noBackground.png"
+		width : plots.width
+		height: plots.height 
+		anchors.centerIn : parent
+		fillMode: Image.PreserveAspectFit
+		Rectangle {
+			id : colorBackgroundSub
+			anchors.fill : biogears_background_sub
+			color : "#ecf0f1"
+			opacity : 0.95
+		}
+	  }
       GridView {
         id : substanceGridView
         anchors.fill : parent
@@ -318,11 +363,20 @@ Page {
       id : customSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      Rectangle {
-        id : customBackground
-        anchors.fill : parent
-        color : "#ecf0f1"
-      }
+      Image {
+		id: biogears_background_custom
+		source : "qrc:/icons/biogears_noBackground.png"
+		width : plots.width
+		height: plots.height 
+		anchors.centerIn : parent
+		fillMode: Image.PreserveAspectFit
+		Rectangle {
+			id : colorBackgroundCustom
+			anchors.fill : biogears_background_custom
+			color : "#ecf0f1"
+			opacity : 0.95
+		}
+	  }
       GridView {
         id : customGridView
         anchors.fill : parent

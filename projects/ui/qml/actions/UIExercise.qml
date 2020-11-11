@@ -101,7 +101,8 @@ UIActionForm {
       Label {
         font.pixelSize : 10
         font.bold : true
-        color : "blue"
+        Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1".arg(actionType)
       }      
       Label {
@@ -115,6 +116,8 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         visible : {
           if (root.type === "Generic"){
             return root.property_1 > 0.0
@@ -151,6 +154,31 @@ UIActionForm {
         to : 100
         stepSize : 1
         value : root.property_1
+		background: Rectangle {
+			x: property_1.leftPadding
+			y: property_1.topPadding + property_1.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: property_1.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: property_1.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: property_1.leftPadding + property_1.visualPosition * (property_1.availableWidth - width)
+			y: property_1.topPadding + property_1.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: property_1.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.property_1 = value
           if ( root.active )
@@ -160,6 +188,8 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 3
+		Layout.leftMargin : 5
+		color : "#34495e"
         visible : {
           if (root.type === "Generic"){
             return root.property_1 > 0.0
@@ -183,6 +213,8 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         visible : {
           if (root.type === "Generic"){
             return root.property_2 > 0.0
@@ -219,6 +251,31 @@ UIActionForm {
         to : 100
         stepSize : 1
         value : root.property_2
+		background: Rectangle {
+			x: property_2.leftPadding
+			y: property_2.topPadding + property_2.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: property_2.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: property_2.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: property_2.leftPadding + property_2.visualPosition * (property_2.availableWidth - width)
+			y: property_2.topPadding + property_2.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: property_2.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.property_2 = value
           if ( root.active )
@@ -228,6 +285,8 @@ UIActionForm {
       Label {
         Layout.row : 2
         Layout.column : 3
+		Layout.leftMargin : 5
+		color : "#34495e"
         visible : {
           if (root.type === "Generic"){
             return root.property_2 > 0.0
@@ -251,6 +310,8 @@ UIActionForm {
       Label {
         Layout.row : 3
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Weight"
         visible : ( root.type == "Running" || root.type == "Cycling") ? true : false
       }      
@@ -263,6 +324,31 @@ UIActionForm {
         stepSize : 1
         value : root.weight
         visible : ( root.type == "Running" || root.type == "Cycling") ? true : false
+		background: Rectangle {
+			x: weight_slider.leftPadding
+			y: weight_slider.topPadding + weight_slider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: weight_slider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: weight_slider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: weight_slider.leftPadding + weight_slider.visualPosition * (weight_slider.availableWidth - width)
+			y: weight_slider.topPadding + weight_slider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: weight_slider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.weight = value
           if ( root.active )
@@ -270,6 +356,8 @@ UIActionForm {
         }
       }
       Label {
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 kg".arg(weight)
         visible : ( root.type == "Running" || root.type == "Cycling") ? true : false
       }
@@ -281,7 +369,9 @@ UIActionForm {
         Layout.column : 2
         Layout.columnSpan : 2
         Layout.fillWidth : true
-        Layout.preferredHeight : 30      
+        Layout.preferredHeight : 30
+		Layout.bottomMargin : 5		
+		radius: pill.width*0.6
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -295,7 +385,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+            radius: pill.width*0.6  
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -552,6 +642,31 @@ UIActionForm {
           stepSize : grid.subType ==1 ? 25 : 0.05
           value : grid.subType == 0 ? root.property_1 : grid.subType == 1 ? root.property_2 : 0
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: inputSlider.leftPadding
+			y: inputSlider.topPadding + inputSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: inputSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: inputSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: inputSlider.leftPadding + inputSlider.visualPosition * (inputSlider.availableWidth - width)
+			y: inputSlider.topPadding + inputSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: inputSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             if (grid.subType==0){
               root.property_1 = value
@@ -667,6 +782,31 @@ UIActionForm {
           stepSize : root.type === "Cycling" ? 5 : 0.5
           value : root.property_1
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: prop1Slider.leftPadding
+			y: prop1Slider.topPadding + prop1Slider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: prop1Slider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: prop1Slider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: prop1Slider.leftPadding + prop1Slider.visualPosition * (prop1Slider.availableWidth - width)
+			y: prop1Slider.topPadding + prop1Slider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: prop1Slider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
               root.property_1 = value     
           }
@@ -744,6 +884,31 @@ UIActionForm {
           stepSize : root.type === "Cycling" ? 10 : 1
           value : root.property_2
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: prop2Slider.leftPadding
+			y: prop2Slider.topPadding + prop2Slider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: prop2Slider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: prop2Slider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: prop2Slider.leftPadding + prop2Slider.visualPosition * (prop2Slider.availableWidth - width)
+			y: prop2Slider.topPadding + prop2Slider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: prop2Slider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
               root.property_2 = value
           }
@@ -776,6 +941,31 @@ UIActionForm {
           stepSize : 1
           value : root.weight
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: weightSlider.leftPadding
+			y: weightSlider.topPadding + weightSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: weightSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: weightSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: weightSlider.leftPadding + weightSlider.visualPosition * (weightSlider.availableWidth - width)
+			y: weightSlider.topPadding + weightSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: weightSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
               root.weight = value
           }
@@ -897,6 +1087,31 @@ UIActionForm {
           stepSize : 1
           value : root.weight
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: prop1Slider.leftPadding
+			y: prop1Slider.topPadding + prop1Slider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: prop1Slider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: prop1Slider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: prop1Slider.leftPadding + prop1Slider.visualPosition * (prop1Slider.availableWidth - width)
+			y: prop1Slider.topPadding + prop1Slider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: prop1Slider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
               root.weight = value     
           }
@@ -961,6 +1176,31 @@ UIActionForm {
           stepSize : 1
           value : root.property_2
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: repsSlider.leftPadding
+			y: repsSlider.topPadding + repsSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: repsSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: repsSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: repsSlider.leftPadding + repsSlider.visualPosition * (repsSlider.availableWidth - width)
+			y: repsSlider.topPadding + repsSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: repsSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
               root.property_2 = value
           }

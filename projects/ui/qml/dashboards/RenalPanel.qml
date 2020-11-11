@@ -69,15 +69,15 @@ Item {
 		// start, stop, and pause are handled in GraphForm after passing out renalTimer
 		onTriggered : {
 			let urineProdIndex = physiologyRenalModel.index(1, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.urineProductionRate = physiologyRenalModel.data(urineProdIndex, PhysiologyModel.ValueRole).toFixed(2)
+			root.urineProductionRate = physiologyRenalModel.data(urineProdIndex, PhysiologyModel.ValueRole).toFixed(1)
 			let glomFiltRateIndex = physiologyRenalModel.index(2, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.glomerularFiltrationRate = physiologyRenalModel.data(glomFiltRateIndex, PhysiologyModel.ValueRole).toFixed(2)
+			root.glomerularFiltrationRate = physiologyRenalModel.data(glomFiltRateIndex, PhysiologyModel.ValueRole).toFixed(1)
 			let renalBloodFlowIndex = physiologyRenalModel.index(6, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.renalBloodFlow = physiologyRenalModel.data(renalBloodFlowIndex, PhysiologyModel.ValueRole).toFixed(2)
+			root.renalBloodFlow = physiologyRenalModel.data(renalBloodFlowIndex, PhysiologyModel.ValueRole).toFixed(1)
 			let lReabsIndex = physiologyRenalModel.index(7, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.leftReabsorptionRate = physiologyRenalModel.data(lReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
+			root.leftReabsorptionRate = physiologyRenalModel.data(lReabsIndex, PhysiologyModel.ValueRole).toFixed(1)
 			let rReabsIndex = physiologyRenalModel.index(8, 0) //first number refers to request name within energy (0 is core temp) second should be 0 to get reserved slot name
-			root.rightReabsorptionRate = physiologyRenalModel.data(rReabsIndex, PhysiologyModel.ValueRole).toFixed(2)
+			root.rightReabsorptionRate = physiologyRenalModel.data(rReabsIndex, PhysiologyModel.ValueRole).toFixed(1)
 			root.meanReabsorptionRate = (root.leftReabsorptionRate + root.rightReabsorptionRate) / 2;
 
 		}
@@ -101,7 +101,22 @@ Item {
 	Rectangle {
 		id : renalBackground
 		anchors.fill : parent
-		color : Qt.rgba(0, 0.15, 0, 0.7)
+		color : "transparent"
+		
+		Image {
+			id: biogears_background
+			source : "qrc:/icons/biogears_noBackground.png"
+			width : renalBackground.width
+			height: renalBackground.height 
+			anchors.centerIn : parent
+			fillMode: Image.PreserveAspectFit
+			Rectangle {
+				id : colorBackground
+				anchors.fill : biogears_background
+				color : "#ecf0f1"
+				opacity : 0.95
+			}
+		}
 
 		
 		
@@ -132,7 +147,7 @@ Item {
 				Layout.rowSpan: 4
 				Layout.preferredHeight: renalPanelGrid.prefHeight(this)
 				Layout.preferredWidth: renalPanelGrid.prefWidth(this) 
-				color : Qt.rgba(0.75, 0.75, 0.75, 1)
+				color : "transparent" //Qt.rgba(0.75, 0.75, 0.75, 1)
 				
 				ColumnLayout {
 					id: columnLayout

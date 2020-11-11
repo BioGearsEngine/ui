@@ -97,13 +97,16 @@ UIActionForm {
         Layout.columnSpan : 4
         Layout.fillWidth : true
         font.bold : true
-        color : "blue"
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Drug %1 [%2]".arg(subClass_str).arg(root.drug)
       }      
  //Column 2
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Dose"
         visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
         font.pointSize  : 10
@@ -117,6 +120,31 @@ UIActionForm {
         stepSize : 1
         value : root.dose
         visible :  root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
+		background: Rectangle {
+			x: dosage.leftPadding
+			y: dosage.topPadding + dosage.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: dosage.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: dosage.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: dosage.leftPadding + dosage.visualPosition * (dosage.availableWidth - width)
+			y: dosage.topPadding + dosage.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: dosage.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.dose = value
           if ( root.active )
@@ -138,12 +166,16 @@ UIActionForm {
           return ""
         }
         font.pointSize : 10
+		Layout.leftMargin : 5
+		color : "#34495e"
         visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceOralDose
       }
       //Column 3
       Label {
         Layout.row : 2
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Concentration"
         visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceInfusion
         font.pointSize : 10
@@ -157,6 +189,31 @@ UIActionForm {
         stepSize : 1
         value : root.concentration
         visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceInfusion
+		background: Rectangle {
+			x: concentration.leftPadding
+			y: concentration.topPadding + concentration.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: concentration.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: concentration.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: concentration.leftPadding + concentration.visualPosition * (concentration.availableWidth - width)
+			y: concentration.topPadding + concentration.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: concentration.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.concentration = value
           if ( root.active )
@@ -164,6 +221,8 @@ UIActionForm {
         }
       }
       Label {
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 ug/mL".arg(root.concentration )
         visible : root.actionSubClass === EventModel.SubstanceBolus || root.actionSubClass === EventModel.SubstanceInfusion
         font.pointSize : 10
@@ -172,6 +231,8 @@ UIActionForm {
       Label {
         Layout.row : 3
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Flow Rate"
         visible : root.actionSubClass === EventModel.SubstanceInfusion
         font.pointSize : 10
@@ -185,6 +246,31 @@ UIActionForm {
         stepSize : 1
         value : root.rate
         visible : root.actionSubClass === EventModel.SubstanceInfusion
+		background: Rectangle {
+			x: flowRate.leftPadding
+			y: flowRate.topPadding + flowRate.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: flowRate.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: flowRate.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: flowRate.leftPadding + flowRate.visualPosition * (flowRate.availableWidth - width)
+			y: flowRate.topPadding + flowRate.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: flowRate.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.rate = value
           if ( root.active )
@@ -192,6 +278,8 @@ UIActionForm {
         }
       }
       Label {
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "%1 ml/min".arg(root.rate )
         visible : root.actionSubClass === EventModel.SubstanceInfusion
         font.pointSize : 10
@@ -205,7 +293,9 @@ UIActionForm {
         Layout.columnSpan : 2
         Layout.fillWidth : true
         implicitHeight : 30   
-        Layout.maximumWidth : grid.width / 4     
+        Layout.maximumWidth : grid.width / 4   
+		Layout.bottomMargin : 5
+		radius : pill.width*0.6
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
         Text {
@@ -219,7 +309,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+			radius : pill.width*0.6
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -495,6 +585,31 @@ UIActionForm {
           stepSize : 1
           value : root.dose
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: doseSlider.leftPadding
+			y: doseSlider.topPadding + doseSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: doseSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: doseSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: doseSlider.leftPadding + doseSlider.visualPosition * (doseSlider.availableWidth - width)
+			y: doseSlider.topPadding + doseSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: doseSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.dose = value
           }
@@ -525,6 +640,31 @@ UIActionForm {
           stepSize : 10
           value : root.concentration
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: concentrationSlider.leftPadding
+			y: concentrationSlider.topPadding + concentrationSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: concentrationSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: concentrationSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: concentrationSlider.leftPadding + concentrationSlider.visualPosition * (concentrationSlider.availableWidth - width)
+			y: concentrationSlider.topPadding + concentrationSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: concentrationSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.concentration = value
           }
@@ -726,6 +866,31 @@ UIActionForm {
           stepSize : 1
           value : root.rate
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: rateSlider.leftPadding
+			y: rateSlider.topPadding + rateSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: rateSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: rateSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: rateSlider.leftPadding + rateSlider.visualPosition * (rateSlider.availableWidth - width)
+			y: rateSlider.topPadding + rateSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: rateSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.rate = value
           }
@@ -758,6 +923,31 @@ UIActionForm {
           stepSize : 10
           value : root.concentration
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: concentrationSlider.leftPadding
+			y: concentrationSlider.topPadding + concentrationSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: concentrationSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: concentrationSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: concentrationSlider.leftPadding + concentrationSlider.visualPosition * (concentrationSlider.availableWidth - width)
+			y: concentrationSlider.topPadding + concentrationSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: concentrationSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.concentration = value
           }
@@ -961,6 +1151,31 @@ UIActionForm {
           stepSize : 25
           value : root.dose
           Layout.alignment : Qt.AlignLeft
+		  background: Rectangle {
+			x: doseSlider.leftPadding
+			y: doseSlider.topPadding + doseSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: doseSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: doseSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: doseSlider.leftPadding + doseSlider.visualPosition * (doseSlider.availableWidth - width)
+			y: doseSlider.topPadding + doseSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: doseSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.dose = value
           }

@@ -12,6 +12,7 @@ Button {
   background : Rectangle {
     anchors.fill : parent
     color : "lightgray"
+	border.color : "black"
   }
   Text {
     id : patientText

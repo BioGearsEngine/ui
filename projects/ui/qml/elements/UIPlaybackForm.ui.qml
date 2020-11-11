@@ -45,7 +45,7 @@ ColumnLayout {
       contentItem : Image {
         id : resetImage
         fillMode : Image.PreserveAspectFit
-        source: "icons/reset.png"
+        source: "icons/reverse.svg"
         height : 30
       }
       onClicked: {root.restartClicked()}
@@ -62,7 +62,7 @@ ColumnLayout {
       contentItem : Image {
         id : pausePlayImage
         fillMode : Image.PreserveAspectFit
-        source: "icons/play.png"
+        source: "icons/play.svg"
         height : 30
       }
       state : "Stopped"
@@ -83,7 +83,7 @@ ColumnLayout {
       states: [
        State{
           name: "Stopped"
-          PropertyChanges { target: pausePlayImage; source: "icons/play.png" }
+          PropertyChanges { target: pausePlayImage; source: "icons/play.svg" }
           PropertyChanges { target: pause_play; text: "Play" }
           PropertyChanges { target: pause_play; playing: false }
           PropertyChanges { target: pause_play; paused: false }
@@ -97,7 +97,7 @@ ColumnLayout {
           }
         ,State {
           name: "Paused"
-          PropertyChanges { target: pausePlayImage; source: "icons/play.png" }
+          PropertyChanges { target: pausePlayImage; source: "icons/play.svg" }
           PropertyChanges { target: pause_play; text: "Resume" }
           PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: true }
@@ -115,7 +115,7 @@ ColumnLayout {
       contentItem : Image {
         id : forwardImage
         fillMode : Image.PreserveAspectFit
-        source: "icons/clock-realtime.png"
+        source: "icons/speedup.svg"
         height : 30
       }
       state : "realtime"
@@ -130,12 +130,12 @@ ColumnLayout {
       states: [
         State {
           name: "realtime"
-          PropertyChanges { target: forwardImage; source: "icons/clock-realtime.png" }
+          PropertyChanges { target: forwardImage; source: "icons/speedup.svg" }
           PropertyChanges { target: forward; rate: 1 }
         }
         ,State {
           name: "max"
-          PropertyChanges { target: forwardImage; source: "icons/clock-max.png" }
+          PropertyChanges { target: forwardImage; source: "icons/speedup.svg" }
           PropertyChanges { target: forward; rate: 2 }
         }
       ]

@@ -34,6 +34,8 @@ UIActionForm {
         font.pointSize : 12
         Layout.columnSpan : 4
         Layout.fillWidth : true
+		Layout.leftMargin : 5
+		color : "#34495e"
         font.bold : true
         color : "blue"
         text : "%1".arg(actionType)
@@ -43,6 +45,8 @@ UIActionForm {
       Label {
         Layout.row : 1
         Layout.column : 0
+		Layout.leftMargin : 5
+		color : "#34495e"
         text : "Severity"
         font.pointSize : 10
       }      
@@ -54,7 +58,31 @@ UIActionForm {
         to : 1
         stepSize : 0.05
         value : root.severity
-
+		background: Rectangle {
+			x: stimulus.leftPadding
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: stimulus.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: stimulus.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: stimulus.leftPadding + stimulus.visualPosition * (stimulus.availableWidth - width)
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: stimulus.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
         onMoved : {
           root.severity = value
           if ( root.active )
@@ -62,6 +90,7 @@ UIActionForm {
         }
       }
       Label {
+		color : "#34495e"
         text : "%1".arg(root.severity)
         font.pointSize : 10
       }
@@ -74,6 +103,8 @@ UIActionForm {
         Layout.columnSpan : 2
         Layout.fillWidth : true
         Layout.maximumWidth : grid.width / 4
+		Layout.bottomMargin : 5
+		radius : pill.width * 0.6
         implicitHeight : 30     
         color:        root.active? 'green': 'red' // background
         opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
@@ -88,7 +119,7 @@ UIActionForm {
         }
         Rectangle { // pill
             id: pill
-    
+			radius : pill.width * 0.6
             x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
             width: parent.width * .5;
             height: parent.height // square
@@ -175,6 +206,31 @@ UIActionForm {
           stepSize : 0.05
           value : root.severity
           Layout.fillWidth : true
+		  background: Rectangle {
+			x: stimulus.leftPadding
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: stimulus.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: stimulus.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: stimulus.leftPadding + stimulus.visualPosition * (stimulus.availableWidth - width)
+			y: stimulus.topPadding + stimulus.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: stimulus.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
           onMoved : {
             root.severity = value
           }
