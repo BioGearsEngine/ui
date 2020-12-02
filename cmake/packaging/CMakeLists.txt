@@ -18,8 +18,8 @@ if(WIN32 AND NOT UNIX)
   # There is a bug in NSI that does not handle full UNIX paths properly.
   # Make sure there is at least one set of four backlashes.
   #set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/BioGearsLogo.bmp")
-  set(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}biogearslogo_XoQ_icon.ico")
-  set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} BioGears UI")
+  set(CPACK_NSIS_INSTALLED_ICON_NAME "${CMAKE_CURRENT_SOURCE_DIR}/biogearslogo_XoQ_icon.ico")
+  set(CPACK_NSIS_DISPLAY_NAME "BioGears Explorer")
   set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.biogearsengine.com")
   set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.biogearsengine.com")
   set(CPACK_NSIS_CONTACT "admin@biogearsengine.com")
