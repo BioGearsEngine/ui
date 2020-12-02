@@ -71,7 +71,7 @@ constexpr bool _OFFICAL_RELEASE_ = ${${ROOT_PROJECT_NAME}_CLEAN_BUILD};
 constexpr int _MAJOR_VERSION_NUMBER_  = ${${ROOT_PROJECT_NAME}_VERSION_MAJOR};
 constexpr int _MINOR_VERSION_NUMBER_  = ${${ROOT_PROJECT_NAME}_VERSION_MINOR};
 constexpr int _PATCH_VERSION_NUMBER_  = ${${ROOT_PROJECT_NAME}_VERSION_PATCH};
-constexpr int _TWEAK_VERSION_NUMBER_  = ${${ROOT_PROJECT_NAME}_VERSION_TWEAK};
+constexpr char const *  _TWEAK_VERSION_NUMBER_  = "${${ROOT_PROJECT_NAME}_VERSION_TWEAK}";
 
 
 using namespace std::string_literals;

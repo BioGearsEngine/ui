@@ -129,6 +129,7 @@ function(remove_duplicate_libraries libraries)
   
   set( ${libraries} ${common_libraries} ${results} PARENT_SCOPE)
 endfunction()
+
 ########################################################################################################
 # 
 # Git Version Macro
