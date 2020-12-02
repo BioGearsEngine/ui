@@ -1,7 +1,7 @@
 ###############################################################################
 # Policy adjustments
 ###############################################################################
-
+cmake_policy(SET CMP0087 NEW)
 ###############################################################################
 # Options
 ###############################################################################
@@ -47,7 +47,10 @@ add_source_files(${PREFIX}_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cpp/ "version.cpp
 ###############################################################################
 #Define Logic
 ###############################################################################
-add_executable(${PROJECT_NAME} ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS} ${RESOURCES} )
+CMAKE_POLICY(SET CMP0020 NEW)
+add_executable(${PROJECT_NAME} WIN32
+               ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS} ${RESOURCES} )
+
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
   DEFINE_SYMBOL ${PROJECT_NAME}_EXPORTS
@@ -59,9 +62,14 @@ set_target_properties(${PROJECT_NAME}
   AUTOMOC ON
   CXX_STANDARD 14
   VS_DEBUGGER_WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/runtime
+  CPACK_START_MENU_SHORTCUTS "Biogears UI"
   )
 
 if(WIN32)
+  target_sources(${PROJECT_NAME}  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BiogearsUI.rc)
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set_property(TARGET ${PROJECT_NAME}  PROPERTY WIN32_EXECUTABLE true)
+  endif()
   target_compile_definitions(${PROJECT_NAME} PRIVATE _SCL_SECURE_NO_WARNINGS _CRT_SECURE_NO_WARNINGS bigobj)
   target_compile_options(${PROJECT_NAME} PRIVATE $<$<PLATFORM_ID:Windows>:/bigobj>  PRIVATE $<$<PLATFORM_ID:Windows>:/MP>)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
@@ -92,10 +100,15 @@ set(${PREFIX}_LIBS
 )
 target_link_libraries(${PROJECT_NAME}  ${${PREFIX}_LIBS} )
 
-install(TARGETS ${PROJECT_NAME} EXPORT BiogearsUI
+install(TARGETS ${PROJECT_NAME}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR}
    ARCHIVE DESTINATION lib
+)
+
+
+set_property(INSTALL "$<TARGET_FILE_NAME:${PROJECT_NAME}>"
+  PROPERTY CPACK_START_MENU_SHORTCUTS "BioGears Commnad Line"
 )
 
 if(NOT ${PREFIX}_BUILD_STATIC)
@@ -143,15 +156,16 @@ add_custom_command(
     "
   )
 
-add_custom_target(STAGE 
+add_custom_target(gather_runtime_dependencies 
   ${CMAKE_COMMAND} 
   -DCMAKE_INSTALL_CONFIG_NAME=$<CONFIG> -P ${CMAKE_BINARY_DIR}/stage_$<CONFIG>_script.cmake
   )
-set_target_properties(STAGE
+set_target_properties(gather_runtime_dependencies
     PROPERTIES
-    FOLDER "CMakePredefinedTargets"
-    PROJECT_LABEL "STAGE"
+    FOLDER ""
+    PROJECT_LABEL "gather_runtime_dependencies"
 )
-#add_dependencies(STAGE stage_biogears_schema stage_biogears_data)
-
+#add_dependencies(gather_runtime_dependencies stage_biogears_schema stage_biogears_data)
+####
+####
 message(STATUS "")

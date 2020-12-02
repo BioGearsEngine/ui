@@ -8,7 +8,7 @@
 #                                           (also required for toolchain file)
 #   ANDROID         GRADLE_EXECUTABLE   Location of the Gradle executable
 ###############################################################################
-set(ROOT_PROJECT_NAME Visualizer)
+set(ROOT_PROJECT_NAME BiogearsUI)
 set(${ROOT_PROJECT_NAME}_CMAKE_MIN_VERSION 3.11.0)
 set(${ROOT_PROJECT_NAME}_CMAKE_POLICY 3.11.0)
 
@@ -83,8 +83,9 @@ endif()
 # list them here. This will install them in your sysroot
 # so other projects can build off those libraries
 ###############################################################################
-install(FILES cmake/Find${ROOT_PROJECT_NAME}.cmake
-        DESTINATION cmake/)
-
+if( PROJECT_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR )
+  message(STATUS "Preparing Installer Packages")
+  add_subdirectory(cmake/packaging)
+endif()
 
 generate_project_suffix()
