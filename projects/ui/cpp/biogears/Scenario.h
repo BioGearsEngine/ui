@@ -92,6 +92,7 @@ public:
   Q_INVOKABLE QVariantMap edit_substance();
   Q_INVOKABLE void export_substance();
   Q_INVOKABLE void export_state(bool saveAs);
+  Q_INVOKABLE void save_plots(QString location, QString name);
   Q_INVOKABLE void load_state();
 
   Q_INVOKABLE double get_simulation_time();
@@ -180,9 +181,11 @@ protected:
   PatientConditions get_physiology_conditions();
 
   void setup_physiology_model();
+  void configure_physiology_model();
+  void setup_data_request_tree();
   void setup_physiology_substances(BioGearsData*);
   void setup_physiology_lists();
-
+  void remake_engine();
   void physiology_thread_main();
   void physiology_thread_step();
 
@@ -200,7 +203,7 @@ private:
   std::shared_ptr<biogears::SEUrinalysis> _urinalysis;
   std::unique_ptr<Urinalysis> _urinalysis_qml;
   std::shared_ptr<biogears::SEComprehensiveMetabolicPanel> _blood_panel;
-
+  std::string _scenario_name;
   ActionChannel _action_queue;
   AssessmentChannel _assessment_queue;
 

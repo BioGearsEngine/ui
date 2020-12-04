@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.3
 import com.biogearsengine.ui.scenario 1.0
 
+import Qt.labs.platform 1.1 as Labs
 Rectangle {
   id : menuArea
   property alias wizardDialog : wizardDialog
@@ -60,6 +61,14 @@ Rectangle {
         onTriggered : {
           let saveAs = true
           scenario.export_state(saveAs);
+        }
+      }
+      Action {
+        text : "Save Plots"
+        onTriggered : {
+          let location = Labs.StandardPaths.writableLocation(Labs.StandardPaths.DocumentsLocation)
+          let runName  = Qt.formatDateTime(new Date(), "yyyy-MM-dd")
+          scenario.save_plots(location, runName);
         }
       }
       Action {
