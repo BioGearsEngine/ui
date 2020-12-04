@@ -119,10 +119,6 @@ if(WIN32 AND NOT UNIX)
       ${Qt5_ROOT_DIR}/qml/
       DESTINATION bin/
       FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-      FILES_MATCHING 
-      PATTERN "*.dll"
-      PATTERN "*.qml"
-      PATTERN "*.qmlc"
       )  
   install(DIRECTORY 
       ${Qt5_ROOT_DIR}/translations/

@@ -48,8 +48,7 @@ add_source_files(${PREFIX}_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cpp/ "version.cpp
 #Define Logic
 ###############################################################################
 CMAKE_POLICY(SET CMP0020 NEW)
-add_executable(${PROJECT_NAME} WIN32
-               ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS} ${RESOURCES} )
+add_executable(${PROJECT_NAME} ${${PREFIX}_SOURCES} ${${PREFIX}_HEADERS} ${RESOURCES} )
 
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
@@ -67,9 +66,7 @@ set_target_properties(${PROJECT_NAME}
 
 if(WIN32)
   target_sources(${PROJECT_NAME}  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BiogearsUI.rc)
-  if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set_property(TARGET ${PROJECT_NAME}  PROPERTY WIN32_EXECUTABLE true)
-  endif()
+  set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE $<$<CONFIG:Release>:true>) 
   target_compile_definitions(${PROJECT_NAME} PRIVATE _SCL_SECURE_NO_WARNINGS _CRT_SECURE_NO_WARNINGS bigobj)
   target_compile_options(${PROJECT_NAME} PRIVATE $<$<PLATFORM_ID:Windows>:/bigobj>  PRIVATE $<$<PLATFORM_ID:Windows>:/MP>)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
