@@ -7,8 +7,8 @@
 #include <QChart>
 #include <QChartView>
 #include <QDebug>
-#include <QSplineSeries>
 #include <QLineSeries>
+#include <QSplineSeries>
 #include <QValueAxis>
 
 #include "PatientConditions.h"
@@ -434,6 +434,16 @@ Scenario& Scenario::load_patient(QString file)
   _engine_mutex.lock(); //< I ran in to some -O2 issues when using an std::lock_guard in msvc
 
   remake_engine();
+  // Physiology System Names are defined on the System Objects
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("HeartRate", biogears::FrequencyUnit::Per_min);
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("SystolicArterialPressure", biogears::PressureUnit::mmHg);
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("DiastolicArterialPressure", biogears::PressureUnit::mmHg);
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("RespirationRate", biogears::FrequencyUnit::Per_min);
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("TidalVolume", biogears::VolumeUnit::mL);
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("TotalLungVolume", biogears::VolumeUnit::mL);
+  _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("OxygenSaturation");
+  
+  _engine->GetEngineTrack()->GetDataRequestManager().SetResultsFilename("BioGearsUI.csv");
 
   if (_engine->LoadState(path)) {
     _scenario_name = _engine->GetPatient().GetName_cStr();
@@ -2667,9 +2677,9 @@ void Scenario::save_plots(QString location, QString name)
   if (_scenario_name.empty()) {
     destination = QDir(location).filePath(QString("BioGears Runs/%1s-%2").arg(_engine->GetPatient().GetName_cStr()).arg(name));
   } else {
-    destination = QDir(location).filePath(QString("BioGears Runs/%1-%2").arg(_scenario_name.c_str());
+    destination = QDir(location).filePath(QString("BioGears Runs/%1-%2").arg(_scenario_name.c_str()).arg(name));
   }
-
+  QDir destinationDir{ QUrl(destination).toLocalFile() };
   if (results_file.open(QIODevice::ReadOnly)) {
     QTextStream results_stream{ &results_file };
     QStringList headers;
@@ -2677,6 +2687,13 @@ void Scenario::save_plots(QString location, QString name)
 
     headers = results_stream.readLine().split(',');
     tracks.resize(headers.size());
+
+    if (!destinationDir.exists()) {
+      destinationDir.mkpath(".");
+    } else {
+      destinationDir.removeRecursively();
+      destinationDir.mkpath(".");
+    }
 
     while (!results_stream.atEnd()) {
       auto currentLine = results_stream.readLine().split(',');
@@ -2688,6 +2705,7 @@ void Scenario::save_plots(QString location, QString name)
         }
       }
     }
+
     for (auto ii = 1; ii < headers.size(); ++ii) {
       auto view = std::make_unique<QtCharts::QChartView>();
       view->resize(1280, 720);
@@ -2749,16 +2767,21 @@ void Scenario::save_plots(QString location, QString name)
       view->setRenderHint(QPainter::Antialiasing, true);
       view->setRenderHint(QPainter::HighQualityAntialiasing, true);
       QPixmap buffer = view->grab();
-      QDir destinationDir{ QUrl(destination).toLocalFile() };
-      if (!destinationDir.exists()) {
-        destinationDir.mkpath(".");
-      }
-      QFile file(QString("%1/%2.png").arg(destinationDir.absoluteFilePath(".")).arg(headers[ii]));
+
+      auto safe_header_name = headers[ii];
+      safe_header_name.replace(QRegularExpression(R"([\\:*?\"<>|])"), QString("_"));
+      safe_header_name.replace(QRegularExpression(R"([/])"), QString("_per_"));
+      QFile file(QString("%1/%2.png").arg(destinationDir.absoluteFilePath(".")).arg(safe_header_name));
       file.open(QIODevice::WriteOnly);
       if (file.isOpen()) {
         buffer.save(&file, "PNG");
       }
     }
+    auto results_file_name = QString("%1/%2.csv").arg(destinationDir.absoluteFilePath(".")).arg(_scenario_name.c_str()).arg(name);
+    if (QFile::exists(results_file_name)) {
+      QFile::remove(results_file_name);
+    }
+    results_file.copy(results_file_name);
   }
   _engine_mutex.unlock();
 }

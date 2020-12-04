@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Material 2.3
+import QtGraphicalEffects 1.12
 
 ColumnLayout {
   id: root
@@ -117,6 +118,14 @@ ColumnLayout {
         fillMode : Image.PreserveAspectFit
         source: "icons/speedup.svg"
         height : 30
+
+        ColorOverlay {
+          id:fowardOverlay
+          anchors.fill: forwardImage
+          source: forwardImage
+          color: "#FF444444"
+          visible : false
+        }    
       }
       state : "realtime"
       onClicked: {
@@ -130,13 +139,12 @@ ColumnLayout {
       states: [
         State {
           name: "realtime"
-          PropertyChanges { target: forwardImage; source: "icons/speedup.svg" }
           PropertyChanges { target: forward; rate: 1 }
+          PropertyChanges { target: fowardOverlay; visible: false }
         }
         ,State {
           name: "max"
-          PropertyChanges { target: forwardImage; source: "icons/speedup.svg" }
-          PropertyChanges { target: forward; rate: 2 }
+          PropertyChanges { target: fowardOverlay; visible: true }
         }
       ]
     }
