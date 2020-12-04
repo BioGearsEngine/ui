@@ -2667,7 +2667,7 @@ void Scenario::save_plots(QString location, QString name)
   if (_scenario_name.empty()) {
     destination = QDir(location).filePath(QString("BioGears Runs/%1s-%2").arg(_engine->GetPatient().GetName_cStr()).arg(name));
   } else {
-    destination = QDir(location).filePath(QString("BioGears Runs/%1-%2").arg(_engine->GetPatient().GetName_cStr()).arg(name));
+    destination = QDir(location).filePath(QString("BioGears Runs/%1-%2").arg(_scenario_name.c_str());
   }
 
   if (results_file.open(QIODevice::ReadOnly)) {
