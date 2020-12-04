@@ -2720,7 +2720,7 @@ void Scenario::save_plots(QString location, QString name)
       QFont font;
       font.setPixelSize(30);
       chart->setTitleFont(font);
-      font.setPixelSize(20);
+      font.setPixelSize(26);
       yAxis->setTitleFont(font);
       xAxis->setTitleFont(font);
       font.setPixelSize(16);
