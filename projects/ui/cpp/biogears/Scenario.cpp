@@ -46,7 +46,7 @@
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/framework/scmp/scmp_channel.tci.h>
 
-namespace bio {
+namespace bgui {
 Scenario::Scenario(QObject* parent)
   : Scenario("DefaultTemplateMale", parent)
 {
@@ -2675,9 +2675,9 @@ void Scenario::save_plots(QString location, QString name)
   QFile results_file{ "BioGearsUI.csv" };
   QString destination;
   if (_scenario_name.empty()) {
-    destination = QDir(location).filePath(QString("BioGears Runs/%1s-%2").arg(_engine->GetPatient().GetName_cStr()).arg(name));
+    destination = QDir(location).filePath(QString("BioGears/runs/%1s-%2").arg(_engine->GetPatient().GetName_cStr()).arg(name));
   } else {
-    destination = QDir(location).filePath(QString("BioGears Runs/%1-%2").arg(_scenario_name.c_str()).arg(name));
+    destination = QDir(location).filePath(QString("BioGears/runs/%1-%2").arg(_scenario_name.c_str()).arg(name));
   }
   QDir destinationDir{ QUrl(destination).toLocalFile() };
   if (results_file.open(QIODevice::ReadOnly)) {
@@ -2892,7 +2892,7 @@ void Scenario::export_state(bool saveAs)
 #include <biogears/cdm/system/equipment/Anesthesia/actions/SEAnesthesiaMachineAction.h>
 #include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerAction.h>
 #include <biogears/cdm/system/equipment/Inhaler/actions/SEInhalerConfiguration.h>
-namespace bio {
+namespace bgui {
 //---------------------------------------------------------------------------------
 // ACTION FACTORY FUNCTIONS TO BE REFACTORED TO ACTION FACTORY LATER
 void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
@@ -3337,7 +3337,7 @@ QString Scenario::get_patient_state_files(QString patient)
 
 } // namespace ui
 
-namespace bio {
+namespace bgui {
 void Scenario::request_urinalysis()
 {
   _assessment_queue.as_source().insert(_urinalysis.get());
@@ -3348,4 +3348,4 @@ void Scenario::request_blood_panel()
   _assessment_queue.as_source().insert(_blood_panel.get());
 }
 
-} //namespace bio
+} //namespace bgui

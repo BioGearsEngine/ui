@@ -17,6 +17,7 @@ set(${PREFIX}_PRIVATE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cpp" )
 set(${PREFIX}_GENERATED_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
 set(${PREFIX}_UNIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/unit" PARENT_SCOPE)
 
+option(BUILD_FOR_INSTLLATION "Turns on instllation features like local runtime directories" OFF)
 ###############################################################################
 # Requirments
 ###############################################################################
@@ -63,7 +64,9 @@ set_target_properties(${PROJECT_NAME}
   VS_DEBUGGER_WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/runtime
   CPACK_START_MENU_SHORTCUTS "Biogears UI"
   )
-
+  if(BUILD_FOR_INSTLLATION)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE BIOGEARS_EXPLORER_RELEASE_BUNDLE)
+  endif()
 if(WIN32)
   target_sources(${PROJECT_NAME}  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/BiogearsUI.rc)
   set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE $<$<CONFIG:Release>:true>) 

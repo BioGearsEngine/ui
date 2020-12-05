@@ -57,7 +57,7 @@ constexpr const char* _COMPILER_NAME_ = "MiniGW";
 constexpr const char* _COMPILER_VERSION_ = "";
 #endif
 
-namespace bio {
+namespace bgui {
 
 
 //-----------------------------------------------------------------------------
@@ -75,6 +75,55 @@ constexpr char const *  _TWEAK_VERSION_NUMBER_  = "${${ROOT_PROJECT_NAME}_VERSIO
 
 
 using namespace std::string_literals;
+//-----------------------------------------------------------------------------
+QString version_string(){
+  if ( 0 == std::strlen(_TWEAK_VERSION_NUMBER_)) {
+    return QString("%1.%3.%3").arg(_MAJOR_VERSION_NUMBER_).arg(_MINOR_VERSION_NUMBER_).arg(_PATCH_VERSION_NUMBER_);
+  } else {
+    return QString("%1.%2.%3+%4").arg(_MAJOR_VERSION_NUMBER_).arg(_MINOR_VERSION_NUMBER_).arg(_PATCH_VERSION_NUMBER_).arg(_TWEAK_VERSION_NUMBER_);
+  }
+}
+QString full_version_string(){
+  if ( 0 == std::strlen(_TWEAK_VERSION_NUMBER_)) {
+    return QString("%1.%2.%3-%4").arg(_MAJOR_VERSION_NUMBER_).arg(_MINOR_VERSION_NUMBER_).arg(_PATCH_VERSION_NUMBER_).arg(_REV_HASH_);
+  } else {
+    return QString("%1.%2.%3+%4-%5").arg(_MAJOR_VERSION_NUMBER_).arg(_MINOR_VERSION_NUMBER_).arg(_PATCH_VERSION_NUMBER_).arg(_TWEAK_VERSION_NUMBER_).arg(_REV_HASH_);
+  }
+}
+QString project_name(){
+  return _PROJECT_NAME_;
+}
+QString rev_hash(){
+  return _REV_HASH_;
+}
+QString rev_tag(){
+  return _REV_TAG_;
+}
+
+int bgui_major_version()
+{
+  return _MAJOR_VERSION_NUMBER_;
+}
+int bgui_minor_version()
+{
+  return _MINOR_VERSION_NUMBER_;
+}
+int bgui_patch_version()
+{
+  return _PATCH_VERSION_NUMBER_;
+}
+
+bool bgui_offical_release()
+{
+  return _OFFICAL_RELEASE_;
+}
+
+QString rev_commit_date(){
+  return _REV_COMMIT_DATE_;
+}
+QString biogears_build_date(){
+  return __DATE__; 
+}
 //-----------------------------------------------------------------------------
 QString SystemInformation::about()
 {

@@ -8,7 +8,7 @@
 #include <biogears/schema/cdm/Scenario.hxx>
 #include <biogears/string/manipulation.h>
 
-namespace bio {
+namespace bgui {
 
 //!
 //!  EventTree is a data structure for storing events and converting between XSD <--> QML

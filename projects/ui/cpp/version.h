@@ -16,15 +16,33 @@ specific language governing permissions and limitations under the License.
 #include <string>
 
 #include <QObject>
+#include <QString>
 
 #include <biogears/exports.h>
 
-namespace bio {
+namespace bgui {
+
+  QString version_string();
+  QString full_version_string();
+  QString project_name();
+  QString rev_hash();
+  QString rev_tag();
+
+  int bgui_major_version();
+  int bgui_minor_version();
+  int bgui_patch_version();
+
+  bool bgui_offical_release();
+
+  QString rev_commit_date();
+  QString biogears_build_date();
+
 
 class SystemInformation : public QObject {
 
  public:
   QString about();
+
 
 signals:
   void aboutChanged();

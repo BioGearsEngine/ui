@@ -40,7 +40,7 @@ class SEUrinalysis;
 class SEComprehensiveMetabolicPanel;
 }
 
-namespace bio {
+namespace bgui {
 
 class Scenario : public QObject, public biogears::Runnable {
 

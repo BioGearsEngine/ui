@@ -118,7 +118,7 @@ inline std::ostream& operator<<(std::ostream& os, const Event& e)
   return os;
 }
 
-namespace bio {
+namespace bgui {
 class EventTree : public QObject {
   Q_OBJECT
 

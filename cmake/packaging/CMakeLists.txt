@@ -1,3 +1,5 @@
+cmake_policy(SET CMP0087 NEW)
+
 include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_NAME "BioGears Explorer")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "BioGears User Interface")
@@ -6,8 +8,8 @@ set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_HOMEPAGE_URL "http://biogearsengine.com")
 set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/biogearslogo_XoQ_icon.ico")
-
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "BioGears/${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}")
+set(VERSION_NUMBER "${${ROOT_PROJECT_NAME}_VERSION_MAJOR}.${${ROOT_PROJECT_NAME}_VERSION_MINOR}.${${ROOT_PROJECT_NAME}_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "BioGears/${VERSION_NUMBER}")
 set(CPACK_PACKAGE_VERSION_MAJOR ${${ROOT_PROJECT_NAME}_VERSION_MAJOR} )      
 set(CPACK_PACKAGE_VERSION_MINOR ${${ROOT_PROJECT_NAME}_VERSION_MINOR} )
 set(CPACK_PACKAGE_VERSION_PATCH ${${ROOT_PROJECT_NAME}_VERSION_PATCH} )
@@ -36,20 +38,10 @@ if(WIN32 AND NOT UNIX)
   set(CPACK_WIX_PROPERTY_ARPHELPLINK  "https://biogearsengine.com")
   set(ARPURLINFOABOUT  "https://biogearsengine.com")
 
+  get_filename_component(Qt5_ROOT_DIR "${Qt5_DIR}/../../../" ABSOLUTE  )
+  
   install(CODE "
     include(BundleUtilities)
-
-    function(EXELIST result curdir)
-      file(GLOB children RELATIVE \${curdir} \${curdir}/*)
-      set(artifactList \"\")
-      foreach(child \${children})
-        if(NOT IS_DIRECTORY \${curdir}/\${child} AND \${child} MATCHES \".*${CMAKE_EXECUTABLE_SUFFIX}\" )
-          list(APPEND artifactList \${curdir}/\${child})
-        set(\${result} \${artifactList} PARENT_SCOPE)
-        return()
-        endif()
-      endforeach()
-    endfunction()
 
     string(TOUPPER \${CMAKE_INSTALL_CONFIG_NAME} CONFIG)
     if( NOT UNIX )
@@ -66,67 +58,87 @@ if(WIN32 AND NOT UNIX)
       list(APPEND THIRD_PARTY_LIB \"\${_dir}/lib\")
       list(APPEND THIRD_PARTY_BIN \"\${_dir}/bin\")
     endforeach()
-    
-    EXELIST(artifacts \${CMAKE_INSTALL_PREFIX}/bin )
-    
-    foreach( artifact IN LISTS artifacts)
-      fixup_bundle(\${artifact}
-                      \"\"
-                    \"\${THIRD_PARTY_LIB};\${THIRD_PARTY_BIN}\"
+
+    message(\" Generating Bundle for \${CMAKE_INSTALL_PREFIX}/bin/BioGearsUI.exe\")
+    fixup_bundle(\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:BioGearsUI>
+                    \"\"
+                \"\${THIRD_PARTY_LIB};\${THIRD_PARTY_BIN}\"
+    )
+    if(WIN32)
+        message(\" Running windeployqt for \${CMAKE_INSTALL_PREFIX}/bin/BioGearsUI.exe\")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E env \"${Qt5_ROOT_DIR}/bin/windeployqt\" --no-compiler-runtime --list mapping \"\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:BioGearsUI>\"
+            WORKING_DIRECTORY  \"\${CMAKE_INSTALL_PREFIX}/bin/\"
+            OUTPUT_VARIABLE _output
+            ERROR_VARIABLE  _error
+            OUTPUT_STRIP_TRAILING_WHITESPACE
         )
-    endforeach()
-  "         
-  )
+        if(_output)
+          message(\"windeployqt OUTPUT : \${_output}\")
+        endif()
+        if( _error )
+          message(\"windeployqt ERROR : \${_error}\")
+        endif()
+    endif()
+
+  ")
 
   install(DIRECTORY 
     ${PROJECT_SOURCE_DIR}/extern/biogears/share/xsd 
-    DESTINATION bin/
+    DESTINATION runtime/${VERSION_NUMBER}
     FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
     )
 
   install(DIRECTORY 
       ${PROJECT_SOURCE_DIR}/extern/biogears/share/data/
-      DESTINATION bin/
+      DESTINATION runtime/${VERSION_NUMBER}
       FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
       FILES_MATCHING 
       PATTERN "*.xml"
-      PATTERN "*.xlsx"
+      PATTERN "*.config"
+      PATTERN "*.csv"
       )
   install(DIRECTORY 
       ${PROJECT_SOURCE_DIR}/extern/biogears/share/Scenarios
-      DESTINATION bin/
+      DESTINATION runtime/${VERSION_NUMBER}
       FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
       FILES_MATCHING 
       PATTERN "*.xml"
       )
 
-  get_filename_component(Qt5_ROOT_DIR "${Qt5_DIR}/../../../" ABSOLUTE  )
-  install(DIRECTORY 
-      ${Qt5_ROOT_DIR}/bin/
-      DESTINATION bin/
-      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-      FILES_MATCHING 
-      PATTERN "*.dll"
-      )
-  install(DIRECTORY 
-      ${Qt5_ROOT_DIR}/plugins/
-      DESTINATION bin/
-      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-      FILES_MATCHING 
-      PATTERN "*.dll"
-      )   
-  install(DIRECTORY 
-      ${Qt5_ROOT_DIR}/qml/
-      DESTINATION bin/
-      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-      )  
-  install(DIRECTORY 
-      ${Qt5_ROOT_DIR}/translations/
-      DESTINATION bin/
-      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-      FILES_MATCHING 
-      PATTERN "*.qm"
-      )   
+
+    #  install(DIRECTORY 
+    #      ${Qt5_ROOT_DIR}/bin/
+    #      DESTINATION bin/
+    #      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    #      FILES_MATCHING 
+    #      PATTERN "*.dll"
+    #      )
+    #  install(DIRECTORY 
+    #      ${Qt5_ROOT_DIR}/plugins/
+    #      DESTINATION bin/
+    #      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    #      FILES_MATCHING 
+    #      PATTERN "*.dll"
+    #      )   
+          install(DIRECTORY 
+          ${Qt5_ROOT_DIR}/qml/Qt 
+          ${Qt5_ROOT_DIR}/qml/QtCharts 
+          ${Qt5_ROOT_DIR}/qml/QtDataVisualization
+          ${Qt5_ROOT_DIR}/qml/QtGraphicalEffects
+          ${Qt5_ROOT_DIR}/qml/QtQuick 
+          ${Qt5_ROOT_DIR}/qml/QtQuick.2 
+          ${Qt5_ROOT_DIR}/qml/QtQMl 
+          DESTINATION bin/
+          FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+          )  
+    #  install(DIRECTORY 
+    #      ${Qt5_ROOT_DIR}/translations
+    #      DESTINATION bin/
+    #      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    #      FILES_MATCHING 
+    #      PATTERN "*.qm"
+    #      )   
 
 else()
   set(CPACK_STRIP_FILES "")
