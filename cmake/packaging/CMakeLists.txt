@@ -107,22 +107,23 @@ if(WIN32 AND NOT UNIX)
       )
 
 
-    #  install(DIRECTORY 
-    #      ${Qt5_ROOT_DIR}/bin/
-    #      DESTINATION bin/
-    #      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    #      FILES_MATCHING 
-    #      PATTERN "*.dll"
-    #      )
-    #  install(DIRECTORY 
-    #      ${Qt5_ROOT_DIR}/plugins/
-    #      DESTINATION bin/
-    #      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    #      FILES_MATCHING 
-    #      PATTERN "*.dll"
-    #      )   
+   install(Files 
+       ${Qt5_ROOT_DIR}/bin/Qt5OpenGL.dll
+       ${Qt5_ROOT_DIR}/bin/Qt5OpenGLd.dll
+       DESTINATION bin/
+       FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+
+       )
+  install(DIRECTORY 
+      ${Qt5_ROOT_DIR}/plugins/
+      DESTINATION bin/
+      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+      FILES_MATCHING 
+      PATTERN "*.dll"
+      )   
           install(DIRECTORY 
           ${Qt5_ROOT_DIR}/qml/Qt 
+          ${Qt5_ROOT_DIR}/qml/QtCanvas3D
           ${Qt5_ROOT_DIR}/qml/QtCharts 
           ${Qt5_ROOT_DIR}/qml/QtDataVisualization
           ${Qt5_ROOT_DIR}/qml/QtGraphicalEffects
