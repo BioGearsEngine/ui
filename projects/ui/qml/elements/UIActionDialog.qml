@@ -91,6 +91,11 @@ UIActionDialogForm {
         root.width = 600
         dialogLoader.sourceComponent = drugOralComponent;
         return;
+	  case "Environment" :
+        root.height = 450
+        root.width = 750
+        dialogLoader.sourceComponent = environmentComponent
+        return;
       case "Fluids-Infusion" :
         root.height = 300;
         root.width = 600
@@ -937,6 +942,234 @@ UIActionDialogForm {
       }
     }
   }
+  
+  Component {
+    id : environmentComponent
+    GridLayout {
+      id : environmentAction
+      rows : 8
+      columns : 2
+      columnSpacing : 20
+      rowSpacing : 5
+      property var props : ({surroundingType : '', airDensity : 0, airVelocity : 0, ambientTemp : 0, atmPressure : 100000, cloResist : 0, emissivity : 0, meanRadiantTemp : 0, relativeHumidity : 0, respirationAmbientTemperature : 0})
+      UIComboBox {
+        id : surroundingTypeCombo
+        objectName  : "surroundingType"
+        Layout.row : 0
+        Layout.column : 0 
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Surrounding Type"
+        comboBox.model : ["Air", "Water"]
+        onComboUpdate : {
+          environmentAction.props.surroundingType = currentSelection
+        }
+      }
+      UISpinBox {
+        id : airDensitySpin
+        objectName : "airDensity"
+        Layout.row : 1
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Air Density (kg/m3)"
+		required : false
+        spinBox.value : environmentAction.props.airDensity
+        spinMax : 30
+        spinStep : 1
+        spinScale : 10 // Max of 3.0 with steps of 0.1
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.airDensity = value;
+        }
+      }
+      UISpinBox {
+        id : airVelocitySpin
+        objectName : "airVelocity"
+        Layout.row : 1
+        Layout.column : 1
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.fillWidth : true
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Air Velocity (m/s)"
+		required : false
+        spinBox.value : environmentAction.props.airVelocity
+        spinMax : 600
+        spinStep : 10
+        spinScale : 10 // Max of 60.00 with steps of 1
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.airVelocity = value;
+        }
+      }
+      UISpinBox {
+        id : ambientTempSpin
+        objectName : "ambientTemp"
+        Layout.row : 2
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Ambient Temp. (C)"
+		required : false
+        spinBox.value : environmentAction.props.ambientTemp
+        spinMax : 450
+        spinStep : 5
+        spinScale : 10 // Max of 45 with steps of 0.5
+		spinBox.from : -150 // Min of -15
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.ambientTemp = value;
+        }
+      }
+      UISpinBox {
+        id : atmPressureSpin
+        objectName : "atmPressure"
+        Layout.row : 2
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Atm. Pressure (Pa)"
+		required : false
+        spinBox.value : environmentAction.props.atmPressure
+        spinMax : 150000
+        spinStep : 10000
+        spinScale : 1 // Max of 100k with steps of 10k
+		spinBox.from : 10000 // Min of 10k
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.atmPressure = value;
+        }
+      }
+      UISpinBox {
+        id : cloResistSpin
+        objectName : "cloResist"
+        Layout.row : 3
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Clothing Resistance (clo)"
+		required : false
+        spinBox.value : environmentAction.props.cloResist
+        spinMax : 200
+        spinStep : 5
+        spinScale : 100 // Max of 2 with steps of 0.05
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.cloResist = value;
+        }
+      }
+      UISpinBox {
+        id : emissivitySpin
+        objectName : "emissivity"
+        Layout.row : 3
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Emissivity"
+		required : false
+        spinBox.value : environmentAction.props.emissivity
+        spinMax : 100
+        spinStep : 5
+		spinScale : 100 // Max of 1 with steps of 0.05
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.emissivity = value;
+        }
+      }
+      UISpinBox {
+        id : meanRadiantTempSpin
+        objectName : "meanRadiantTemp"
+        Layout.row : 4
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Mean Radiant Temp. (C)"
+		required : false
+        spinBox.value : environmentAction.props.meanRadiantTemp
+        spinMax : 450
+        spinStep : 5
+        spinScale : 10 // Max of 45 with steps of 0.5
+		spinBox.from : -150 // Min of -15
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.meanRadiantTemp = value;
+        }
+      }
+	  UISpinBox {
+        id : relativeHumiditySpin
+        objectName : "relativeHumidity"
+        Layout.row : 4
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Relative Humidity"
+		required : false
+        spinBox.value : environmentAction.props.relativeHumidity
+        spinMax : 100
+        spinStep : 5
+        spinScale : 100   //Max of 1.00 with steps of 0.05
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.relativeHumidity = value;
+        }
+      }
+      UISpinBox {
+        id : respirationAmbientTemperatureSpin
+        objectName : "respirationAmbientTemperature"
+        Layout.row : 5
+        Layout.column : 0
+		Layout.columnSpan : 2
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width - 20
+        label.text : "Respiration Ambient Temp. (C)"
+		required : false
+        spinBox.value : environmentAction.props.respirationAmbientTemperature
+        spinMax : 450
+        spinStep : 5
+        spinScale : 10 // Max of 45 with steps of 0.5
+		spinBox.from : -150 // Min of -15
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.respirationAmbientTemperature = value;
+        }
+      }
+      
+      Connections {
+        target : root
+        onReset : {
+          surroundingTypeCombo.resetCombo()
+          airDensitySpin.resetSpin()
+          airVelocitySpin.resetSpin()
+          ambientTempSpin.resetSpin()
+          atmPressureSpin.resetSpin()
+          cloResistSpin.resetSpin()
+          emissivitySpin.resetSpin()
+          meanRadiantTempSpin.resetSpin()
+          relativeHumiditySpin.resetSpin()
+          respirationAmbientTemperatureSpin.resetSpin()
+        }
+      }
+    }
+  }
+  
   Component {
     id : fluidInfusionComponent
     GridLayout {

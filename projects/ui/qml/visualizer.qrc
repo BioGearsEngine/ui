@@ -74,6 +74,7 @@
         <file alias="UIDrugAdministration.qml">actions/UIDrugAdministration.qml</file>
         <file alias="UICompoundInfusion.qml">actions/UICompoundInfusion.qml</file>
         <file alias="UIConsumeMeal.qml">actions/UIConsumeMeal.qml</file>
+		<file alias="UIUpdateEnvironment.qml">actions/UIUpdateEnvironment.qml</file>
         <file alias="ActionModel.qml">actions/ActionModel.qml</file>
         <file alias="UIAnesthesiaMachine.qml">actions/UIAnesthesiaMachine.qml</file>
         <file alias="UIExercise.qml">actions/UIExercise.qml</file>
@@ -117,6 +118,11 @@
 		<file alias="patient.svg">img/patient.svg</file>
 		<file alias="play.svg">img/play.svg</file>
 		<file alias="prev.svg">img/prev.svg</file>
+		<file alias="next1.png">img/next1.png</file>
+		<file alias="administer_icon.png">img/administer_icon.png</file>
+		<file alias="exercise_icon.png">img/exercise_icon.png</file>
+		<file alias="insult_icon.png">img/insult_icon.png</file>
+		<file alias="prev1.png">img/prev1.png</file>
 		<file alias="reverse.svg">img/reverse.svg</file>
 		<file alias="speedup.svg">img/speedup.svg</file>
 		<file alias="biogears_noBackground.png">img/biogears_noBackground.png</file>

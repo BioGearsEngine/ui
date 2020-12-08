@@ -52,11 +52,11 @@ Drawer {
 				if (sectionText.text == "Nutrition")
 					return "icons/patient.svg"
 				if (sectionText.text == "Exercise")
-					return "icons/icon-round-question_mark.svg"
+					return "icons/exercise_icon.png"
 				if (sectionText.text == "Insults")
-					return "icons/burn.svg"
+					return "icons/insult_icon.png"
 				if (sectionText.text == "Administer Substances")
-					return "icons/icon-round-question_mark.svg"
+					return "icons/administer_icon.png"
 				if (sectionText.text == "Interventions")
 					return "icons/nursing.svg"
 				else
@@ -152,6 +152,7 @@ Drawer {
         ListElement { name : "Tourniquet"; section : "Interventions"; property var func : function(props) {actionModel.add_tourniquet_action(props)}}
         ListElement { name : "Inhaler"; section : "Interventions" ; property var func : function(actionItem) {actionModel.add_binary_action("UIInhaler.qml")} }
         ListElement { name : "Anesthesia Machine"; section : "Interventions"; property var func : function (props) { actionModel.add_anesthesia_machine_action(props)}}
+		ListElement { name : "Environment"; section : "Interventions"; property var func : function (props) { actionModel.add_environment_action(props)}}
       }
     }
     UIBioGearsButtonForm {
