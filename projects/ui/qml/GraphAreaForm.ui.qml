@@ -107,7 +107,7 @@ Page {
       anchors.right : headerTextbox.left
       Image {
         anchors.centerIn : parent
-        source : "icons/prev.svg"
+        source : "icons/prev1.png"
         width : parent.width * 0.8
         fillMode : Image.PreserveAspectFit
         MouseArea {
@@ -132,7 +132,7 @@ Page {
       //anchors.rightMargin : 15
       Image {
         anchors.centerIn : parent
-        source : "icons/next.svg"
+        source : "icons/next1.png"
         width : parent.width * 0.8
         fillMode : Image.PreserveAspectFit
         MouseArea {

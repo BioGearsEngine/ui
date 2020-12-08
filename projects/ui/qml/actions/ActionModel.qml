@@ -86,6 +86,9 @@ import com.biogearsengine.ui.scenario 1.0
           case EventModel.ConsumeNutrients :
             setupAutoEvent(function() {return add_consume_meal_builder(biogears_scenario, event.Params, event.StartTime);});
             break;
+		  case EventModel.EnvironmentChange : 
+            setupAutoEvent(function() {return add_environment_builder(biogears_scenario, event.Params, event.StartTime, event.Duration);});
+            break;
           case EventModel.Exercise :
             setupAutoEvent(function() {return add_exercise_builder(biogears_scenario, event.SubType, event.Params, event.StartTime, event.Duration);});
             break;
@@ -432,6 +435,29 @@ import com.biogearsengine.ui.scenario 1.0
                                                                   "reliefPressure_cmH2O" : props.reliefPressure, "o2Fraction" : props.o2Frac, "leftChamberFraction" : props.leftSub[1],
                                                                   "rightChamberFraction" : props.rightSub[1], "bottle1_mL" : props.bottle1,"bottle2_mL" : props.bottle2,
                                                                   "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
+                                                               })
+        action.scenario = biogears_scenario
+        action.uuid = uuidv4()
+        action.remove.connect(removeAction)
+
+        actionSwitchModel.append(action)
+        notifierComponent.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "%1 Added".arg(action.actionType), z : 200, dim: false})
+      } else {
+        if (compartment.status == Component.Error){
+          console.log("Error : " + compartment.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+	
+	function add_environment_action(props) {
+      var compartment = Qt.createComponent("UIUpdateEnvironment.qml");
+      if ( compartment.status == Component.Ready)  {
+        var action = compartment.createObject(actionSwitchView,{  "description" : props.description, "surroundingType" : props.surroundingType, "airDensity_kg_Per_m3" : props.airDensity,
+                                                                  "airVelocity_m_Per_s" : props.airVelocity, "ambientTemperature_C" : props.ambientTemperature,
+                                                                  "atmpshpericPressure_Pa" : props.atmPressure, "clothingResistance_clo" : props.cloResistance, "emissivity" : props.emissivity, "meanRadiantTemperature_C" : props.meanRadiantTemperature,
+                                                                  "relativeHumidity" : props.relativeHumidity, "respirationAmbientTemperature_C" : props.respirationAmbientTemperature,
                                                                })
         action.scenario = biogears_scenario
         action.uuid = uuidv4()
@@ -928,6 +954,63 @@ import com.biogearsengine.ui.scenario 1.0
                                                                   "ieRatio" : ieRatio, "pMax_cmH2O" : pMax_cmH2O, "peep_cmH2O" : peep_cmH2O, "respirationRate_Per_min" : respirationRate_Per_min,
                                                                   "reliefPressure_cmH2O" : reliefPressure_cmH2O, "o2Fraction" : o2Frac, "leftChamberFraction" : leftChamberFraction,
                                                                   "rightChamberFraction" : rightChamberFraction, "bottle1_mL" : bottle1_mL,"bottle2_mL" : bottle2_mL,
+                                                                  "actionStartTime_s" : startTime, "actionDuration_s" : duration,
+                                                                  "width" : actionSwitchView.width - actionSwitchView.scrollWidth, "builderMode" : true
+                                                               });
+
+        return v_machineAction;
+      } else {
+        if (v_machineForm.status == Component.Error){
+          console.log("Error : " + v_machineForm.errorString() );
+          return;
+        }
+        console.log("Error : Action switch component not ready");
+      }
+    }
+	
+	function add_environment_builder(scenario, props = "", startTime = 0, duration = 0){
+      var v_machineForm = Qt.createComponent("UIUpdateEnvironment.qml");
+      let surroundingType = "";
+      let airDensity_kg_Per_m3 = 0.0;
+      let airVelocity_m_Per_s = 0.0;
+      let ambientTemperature_C = 0.0;
+      let atmpshpericPressure_Pa = 0.0;
+      let clothingResistance_clo = 0.0;
+      let emissivity = 0.0;
+      let meanRadiantTemperature_C = 0.0;
+      let relativeHumidity = 0.0;
+      let respirationAmbientTemperature_C = 0.0;
+      if (props!==""){
+        let params = props.split(";")
+        for (let i = 0; i < params.length; ++i){
+          let param = params[i].split("=")
+          if (param[0]==="SurroundingType"){
+            surroundingType = param[1]
+          } else if (param[0] === "AirDensity"){
+            airDensity_kg_Per_m3 = param[1]
+          } else if (param[0] === "AirVelocity"){
+            airVelocity_m_Per_s = param[1]
+          } else if (param[0] === "AmbientTemperature"){
+            ambientTemperature_C = param[1]
+          } else if (param[0] === "AtmosphericPressure"){
+            atmpshpericPressure_Pa = param[1]
+          } else if (param[0] === "ClothingResistance"){
+            clothingResistance_clo = param[1]
+          } else if (param[0] === "Emissivity"){
+            emissivity = param[1];
+		  } else if (param[0] === "MeanRadiantTemperature"){
+            meanRadiantTemperature_C = param[1]
+          } else if (param[0] === "RelativeHumidity"){
+            relativeHumidity = param[1]
+          } else if (param[0] === "RespirationAmbientTemperature"){
+            respirationAmbientTemperature_C = param[1];
+          }
+        }
+      }
+      if ( v_machineForm.status == Component.Ready)  {
+        var v_machineAction = v_machineForm.createObject(actionSwitchView,{ "scenario" : scenario, "surroundingType" : surroundingType, "airDensity_kg_Per_m3" : airDensity_kg_Per_m3, "airVelocity_m_Per_s" : airVelocity_m_Per_s,
+                                                                  "ambientTemperature_C" : ambientTemperature_C, "atmpshpericPressure_Pa" : atmpshpericPressure_Pa, "clothingResistance_clo" : clothingResistance_clo,
+                                                                  "emissivity" : emissivity, "meanRadiantTemperature_C" : meanRadiantTemperature_C, "relativeHumidity" : relativeHumidity, "respirationAmbientTemperature_C" : respirationAmbientTemperature_C,
                                                                   "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                   "width" : actionSwitchView.width - actionSwitchView.scrollWidth, "builderMode" : true
                                                                });

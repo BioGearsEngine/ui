@@ -2292,6 +2292,30 @@ void Scenario::export_nutrition(const biogears::SENutrition* nutrition)
   return;
 }
 
+
+// Environment ______________________________________
+QVariantMap Scenario::load_environment_action(QString enviroActionName)
+{
+  //Create a QVariantMap with key = PropName and item = {value, unit}
+  QVariantMap enviroMap;
+  QDir environmentDirectory = QDir("environment");
+  if (!environmentDirectory.exists()) {
+    std::cout << "This is not the environment directory you're looking for";
+  } else {
+    QString fileBaseName = enviroActionName + ".xml";
+    QFileInfo environmentFileInfo(environmentDirectory, fileBaseName);
+    biogears::SEEnvironmentalConditions* environment = new biogears::SEEnvironmentalConditions(_engine->GetSubstances());
+    if (environmentFileInfo.isFile()) {
+      std::unique_ptr<CDM::ObjectData> environmentXMLData = biogears::Serializer::ReadFile(environmentFileInfo.filePath().toStdString(), _engine->GetLogger());
+      CDM::EnvironmentalConditionsData* environmentData = dynamic_cast<CDM::EnvironmentalConditionsData*>(environmentXMLData.get());
+      environment->Load(*environmentData);
+      if (environment->HasAirDensity()) {
+        enviroMap["AirDensity"] = environment->GetAirDensity().GetValue(biogears::MassPerVolumeUnit::kg_Per_m3);
+      }
+    }
+  }
+  return enviroMap;
+}
 void Scenario::create_environment(QVariantMap environmentData)
 {
   biogears::SEEnvironmentalConditions* newEnvironment = new biogears::SEEnvironmentalConditions(_engine->GetSubstanceManager());
@@ -3021,6 +3045,30 @@ void Scenario::create_consume_meal_action(QString mealName, double carbs_g, doub
   action->GetNutrition().GetWater().SetValue(water_mL, biogears::VolumeUnit::mL);
 
   _action_queue.as_source().insert(std::move(action));
+}
+
+void Scenario::create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C)
+{
+  auto environmentAction = std::make_unique<biogears::SEEnvironmentChange>(_engine->GetSubstances());
+  //auto& conditions = environmentAction->GetConditions();
+
+  environmentAction->GetConditions().SetName(enviroName.toStdString());
+  environmentAction->GetConditions().SetSurroundingType((CDM::enumSurroundingType::value)surroundingType);
+  environmentAction->GetConditions().GetAirDensity().SetValue(airDensity_kg_Per_m3, biogears::MassPerVolumeUnit::kg_Per_m3);
+  environmentAction->GetConditions().GetAirVelocity().SetValue(airVelocity_m_Per_s, biogears::LengthPerTimeUnit::m_Per_s);
+  environmentAction->GetConditions().GetAmbientTemperature().SetValue(ambientTemperature_C, biogears::TemperatureUnit::C);
+  environmentAction->GetConditions().GetAtmosphericPressure().SetValue(atmpshpericPressure_Pa, biogears::PressureUnit::Pa);
+  environmentAction->GetConditions().GetClothingResistance().SetValue(clothingResistance_clo, biogears::HeatResistanceAreaUnit::clo);
+  environmentAction->GetConditions().GetEmissivity().SetValue(emissivity);
+  environmentAction->GetConditions().GetMeanRadiantTemperature().SetValue(meanRadiantTemperature_C, biogears::TemperatureUnit::C);
+  environmentAction->GetConditions().GetRelativeHumidity().SetValue(relativeHumidity);
+  environmentAction->GetConditions().GetRespirationAmbientTemperature().SetValue(respirationAmbientTemperature_C, biogears::TemperatureUnit::C);
+
+  //environmentAction->GetConditions().GetAmbientGas(_engine->GetSubstances().GetO2())->SetValue(oxygen);
+  //environmentAction->GetConditions().GetAmbientGas("Oxygen")->SetValue(nitrogen);
+  //environmentAction->GetConditions().GetAmbientGas("Oxygen")->SetValue(carbonMonoxide);
+
+  _action_queue.as_source().insert(std::move(environmentAction));
 }
 
 QString Scenario::patient_name_and_time()

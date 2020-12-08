@@ -77,6 +77,7 @@ public:
   Q_INVOKABLE void create_environment(QVariantMap environmentData);
   Q_INVOKABLE QVariantMap edit_environment();
   Q_INVOKABLE void export_environment();
+  Q_INVOKABLE QVariantMap load_environment_action(QString enviroActionName);
   Q_INVOKABLE void create_nutrition(QVariantMap nutrition);
   Q_INVOKABLE QVariantMap edit_nutrition();
   Q_INVOKABLE void export_nutrition();
@@ -123,6 +124,7 @@ public: //Action Factory Interface;
   Q_INVOKABLE void create_ards_action(double severity);
   Q_INVOKABLE void create_asthma_action(double severity);
   Q_INVOKABLE void create_consume_meal_action(QString mealName, double carbs_g, double fat_g, double protein_g, double sodium_mg, double calcium_mg, double water_mL);
+  Q_INVOKABLE void create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C);
   Q_INVOKABLE void create_substance_bolus_action(QString substance, int route, double dose_mL, double concentration_ug_Per_mL);
   Q_INVOKABLE void create_substance_oral_action(QString substance, int route, double dose_mg);
   Q_INVOKABLE void create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min);
