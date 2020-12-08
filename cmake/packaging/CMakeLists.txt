@@ -106,14 +106,6 @@ if(WIN32 AND NOT UNIX)
       PATTERN "*.xml"
       )
 
-
-   install(Files 
-       ${Qt5_ROOT_DIR}/bin/Qt5OpenGL.dll
-       ${Qt5_ROOT_DIR}/bin/Qt5OpenGLd.dll
-       DESTINATION bin/
-       FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-
-       )
   install(DIRECTORY 
       ${Qt5_ROOT_DIR}/plugins/
       DESTINATION bin/
