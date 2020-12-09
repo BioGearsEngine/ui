@@ -13,7 +13,7 @@
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/version.h>
 
-#include <QDIR>
+#include <QDir>
 #include <QStandardPaths>
 void syncronize_runtime_directory(QDir source_directory, QDir destination_directory)
 {
