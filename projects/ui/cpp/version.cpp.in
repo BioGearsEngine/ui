@@ -5,6 +5,7 @@
 
 #include <QtCore>
 #include <ctime>
+#include <cstring>
 #include <locale>
 
 constexpr const char* _OS_ =
