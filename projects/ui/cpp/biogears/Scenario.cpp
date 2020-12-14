@@ -2363,7 +2363,6 @@ void Scenario::export_nutrition(const biogears::SENutrition* nutrition)
   return;
 }
 
-
 // Environment ______________________________________
 QVariantMap Scenario::load_environment_action(QString enviroActionName)
 {
@@ -3234,11 +3233,12 @@ void Scenario::create_consume_meal_action(QString mealName, double carbs_g, doub
   _action_queue.as_source().insert(std::move(action));
 }
 
-void Scenario::create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C)
+void Scenario::create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C, double gasFractionO2, double gasFractionCO2, double gasFractionCO, double gasFractionN2, double concentrationSarin, double concentrationFireParticulate)
 {
   auto environmentAction = std::make_unique<biogears::SEEnvironmentChange>(_engine->GetSubstances());
-  //auto& conditions = environmentAction->GetConditions();
+  auto& conditions = environmentAction->GetConditions();
 
+  // Divide by spin scale from qml
   environmentAction->GetConditions().SetName(enviroName.toStdString());
   environmentAction->GetConditions().SetSurroundingType((CDM::enumSurroundingType::value)surroundingType);
   environmentAction->GetConditions().GetAirDensity().SetValue(airDensity_kg_Per_m3, biogears::MassPerVolumeUnit::kg_Per_m3);
@@ -3251,9 +3251,25 @@ void Scenario::create_environment_action(QString enviroName, int surroundingType
   environmentAction->GetConditions().GetRelativeHumidity().SetValue(relativeHumidity);
   environmentAction->GetConditions().GetRespirationAmbientTemperature().SetValue(respirationAmbientTemperature_C, biogears::TemperatureUnit::C);
 
-  //environmentAction->GetConditions().GetAmbientGas(_engine->GetSubstances().GetO2())->SetValue(oxygen);
-  //environmentAction->GetConditions().GetAmbientGas("Oxygen")->SetValue(nitrogen);
-  //environmentAction->GetConditions().GetAmbientGas("Oxygen")->SetValue(carbonMonoxide);
+  biogears::SESubstance* ambientGasO2 = nullptr;
+  biogears::SESubstance* ambientGasCO2 = nullptr;
+  biogears::SESubstance* ambientGasCO = nullptr;
+  biogears::SESubstance* ambientGasN2 = nullptr;
+  biogears::SESubstance* ambientAerosolSarin = nullptr;
+  biogears::SESubstance* ambientAerosolForestFireParticulate = nullptr;
+  ambientGasO2 = &_engine->GetSubstances().GetO2();
+  ambientGasCO2 = &_engine->GetSubstances().GetCO2();
+  ambientGasCO = &_engine->GetSubstances().GetCO();
+  ambientGasN2 = &_engine->GetSubstances().GetN2();
+  ambientAerosolSarin = _engine->GetSubstances().GetSubstance("Sarin");
+  ambientAerosolForestFireParticulate = _engine->GetSubstances().GetSubstance("ForestFireParticulate");
+
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasO2).GetFractionAmount().SetValue(gasFractionO2);
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasCO2).GetFractionAmount().SetValue(gasFractionCO2);
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasCO).GetFractionAmount().SetValue(gasFractionCO);
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasN2).GetFractionAmount().SetValue(gasFractionN2);
+  environmentAction->GetConditions().GetAmbientAerosol(*ambientAerosolSarin).GetConcentration().SetValue(concentrationSarin, biogears::MassPerVolumeUnit::mg_Per_m3);
+  environmentAction->GetConditions().GetAmbientAerosol(*ambientAerosolForestFireParticulate).GetConcentration().SetValue(concentrationFireParticulate, biogears::MassPerVolumeUnit::mg_Per_m3);
 
   _action_queue.as_source().insert(std::move(environmentAction));
 }

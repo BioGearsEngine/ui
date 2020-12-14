@@ -454,10 +454,13 @@ import com.biogearsengine.ui.scenario 1.0
 	function add_environment_action(props) {
       var compartment = Qt.createComponent("UIUpdateEnvironment.qml");
       if ( compartment.status == Component.Ready)  {
-        var action = compartment.createObject(actionSwitchView,{  "description" : props.description, "surroundingType" : props.surroundingType, "airDensity_kg_Per_m3" : props.airDensity,
-                                                                  "airVelocity_m_Per_s" : props.airVelocity, "ambientTemperature_C" : props.ambientTemperature,
-                                                                  "atmpshpericPressure_Pa" : props.atmPressure, "clothingResistance_clo" : props.cloResistance, "emissivity" : props.emissivity, "meanRadiantTemperature_C" : props.meanRadiantTemperature,
-                                                                  "relativeHumidity" : props.relativeHumidity, "respirationAmbientTemperature_C" : props.respirationAmbientTemperature,
+        var action = compartment.createObject(actionSwitchView,{  "description" : props.description, "surroundingType" : props.surroundingType, "airDensity_kg_Per_m3" : props.airDensity/10,
+                                                                  "airVelocity_m_Per_s" : props.airVelocity/10, "ambientTemperature_C" : props.ambientTemp/10,
+                                                                  "atmpshpericPressure_Pa" : props.atmPressure, "clothingResistance_clo" : props.cloResist/100, "emissivity" : props.emissivity/100, "meanRadiantTemperature_C" : props.meanRadiantTemp/10,
+                                                                  "relativeHumidity" : props.relativeHumidity/100, "respirationAmbientTemperature_C" : props.respirationAmbientTemperature/10,
+																  "gasFractionO2" : props.gasFractionO2/100, "gasFractionCO2" : props.gasFractionCO2/100, "gasFractionCO" : props.gasFractionCO/100,
+																  "gasFractionN2" : props.gasFractionN2/100, "concentrationSarin" : props.concentrationSarin, "concentrationFireParticulate" : props.concentrationFireParticulate,
+																  "width" : actionSwitchView.width,  "Layout.fillWidth" : true,
                                                                })
         action.scenario = biogears_scenario
         action.uuid = uuidv4()
@@ -980,6 +983,12 @@ import com.biogearsengine.ui.scenario 1.0
       let meanRadiantTemperature_C = 0.0;
       let relativeHumidity = 0.0;
       let respirationAmbientTemperature_C = 0.0;
+	  let gasFractionO2 = 0.0;
+	  let gasFractionCO2 = 0.0;
+	  let gasFractionCO = 0.0;
+	  let gasFractionN2 = 0.0;
+	  let concentrationSarin = 0.0;
+	  let concentrationFireParticulate = 0.0;
       if (props!==""){
         let params = props.split(";")
         for (let i = 0; i < params.length; ++i){
@@ -987,23 +996,35 @@ import com.biogearsengine.ui.scenario 1.0
           if (param[0]==="SurroundingType"){
             surroundingType = param[1]
           } else if (param[0] === "AirDensity"){
-            airDensity_kg_Per_m3 = param[1]
+            airDensity_kg_Per_m3 = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "AirVelocity"){
-            airVelocity_m_Per_s = param[1]
+            airVelocity_m_Per_s = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "AmbientTemperature"){
-            ambientTemperature_C = param[1]
+            ambientTemperature_C = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "AtmosphericPressure"){
-            atmpshpericPressure_Pa = param[1]
+            atmpshpericPressure_Pa = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "ClothingResistance"){
-            clothingResistance_clo = param[1]
+            clothingResistance_clo = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "Emissivity"){
-            emissivity = param[1];
+            emissivity = parseFloat(param[1].split(',')[0]);
 		  } else if (param[0] === "MeanRadiantTemperature"){
-            meanRadiantTemperature_C = param[1]
+            meanRadiantTemperature_C = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "RelativeHumidity"){
-            relativeHumidity = param[1]
+            relativeHumidity = parseFloat(param[1].split(',')[0]);
           } else if (param[0] === "RespirationAmbientTemperature"){
-            respirationAmbientTemperature_C = param[1];
+            respirationAmbientTemperature_C = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "GasFractionO2"){
+            gasFractionO2 = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "GasFractionCO2"){
+            gasFractionCO2 = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "GasFractionCO"){
+            gasFractionCO = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "GasFractionN2"){
+            gasFractionN2 = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "ConcentrationSarin"){
+            concentrationSarin = parseFloat(param[1].split(',')[0]);
+          } else if (param[0] === "ConcentrationFireParticulate"){
+            concentrationFireParticulate = parseFloat(param[1].split(',')[0]);
           }
         }
       }
@@ -1011,6 +1032,7 @@ import com.biogearsengine.ui.scenario 1.0
         var v_machineAction = v_machineForm.createObject(actionSwitchView,{ "scenario" : scenario, "surroundingType" : surroundingType, "airDensity_kg_Per_m3" : airDensity_kg_Per_m3, "airVelocity_m_Per_s" : airVelocity_m_Per_s,
                                                                   "ambientTemperature_C" : ambientTemperature_C, "atmpshpericPressure_Pa" : atmpshpericPressure_Pa, "clothingResistance_clo" : clothingResistance_clo,
                                                                   "emissivity" : emissivity, "meanRadiantTemperature_C" : meanRadiantTemperature_C, "relativeHumidity" : relativeHumidity, "respirationAmbientTemperature_C" : respirationAmbientTemperature_C,
+																  "gasFractionO2" : gasFractionO2, "gasFractionCO2" : gasFractionCO2, "gasFractionCO" : gasFractionCO, "gasFractionN2" : gasFractionN2, "concentrationSarin" : concentrationSarin, "concentrationFireParticulate" : concentrationFireParticulate, 
                                                                   "actionStartTime_s" : startTime, "actionDuration_s" : duration,
                                                                   "width" : actionSwitchView.width - actionSwitchView.scrollWidth, "builderMode" : true
                                                                });

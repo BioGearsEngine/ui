@@ -17,44 +17,49 @@ UIActionForm {
   property string name : "Default"
   property string sourceFile : ""
   property string surroundingType : ""
-  property double airDensity_kg_Per_m3 : 0
+  property double airDensity_kg_Per_m3 : 12
   property double airVelocity_m_Per_s : 0
-  property double ambientTemperature_C : 0
-  property double atmpshpericPressure_Pa  : 0
-  property double clothingResistance_clo : 0
-  property double emissivity : 0
-  property double meanRadiantTemperature_C : 0
-  property double relativeHumidity : 0
-  property double respirationAmbientTemperature_C  : 0
-  property double oxygen : 0 //fraction value
-  property double nitrogen : 0 // fraction value
-  property double carbonMonoxide : 0  // fraction value
+  property double ambientTemperature_C : 220
+  property double atmpshpericPressure_Pa  : 100000
+  property double clothingResistance_clo : 50
+  property double emissivity : 95
+  property double meanRadiantTemperature_C : 220
+  property double relativeHumidity : 60
+  property double respirationAmbientTemperature_C  : 220
+  property double gasFractionO2 : 21 //fraction value
+  property double gasFractionCO2 : 0 // fraction value
+  property double gasFractionCO : 0  // fraction value
+  property double gasFractionN2 : 79 //fraction value
+  property double concentrationSarin : 0 // concentration value
+  property double concentrationFireParticulate : 0  // concentration value
   
   fullName  : "<b><font color=\"lightsteelblue\">%1</font>  Environment</b>".arg(root.name)
   shortName : "<b>Environmental Conditions <font color=\"lightsteelblue\"></font> </b>"
   
   property bool validBuildConfig : {
     //let GasCheck = Add gas fractions and check do not exceed 1.00
-    return true
+	let GasCheck = (root.gasFractionCO + root.gasFractionCO2 + root.gasFractionN2 + root.gasFractionO2)  == 1
+	
+    return GasCheck
   }
 
   //Builder mode data -- data passed to scenario builder
-  buildParams : "Surrounding Type=" + surroundingType + ";Air Density=" + airDensity_kg_Per_m3 + ",kg/m3;Air Velocity=" + airVelocity_m_Per_s + ",m/s;Ambient Temperature=" + ambientTemperature_C + ",C;Atmospheric Pressure=" + atmpshpericPressure_Pa + ",Pa;Clothing Resistance=" + clothingResistance_clo + ",clo;Emissivity=" + emissivity + ";Mean Radiant Temperature=" + meanRadiantTemperature_C + ",C;Respiration Ambient Temperature=" + respirationAmbientTemperature_C + "C;Oxygen=" + oxygen + ";Nitrogen=" + nitrogen + ",;Carbon Monoxide=" + carbonMonoxide + ";";
+  buildParams : "Surrounding Type=" + surroundingType + ";Air Density=" + airDensity_kg_Per_m3 + ",kg/m3;Air Velocity=" + airVelocity_m_Per_s + ",m/s;Ambient Temperature=" + ambientTemperature_C + ",C;Atmospheric Pressure=" + atmpshpericPressure_Pa + ",Pa;Clothing Resistance=" + clothingResistance_clo + ",clo;Emissivity=" + emissivity + ";Mean Radiant Temperature=" + meanRadiantTemperature_C + ",C;Respiration Ambient Temperature=" + respirationAmbientTemperature_C + ",C;Gas Fraction O2=" + gasFractionO2 + ";Gas Fraction CO2=" + gasFractionCO2 + ";Gas Fraction CO=" + gasFractionCO + ";Gas Fraction N2=" + gasFractionN2 + ";Concentration Sarin=" + concentrationSarin + ",mg/m3;Concentration Fire Particulate=" + concentrationFireParticulate + ",mg/m3;";
   //Interactive mode -- apply action immediately while running
   onActivate:   { 
   let surroundTypeEnum = root.surroundingType == "Air" ? 1 : (root.connection == "Water" ? 2 : 0)
-  scenario.create_environment_action(name, surroundingType, airDensity_kg_Per_m3, airVelocity_m_Per_s, ambientTemperature_C, atmpshpericPressure_Pa, clothingResistance_clo, emissivity, meanRadiantTemperature_C, relativeHumidity, respirationAmbientTemperature_C)  
+  scenario.create_environment_action(name, surroundingType, airDensity_kg_Per_m3, airVelocity_m_Per_s, ambientTemperature_C, atmpshpericPressure_Pa, clothingResistance_clo, emissivity, meanRadiantTemperature_C, relativeHumidity, respirationAmbientTemperature_C, gasFractionO2, gasFractionCO2, gasFractionCO, gasFractionN2, concentrationSarin, concentrationFireParticulate)  
   }
   onDeactivate: { //cannot really deactivate an environment
   let surroundTypeEnum = 0; //off
-  scenario.create_environment_action(name, surroundingType, airDensity_kg_Per_m3, airVelocity_m_Per_s, ambientTemperature_C, atmpshpericPressure_Pa, clothingResistance_clo, emissivity, meanRadiantTemperature_C, relativeHumidity, respirationAmbientTemperature_C)  
+  scenario.create_environment_action(name, surroundingType, airDensity_kg_Per_m3, airVelocity_m_Per_s, ambientTemperature_C, atmpshpericPressure_Pa, clothingResistance_clo, emissivity, meanRadiantTemperature_C, relativeHumidity, respirationAmbientTemperature_C, gasFractionO2, gasFractionCO2, gasFractionCO, gasFractionN2, concentrationSarin, concentrationFireParticulate)  
   }
 
   controlsDetails : Component  {
     GridLayout {
       id: grid
       columns : 4
-      rows    : 13
+      rows    : 14
       width : root.width -5
       anchors.centerIn : parent 
       //Row 1
@@ -121,7 +126,7 @@ UIActionForm {
         Layout.row : 1
         Layout.column : 3
 		color : "#34495e"
-        text : "%1 cmH2O".arg(root.airDensity_kg_Per_m3)
+        text : "%1 kg/m3".arg(root.airDensity_kg_Per_m3)
         font.pointSize : 10
       }
       //Row 3
@@ -574,67 +579,138 @@ UIActionForm {
 		color : "#34495e"
         text : "%1 C".arg(respirationAmbientTemperature_C)
       }
-      
-	  // left room to add gas fractions
-	  
-      // Row 13 : On/Off toggle
-      Rectangle {
-        id: toggle      
-        Layout.row : 12
-        Layout.column : 2
-        Layout.columnSpan : 2
+	  //Row 11
+	  Label {
+		Layout.leftMargin : 5
+        Layout.row : 10
+        Layout.column : 0
+		Layout.columnSpan : 4
+		color : "#34495e"
+        text : "Gas Fractions: %1 O2, %2 CO2, %3 CO, %4 N2".arg(gasFractionO2).arg(gasFractionCO2).arg(gasFractionCO).arg(gasFractionN2)
+      }
+	  // Row 12
+      Label {
+        Layout.column : 0
+        Layout.row : 11
+		Layout.leftMargin : 5
+		color : "#34495e"
+        text : "Sarin Conc."
+      }      
+      Slider {
+        id: sarinConcSlider
         Layout.fillWidth : true
-        Layout.preferredHeight : 30  
-		Layout.bottomMargin : 5
-		radius : pill.width * 0.6
-        color: 'white' // background
-        opacity:      active  &&  !mouseArea.pressed? 1: 0.3 // disabled/pressed state      
-        Text {
-          text:  'Update'
-          color: 'black'
-          horizontalAlignment : Text.AlignHCenter
-          width : pill.width
-          x:    root.active ? 0: pill.width
-          font.pixelSize: 0.5 * toggle.height
-          anchors.verticalCenter: parent.verticalCenter
-        }
-        Rectangle { // pill
-            id: pill
-			radius : pill.width * 0.6
-            x: root.active ? pill.width: 0 // binding must not be broken with imperative x = ...
-            width: parent.width * .5;
-            height: parent.height // square
-            border.width: parent.border.width
-    
-        }
-        MouseArea {
-            id: mouseArea
-    
-            anchors.fill: parent
-    
-            drag {
-                target:   pill
-                axis:     Drag.XAxis
-                maximumX: toggle.width - pill.width
-                minimumX: 0
-            }
-    
-            onReleased: { // Did we drag the button far enough.
-              if( root.active) {
-                  if(pill.x < toggle.width - pill.width) {
-                    root.active = false // right to left
-                  }
-              } else {
-                  if(pill.x > toggle.width * 0.5 - pill.width * 0.5){
-                    root.active = true // left  to right
-                } 
-              }
-            }
-            onClicked: {
-              root.active = !root.active
-            }// emit
+        Layout.row : 11
+        Layout.column : 1
+        Layout.columnSpan : 2
+        from : 0
+        to : 10
+        stepSize : 0.5
+        value : root.concentrationSarin
+		background: Rectangle {
+			x: sarinConcSlider.leftPadding
+			y: sarinConcSlider.topPadding + sarinConcSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: sarinConcSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: sarinConcSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: sarinConcSlider.leftPadding + sarinConcSlider.visualPosition * (sarinConcSlider.availableWidth - width)
+			y: sarinConcSlider.topPadding + sarinConcSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: sarinConcSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
+        onMoved : {
+          root.concentrationSarin = value
+          if ( root.active ){
+            root.active = false;
+          }
         }
       }
+      Label {
+        Layout.row : 11
+        Layout.column : 3
+		color : "#34495e"
+        text : "%1 mg/m3".arg(concentrationSarin)
+      }
+      // Row 13
+      Label {
+        Layout.column : 0
+        Layout.row : 12
+		Layout.leftMargin : 5
+		color : "#34495e"
+        text : "FFP Conc."
+      }      
+      Slider {
+        id: ffpConcSlider
+        Layout.fillWidth : true
+        Layout.row : 12
+        Layout.column : 1
+        Layout.columnSpan : 2
+        from : 0
+        to : 10
+        stepSize : 0.5
+        value : root.concentrationFireParticulate
+		background: Rectangle {
+			x: ffpConcSlider.leftPadding
+			y: ffpConcSlider.topPadding + ffpConcSlider.availableHeight / 2 - height / 2
+			implicitWidth: 200
+			implicitHeight: 4
+			width: ffpConcSlider.availableWidth
+			height: implicitHeight
+			radius: 2
+			color: "#1abc9c"
+			Rectangle {
+				width: ffpConcSlider.visualPosition * parent.width
+				height: parent.height
+				color: "#16a085"
+				radius: 2
+			}
+		}
+		handle: Rectangle {
+			x: ffpConcSlider.leftPadding + ffpConcSlider.visualPosition * (ffpConcSlider.availableWidth - width)
+			y: ffpConcSlider.topPadding + ffpConcSlider.availableHeight / 2 - height / 2
+			implicitWidth: 16
+			implicitHeight: 16
+			radius: 8
+			color: ffpConcSlider.pressed ? "#8e44ad" : "#16a085"
+			//border.color: "#8e44ad"
+		}
+        onMoved : {
+          root.concentrationFireParticulate = value
+          if ( root.active ){
+            root.active = false;
+          }
+        }
+      }
+      Label {
+        Layout.row : 12
+        Layout.column : 3
+		color : "#34495e"
+        text : "%1 mg/m3".arg(concentrationFireParticulate)
+      }
+	  
+      // Row 14 : On/Off toggle
+      Button {
+		Layout.row : 13
+        Layout.column : 2
+		Layout.columnSpan : 2
+		text : "Update"
+		onClicked: {
+		  root.active = !root.active
+		}// emit
+	  }
     }
   }// End Details Component
  builderDetails : Component {

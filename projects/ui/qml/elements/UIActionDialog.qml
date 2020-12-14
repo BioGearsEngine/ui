@@ -35,9 +35,54 @@ UIActionDialogForm {
           errorString += dialogItem.children[child].objectName + " is invalid\n";
         }
       }
+	  
     }
     return valid
   }
+  
+  //-----------------------------------------
+  property var notification :     Component {
+      id : notifierComponent
+      Rectangle {
+        id: notifierRect
+        property string message
+        property string header : "Environment Error" 
+        height : 150
+        width :  body.width + 50
+        color : "lightslategrey"
+        opacity: 1.0
+        visible: false;
+        radius : 5
+        Rectangle {
+          color : "white"
+          anchors.left : parent.left
+          anchors.right : parent.right
+          height : title.height
+          Text {
+            id: title
+            text : header
+            font.bold: true
+            font.pixelSize : 15
+          }
+        }
+        Text {
+          id : body
+          text : message
+          anchors.centerIn : parent
+          font.pixelSize : 25
+        }
+        Timer {
+          id: opacityTimer
+          interval: 250; running: true; repeat: true
+          onTriggered: {
+            parent.opacity = parent.opacity - .1
+            if ( parent.opacity < 0.1 ) {
+              parent.destroy()
+            }
+          }
+        }
+      }
+    }
    
    //-----------------------------------------
   function setContent(actionName){
@@ -92,8 +137,8 @@ UIActionDialogForm {
         dialogLoader.sourceComponent = drugOralComponent;
         return;
 	  case "Environment" :
-        root.height = 450
-        root.width = 750
+        root.height = 550
+        root.width = 900
         dialogLoader.sourceComponent = environmentComponent
         return;
       case "Fluids-Infusion" :
@@ -951,10 +996,11 @@ UIActionDialogForm {
       columns : 2
       columnSpacing : 20
       rowSpacing : 5
-      property var props : ({surroundingType : '', airDensity : 0, airVelocity : 0, ambientTemp : 0, atmPressure : 100000, cloResist : 0, emissivity : 0, meanRadiantTemp : 0, relativeHumidity : 0, respirationAmbientTemperature : 0})
+      property var props : ({surroundingType : '', airDensity : 12.0, airVelocity : 0.0, ambientTemp : 220.0, atmPressure : 100000.0, cloResist : 50.0, emissivity : 95.0, meanRadiantTemp : 220.0, relativeHumidity : 60.0, respirationAmbientTemperature : 220.0, gasFractionO2 : 21.0, gasFractionCO2 : 0.0, gasFractionCO : 0.0, gasFractionN2 : 79.0, concentrationSarin : 0.0, concentrationFireParticulate : 0.0})
       UIComboBox {
         id : surroundingTypeCombo
         objectName  : "surroundingType"
+		elementRatio : 0.8
         Layout.row : 0
         Layout.column : 0 
         Layout.fillWidth : true
@@ -976,6 +1022,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Air Density (kg/m3)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.airDensity
         spinMax : 30
         spinStep : 1
@@ -996,6 +1043,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Air Velocity (m/s)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.airVelocity
         spinMax : 600
         spinStep : 10
@@ -1016,6 +1064,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Ambient Temp. (C)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.ambientTemp
         spinMax : 450
         spinStep : 5
@@ -1037,10 +1086,11 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Atm. Pressure (Pa)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.atmPressure
         spinMax : 150000
         spinStep : 10000
-        spinScale : 1 // Max of 100k with steps of 10k
+        spinScale : 1 // Max of 150k with steps of 10k
 		spinBox.from : 10000 // Min of 10k
         spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
         spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
@@ -1058,6 +1108,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Clothing Resistance (clo)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.cloResist
         spinMax : 200
         spinStep : 5
@@ -1078,6 +1129,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Emissivity"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.emissivity
         spinMax : 100
         spinStep : 5
@@ -1098,6 +1150,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Mean Radiant Temp. (C)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.meanRadiantTemp
         spinMax : 450
         spinStep : 5
@@ -1119,6 +1172,7 @@ UIActionDialogForm {
         Layout.maximumWidth : parent.width / 2 - 20
         label.text : "Relative Humidity"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.relativeHumidity
         spinMax : 100
         spinStep : 5
@@ -1134,12 +1188,13 @@ UIActionDialogForm {
         objectName : "respirationAmbientTemperature"
         Layout.row : 5
         Layout.column : 0
-		Layout.columnSpan : 2
+		Layout.columnSpan : 1
         Layout.fillWidth : true
         Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
-        Layout.maximumWidth : parent.width - 20
-        label.text : "Respiration Ambient Temp. (C)"
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Resp. Ambient Temp. (C)"
 		required : false
+		elementRatio : 0.8
         spinBox.value : environmentAction.props.respirationAmbientTemperature
         spinMax : 450
         spinStep : 5
@@ -1149,6 +1204,151 @@ UIActionDialogForm {
         spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
         onSpinUpdate : {
           environmentAction.props.respirationAmbientTemperature = value;
+        }
+      }
+	  
+	  UISpinBox {
+        id : gasFractionO2Spin
+        objectName : "gasFractionO2"
+		function isValid() { return (environmentAction.props.gasFractionO2 + environmentAction.props.gasFractionCO2 + environmentAction.props.gasFractionCO + environmentAction.props.gasFractionN2) == 100; }
+        Layout.row : 6
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Gas Fraction (O2)"
+		required : false
+		elementRatio : 0.8
+        spinBox.value : environmentAction.props.gasFractionO2
+        spinMax : 100
+        spinStep : 1
+        spinScale : 100 // Max of 45 with steps of 0.5
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.gasFractionO2 = value;
+        }
+      }
+	  UISpinBox {
+        id : gasFractionCO2Spin
+        objectName : "gasFractionCO2"
+		function envGasErrorCheck()
+		{
+			var envGasSum = environmentAction.props.gasFractionO2 + environmentAction.props.gasFractionCO2 + environmentAction.props.gasFractionCO + environmentAction.props.gasFractionN2
+			if(envGasSum != 100)
+			{
+				notifierComponent.createObject(parent.parent, { "visible" : true,  "anchors.centerIn" : parent.parent, "message" : "Gas fractions do not add up to 1", z : 200, dim: false})
+			}
+			return
+		}
+		function isValid() 
+		{ 
+			envGasErrorCheck();
+			return (environmentAction.props.gasFractionO2 + environmentAction.props.gasFractionCO2 + environmentAction.props.gasFractionCO + environmentAction.props.gasFractionN2) == 100; 
+		}
+        Layout.row : 6
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Gas Fraction (CO2)"
+		required : false
+		elementRatio : 0.8
+        spinBox.value : environmentAction.props.gasFractionCO2
+        spinMax : 100
+        spinStep : 1
+        spinScale : 100 // Max of 45 with steps of 0.5
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.gasFractionCO2 = value;
+        }
+      }
+	  UISpinBox {
+        id : gasFractionCOSpin
+        objectName : "gasFractionCO"
+		function isValid() { return (environmentAction.props.gasFractionO2 + environmentAction.props.gasFractionCO2 + environmentAction.props.gasFractionCO + environmentAction.props.gasFractionN2) == 100; }
+        Layout.row : 7
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Gas Fraction (CO)"
+		required : false
+		elementRatio : 0.8
+        spinBox.value : environmentAction.props.gasFractionCO
+        spinMax : 100
+        spinStep : 1
+        spinScale : 100 // Max of 45 with steps of 0.5
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.gasFractionCO = value;
+        }
+      }
+	  UISpinBox {
+        id : gasFractionN2Spin
+        objectName : "gasFractionN2"
+		function isValid() { return (environmentAction.props.gasFractionO2 + environmentAction.props.gasFractionCO2 + environmentAction.props.gasFractionCO + environmentAction.props.gasFractionN2) == 100; }
+        Layout.row : 7
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Gas Fraction (N2)"
+		required : false
+		elementRatio : 0.8
+        spinBox.value : environmentAction.props.gasFractionN2
+        spinMax : 100
+        spinStep : 1
+        spinScale : 100 // Max of 45 with steps of 0.5
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.gasFractionN2 = value;
+        }
+      }
+	  
+	  UISpinBox {
+        id : concSarinSpin
+        objectName : "concentrationSarin"
+        Layout.row : 8
+        Layout.column : 0
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "Sarin Conc. (mg/m3)"
+		required : false
+		elementRatio : 0.8
+        spinBox.value : environmentAction.props.concentrationSarin
+        spinMax : 1000
+        spinStep : 50
+        spinScale : 100 // Max of 10 with steps of 0.5
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.concentrationSarin = value;
+        }
+      }
+	  UISpinBox {
+        id : concFFPSpin
+        objectName : "concentrationFireParticulate"
+        Layout.row : 8
+        Layout.column : 1
+        Layout.fillWidth : true
+        Layout.alignment : Qt.AlignHCenter | Qt.AlignVCenter
+        Layout.maximumWidth : parent.width / 2 - 20
+        label.text : "FFP Conc. (mg/m3)"
+		required : false
+		elementRatio : 0.8
+        spinBox.value : environmentAction.props.concentrationFireParticulate
+        spinMax : 1000
+        spinStep : 50
+        spinScale : 100 // Max of 10 with steps of 0.5
+        spinBox.valueFromText : function(text, locale) { return valueFromDecimal(text, locale) }
+        spinBox.textFromValue : function(value) { return valueToDecimal(spinBox.value) }
+        onSpinUpdate : {
+          environmentAction.props.concentrationFireParticulate = value;
         }
       }
       
@@ -1165,6 +1365,12 @@ UIActionDialogForm {
           meanRadiantTempSpin.resetSpin()
           relativeHumiditySpin.resetSpin()
           respirationAmbientTemperatureSpin.resetSpin()
+		  gasFractionO2.resetSpin()
+		  gasFractionCO2.resetSpin()
+		  gasFractionCO.resetSpin()
+		  gasFractionN2.resetSpin()
+		  concentrationSarin.resetSpin()
+		  concentrationFireParticulate.resetSpin()
         }
       }
     }
