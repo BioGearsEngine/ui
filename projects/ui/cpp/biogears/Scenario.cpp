@@ -329,7 +329,6 @@ Scenario& Scenario::load_patient(QString file)
       cardiovascular->child(8)->unit_scalar(&_engine->GetTissue().GetExtracellularFluidVolume());
       cardiovascular->child(9)->unit_scalar(&_engine->GetTissue().GetIntracellularFluidVolume());
       cardiovascular->child(10)->unit_scalar(&_engine->GetTissue().GetTotalBodyFluidVolume());
-      
     }
 
     auto respiratory = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::RESPIRATORY, 0, QModelIndex()).internalPointer());
@@ -343,7 +342,7 @@ Scenario& Scenario::load_patient(QString file)
       respiratory->child(5)->unit_scalar(&_engine->GetRespiratory().GetTotalDeadSpaceVentilation());
       respiratory->child(6)->unit_scalar(&_engine->GetRespiratory().GetTranspulmonaryPressure());
     }
-    
+
     auto blood_chemistry = static_cast<BioGearsData*>(_physiology_model->index(BioGearsData::BLOOD_CHEMISTRY, 0, QModelIndex()).internalPointer());
     {
       blood_chemistry->child(0)->unit_scalar(&_engine->GetBloodChemistry().GetArterialOxygenPressure());
@@ -1102,7 +1101,6 @@ bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QStr
   Event advanceTime; //Store advance time event
   advanceTime.typeName = "AdvanceTime";
   advanceTime.eType = EventTree::EventTypes::AdvanceTime;
-
 
   //Event queue is set up such that a single Advance Time event is present at the end of the queue (no advance times between events -- taken care
   // of by "duration" fields).  Use this terminal Advance Time as a sentinal as we loop through queue and add events to scenario file
@@ -2292,7 +2290,6 @@ void Scenario::export_nutrition(const biogears::SENutrition* nutrition)
   return;
 }
 
-
 // Environment ______________________________________
 QVariantMap Scenario::load_environment_action(QString enviroActionName)
 {
@@ -2949,7 +2946,7 @@ void Scenario::create_inhaler_action()
   hold->Period(*period->Unload());
   breathData->AddBreathHold().Load(*hold);
   //Create exhale command and add to breathing sequence
-  exhale->ExpiratoryReserveVolumeFraction(0.0);   //Period stays @ 3.0 s
+  exhale->ExpiratoryReserveVolumeFraction(0.0); //Period stays @ 3.0 s
   breathData->AddForcedExhale().Load(*exhale);
 
   //Add inhaler configuration action and breath command actions
@@ -2959,7 +2956,6 @@ void Scenario::create_inhaler_action()
   if (!_engine->GetSubstances().IsActive(*albuterol)) {
     _substance_queue.push_back(albuterol);
   }
-
 }
 void Scenario::create_airway_obstruction_action(double severity)
 {
@@ -3047,11 +3043,12 @@ void Scenario::create_consume_meal_action(QString mealName, double carbs_g, doub
   _action_queue.as_source().insert(std::move(action));
 }
 
-void Scenario::create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C)
+void Scenario::create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C, double gasFractionO2, double gasFractionCO2, double gasFractionCO, double gasFractionN2, double concentrationSarin, double concentrationFireParticulate)
 {
   auto environmentAction = std::make_unique<biogears::SEEnvironmentChange>(_engine->GetSubstances());
-  //auto& conditions = environmentAction->GetConditions();
+  auto& conditions = environmentAction->GetConditions();
 
+  // Divide by spin scale from qml
   environmentAction->GetConditions().SetName(enviroName.toStdString());
   environmentAction->GetConditions().SetSurroundingType((CDM::enumSurroundingType::value)surroundingType);
   environmentAction->GetConditions().GetAirDensity().SetValue(airDensity_kg_Per_m3, biogears::MassPerVolumeUnit::kg_Per_m3);
@@ -3064,9 +3061,25 @@ void Scenario::create_environment_action(QString enviroName, int surroundingType
   environmentAction->GetConditions().GetRelativeHumidity().SetValue(relativeHumidity);
   environmentAction->GetConditions().GetRespirationAmbientTemperature().SetValue(respirationAmbientTemperature_C, biogears::TemperatureUnit::C);
 
-  //environmentAction->GetConditions().GetAmbientGas(_engine->GetSubstances().GetO2())->SetValue(oxygen);
-  //environmentAction->GetConditions().GetAmbientGas("Oxygen")->SetValue(nitrogen);
-  //environmentAction->GetConditions().GetAmbientGas("Oxygen")->SetValue(carbonMonoxide);
+  biogears::SESubstance* ambientGasO2 = nullptr;
+  biogears::SESubstance* ambientGasCO2 = nullptr;
+  biogears::SESubstance* ambientGasCO = nullptr;
+  biogears::SESubstance* ambientGasN2 = nullptr;
+  biogears::SESubstance* ambientAerosolSarin = nullptr;
+  biogears::SESubstance* ambientAerosolForestFireParticulate = nullptr;
+  ambientGasO2 = &_engine->GetSubstances().GetO2();
+  ambientGasCO2 = &_engine->GetSubstances().GetCO2();
+  ambientGasCO = &_engine->GetSubstances().GetCO();
+  ambientGasN2 = &_engine->GetSubstances().GetN2();
+  ambientAerosolSarin = _engine->GetSubstances().GetSubstance("Sarin");
+  ambientAerosolForestFireParticulate = _engine->GetSubstances().GetSubstance("ForestFireParticulate");
+
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasO2).GetFractionAmount().SetValue(gasFractionO2);
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasCO2).GetFractionAmount().SetValue(gasFractionCO2);
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasCO).GetFractionAmount().SetValue(gasFractionCO);
+  environmentAction->GetConditions().GetAmbientGas(*ambientGasN2).GetFractionAmount().SetValue(gasFractionN2);
+  environmentAction->GetConditions().GetAmbientAerosol(*ambientAerosolSarin).GetConcentration().SetValue(concentrationSarin, biogears::MassPerVolumeUnit::mg_Per_m3);
+  environmentAction->GetConditions().GetAmbientAerosol(*ambientAerosolForestFireParticulate).GetConcentration().SetValue(concentrationFireParticulate, biogears::MassPerVolumeUnit::mg_Per_m3);
 
   _action_queue.as_source().insert(std::move(environmentAction));
 }
