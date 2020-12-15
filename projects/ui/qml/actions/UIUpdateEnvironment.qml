@@ -52,7 +52,6 @@ UIActionForm {
   }
   onDeactivate: { //cannot really deactivate an environment
   let surroundTypeEnum = 0; //off
-  scenario.create_environment_action(name, surroundingType, airDensity_kg_Per_m3, airVelocity_m_Per_s, ambientTemperature_C, atmpshpericPressure_Pa, clothingResistance_clo, emissivity, meanRadiantTemperature_C, relativeHumidity, respirationAmbientTemperature_C, gasFractionO2, gasFractionCO2, gasFractionCO, gasFractionN2, concentrationSarin, concentrationFireParticulate)  
   }
 
   controlsDetails : Component  {
