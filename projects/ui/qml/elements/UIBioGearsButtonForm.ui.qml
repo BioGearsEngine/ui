@@ -16,7 +16,7 @@ Button {
     id : background
     anchors.fill : parent
     radius : 5
-    color : enabled ? primary : "gray"
+    color : enabled ? primary : "#0B6623"
   }
   contentItem : Text {
     text : root.text

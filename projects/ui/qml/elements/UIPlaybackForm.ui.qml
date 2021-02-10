@@ -49,6 +49,13 @@ ColumnLayout {
         source: "icons/reverse.svg"
         height : 30
       }
+      ColorOverlay {
+          id:resetOverlay
+          anchors.fill: resetImage
+          source: resetImage
+          color: "#006400"
+          visible : reset.pressed 
+      } 
       onClicked: {root.restartClicked()}
     }
     UIBioGearsButtonForm {
@@ -66,6 +73,15 @@ ColumnLayout {
         source: "icons/play.svg"
         height : 30
       }
+
+      ColorOverlay {
+          id:pause_playOverlay
+          anchors.fill: pausePlayImage
+          source: pausePlayImage
+          color: "#006400"
+          visible : false
+        } 
+
       state : "Stopped"
       onClicked: {
         console.log("UIPlaybackForm %1 %2".arg(playing).arg(paused))
@@ -84,24 +100,24 @@ ColumnLayout {
       states: [
        State{
           name: "Stopped"
-          PropertyChanges { target: pausePlayImage; source: "icons/play.svg" }
           PropertyChanges { target: pause_play; text: "Play" }
           PropertyChanges { target: pause_play; playing: false }
           PropertyChanges { target: pause_play; paused: false }
+          PropertyChanges { target: pause_playOverlay; visible: false }
        }
         ,State {
           name: "Simulating"
-          PropertyChanges { target: pausePlayImage; source: "icons/pause.png" }
           PropertyChanges { target: pause_play; text: "Pause" }
           PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: false }
+          PropertyChanges { target: pause_playOverlay; visible: true }
           }
         ,State {
           name: "Paused"
-          PropertyChanges { target: pausePlayImage; source: "icons/play.svg" }
           PropertyChanges { target: pause_play; text: "Resume" }
           PropertyChanges { target: pause_play; playing: true }
           PropertyChanges { target: pause_play; paused: true }
+          PropertyChanges { target: pause_playOverlay; visible: false }
         }
       ]
     }
@@ -123,7 +139,7 @@ ColumnLayout {
           id:fowardOverlay
           anchors.fill: forwardImage
           source: forwardImage
-          color: "#FF444444"
+          color: "#006400"
           visible : false
         }    
       }

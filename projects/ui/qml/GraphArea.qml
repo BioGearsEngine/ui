@@ -415,10 +415,11 @@ GraphAreaForm {
         default:
           continue;
       }
+      let visible = (i == plots.currentIndex) 
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 10){
-          plot.update(physiologyRequestModel.simulation_time)
+          plot.update(physiologyRequestModel.simulation_time, visible)
         }
       }
     }
@@ -464,10 +465,11 @@ GraphAreaForm {
         default:
           continue;
       }
+      let visible = (i == plots.currentIndex) 
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 5){
-          plot.update(physiologyRequestModel.simulation_time)
+          plot.update(physiologyRequestModel.simulation_time, visible)
         }
       }
     }
@@ -513,16 +515,17 @@ GraphAreaForm {
         default:
           continue;
       }
+      let visible = (i == plots.currentIndex) 
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == 1){
-          plot.update(physiologyRequestModel.simulation_time)
+          plot.update(physiologyRequestModel.simulation_time, visible)
         }
       }
     }
   }
 
-    everyFiveSecondsPlotTimer.onTriggered : {
+  everyFiveSecondsPlotTimer.onTriggered : {
     let currentCategory = null
     let currentModel = null
     for (var i = 0 ; i < PhysiologyModel.TOTAL_CATEGORIES; ++i){
@@ -562,11 +565,12 @@ GraphAreaForm {
         default:
           continue;
       }
+      let visible = (i == plots.currentIndex) 
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == -5){
           
-          plot.update(physiologyRequestModel.simulation_time)
+          plot.update(physiologyRequestModel.simulation_time, visible)
         }
       }
     }
@@ -612,10 +616,11 @@ GraphAreaForm {
         default:
           continue;
       }
+      let visible = (i == plots.currentIndex) 
       for ( var j = 0; j < currentModel.count; ++j){
         var plot = currentModel.get(j)
         if (plot.model && plot.rate == -10){
-          plot.update(physiologyRequestModel.simulation_time)
+          plot.update(physiologyRequestModel.simulation_time, visible)
         }
       }
     }

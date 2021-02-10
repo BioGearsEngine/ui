@@ -6,16 +6,17 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.3
 import QtCharts 2.3
 import QtQml.Models 2.2
+import QtGraphicalEffects 1.12
 
 import com.biogearsengine.ui.scenario 1.0
 Page {
-  id: root
+  id : root
   z : 0 // Explicitly setting this to lowest level so that messages displayed in Controls view will not get hidden behind plots
   property PhysiologyModel physiologyRequestModel
   property Component requestMenuComponent : requestMenuComponent
   property Component requestMenuItemComponent : requestMenuItemComponent
   property alias energyMetabolismSeries : energyMetabolismSeries
-  property alias renalSeries : renalSeries 
+  property alias renalSeries : renalSeries
   property alias vitalsGridView : vitalsSeries.vitalsGridView
   property alias cardiovascularGridView : cardiovascularGridView
   property alias bloodChemistryGridView : bloodChemistryGridView
@@ -30,9 +31,10 @@ Page {
   property alias fiveHzPlotTimer : fiveHzPlotTimer
   property alias oneHzPlotTimer : oneHzPlotTimer
   property alias everyFiveSecondsPlotTimer : everyFiveSecondsPlotTimer
-  property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer   
+  property alias everyTenSecondsPlotTimer : everyTenSecondsPlotTimer
+  property alias plots : plots
   signal urinalysisRequest()
-  
+
 
   state : "realTime"
 
@@ -70,105 +72,121 @@ Page {
     border.width : 0
     height : 40
     color : "#2980b9"
-	
-	Rectangle {
-	id : headerTextbox
-	width : headerBar.width * 0.3
-	height : headerBar.height
-	color : "transparent"
-	anchors.horizontalCenter : parent.horizontalCenter
-	anchors.verticalCenter : parent.verticalCenter
-    SwipeView {
-      id : systemSwipeView
-      clip : true
-	  anchors.left : headerTextbox.left
-      anchors.right : headerTextbox.right
-      height : parent.height
-      Repeater {
-        anchors.fill : parent
-		model : physiologyRequestModel
-        delegate : UITabButtonForm {
-          text : name
-        }
-      }
-      currentIndex : plots.currentIndex
-      onCurrentIndexChanged : {
-        if (plots.currentIndex != currentIndex) {
-          plots.currentIndex = currentIndex;
-        }
-      }
-    }
-	}
-	Rectangle {
-      id : previous
-      color : "transparent"
-      height : parent.height
-      width : 40
-      anchors.right : headerTextbox.left
-      Image {
-        anchors.centerIn : parent
-        source : "icons/prev1.png"
-        width : parent.width * 0.8
-        fillMode : Image.PreserveAspectFit
-        MouseArea {
-          anchors.fill : parent
-          cursorShape : Qt.PointingHandCursor
-          onClicked : {
-            if (plots.currentIndex == 0) {
-              plots.currentIndex = plots.count - 1;
-            } else {
-              plots.currentIndex = plots.currentIndex - 1
-            }
-          }
-        }
-      }
-    }
+
     Rectangle {
-      id : next
+      id : headerTextbox
+      width : headerBar.width * 0.3
+      height : headerBar.height
       color : "transparent"
-      height : parent.height
-      width : 40
-      anchors.left : headerTextbox.right
-      //anchors.rightMargin : 15
-      Image {
-        anchors.centerIn : parent
-        source : "icons/next1.png"
-        width : parent.width * 0.8
-        fillMode : Image.PreserveAspectFit
-        MouseArea {
+      anchors.horizontalCenter : parent.horizontalCenter
+      anchors.verticalCenter : parent.verticalCenter
+      SwipeView {
+        id : systemSwipeView
+        clip : true
+        anchors.left : headerTextbox.left
+        anchors.right : headerTextbox.right
+        height : parent.height
+        Repeater {
           anchors.fill : parent
-          cursorShape : Qt.PointingHandCursor
-          onClicked : {
-            if (plots.currentIndex == plots.count - 1) {
-              plots.currentIndex = 0;
-            } else {
-              plots.currentIndex = plots.currentIndex + 1
-            }
+          model : physiologyRequestModel
+          delegate : UITabButtonForm {
+            text : name
+          }
+        }
+        currentIndex : plots.currentIndex
+        onCurrentIndexChanged : {
+          if (plots.currentIndex != currentIndex) {
+            plots.currentIndex = currentIndex;
           }
         }
       }
     }
+
+    UIBioGearsButtonForm {
+      id : previous
+      primary : "transparent"
+      secondary : "transparent"
+      height : parent.height
+      width : 30
+      anchors.right : headerTextbox.left
+      text : "reset"
+      display : AbstractButton.IconOnly
+      contentItem : Image {
+        id : resetImage
+        fillMode : Image.PreserveAspectFit
+        source : "icons/prev1.png"
+        height : 25
+      }
+      ColorOverlay {
+        id : resetOverlay
+        anchors.fill : resetImage
+        source : resetImage
+        color : "#1A5276"
+        visible : previous.pressed
+      }
+      onClicked : {
+        if (plots.currentIndex != 0) {
+          plots.currentIndex = plots.currentIndex - 1
+        } else {
+          //plots.currentIndex = plots.count - 1;
+        }
+      }
+    }
+
+    UIBioGearsButtonForm {
+      id : next
+      primary : "transparent"
+      secondary : "transparent"
+      height : parent.height
+      width : 30
+      anchors.left : headerTextbox.right
+      // anchors.rightMargin : 15
+      text : "next"
+      display : AbstractButton.IconOnly
+      contentItem : Image {
+        id : nextImage
+        fillMode : Image.PreserveAspectFit
+        source : "icons/next1.png"
+        height : 25
+      }
+      ColorOverlay {
+        id : nextOverlay
+        anchors.fill : nextImage
+        source : nextImage
+        color : "#1A5276"
+        visible : next.pressed
+      }
+      onClicked : {
+        if (plots.currentIndex != plots.count - 1) {
+          plots.currentIndex =  plots.currentIndex + 1;
+        } else {
+          //plots.currentIndex = 0
+        }
+      }
+    }
+
     Rectangle {
       id : filterMenuButton
       color : "transparent"
       height : parent.height
-      width : 40
+      width : 80
       anchors.right : parent.right
       Image {
         anchors.centerIn : parent
-        source : "icons/menu.svg"
+        source : "icons/PlotsSelectionIcon.png"
         sourceSize.width : parent.width
         sourceSize.height : parent.height * 0.8
+
         MouseArea {
           anchors.fill : parent
           cursorShape : Qt.PointingHandCursor
           onClicked : {
-            let menuObject = menuInstantiator.objectAt(plots.currentIndex).item
-            if (menuObject.visible){          
-              menuObject.close()        
-            } else {          
-              menuObject.open()        
-            }      
+            let menuObject = menuInstantiator.objectAt(plots.currentIndex).item;
+            if (menuObject.visible) {
+              menuObject.close()
+            } else {
+              menuObject.open()
+            }
           }
         }
       }
@@ -177,13 +195,13 @@ Page {
         model : DelegateModel {
           id : menuModel
           model : physiologyRequestModel
-          //root index defaults to top level
-          delegate : Loader  {
+          // root index defaults to top level
+          delegate : Loader {
             id : menuLoader
             x : -50
             y : 50
-            property var _model_data : root.physiologyRequestModel
-            property var _node_index : menuModel.modelIndex(index)
+            property var _model_data: root.physiologyRequestModel
+            property var _node_index: menuModel.modelIndex(index)
             property int _category : index
             property string _info : ""
             property int _level : 0
@@ -191,23 +209,25 @@ Page {
           }
         }
         onObjectAdded : {
-          object.parent = filterMenuButton
-          if (index == PhysiologyModel.SUBSTANCES){
+          object.parent = filterMenuButton;
+          if (index == PhysiologyModel.SUBSTANCES) {
             root.newActiveSubstance.connect(object.item.activateObject)
           }
         }
-        onObjectRemoved : {console.log('Removed menu--not desirable behavior')}
+        onObjectRemoved : {
+          console.log('Removed menu--not desirable behavior')
+        }
       }
     }
-  }//end header
+  } // end header
 
   SwipeView {
-      id : plots
-      anchors.fill : parent
-      currentIndex : 0
-      clip : true
-	  
-	  
+    id : plots
+    anchors.fill : parent
+    currentIndex : 0
+    clip : true
+
+
     VitalsPanel {
       id : vitalsSeries
       Layout.fillWidth : true
@@ -218,32 +238,32 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       Image {
-			id: biogears_background_cardio
-			source : "qrc:/icons/biogears_noBackground.png"
-			width : plots.width
-			height: plots.height 
-			anchors.centerIn : parent
-			fillMode: Image.PreserveAspectFit
-			Rectangle {
-				id : colorBackgroundCardio
-				anchors.fill : biogears_background_cardio
-				color : "#ecf0f1"
-				opacity : 0.95
-			}
-	    }
+        id : biogears_background_cardio
+        source : "qrc:/icons/biogears_noBackground.png"
+        width : plots.width
+        height : plots.height
+        anchors.centerIn : parent
+        fillMode : Image.PreserveAspectFit
+        Rectangle {
+          id : colorBackgroundCardio
+          anchors.fill : biogears_background_cardio
+          color : "#ecf0f1"
+          opacity : 0.95
+        }
+      }
       GridView {
-          id : cardiovascularGridView
-          anchors.fill : parent
-          clip : true
-          cellWidth : plots.width / 2
-          cellHeight : plots.height / 2
-          model : cardiovascularModel
-          ScrollBar.vertical : ScrollBar {
-            parent : cardiovascularGridView.parent
-            anchors.top : cardiovascularGridView.top
-            anchors.right : cardiovascularGridView.right
-            anchors.bottom : cardiovascularGridView.bottom
-          }
+        id : cardiovascularGridView
+        anchors.fill : parent
+        clip : true
+        cellWidth : plots.width / 2
+        cellHeight : plots.height / 2
+        model : cardiovascularModel
+        ScrollBar.vertical : ScrollBar {
+          parent : cardiovascularGridView.parent
+          anchors.top : cardiovascularGridView.top
+          anchors.right : cardiovascularGridView.right
+          anchors.bottom : cardiovascularGridView.bottom
+        }
       }
     }
     Item {
@@ -251,19 +271,19 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       Image {
-		id: biogears_background_respiratory
-		source : "qrc:/icons/biogears_noBackground.png"
-		width : plots.width
-		height: plots.height 
-		anchors.centerIn : parent
-		fillMode: Image.PreserveAspectFit
-		Rectangle {
-			id : colorBackgroundRespiratory
-			anchors.fill : biogears_background_respiratory
-			color : "#ecf0f1"
-			opacity : 0.95
-		}
-	  }
+        id : biogears_background_respiratory
+        source : "qrc:/icons/biogears_noBackground.png"
+        width : plots.width
+        height : plots.height
+        anchors.centerIn : parent
+        fillMode : Image.PreserveAspectFit
+        Rectangle {
+          id : colorBackgroundRespiratory
+          anchors.fill : biogears_background_respiratory
+          color : "#ecf0f1"
+          opacity : 0.95
+        }
+      }
       GridView {
         id : respiratoryGridView
         anchors.fill : parent
@@ -284,19 +304,19 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       Image {
-		id: biogears_background_bloodChem
-		source : "qrc:/icons/biogears_noBackground.png"
-		width : plots.width
-		height: plots.height 
-		anchors.centerIn : parent
-		fillMode: Image.PreserveAspectFit
-		Rectangle {
-			id : colorBackgroundBloodChem
-			anchors.fill : biogears_background_bloodChem
-			color : "#ecf0f1"
-			opacity : 0.95
-		}
-	  }
+        id : biogears_background_bloodChem
+        source : "qrc:/icons/biogears_noBackground.png"
+        width : plots.width
+        height : plots.height
+        anchors.centerIn : parent
+        fillMode : Image.PreserveAspectFit
+        Rectangle {
+          id : colorBackgroundBloodChem
+          anchors.fill : biogears_background_bloodChem
+          color : "#ecf0f1"
+          opacity : 0.95
+        }
+      }
       GridView {
         id : bloodChemistryGridView
         anchors.fill : parent
@@ -316,13 +336,13 @@ Page {
       id : energyMetabolismSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-            
+
     }
     RenalPanel {
       id : renalSeries
       Layout.fillWidth : true
       Layout.fillHeight : true
-      onUrinalysisRequest: {
+      onUrinalysisRequest : {
         root.urinalysisRequest();
       }
     }
@@ -331,19 +351,19 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       Image {
-		id: biogears_background_sub
-		source : "qrc:/icons/biogears_noBackground.png"
-		width : plots.width
-		height: plots.height 
-		anchors.centerIn : parent
-		fillMode: Image.PreserveAspectFit
-		Rectangle {
-			id : colorBackgroundSub
-			anchors.fill : biogears_background_sub
-			color : "#ecf0f1"
-			opacity : 0.95
-		}
-	  }
+        id : biogears_background_sub
+        source : "qrc:/icons/biogears_noBackground.png"
+        width : plots.width
+        height : plots.height
+        anchors.centerIn : parent
+        fillMode : Image.PreserveAspectFit
+        Rectangle {
+          id : colorBackgroundSub
+          anchors.fill : biogears_background_sub
+          color : "#ecf0f1"
+          opacity : 0.95
+        }
+      }
       GridView {
         id : substanceGridView
         anchors.fill : parent
@@ -364,19 +384,19 @@ Page {
       Layout.fillWidth : true
       Layout.fillHeight : true
       Image {
-		id: biogears_background_custom
-		source : "qrc:/icons/biogears_noBackground.png"
-		width : plots.width
-		height: plots.height 
-		anchors.centerIn : parent
-		fillMode: Image.PreserveAspectFit
-		Rectangle {
-			id : colorBackgroundCustom
-			anchors.fill : biogears_background_custom
-			color : "#ecf0f1"
-			opacity : 0.95
-		}
-	  }
+        id : biogears_background_custom
+        source : "qrc:/icons/biogears_noBackground.png"
+        width : plots.width
+        height : plots.height
+        anchors.centerIn : parent
+        fillMode : Image.PreserveAspectFit
+        Rectangle {
+          id : colorBackgroundCustom
+          anchors.fill : biogears_background_custom
+          color : "#ecf0f1"
+          opacity : 0.95
+        }
+      }
       GridView {
         id : customGridView
         anchors.fill : parent
@@ -435,139 +455,138 @@ Page {
     repeat : true
     triggeredOnStart : true
   }
-  //Component used by Menu Instantiator to set up bottom-level menu items
+  // Component used by Menu Instantiator to set up bottom-level menu items
   Component {
     id : requestMenuComponent
     Menu {
       id : requestMenu
-      property var modelData : _model_data
-      property var nodeIndex : _node_index
-      property var category : _category
-      property string info : _info
-      property int level : _level
-      property bool menuItem : false
-      title : level > 0 ? modelData.data(nodeIndex, PhysiologyModel.DisplayRole) : ""   //Don't display a title for top level (e.g. "Vitals", "cardiovascular", ...)
-      function activateObject(objectIndex){
-        //This function is currently only connected to a signal in the Substances menu (see MenuInstantiator)
+
+      property var modelData: _model_data      
+      property var nodeIndex: _node_index      
+      property var category: _category      
+      property string info: _info      
+      property int level: _level      
+      property bool menuItem: false
+      title: level > 0 ? modelData.data(nodeIndex, PhysiologyModel.DisplayRole) : "" // Don't display a title for top level (e.g. "Vitals", "cardiovascular", ...)
+      
+      function activateObject(objectIndex) { // This function is currently only connected to a signal in the Substances menu (see MenuInstantiator)
         requestInstantiator.activateObject(objectIndex)
       }
       Instantiator {
         id : requestInstantiator
         signal objectActivated(var object, string role)
-        model : DelegateModel {
-          id : requestDelegate
-          model : requestMenu.modelData
-          rootIndex : requestMenu.nodeIndex
-          delegate : Loader {
-            id : menuLoader
-            property var _model_data : requestMenu.modelData
-            property var _node_index : requestDelegate.modelIndex(index)
-            property var _category : requestMenu.category
-            property var _level : requestMenu.level + 1
-            property string _info : requestMenu.info + _model_data.data(_node_index, PhysiologyModel.DisplayRole) + " - "
-            sourceComponent : {
-              if (_model_data.data(_node_index, PhysiologyModel.NestedRole)){
-                return requestMenuComponent
+          model : DelegateModel {
+            id : requestDelegate
+            model : requestMenu.modelData
+            rootIndex : requestMenu.nodeIndex
+            delegate : Loader {
+              id : menuLoader
+              property var _model_data: requestMenu.modelData
+              property var _node_index: requestDelegate.modelIndex(index)
+              property var _category: requestMenu.category
+              property var _level: requestMenu.level + 1
+              property string _info : requestMenu.info + _model_data.data(_node_index, PhysiologyModel.DisplayRole) + " - "
+              sourceComponent : {
+                if (_model_data.data(_node_index, PhysiologyModel.NestedRole)) {
+                  return requestMenuComponent
+                } else {
+                  return requestMenuItemComponent
+                }
+              }
+            }
+          }
+          onObjectAdded : {
+            if (object._model_data.data(object._node_index, PhysiologyModel.UsableRole)) {
+              // Only add the object to the menu if its usable role is true.  This signal will only be emitted when patient state is changed, because the instantiator only adds
+              // objects when the model changes (PhysiologyModel constant for a given patient state). Note that this means that Instantiator owns all objects that *could* be added
+              // to menu over scenario lifetime, but only objects explicity added to menu will be displayed.  Thus, to add sub-menus / menu items during runtime, we will use the custom
+              // "objectActivated" signal.
+              if (object.item.menuItem) {
+                requestMenu.addItem(object.item);
+                root.onNewPhysiologyModel.connect(object.item.toggleEnabled);
               } else {
-                return requestMenuItemComponent
+                requestMenu.addMenu(object.item);
+              }
+            }
+          }
+          onObjectActivated : { // Insert subMenu into parent menu alphabetically
+            let insertIndex = 0;
+            while (insertIndex < requestMenu.count && requestMenu.menuAt(insertIndex).title < role) {
+              ++ insertIndex;
+            }
+            requestMenu.insertMenu(insertIndex, object.item)
+          }
+          onObjectRemoved : {
+            if (object.item.menuItem) {
+              requestMenu.removeItem(object.item)
+            } else {
+              object.item.releaseObjects()
+              requestMenu.removeItem(object.item)
+            }
+          }
+          function activateObject(subIndex) {
+            for (let i = 0; i < count; ++ i) {
+              // Search across all the objects in the Substance instantiator (only called when we are in the Substances menu)
+              // We compare the name role of the indicated QModelIndex (subIndex) -- which has just had it's "usable" role changed to TRUE --
+              // to each of the instantiated objects. When we find it, we emit "objectActivated" signal so that instantiator knows to insert
+              // the menu associated with this substance into the Substance menu. We will need to implement a tree-search algorithm if we have
+              // other menus with nested roles who's usable role can change from false to true
+              let object = objectAt(i);
+              let objectRole = modelData.data(object.item.nodeIndex, PhysiologyModel.DisplayRole);
+              let compRole = modelData.data(subIndex, PhysiologyModel.DisplayRole);
+              if (compRole == objectRole) {
+                objectActivated(object, objectRole);
+                break;
               }
             }
           }
         }
-        onObjectAdded : {
-          if (object._model_data.data(object._node_index, PhysiologyModel.UsableRole)){
-            //Only add the object to the menu if its usable role is true.  This signal will only be emitted when patient state is changed, because the instantiator only adds 
-            // objects when the model changes (PhysiologyModel constant for a given patient state). Note that this means that Instantiator owns all objects that *could* be added 
-            // to menu over scenario lifetime, but only objects explicity added to menu will be displayed.  Thus, to add sub-menus / menu items during runtime, we will use the custom 
-            // "objectActivated" signal.  
-            if (object.item.menuItem){
-              requestMenu.addItem(object.item)
-              root.onNewPhysiologyModel.connect(object.item.toggleEnabled)
+      }
+    }
+    // Component used by Menu Instantiator to set up nested sub-menus (calls to simpleMenuComponent to make bottome level items)
+    Component {
+      id : requestMenuItemComponent
+      MenuItem {
+        id : requestMenuItem
+        height : checkbox.height + 2
+        property var modelData : _model_data
+        property var item : _node_index
+        property int category : _category
+        property int level : _level
+        property string info : _info
+        property string title : info.slice(0, -3)         // chops the trailing " - " sequence off the info string
+        property bool menuItem : true
+        property PhysiologyModel bgModel : modelData.category(_category)
+        function toggleEnabled() {
+          if (checkbox.checked != modelData.data(item, PhysiologyModel.EnabledRole)) {
+            checkbox.checked = modelData.data(item, PhysiologyModel.EnabledRole);
+            if (checkbox.checked) {
+              createPlotView(category, bgModel, item, title);
             } else {
-              requestMenu.addMenu(object.item)
-            }   
-          }  
-        }
-        onObjectActivated : {
-          //Insert subMenu into parent menu alphabetically
-          let insertIndex = 0
-          while (insertIndex < requestMenu.count && requestMenu.menuAt(insertIndex).title < role){
-            ++insertIndex;
-          }
-          requestMenu.insertMenu(insertIndex, object.item)
-        }
-        onObjectRemoved : {
-          if (object.item.menuItem){
-            requestMenu.removeItem(object.item)
-          } else {
-            object.item.releaseObjects()
-            requestMenu.removeItem(object.item)
+              removePlotView(category, item.row, title);
+            }
           }
         }
-        function activateObject(subIndex){
-          for (let i = 0; i < count; ++i){
-            //Search across all the objects in the Substance instantiator (only called when we are in the Substances menu)
-            //We compare the name role of the indicated QModelIndex (subIndex) -- which has just had it's "usable" role changed to TRUE -- 
-            // to each of the instantiated objects. When we find it, we emit "objectActivated" signal so that instantiator knows to insert
-            // the menu associated with this substance into the Substance menu. We will need to implement a tree-search algorithm if we have
-            // other menus with nested roles who's usable role can change from false to true
-            let object = objectAt(i)
-            let objectRole = modelData.data(object.item.nodeIndex, PhysiologyModel.DisplayRole)
-            let compRole = modelData.data(subIndex, PhysiologyModel.DisplayRole)
-            if (compRole == objectRole){
-              objectActivated(object, objectRole)
-              break;
+        CheckBox {
+          id : checkbox
+          checkable : true
+          checked : false // Menu items that need to be initialized to checked = true handled by connection between newPhysiologyModel and toggleEnabled()
+          text : modelData.data(item, PhysiologyModel.DisplayRole)
+          onClicked : {
+            if (checked) {
+              modelData.setData(item, true, PhysiologyModel.EnabledRole);
+              createPlotView(category, bgModel, item, title);
+            } else {
+              modelData.setData(item, false, PhysiologyModel.EnabledRole);
+              removePlotView(category, item.row, title);
             }
           }
         }
       }
     }
   }
-  //Component used by Menu Instantiator to set up nested sub-menus (calls to simpleMenuComponent to make bottome level items)
-  Component {
-    id : requestMenuItemComponent
-    MenuItem {
-      id : requestMenuItem
-      height : checkbox.height + 2
-      property var modelData : _model_data
-      property var item : _node_index
-      property int category : _category
-      property int level : _level
-      property string info : _info
-      property string title : info.slice(0,-3)    //chops the trailing " - " sequence off the info string
-      property bool menuItem : true
-      property PhysiologyModel bgModel : modelData.category(_category)
-      function toggleEnabled() {
-        if (checkbox.checked != modelData.data(item, PhysiologyModel.EnabledRole)){
-          checkbox.checked = modelData.data(item, PhysiologyModel.EnabledRole)
-          if (checkbox.checked){
-            createPlotView(category, bgModel, item, title)
-          } else {
-            removePlotView(category, item.row, title)
-          }
-        }
-      }
-      CheckBox {
-        id : checkbox
-        checkable : true
-        checked : false     //Menu items that need to be initialized to checked = true handled by connection between newPhysiologyModel and toggleEnabled()
-        text : modelData.data(item, PhysiologyModel.DisplayRole)
-        onClicked : {
-          if (checked){
-            modelData.setData(item, true, PhysiologyModel.EnabledRole)
-            createPlotView(category, bgModel, item, title)
-          } else {
-            modelData.setData(item, false, PhysiologyModel.EnabledRole)
-            removePlotView(category, item.row, title)
-          }
-        }
-      }
-    }
-  }
-}
 
-/*##^## Designer {
+  /*##^## Designer {
     D{i:0;autoSize:true;height:480;width:640}
 }
  ##^##*/
-
