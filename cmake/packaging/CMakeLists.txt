@@ -113,25 +113,25 @@ if(WIN32 AND NOT UNIX)
       FILES_MATCHING 
       PATTERN "*.dll"
       )   
-          install(DIRECTORY 
-          ${Qt5_ROOT_DIR}/qml/Qt 
-          ${Qt5_ROOT_DIR}/qml/QtCanvas3D
-          ${Qt5_ROOT_DIR}/qml/QtCharts 
-          ${Qt5_ROOT_DIR}/qml/QtDataVisualization
-          ${Qt5_ROOT_DIR}/qml/QtGraphicalEffects
-          ${Qt5_ROOT_DIR}/qml/QtQuick 
-          ${Qt5_ROOT_DIR}/qml/QtQuick.2 
-          ${Qt5_ROOT_DIR}/qml/QtQMl 
-          DESTINATION bin/
-          FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-          )  
-    #  install(DIRECTORY 
-    #      ${Qt5_ROOT_DIR}/translations
-    #      DESTINATION bin/
-    #      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
-    #      FILES_MATCHING 
-    #      PATTERN "*.qm"
-    #      )   
+install(DIRECTORY 
+    ${Qt5_ROOT_DIR}/qml/Qt 
+    ${Qt5_ROOT_DIR}/qml/QtCanvas3D
+    ${Qt5_ROOT_DIR}/qml/QtCharts 
+    ${Qt5_ROOT_DIR}/qml/QtDataVisualization
+    ${Qt5_ROOT_DIR}/qml/QtGraphicalEffects
+    ${Qt5_ROOT_DIR}/qml/QtQuick 
+    ${Qt5_ROOT_DIR}/qml/QtQuick.2 
+    ${Qt5_ROOT_DIR}/qml/QtQMl 
+    DESTINATION bin/
+    FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+    )  
+#  install(DIRECTORY 
+#      ${Qt5_ROOT_DIR}/translations
+#      DESTINATION bin/
+#      FILE_PERMISSIONS OWNER_READ GROUP_READ WORLD_READ
+#      FILES_MATCHING 
+#      PATTERN "*.qm"
+#      )   
 
 else()
   set(CPACK_STRIP_FILES "")
