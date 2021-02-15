@@ -55,20 +55,12 @@ cd visualizer
 git submodule init
 git submodule update --progress
 
-#Building BioGears Example for gcc5.4 on Ubuntu 16.4
-mkdir build-libbiogears
-cd build-gcc5.4
-cmake ../projects/libbiogears -G Ninja -DCMAKE_PREFIX_PATH=/opt/biogears/external/ -DCMAKE_INSTALL_PREFIX=/opt/biogears/visualizer/build-ui/usr
-cmake -DCMAKE_BUILD_TYPE=Release .
-cmake --build . --config Release --target install  
-cmake -DCMAKE_BUILD_TYPE=Debug .
-cmake --build . --config Debug --target install 
 
 #Building the Visualizer code against biogears
 cd ..
 mkdir build-ui
 cd build-ui
-cmake .. -G Ninja -DCMAKE_PREFIX_PATH="/opt/biogears/external/;/opt/biogears/visualizer/build-ui/usr'
+cmake .. -G Ninja -DCMAKE_PREFIX_PATH="/opt/biogears/external/"
 cmake -DCMAKE_BUILD_TYPE=Debug .
 cmake --build . --config Debug --target install
 cmake --build . --config Debug --target STAGE
