@@ -61,9 +61,9 @@ cd ..
 mkdir build-ui
 cd build-ui
 cmake .. -G Ninja -DCMAKE_PREFIX_PATH="/opt/biogears/external/"
-cmake -DCMAKE_BUILD_TYPE=Debug .
-cmake --build . --config Debug --target install
-cmake --build . --config Debug --target gather_runtime_dependencies
+cmake -DCMAKE_BUILD_TYPE=Release .
+cmake --build . --config Release --target install
+cmake --build . --config Release --target gather_runtime_dependencies
 ```
 
 Further instructions can be found in our WIKI at our github page
