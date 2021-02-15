@@ -1,4 +1,4 @@
-# Overview
+tage Overview
 
 ## BioGears Simulation UI
 BioGears® simulation UI source code is hosted here. Our latest deployment is still in a beta phase, and is intended to be an intermediate release to showcase the capabilities of the BioGears® simulation UI. This version of the software is meant to elicit feedback and enhance community involvement in establishing end product expectations.
@@ -70,8 +70,6 @@ Further instructions can be found in our WIKI at our github page
 # Running the Visualizer
 
 ## Initial Setup
-Most users will ned to run build targets *stage_biogears_data* and *stage_biogears_schema* one time each after the first build. This will seed the runtime folder for the visualizer with all the data files biogears needs at runtime
-
 Once open in Microsoft Visual Studios (MVS), right-click on BioGearsUI on the lefthand side of the screen in the Solution Explorer. Switch the configuration in the top left corner of the property page to be "All Configurations." On the left hand side of the screen, navigate to Configuration Properties→Debugging, and fill in the Environment box with the QT Path:
 
 * QT_PLUGIN_PATH=D:\remotes\sed-stash\biogears\external\windows-vc15-amd64\plugins
