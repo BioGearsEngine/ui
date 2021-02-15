@@ -63,7 +63,7 @@ cd build-ui
 cmake .. -G Ninja -DCMAKE_PREFIX_PATH="/opt/biogears/external/"
 cmake -DCMAKE_BUILD_TYPE=Debug .
 cmake --build . --config Debug --target install
-cmake --build . --config Debug --target STAGE
+cmake --build . --config Debug --target gather_runtime_dependencies
 ```
 
 Further instructions can be found in our WIKI at our github page
@@ -78,7 +78,7 @@ Once open in Microsoft Visual Studios (MVS), right-click on BioGearsUI on the le
 
 **Note**: The above path is an example. Be sure to switch the path to your specific plugin folder of the windows build based on your folder configuration. 
 
-Specify the configuration (release or debug) you wish to build in at the top of the MVS screen. Click the F7 key or navigate to the Build→Build Solution tab at the top of the screen. Make sure the build is successful. Then, navigate in the solution explorer to CMakePredefinedTargets→STAGE, right-clock on stage, and select build. Make sure this build is also successful. 
+Specify the configuration (release or debug) you wish to build in at the top of the MVS screen. Click the F7 key or navigate to the Build→Build Solution tab at the top of the screen. Make sure the build is successful. Then, navigate in the solution explorer to CMakePredefinedTargets→gather_runtime_dependencies, right-clock on stage, and select build. Make sure this build is also successful. 
 
 Click F5 or click the play button to run the solution. The viualizer/UI should pop up and prompt you with further directions.
 
