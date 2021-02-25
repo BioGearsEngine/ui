@@ -10,7 +10,7 @@ Build Status
 |----------|----------|--------------|--------|
 | Windows  |  msvc15  | amd64        | ![Windows msvc15 Build  Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_windows_msvc15.png) |
 | Windows  |  msvc16  | amd64        | ![Windows msvc16 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_windows_msvc16.png) |
-| Linux  |  gcc5.4  | amd64 | ![Linux-gcc5.4-amd64 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_linux_gcc5.4-core2_64.png) |
+| Linux  |  gcc9  | amd64 | ![Linux-gcc9-amd64 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_linux_gcc9-amd64.png) |
 | MacOS  Yosemite |  clang10  | amd64 | ![MacOS Yosemite clang11 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_macos-yosemite.png) |
 | MacOS  Catalina|  clang11  | amd64 | ![MacOS Catalina clang11 Build Status](https://biogearsengine.com/content/badges/nightly_biogears-ui_macos-catalina.png) |
 
