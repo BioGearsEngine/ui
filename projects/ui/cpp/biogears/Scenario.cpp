@@ -2925,7 +2925,9 @@ void Scenario::create_hemorrhage_action(QString compartment, double ml_Per_min)
   action->SetCompartment(compartment.remove(space).toStdString());
   action->GetInitialRate().SetValue(ml_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_tourniquet_action(QString compartment, int level)
 {
@@ -2934,14 +2936,18 @@ void Scenario::create_tourniquet_action(QString compartment, int level)
   action->SetCompartment(compartment.remove(space).toStdString());
   action->SetTourniquetLevel((CDM::enumTourniquetApplicationLevel::value)level);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_asthma_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAsthmaAttack>();
   action->GetSeverity().SetValue(severity);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_substance_infusion_action(QString substance, double concentration_ug_Per_mL, double rate_mL_Per_min)
 {
@@ -2950,7 +2956,9 @@ void Scenario::create_substance_infusion_action(QString substance, double concen
   action->GetConcentration().SetValue(concentration_ug_Per_mL, biogears::MassPerVolumeUnit::ug_Per_mL);
   action->GetRate().SetValue(rate_mL_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 
   //If substance is not active, queue it for addition to physiology model (must be added to model after AdvanceTime so that substance values have been initialized)
   if (!_engine->GetSubstances().IsActive(*sub)) {
@@ -2965,7 +2973,9 @@ void Scenario::create_substance_bolus_action(QString substance, int route, doubl
   action->GetDose().SetValue(dose_mL, biogears::VolumeUnit::mL);
   action->GetConcentration().SetValue(concentration_ug_Per_mL, biogears::MassPerVolumeUnit::ug_Per_mL);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 
   //If substance is not active, queue it for addition to physiology model (must be added to model after AdvanceTime so that substance values have been initialized)
   if (!_engine->GetSubstances().IsActive(*sub)) {
@@ -2979,7 +2989,9 @@ void Scenario::create_substance_oral_action(QString substance, int route, double
   action->SetAdminRoute((CDM::enumOralAdministration::value)route);
   action->GetDose().SetValue(dose_mg, biogears::MassUnit::mg);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 
   //If substance is not active, queue it for addition to physiology model (must be added to model after AdvanceTime so that substance values have been initialized)
   if (!_engine->GetSubstances().IsActive(*sub)) {
@@ -2993,7 +3005,9 @@ void Scenario::create_substance_compound_infusion_action(QString compound, doubl
   action->GetBagVolume().SetValue(bagVolume_mL, biogears::VolumeUnit::mL);
   action->GetRate().SetValue(rate_mL_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 
   //If compound components are not active, queue them for addition to physiology model (must be added to model after AdvanceTime so that substance values have been initialized)
   for (auto cmpt : subCompound->GetComponents()) {
@@ -3009,14 +3023,18 @@ void Scenario::create_blood_transfusion_action(QString compound, double bagVolum
   action->GetBagVolume().SetValue(bagVolume_mL, biogears::VolumeUnit::mL);
   action->GetRate().SetValue(rate_mL_Per_min, biogears::VolumePerTimeUnit::mL_Per_min);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_burn_action(double tbsa)
 {
   auto action = std::make_unique<biogears::SEBurnWound>();
   action->GetTotalBodySurfaceArea().SetValue(tbsa);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_infection_action(QString location, int severity, double mic_mg_Per_L)
 {
@@ -3025,7 +3043,9 @@ void Scenario::create_infection_action(QString location, int severity, double mi
   action->SetSeverity((CDM::enumInfectionSeverity::value)severity);
   action->GetMinimumInhibitoryConcentration().SetValue(mic_mg_Per_L, biogears::MassPerVolumeUnit::mg_Per_L);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_exercise_action(int type, double weight_kg, double property_1, double property_2)
 {
@@ -3063,7 +3083,9 @@ void Scenario::create_exercise_action(int type, double weight_kg, double propert
     break;
   }
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_pain_stimulus_action(double severity, QString location)
 {
@@ -3071,7 +3093,9 @@ void Scenario::create_pain_stimulus_action(double severity, QString location)
   action->GetSeverity().SetValue(severity);
   action->SetLocation(location.toStdString());
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_traumatic_brain_injury_action(double severity, int type)
 {
@@ -3079,7 +3103,9 @@ void Scenario::create_traumatic_brain_injury_action(double severity, int type)
   action->GetSeverity().SetValue(severity);
   action->SetType((CDM::enumBrainInjuryType::value)type);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_tension_pneumothorax_action(double severity, int type, int side)
 {
@@ -3088,7 +3114,9 @@ void Scenario::create_tension_pneumothorax_action(double severity, int type, int
   action->SetType((CDM::enumPneumothoraxType::value)type);
   action->SetSide((CDM::enumSide::value)side);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_needle_decompression_action(int state, int side)
 {
@@ -3096,14 +3124,18 @@ void Scenario::create_needle_decompression_action(int state, int side)
   action->SetActive((CDM::enumOnOff::value)state);
   action->SetSide((CDM::enumSide::value)side);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_cardiac_arrest_action(bool state)
 {
   auto action = std::make_unique<biogears::SECardiacArrest>();
   action->SetActive(state);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_inhaler_action()
 {
@@ -3140,8 +3172,11 @@ void Scenario::create_inhaler_action()
   breathData->AddForcedExhale().Load(*exhale);
 
   //Add inhaler configuration action and breath command actions
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
   _action_queue.as_source().insert(std::move(breathData));
+  _engine_mutex.unlock();
+
   //Add albuterol to active substance queue
   if (!_engine->GetSubstances().IsActive(*albuterol)) {
     _substance_queue.push_back(albuterol);
@@ -3152,35 +3187,46 @@ void Scenario::create_airway_obstruction_action(double severity)
   auto action = std::make_unique<biogears::SEAirwayObstruction>();
   action->GetSeverity().SetValue(severity);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_bronchoconstriction_action(double severity)
 {
   auto action = std::make_unique<biogears::SEBronchoconstriction>();
   action->GetSeverity().SetValue(severity);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_apnea_action(double severity)
 {
   auto action = std::make_unique<biogears::SEApnea>();
   action->GetSeverity().SetValue(severity);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 void Scenario::create_acute_stress_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAcuteStress>();
   action->GetSeverity().SetValue(severity);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
+
 }
 void Scenario::create_ards_action(double severity)
 {
   auto action = std::make_unique<biogears::SEAcuteRespiratoryDistress>();
   action->GetSeverity().SetValue(severity);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 
 void Scenario::create_anesthesia_machine_action(int connection, int primaryGas, int source, double pMax_cmH2O, double peep_cmH2O, double reliefPressure_cmH2O, double inletFlow_L_Per_min, double respirationRate_Per_min, double ieRatio, double o2Fraction, double bottle1_mL, double bottle2_mL, QString leftSub, double leftSubFraction, QString rightSub, double rightSubFraction)
@@ -3214,7 +3260,9 @@ void Scenario::create_anesthesia_machine_action(int connection, int primaryGas, 
   }
 
   if (config.GetConnection() == CDM::enumAnesthesiaMachineConnection::Tube) {
+    _engine_mutex.lock();
     _action_queue.as_source().insert(std::move(intubationAction));
+    _engine_mutex.unlock();
   }
   _action_queue.as_source().insert(std::move(action));
 }
@@ -3230,7 +3278,9 @@ void Scenario::create_consume_meal_action(QString mealName, double carbs_g, doub
   action->GetNutrition().GetCalcium().SetValue(calcium_mg, biogears::MassUnit::mg);
   action->GetNutrition().GetWater().SetValue(water_mL, biogears::VolumeUnit::mL);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
+  _engine_mutex.unlock();
 }
 
 void Scenario::create_environment_action(QString enviroName, int surroundingType, double airDensity_kg_Per_m3, double airVelocity_m_Per_s, double ambientTemperature_C, double atmpshpericPressure_Pa, double clothingResistance_clo, double emissivity, double meanRadiantTemperature_C, double relativeHumidity, double respirationAmbientTemperature_C, double gasFractionO2, double gasFractionCO2, double gasFractionCO, double gasFractionN2, double concentrationSarin, double concentrationFireParticulate)
@@ -3271,7 +3321,10 @@ void Scenario::create_environment_action(QString enviroName, int surroundingType
   environmentAction->GetConditions().GetAmbientAerosol(*ambientAerosolSarin).GetConcentration().SetValue(concentrationSarin, biogears::MassPerVolumeUnit::mg_Per_m3);
   environmentAction->GetConditions().GetAmbientAerosol(*ambientAerosolForestFireParticulate).GetConcentration().SetValue(concentrationFireParticulate, biogears::MassPerVolumeUnit::mg_Per_m3);
 
+  _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(environmentAction));
+  _engine_mutex.unlock();
+
 }
 
 QString Scenario::patient_name_and_time()

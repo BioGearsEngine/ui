@@ -7,12 +7,14 @@ import QtCharts 2.3
 ChartView {
   id: root
   legend.visible : false
-  theme : ChartView.ChartThemeBlueCerulean
+  theme : ChartView.ChartThemeBlueNcs
+  titleFont.family : "Arial"
   titleFont.pointSize : 12
   titleFont.bold : true
   antialiasing: true
   property alias xAxis : xAxis
   property alias yAxis : yAxis
+  
 
   property bool   calculateScale : true;
 
@@ -31,15 +33,19 @@ ChartView {
   localizeNumbers: true
   ValueAxis {
     id: xAxis
-    property int tickCount : 2
+    property int tickCount : 5
+    titleFont.family : "Arial"
+    titleFont.bold : true
     titleText: "Simulation Time (min)"
     min: 0
     max: timeInterval_m
   }
   ValueAxis {
     id: yAxis
+    titleFont.family : "Arial"
+    titleFont.bold : true
     labelFormat: (max < 1.)? '%.3f' : (max < 10.)? '%.2f' : (max < 100.) ?  '%.1f' : (max < 10000.) ?  '%.0f' : '%.2e'
-    tickCount : 3
+    tickCount : 5
   }
   MouseArea {
     anchors.fill : parent
