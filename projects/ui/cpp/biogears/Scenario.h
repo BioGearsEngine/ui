@@ -1,4 +1,8 @@
 #pragma once
+
+#define WINDOWS_LEAN_AND_MEAN
+
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -10,7 +14,9 @@
 #include <QVariant>
 #include <QtQuick>
 
-#include <dirent.h>
+#ifdef ERROR
+#undef  ERROR 
+#endif
 
 #include <biogears/cdm/Serializer.h>
 #include <biogears/cdm/scenario/SEAction.h>
@@ -19,17 +25,18 @@
 #include <biogears/engine/BioGearsPhysiologyEngine.h>
 #include <biogears/engine/Controller/BioGearsEngine.h>
 #include <biogears/framework/scmp/scmp_channel.h>
+#include <biogears/io/io-manager.h>
 #include <biogears/threading/runnable.h>
 #include <biogears/threading/steppable.h>
 
 #include "BioGearsData.h"
 #include "EventTree.h"
 #include "Logger.h"
+#include "Models/DataRequestTree.h"
 #include "PatientConditions.h"
 #include "PatientMetrics.h"
 #include "PatientState.h"
 #include "Urinalysis.h"
-#include "Models/DataRequestTree.h"
 
 namespace biogears {
 class SEScalar;
@@ -162,7 +169,7 @@ signals:
   void patientMetricsChanged(PatientMetrics* metrics);
   void patientStateChanged(PatientState patientState);
   void patientConditionsChanged(PatientConditions conditions);
-  void urinalysis_completed(Urinalysis* urinalysis); 
+  void urinalysis_completed(Urinalysis* urinalysis);
 
   void dataRequestModelChanged(DataRequestTree* requestTree);
   void timeAdvance(double time_s);
@@ -200,6 +207,7 @@ protected:
 private:
   bool _initialized = false;
   std::thread _thread;
+  biogears::IOManager _io_manager;
   biogears::Logger _logger;
   std::unique_ptr<biogears::BioGearsEngine> _engine;
   std::shared_ptr<biogears::SEUrinalysis> _urinalysis;

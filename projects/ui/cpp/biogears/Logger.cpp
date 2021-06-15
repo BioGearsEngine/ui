@@ -1,33 +1,34 @@
 #include "Logger.h"
+#include <biogears/io/io-manager.h>
 
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QString>
 
-void QtLogForward::ForwardDebug(const std::string& msg, const std::string& origin)
+void QtLogForward::Debug(char const* msg) const
 {
-  messageReceived(QString("<font color=#ff0000ff>%1</font>\n").arg(msg.c_str()));
+  messageReceived(QString("<font color=#ff0000ff>%1</font>\n").arg(msg));
 }
 //-------------------------------------------------------------------------------
-void QtLogForward::ForwardInfo(const std::string& msg, const std::string& origin)
+void QtLogForward::Info(char const* msg) const
 {
-  messageReceived(QString("<color=#ffaaaaaa>%1</color>\n").arg(msg.c_str()));
+  messageReceived(QString("<color=#ffaaaaaa>%1</color>\n").arg(msg));
 }
 //-------------------------------------------------------------------------------
-void QtLogForward::ForwardWarning(const std::string& msg, const std::string& origin)
+void QtLogForward::Warning(char const* msg) const
 {
-  messageReceived(QString("<color=#ffffff00>%1</color>\n").arg(msg.c_str()));
+  messageReceived(QString("<color=#ffffff00>%1</color>\n").arg(msg));
 }
 //-------------------------------------------------------------------------------
-void QtLogForward::ForwardError(const std::string& msg, const std::string& origin)
+void QtLogForward::Error(char const* msg) const
 {
 
-  messageReceived(QString("<color=#ffff0000>%1</color>\n").arg(msg.c_str()));
+  messageReceived(QString("<color=#ffff0000>%1</color>\n").arg(msg));
 }
 //-------------------------------------------------------------------------------
-void QtLogForward::ForwardFatal(const std::string& msg, const std::string& origin)
+void QtLogForward::Fatal(char const* msg) const
 {
-  messageReceived(QString("<color=#ffff66cc>%1</color>\n").arg(msg.c_str()));
+  messageReceived(QString("<color=#ffff66cc>%1</color>\n").arg(msg));
 }
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
@@ -44,8 +45,8 @@ struct QtLogger::Implementation {
 };
 //-------------------------------------------------------------------------------
 
-QtLogger::QtLogger(const QString& logFilename, const QString& working_dir)
-  : biogears::Logger(logFilename.toStdString(), working_dir.toStdString())
+QtLogger::QtLogger(const QString& logFilename, biogears::IOManager  iomanager)
+  : biogears::Logger(logFilename.toStdString(), iomanager)
   , _pimpl(std::make_unique<Implementation>())
 {
   biogears::Logger::SetForward(&_pimpl->Qt5LogStream);

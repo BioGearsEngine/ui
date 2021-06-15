@@ -1,12 +1,18 @@
 #pragma once
-#include <biogears/cdm/utils/Logger.h>
+
+#define WINDOWS_LEAN_AND_MEAN
+
 #include <string>
 #include <memory>
 
 #include <QObject>
 #include <QString>
 #include <qtextstream.h>
+#ifdef ERROR
+#undef  ERROR 
+#endif
 
+#include <biogears/cdm/utils/Logger.h>
 class QtLogForward : public QObject, public biogears::LoggerForward {
   Q_OBJECT
 
@@ -14,14 +20,14 @@ public:
 
   QtLogForward(QObject* parent = nullptr);
   ~QtLogForward() = default;
-  void ForwardDebug(const std::string& msg, const std::string& origin) final;
-  void ForwardInfo(const std::string& msg, const std::string& origin) final;
-  void ForwardWarning(const std::string& msg, const std::string& origin) final;
-  void ForwardError(const std::string& msg, const std::string& origin) final;
-  void ForwardFatal(const std::string& msg, const std::string& origin) final;
+  void Debug(const char* msg) const final;
+  void Info(const char* msg) const final;
+  void Warning(const char* msg) const final;
+  void Error(const char* msg) const final;
+  void Fatal(const char* msg) const final;
 
 signals:
-  void messageReceived(QString message);
+  void messageReceived(QString message) const;
 
 
 private:
@@ -33,7 +39,7 @@ class QtLogger : public biogears::Logger {
   friend biogears::Loggable;
 
 public:
-  QtLogger(const QString& logFilename, const QString& working_dir);
+  QtLogger(const QString& logFilename, biogears::IOManager iomanager);
   virtual ~QtLogger();
 
 protected:

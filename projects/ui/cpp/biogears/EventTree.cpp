@@ -1,5 +1,6 @@
 #include "EventTree.h"
 
+#include <iostream>
 #include <fstream>
 #include <istream>
 #include <QFileInfo>

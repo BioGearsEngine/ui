@@ -202,7 +202,7 @@ public:
   Q_INVOKABLE void add_event(Event ev);
   Q_INVOKABLE void add_event(QString name, int type, int subType, QString params, double startTime_s, double duration_s);
   Q_INVOKABLE Event get_event(int index) { return _events[index]; };
-  Q_INVOKABLE int get_event_count() { return _events.size(); };
+  Q_INVOKABLE int get_event_count() { return static_cast<int>(_events.size()); };
   Q_INVOKABLE void clear_events() { _events.clear(); };
   Q_INVOKABLE QString get_timeline_name() { return _timeline_name; };
   Q_INVOKABLE QString get_patient_name() { return _patient_name; }; 

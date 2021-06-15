@@ -1,3 +1,5 @@
+#define WINDOWS_LEAN_AND_MEAN
+
 #include "Scenario.h"
 
 #include <chrono>
@@ -9,6 +11,7 @@
 #include <QDebug>
 #include <QLineSeries>
 #include <QSplineSeries>
+#include <QStringRef>
 #include <QValueAxis>
 
 #include "PatientConditions.h"
@@ -17,6 +20,9 @@
 
 #include "Models/PhysiologyRequest.h"
 
+#ifdef ERROR
+#undef ERROR
+#endif
 //#include <biogears/version.h>
 #include <biogears/cdm/compartment/fluid/SELiquidCompartment.h>
 #include <biogears/cdm/compartment/substances/SELiquidSubstanceQuantity.h>
@@ -55,7 +61,8 @@ Scenario::Scenario(QString name, QObject* parent)
   : QObject(parent)
   , _thread()
   , _engine_mutex()
-  , _logger(name.toStdString() + ".log")
+  , _io_manager()
+  , _logger(name.toStdString() + ".log", _io_manager)
   , _engine(std::make_unique<biogears::BioGearsEngine>(&_logger))
   , _action_queue()
   , _running(false)
@@ -442,7 +449,7 @@ Scenario& Scenario::load_patient(QString file)
   _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("TidalVolume", biogears::VolumeUnit::mL);
   _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("TotalLungVolume", biogears::VolumeUnit::mL);
   _engine->GetEngineTrack()->GetDataRequestManager().CreatePhysiologyDataRequest().Set("OxygenSaturation");
-  
+
   _engine->GetEngineTrack()->GetDataRequestManager().SetResultsFilename("BioGearsUI.csv");
 
   if (_engine->LoadState(path)) {
@@ -619,8 +626,8 @@ auto Scenario::get_physiology_state() -> PatientState
   _current_state->height_cm = (patient.HasHeight()) ? QString::number(patient.GetHeight(biogears::LengthUnit::cm), 'f', 0)
                                                     : "N/A";
   _current_state->gender = (!patient.HasGender()) ? "N/A"
-                                                  : (patient.GetGender() == CDM::enumSex::Male) ? "Male"
-                                                                                                : "Female";
+    : (patient.GetGender() == CDM::enumSex::Male) ? "Male"
+                                                  : "Female";
   _current_state->weight_kg = (patient.HasWeight()) ? QString::number(patient.GetWeight(biogears::MassUnit::kg), 'f', 2)
                                                     : "N/A";
   if (patient.HasWeight()) {
@@ -967,7 +974,7 @@ QVariantMap Scenario::edit_patient()
   }
   //Height
   if (patient->HasHeight()) {
-    patientField[0] = patient->GetHeight(biogears::LengthUnit::in);
+    patientField[0] = patient->GetHeight(biogears::LengthUnit::inch);
     patientField[1] = "in";
     patientMap["Height"] = patientField;
   }
@@ -1090,8 +1097,11 @@ void Scenario::export_patient()
 void Scenario::export_patient(const biogears::SEPatient* patient)
 {
   std::string fileLoc = "./patients/" + patient->GetName() + ".xml";
-  std::string fullPath = biogears::ResolvePath(fileLoc);
-  biogears::CreateFilePath(fullPath);
+  std::string fullPath = _io_manager.ResolvePatientFileLocation(fileLoc);
+  QDir qdir;
+  if( !qdir.exists(fullPath.c_str())){
+    qdir.mkpath(fullPath.c_str());
+  }
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
@@ -1174,8 +1184,11 @@ bool Scenario::create_scenario(EventTree* eventTree, QVariantList requests, QStr
     buildScenario->GetDataRequestManager().CreateFromBind(*_data_request_tree->decode_request(requests[i].toString()), _engine->GetSubstanceManager());
   }
 
-  std::string fullPath = biogears::ResolvePath(scenarioFile.toStdString());
-  biogears::CreateFilePath(fullPath);
+  std::string fullPath = _io_manager.ResolveScenarioFileLocation(scenarioFile.toStdString());
+  QDir qdir;
+  if( !qdir.exists(fullPath.c_str())){
+    qdir.mkpath(fullPath.c_str());
+  }
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
@@ -2071,8 +2084,11 @@ void Scenario::export_substance()
 void Scenario::export_substance(const biogears::SESubstance* substance)
 {
   std::string fileLoc = "./substances/" + substance->GetName() + ".xml";
-  std::string fullPath = biogears::ResolvePath(fileLoc);
-  biogears::CreateFilePath(fullPath);
+  std::string fullPath = _io_manager.ResolveSubstanceFileLocation(fileLoc);
+  QDir qdir;
+  if( !qdir.exists(fullPath.c_str())){
+    qdir.mkpath(fullPath.c_str());
+  }
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
@@ -2158,8 +2174,11 @@ void Scenario::export_compound()
 void Scenario::export_compound(const biogears::SESubstanceCompound* compound)
 {
   std::string fileLoc = "./substances/" + compound->GetName() + ".xml";
-  std::string fullPath = biogears::ResolvePath(fileLoc);
-  biogears::CreateFilePath(fullPath);
+  std::string fullPath = _io_manager.ResolveSubstanceFileLocation(fileLoc);
+  QDir qdir;
+  if( !qdir.exists(fullPath.c_str())){
+    qdir.mkpath(fullPath.c_str());
+  }
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
@@ -2350,8 +2369,12 @@ void Scenario::export_nutrition()
 void Scenario::export_nutrition(const biogears::SENutrition* nutrition)
 {
   std::string fileLoc = "./nutrition/" + nutrition->GetName() + ".xml";
-  std::string fullPath = biogears::ResolvePath(fileLoc);
-  biogears::CreateFilePath(fullPath);
+  std::string fullPath = _io_manager.ResolveNutritionFileLocation(fileLoc);
+
+  QDir qdir;
+  if (!qdir.exists(fullPath.c_str())) {
+    qdir.mkpath(fullPath.c_str());
+  }
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
@@ -2667,8 +2690,11 @@ void Scenario::export_environment()
 void Scenario::export_environment(const biogears::SEEnvironmentalConditions* environment)
 {
   std::string fileLoc = "./environments/" + environment->GetName() + ".xml";
-  std::string fullPath = biogears::ResolvePath(fileLoc);
-  biogears::CreateFilePath(fullPath);
+  std::string fullPath = _io_manager.ResolveEnvironmentFileLocation(fileLoc);
+  QDir qdir;
+  if( !qdir.exists(fullPath.c_str())){
+    qdir.mkpath(fullPath.c_str());
+  }
   std::ofstream stream(fullPath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
@@ -2823,17 +2849,20 @@ void Scenario::export_state(bool saveAs)
     int simulationTime = std::round(_engine->GetSimulationTime(biogears::TimeUnit::s));
     std::string simTime = std::to_string(simulationTime);
     std::string stateName = "./states/" + _engine->GetPatient().GetName() + "@" + simTime + "s.xml";
-    stateFilePath = biogears::ResolvePath(stateName);
+    stateFilePath = _io_manager.ResolveStateFileLocation(stateName);
   }
 
-  biogears::CreateFilePath(stateFilePath);
+  QDir qdir;
+  if (!qdir.exists(stateFilePath.c_str())) {
+    qdir.mkpath(stateFilePath.c_str());
+  }
   std::ofstream stream(stateFilePath);
   xml_schema::namespace_infomap info;
   info[""].name = "uri:/mil/tatrc/physiology/datamodel";
 
   std::unique_ptr<CDM::BioGearsStateData> state(new CDM::BioGearsStateData);
 
-  state->contentVersion(BGE::Version);
+  state->contentVersion(biogears::version_string_str());
 
   state.get()->AirwayMode(_engine->GetAirwayMode());
   state.get()->Intubation(_engine->GetIntubation());
@@ -3217,7 +3246,6 @@ void Scenario::create_acute_stress_action(double severity)
   _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(action));
   _engine_mutex.unlock();
-
 }
 void Scenario::create_ards_action(double severity)
 {
@@ -3324,7 +3352,6 @@ void Scenario::create_environment_action(QString enviroName, int surroundingType
   _engine_mutex.lock();
   _action_queue.as_source().insert(std::move(environmentAction));
   _engine_mutex.unlock();
-
 }
 
 QString Scenario::patient_name_and_time()
@@ -3346,62 +3373,55 @@ bool Scenario::file_exists(std::string file)
   return f.good();
 }
 
+//
+//  Generate a list of known state files recursivly from the "states/" folder
+//  Create a MAP of the Patient Name and Comment for each state/
+//  This list is used for the state drop down in the ui
 QList<QString> Scenario::get_nested_patient_state_list()
 {
-  DIR* dir;
-  struct dirent* ent;
-  std::map<std::string, int> patient_map;
-  std::string contents;
+
+  QMap<QString, int> patient_map;
   QList<QString> patient_list;
-  if ((dir = opendir("states/")) != NULL) {
-    while ((ent = readdir(dir)) != NULL) {
-      std::string dirname = std::string(ent->d_name);
-      if (dirname.find("xml") == -1) {
-        continue;
-      }
-      //State files generated by BioGears will have '@' token. Files created by users may not.  In this case, fall
-      // back to search for ".xml" substring.
-      size_t splitLocation = dirname.find('@');
-      if (splitLocation == std::string::npos) {
-        splitLocation = dirname.find(".xml");
-      }
-      std::string patient_name = dirname.substr(0, splitLocation);
-      auto temp_patient = patient_map.find(patient_name);
-      if (temp_patient == patient_map.end()) {
-        QString temp_list;
-        temp_list += QString::fromStdString(patient_name);
-        temp_list += ",";
-        temp_list += ent->d_name;
-        patient_list.push_back(temp_list);
-        patient_map.insert(std::pair<std::string, int>(patient_name, patient_list.length() - 1));
-      } else {
-        patient_list[temp_patient->second] += ",";
-        patient_list[temp_patient->second] += ent->d_name;
-      }
+
+  QDirIterator it("states", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
+  while (it.hasNext()) {
+    it.next();
+
+    //State files are typically generated as Name@Simtime.xml We want the list to just be Name. So we want to find the first @ or .xml
+    size_t splitLocation = it.fileName().indexOf('@');
+    if (splitLocation == std::string::npos) {
+      splitLocation = it.fileName().indexOf(".xml");
     }
-    closedir(dir);
-  } else {
-    std::cout << "Error could not read dir";
+
+    auto patient_name = QStringRef(&it.fileName(), 0, splitLocation).toString();
+    auto temp_patient = patient_map.find(patient_name);
+    if (temp_patient == patient_map.end()) {
+      QString temp_list;
+      temp_list += patient_name;
+      temp_list += ",";
+      temp_list += it.filePath();
+      patient_list.push_back(temp_list);
+      patient_map.insert(patient_name, patient_list.length() - 1);
+    } else {
+      patient_list[temp_patient.value()] += ",";
+      patient_list[temp_patient.value()] += it.filePath();
+    }
   }
   return patient_list;
 }
 QString Scenario::get_patient_state_files()
 {
-  DIR* dir;
-  struct dirent* ent;
-  std::string contents;
-  if ((dir = opendir("states/")) != NULL) {
-    while ((ent = readdir(dir)) != NULL) {
-      if (ent->d_name[0] != static_cast<char>('.')) {
-        contents += ent->d_name;
-        contents += "\n";
-      }
+
+  QString contents;
+  QDirIterator it("states", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
+  while (it.hasNext()) {
+    it.next();
+    if (it.filePath() != static_cast<char>('.')) {
+      contents += it.filePath();
+      contents += "\n";
     }
-    closedir(dir);
-  } else {
-    std::cout << "Error could not read dir";
   }
-  return QString::fromStdString(contents);
+  return contents;
 }
 
 QString Scenario::get_patient_state_files(std::string patient)
@@ -3411,45 +3431,38 @@ QString Scenario::get_patient_state_files(std::string patient)
 
 QString Scenario::get_patient_state_files(QString patient)
 {
-  DIR* dir;
-  struct dirent* ent;
-  std::string contents;
-  if ((dir = opendir("states/")) != NULL) {
-    while ((ent = readdir(dir)) != NULL) {
-      std::string dirname = std::string(ent->d_name);
-      if (dirname.find('@') == -1) {
-        continue;
-      }
-      if (patient.toStdString() == dirname.substr(0, dirname.find('@'))) {
 
-        contents += ent->d_name;
-        contents += '\n';
-      }
+  QString contents;
+  
+  QDirIterator sitr("states", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
+  while (sitr.hasNext()) {
+    sitr.next();
+    if (sitr.fileName().indexOf('@') == -1) {
+      continue;
     }
-    closedir(dir);
-  } else {
-    std::cout << "Error could not read dir";
-  }
-  if ((dir = opendir("states/advanced")) != NULL) {
-    while ((ent = readdir(dir)) != NULL) {
-      std::string dirname = std::string(ent->d_name);
-      if (dirname.find('@') == -1) {
-        continue;
-      }
-      if (patient.toStdString() == dirname.substr(0, dirname.find('@'))) {
-        contents += "advanced/";
-        contents += ent->d_name;
-        contents += '\n';
-      }
+
+    if (patient == QStringRef(&sitr.fileName(), 0, sitr.fileName().indexOf('@'))) {
+      contents += sitr.fileName();
+      contents += '\n';
     }
-    closedir(dir);
-  } else {
-    std::cout << "Error could not read dir";
   }
-  if (!contents.empty()) {
-    contents.pop_back();
+
+ QDirIterator aitr("states/advanced", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
+  while (aitr.hasNext()) {
+    aitr.next();
+    if (aitr.fileName().indexOf('@') == -1) {
+      continue;
+    }
+    if (patient == QStringRef(&aitr.fileName(), 0, aitr.fileName().indexOf('@'))) {
+      contents += "advanced/";
+      contents += aitr.fileName();
+      contents += '\n';
+    }
   }
-  return QString::fromStdString(contents);
+  if (!contents.isEmpty()) {
+    contents.remove(contents.size());
+  }
+  return contents;
 }
 
 } // namespace ui

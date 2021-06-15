@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <QObject>
 
 struct PatientMetrics : QObject {
@@ -8,7 +10,6 @@ struct PatientMetrics : QObject {
   {
   }
   ~PatientMetrics() override {
-    std::cout << "simulationTime : " << simulationTime << "\n;";
   };
   QString respiratory_rate_bpm;
   QString heart_rate_bpm;
