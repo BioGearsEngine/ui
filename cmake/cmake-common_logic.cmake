@@ -72,7 +72,7 @@ function(CHILDLIST result curdir)
 endfunction()
 
 function(add_source_files var prefix regex source_group)
-    message(STATUS "add_source_files( ${var} \"${prefix}\" ${regex} \"${source_group}\")")
+    #message(STATUS "add_source_files( ${var} \"${prefix}\" ${regex} \"${source_group}\")")
     file(GLOB TEMP "${prefix}/${regex}")
 
     source_group("${source_group}" FILES ${TEMP})

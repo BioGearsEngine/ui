@@ -3382,18 +3382,18 @@ QList<QString> Scenario::get_nested_patient_state_list()
 
   QMap<QString, int> patient_map;
   QList<QString> patient_list;
-
+ QString  filepath;
   QDirIterator it("states", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
   while (it.hasNext()) {
     it.next();
-
+    filepath = it.fileName();
     //State files are typically generated as Name@Simtime.xml We want the list to just be Name. So we want to find the first @ or .xml
-    size_t splitLocation = it.fileName().indexOf('@');
+    size_t splitLocation = filepath.indexOf('@');
     if (splitLocation == std::string::npos) {
-      splitLocation = it.fileName().indexOf(".xml");
+      splitLocation = filepath.indexOf(".xml");
     }
-
-    auto patient_name = QStringRef(&it.fileName(), 0, splitLocation).toString();
+    
+    auto patient_name = QStringRef(&filepath, 0, splitLocation).toString();
     auto temp_patient = patient_map.find(patient_name);
     if (temp_patient == patient_map.end()) {
       QString temp_list;
@@ -3433,16 +3433,17 @@ QString Scenario::get_patient_state_files(QString patient)
 {
 
   QString contents;
-  
+  QString filename;
   QDirIterator sitr("states", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
   while (sitr.hasNext()) {
     sitr.next();
-    if (sitr.fileName().indexOf('@') == -1) {
+    filename = sitr.fileName();
+    if (filename.indexOf('@') == -1) {
       continue;
     }
 
-    if (patient == QStringRef(&sitr.fileName(), 0, sitr.fileName().indexOf('@'))) {
-      contents += sitr.fileName();
+    if (patient == QStringRef(&filename, 0, filename.indexOf('@'))) {
+      contents += filename;
       contents += '\n';
     }
   }
@@ -3450,12 +3451,13 @@ QString Scenario::get_patient_state_files(QString patient)
  QDirIterator aitr("states/advanced", QStringList() << "*.xml", QDir::NoFilter, QDirIterator::Subdirectories);
   while (aitr.hasNext()) {
     aitr.next();
-    if (aitr.fileName().indexOf('@') == -1) {
+    filename = aitr.fileName();
+    if (filename.indexOf('@') == -1) {
       continue;
     }
-    if (patient == QStringRef(&aitr.fileName(), 0, aitr.fileName().indexOf('@'))) {
+    if (patient == QStringRef(&filename, 0, filename.indexOf('@'))) {
       contents += "advanced/";
-      contents += aitr.fileName();
+      contents += filename;
       contents += '\n';
     }
   }

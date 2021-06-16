@@ -29,7 +29,7 @@ public:
   Q_INVOKABLE QVariant data(const QModelIndex& index, int role) const override;
   Q_INVOKABLE QString dataPath(const QModelIndex& index);
   Q_INVOKABLE void resetData();
-  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   QModelIndex parent(const QModelIndex& index) const override;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -41,7 +41,7 @@ public:
   QVariantList encode_requests(CDM::ScenarioData* scenario);
   void initialize(biogears::SECompartmentManager* comps, biogears::SESubstanceManager* subs);
 
-  QHash<int, QByteArray> roleNames() const
+  QHash<int, QByteArray> roleNames() const override
   {
     QHash<int, QByteArray> roles;
     roles[Qt::DisplayRole] = "name";
