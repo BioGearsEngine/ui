@@ -37,7 +37,6 @@ UIActionForm {
 		Layout.leftMargin : 5
 		color : "#34495e"
         font.bold : true
-        color : "blue"
         text : "%1".arg(actionType)
       }      
 
