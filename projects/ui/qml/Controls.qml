@@ -57,12 +57,12 @@ ControlsForm {
       actionSwitchModel.loadAutoEvents(events)
     }
     onPatientMetricsChanged: {
-        root.respiratoryRate.value.text       = metrics.RespiratoryRate
-        root.heartRate.value.text             = metrics.HeartRate 
-        root.core_temp_c.value.text           = metrics.CoreTemp + "c"
-        root.oxygenSaturation.value.text      = metrics.OxygenSaturation
-        root.systolicBloodPressure.value.text = metrics.SystolicBloodPressure
-        root.dystolicBloodPressure.value.text = metrics.DiastolicBloodPressure
+      root.respiratoryRate.value       = metrics.RespiratoryRate
+      root.heartRate.value             = metrics.HeartRate 
+      root.core_temp_c.value.text      = metrics.CoreTemp + "c"
+      root.oxygenSaturation.value      = metrics.OxygenSaturation
+      root.systolicBloodPressure.value = metrics.SystolicBloodPressure
+      root.dystolicBloodPressure.value = metrics.DiastolicBloodPressure
     }
     onPatientStateChanged: {
       root.age_yr.value.text    = patientState.Age
