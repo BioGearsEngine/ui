@@ -94,7 +94,7 @@ We support the [contributor covenant](https://github.com/BioGearsEngine/Engine/b
 
 ##Contributing 
 
-Details will be filled in shortly. In the meantime if you have a contribution or issue to post/push feel free to contact abaird@ara.com with the details. 
+Details will be filled in shortly. In the meantime if you have a contribution or issue to post/push feel free to contact biogears@ara.com with the details. 
 
 ##Additional Documentation
 
